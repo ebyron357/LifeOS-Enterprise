@@ -1,128 +1,108 @@
-# LifeOS Enterprise — Dashboard Specification
+# LifeOS Enterprise — Dashboard Architecture
 
-> Defines the design, purpose, and structure of all dashboard notes in the LifeOS system.
+> Defines the read layer that surfaces the state of every operating system without becoming a source of truth itself.
 
 ---
 
 ## Overview
 
-Dashboards are Obsidian notes that aggregate views of other notes using Dataview queries. They serve as command centers, review surfaces, and real-time status monitors for each life domain.
+Dashboards are read-only operating surfaces built from typed notes.
+They aggregate status, priorities, and review context into views that support action.
+They are command centers, not storage.
 
 This document defines:
-- Dashboard design principles
-- The complete dashboard inventory
-- Layout and section standards
-- Query design guidelines
-- Performance requirements
+- dashboard roles in the architecture
+- dashboard taxonomy by operating system
+- data and rendering constraints
+- future implementation boundaries
 
 ---
 
-## Design Principles
+## Architectural Principles
 
 ### 1. Dashboards Are Views, Not Data
-Dashboards contain queries and structure, not content. All data lives in properly typed notes. If a dashboard is deleted, no information is lost.
+Deleting a dashboard must never delete information.
 
-### 2. Scoped Queries Only
-Every Dataview query must specify a `FROM` clause. Unscoped queries that scan the entire vault are prohibited.
+### 2. Scoped Inputs Only
+Every dashboard must read from well-bounded slices of the vault.
 
 ### 3. Actionable by Default
-Every dashboard must surface at least one actionable item — a next action, an overdue review, an open task. Dashboards that only display passive information are insufficient.
+A dashboard should support a decision, a review, or a next action.
 
-### 4. Fast Rendering
-Queries must be designed for performance. Target render time is under 2 seconds for any dashboard.
+### 4. Replaceable Presentation
+The view layer may evolve without changing canonical note storage.
 
-### 5. Mobile-Friendly Layout
-Dashboards should be readable on mobile Obsidian without requiring horizontal scrolling.
-
----
-
-## Dashboard Inventory
-
-> **Status:** Placeholder — dashboards will be built in Phase 3.
-
-| Dashboard | File | Purpose | Priority |
-|-----------|------|---------|---------|
-| Command Center | `07-Dashboards/Home.md` | Master overview of everything | P0 |
-| Projects | `07-Dashboards/Projects.md` | All active projects and next actions | P0 |
-| Goals | `07-Dashboards/Goals.md` | Goal tracking and progress | P0 |
-| Inbox | `07-Dashboards/Inbox-Review.md` | Unprocessed captures | P0 |
-| Weekly Review | `07-Dashboards/Weekly-Review.md` | Weekly review support view | P0 |
-| Habits | `07-Dashboards/Habits.md` | Habit tracking | P1 |
-| Work Area | `07-Dashboards/Areas/Work.md` | Work domain overview | P1 |
-| Health Area | `07-Dashboards/Areas/Health.md` | Health domain overview | P1 |
-| Finance Area | `07-Dashboards/Areas/Finance.md` | Finance domain overview | P1 |
-| Knowledge Map | `07-Dashboards/Knowledge-Map.md` | Resources and learning overview | P2 |
-| Relationships | `07-Dashboards/Areas/Relationships.md` | People and meetings | P2 |
+### 5. Performance Matters
+The dashboard layer must stay responsive as the vault scales.
 
 ---
 
-## Command Center (Home Dashboard)
+## Read-Layer Model
 
-The Home dashboard is the single entry point for daily use.
+```mermaid
+flowchart TD
+    N[Typed notes]
+    R[Reviews]
+    D[Dashboards]
+    U[User decisions]
 
-**Required sections:**
-1. **Today** — Today's date, top priorities, current energy
-2. **Active Projects** — List of active projects with next actions
-3. **Open Loops** — Inbox items, stale tasks, overdue reviews
-4. **Quick Capture** — Link to create a new capture note
-5. **Focus Goal** — Current primary goal and progress
-
----
-
-## Projects Dashboard
-
-**Required sections:**
-1. **Active Projects** — Table of all active projects: name, area, target date, next action
-2. **Paused Projects** — Projects currently on hold
-3. **Overdue** — Projects past their target date
-4. **Recently Completed** — Last 5 completed projects
+    N --> D
+    R --> D
+    D --> U
+```
 
 ---
 
-## Goals Dashboard
+## Dashboard Taxonomy
 
-**Required sections:**
-1. **Active Goals** — All active goals by area with progress
-2. **Next Milestones** — Upcoming key result deadlines
-3. **Achieved This Year** — Completed goals, year-to-date
-4. **Stale Goals** — Goals not reviewed in 30+ days
-
----
-
-## Weekly Review Dashboard
-
-**Required sections:**
-1. **Week in Review** — Last 7 days' daily notes
-2. **Project Statuses** — All active projects
-3. **Inbox Count** — Unprocessed inbox items
-4. **Goals Check** — Progress on active goals
-5. **Habits Summary** — Last 7 days' habit completion
-6. **Next Week** — Planning section for upcoming week
+| Dashboard Family | Purpose |
+|------------------|---------|
+| Executive Dashboards | Strategic priorities, goals, risks, and portfolio alignment |
+| Business Dashboards | Entity health, relationships, documents, opportunities |
+| Project Dashboards | Active work, next actions, milestones, blockers |
+| Knowledge Dashboards | Maps, references, recent learnings, retrieval surfaces |
+| Learning Dashboards | Active study themes, resources, practice, skill reviews |
+| System Dashboards | Vault health, review health, automation health |
 
 ---
 
-## Future Query Considerations
+## Required Dashboard Roles
 
-> **Note:** Dashboard query implementation is deferred to Phase 3. This section records only high-level constraints for future work.
-
-### Performance Principles
-- Scope every dashboard to a clearly defined slice of the vault
-- Prefer predictable metadata fields over ad hoc text parsing
-- Limit large result sets to the items most useful in the current view
-- Design dashboards to remain responsive as the vault grows
-
-### Design Constraints
-- Dashboard logic must live in dashboard notes, not in content notes
-- Query behavior must align with the canonical object model and metadata schema
-- Query implementation must be documented when it is introduced in a later phase
+| Dashboard | Architectural Role |
+|----------|--------------------|
+| Home / Command Center | Daily operating entry point |
+| Executive Review View | Strategic alignment and priority control |
+| Projects Dashboard | Portfolio execution control |
+| Business Portfolio View | Commercial context and entity health |
+| Knowledge Map | Retrieval and synthesis surface |
+| Learning View | Capability-development overview |
+| Weekly Review View | Review workflow support |
+| System Health View | Automation, schema, and review hygiene |
 
 ---
 
-## TODO
+## Data Contracts
 
-- [ ] Build all P0 dashboards in Phase 3
-- [ ] Define the Dataview version requirement
-- [ ] Profile query performance with 1,000+ note test vault
-- [ ] Define the mobile layout strategy
-- [ ] Create dashboard refresh/reload automation
-- [ ] Document dashboard-specific frontmatter conventions
+1. Dashboard logic reads from metadata and linked note structure.
+2. Dashboards must not require hidden state.
+3. Draft notes are excluded by default.
+4. Archived notes are excluded unless a dashboard is explicitly historical.
+5. Dashboard categories mirror the operating-system boundaries in `ARCHITECTURE.md`.
+
+---
+
+## Implementation Deferrals
+
+The following are intentionally deferred:
+- Dataview queries
+- dashboard note contents
+- mobile layout tuning details
+- plugin-specific rendering configuration
+
+---
+
+## Architectural Notes
+
+- Dashboard Architecture is the primary user-facing read layer.
+- It depends on the integrity of the metadata schema and object model.
+- Its job is to reduce cognitive load, not to introduce more system complexity.

@@ -1,173 +1,183 @@
 # LifeOS Enterprise — Architecture
 
-> Canonical reference for the system architecture, design principles, and structural decisions.
+> Canonical reference for the enterprise operating-system blueprint, system boundaries, and interaction model.
 
 ---
 
 ## Table of Contents
 
 1. [Philosophy](#philosophy)
-2. [System Layers](#system-layers)
-3. [Core Principles](#core-principles)
-4. [Data Architecture](#data-architecture)
-5. [Integration Architecture](#integration-architecture)
-6. [Folder Hierarchy](#folder-hierarchy)
-7. [Technology Stack](#technology-stack)
-8. [Design Constraints](#design-constraints)
+2. [Enterprise System Map](#enterprise-system-map)
+3. [Core Operating Systems](#core-operating-systems)
+4. [Interaction Contracts](#interaction-contracts)
+5. [Cross-Cutting Architecture](#cross-cutting-architecture)
+6. [Document Map](#document-map)
+7. [Design Constraints](#design-constraints)
 
 ---
 
 ## Philosophy
 
-LifeOS Enterprise is built on a single core belief: **a personal operating system should be as reliable, structured, and maintainable as enterprise software.**
+LifeOS Enterprise treats a personal operating system as a set of coordinated business systems.
+Each system has a clear purpose, owns a specific class of decisions, and exchanges structured data with adjacent systems.
 
-The system treats every life domain — health, finance, projects, relationships, learning — as a first-class data domain with a consistent schema, review cadence, and automation surface.
+The architecture follows four rules:
 
-Key philosophical pillars:
-
-- **Single Source of Truth** — Every piece of information has exactly one canonical home.
-- **Everything is a Note** — All objects (people, projects, goals, events) are Markdown notes with structured frontmatter.
-- **Progressive Complexity** — The system works at a minimal level and scales with intentional investment.
-- **Human-First** — The system serves the human, not the other way around. Friction is a design failure.
-
----
-
-## System Layers
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                      AI OS Layer                        │
-│         (AI prompts, synthesis, intelligent capture)    │
-├─────────────────────────────────────────────────────────┤
-│                  Automation Layer                       │
-│         (scripts, templater, periodic tasks)            │
-├─────────────────────────────────────────────────────────┤
-│                   Dashboard Layer                       │
-│         (Dataview queries, MOCs, command center)        │
-├─────────────────────────────────────────────────────────┤
-│                    Template Layer                       │
-│         (note templates, capture forms, snippets)       │
-├─────────────────────────────────────────────────────────┤
-│                  Object Model Layer                     │
-│         (typed notes, metadata schema, relations)       │
-├─────────────────────────────────────────────────────────┤
-│                 Folder Structure Layer                  │
-│         (canonical hierarchy, naming conventions)       │
-└─────────────────────────────────────────────────────────┘
-```
-
-Each layer depends only on the layers below it. This ensures the vault remains functional even if higher layers are incomplete or disabled.
+1. **Strategy drives execution** — long-horizon priorities govern projects, not the reverse.
+2. **Execution produces knowledge** — work creates notes, decisions, lessons, and reusable assets.
+3. **Knowledge compounds learning** — captured insight becomes curriculum, playbooks, and better judgment.
+4. **Automation and AI augment, never replace, structure** — higher-order layers depend on typed notes and governance.
 
 ---
 
-## Core Principles
+## Enterprise System Map
 
-### 1. Typed Notes
-Every note belongs to a defined **type** with a consistent frontmatter schema and placement in the folder hierarchy.
+```mermaid
+flowchart TD
+    E[Executive OS]
+    B[Business OS]
+    P[Project OS]
+    K[Knowledge OS]
+    L[Learning OS]
+    D[Dashboard Architecture]
+    A[Automation OS]
+    I[AI OS]
+    G[Plugin Architecture]
 
-### 2. Consistent Metadata
-All notes use YAML frontmatter. Schema conventions are defined in [docs/METADATA_SCHEMA.md](./docs/METADATA_SCHEMA.md).
-
-### 3. Atomic Notes
-Each note captures one concept, decision, event, or entity. Composition is achieved through links and Dataview queries, not by stuffing content into a single file.
-
-### 4. Explicit Relationships
-Relationships between notes (e.g., project → goal, task → project, person → meeting) are expressed as YAML frontmatter properties rather than inline wikilinks where precision matters.
-
-### 5. Idempotent Automation
-All scripts and automations must be safe to run multiple times without causing unintended side effects.
-
-### 6. Reviewable System
-Every major domain participates in a defined review cadence (daily, weekly, monthly, quarterly, annual). See [docs/REVIEW_SYSTEM.md](./docs/REVIEW_SYSTEM.md).
-
----
-
-## Data Architecture
-
-### Object Types
-
-The system defines a fixed set of **first-class object types**. Each type has:
-- A canonical folder location
-- A required frontmatter schema
-- A dedicated template
-- Participation in at least one dashboard
-
-See [docs/OBJECT_MODEL.md](./docs/OBJECT_MODEL.md) for the full list.
-
-### Metadata Schema
-
-All frontmatter properties follow naming and typing conventions defined in [docs/METADATA_SCHEMA.md](./docs/METADATA_SCHEMA.md).
-
-### Linking Strategy
-
-- **Wikilinks** (`[[Note]]`) are used for narrative, contextual references.
-- **Frontmatter properties** are used for typed, queryable relationships.
-- **Tags** are used for cross-cutting classification (e.g., `#area/health`, `#status/active`).
-
----
-
-## Integration Architecture
-
-### Plugin Stack
-The system relies on a curated set of Obsidian community plugins. The stack is defined in [docs/PLUGIN_STACK.md](./docs/PLUGIN_STACK.md).
-
-### AI Integration
-AI capabilities are integrated as an OS-level layer described in [docs/AI_OS.md](./docs/AI_OS.md). AI is used for capture assistance, synthesis, review support, and intelligent search — not as a replacement for structured data.
-
-### Automation
-External and internal automation is described in [docs/AUTOMATION_SPEC.md](./docs/AUTOMATION_SPEC.md). Scripts live in the `scripts/` directory of this repository.
-
----
-
-## Folder Hierarchy
-
-The top-level vault folder structure is designed around **life domains** and **note types**. The full specification is in [docs/FOLDER_STRUCTURE.md](./docs/FOLDER_STRUCTURE.md).
-
-High-level summary:
-
-```
-Vault/
-├── 00-Inbox/
-├── 01-Projects/
-├── 02-Areas/
-├── 03-Resources/
-├── 04-Archives/
-├── 05-Templates/
-├── 06-Meta/
-└── 07-Dashboards/
+    E --> P
+    E --> B
+    E --> L
+    B --> P
+    P --> K
+    L --> K
+    K --> E
+    K --> B
+    K --> P
+    A --> E
+    A --> B
+    A --> P
+    A --> K
+    A --> L
+    I --> E
+    I --> B
+    I --> P
+    I --> K
+    I --> L
+    D --> E
+    D --> B
+    D --> P
+    D --> K
+    D --> L
+    G --> D
+    G --> A
+    G --> I
 ```
 
+### Layer Model
+
+| Layer | Purpose | Primary Outputs |
+|------|---------|-----------------|
+| Strategic | Executive OS, Business OS | goals, priorities, decisions, risks, opportunities |
+| Execution | Project OS, Learning OS | projects, tasks, workflows, review outcomes |
+| Knowledge | Knowledge OS | knowledge notes, resources, documents, patterns |
+| Experience | Dashboard Architecture | operational views, review surfaces, command centers |
+| Enablement | Plugin Architecture, Automation OS, AI OS | platform capabilities, orchestration, augmentation |
+
 ---
 
-## Technology Stack
+## Core Operating Systems
 
-| Layer | Technology |
-|-------|-----------|
-| Vault | Obsidian |
-| Notes | Markdown + YAML frontmatter |
-| Querying | Dataview |
-| Templating | Templater |
-| Automation | JavaScript (Templater), Python/Shell (external) |
-| AI | To be defined — see [docs/AI_OS.md](./docs/AI_OS.md) |
-| Sync | To be defined |
-| Version Control | Git (this repository) |
+| System | Purpose | Canonical Inputs | Canonical Outputs | Primary Document |
+|-------|---------|------------------|-------------------|------------------|
+| Executive OS | Run strategy, reviews, prioritization, and portfolio control | goals, decisions, risks, opportunities, review notes | priorities, strategic decisions, review directives | [docs/EXECUTIVE_OS.md](./docs/EXECUTIVE_OS.md) |
+| Business OS | Manage commercial entities, finances, operations, and relationships | business, company, asset, document, project, goal notes | business priorities, operating metrics, compliance artifacts | [docs/BUSINESS_OS.md](./docs/BUSINESS_OS.md) |
+| Project OS | Convert priorities into bounded execution | goals, areas, business directives, risks | projects, tasks, status changes, deliverables | [docs/PROJECT_OS.md](./docs/PROJECT_OS.md) |
+| Knowledge OS | Store, relate, retrieve, and govern durable knowledge | meetings, documents, resources, project lessons | knowledge notes, decision history, reference systems | [docs/KNOWLEDGE_OS.md](./docs/KNOWLEDGE_OS.md) |
+| Learning OS | Turn resources and practice into skill development | resources, knowledge notes, goals, projects | learning plans, study workflows, capability growth | [docs/LEARNING_OS.md](./docs/LEARNING_OS.md) |
+| AI OS | Provide AI-assisted capture, synthesis, and review support | structured note context and approved prompts | suggestions, summaries, classifications, briefings | [docs/AI_OS.md](./docs/AI_OS.md) |
+| Automation OS | Run deterministic orchestration across the vault | typed metadata, schedules, events | created notes, reminders, validations, logs | [docs/AUTOMATION_SPEC.md](./docs/AUTOMATION_SPEC.md) |
+| Dashboard Architecture | Surface system state through role-based views | typed notes and review outputs | command centers, dashboards, review surfaces | [docs/DASHBOARD_SPEC.md](./docs/DASHBOARD_SPEC.md) |
+| Plugin Architecture | Define capability boundaries for Obsidian extensions | platform constraints and system requirements | approved plugin roles and dependency rules | [docs/PLUGIN_STACK.md](./docs/PLUGIN_STACK.md) |
+
+---
+
+## Interaction Contracts
+
+### Core Contracts
+
+| Source | Target | Contract | Governing Data |
+|--------|--------|----------|----------------|
+| Executive OS | Project OS | Strategic directives become active projects | `goal`, `decision`, `priority`, `review-cadence` |
+| Executive OS | Business OS | Strategic priorities shape business focus and risk posture | `goal`, `business`, `risk`, `opportunity` |
+| Business OS | Project OS | Operating needs generate projects and constraints | `business`, `document`, `asset`, `risk` |
+| Project OS | Knowledge OS | Execution generates reusable context and lessons | `meeting`, `decision`, `document`, `knowledge` |
+| Learning OS | Knowledge OS | Study outputs become durable knowledge | `resource`, `knowledge`, `workflow` |
+| Knowledge OS | Executive OS | Reviews surface patterns, evidence, and decision support | `knowledge`, `decision`, `review` |
+| Automation OS | All systems | Deterministic enforcement and scheduled maintenance | metadata, schedules, validation rules |
+| AI OS | All systems | Augmentation with human approval and privacy controls | prompt context, structured note excerpts |
+| Dashboard Architecture | All systems | Read-only views over canonical notes | typed notes and review outputs |
+
+### Review Loop
+
+```mermaid
+sequenceDiagram
+    participant Exec as Executive OS
+    participant Biz as Business OS
+    participant Proj as Project OS
+    participant Know as Knowledge OS
+    participant Learn as Learning OS
+
+    Exec->>Proj: Set priorities and desired outcomes
+    Biz->>Proj: Add operating constraints and opportunities
+    Proj->>Know: Produce decisions, documents, lessons
+    Learn->>Know: Produce synthesized understanding
+    Know->>Exec: Surface patterns for review
+    Exec->>Biz: Update priorities and portfolio decisions
+```
+
+---
+
+## Cross-Cutting Architecture
+
+### Dashboard Architecture
+Dashboards are the read layer for every operating system. They do not own data and must remain replaceable.
+
+### Plugin Architecture
+Plugins provide capabilities, not policy. Policy lives in documentation and metadata; plugins only enable it.
+
+### Automation OS
+Automation provides deterministic workflows such as creation, validation, routing, reminders, and archival.
+It must remain safe to disable without losing canonical data.
+
+### AI OS
+AI is an advisory layer for capture, synthesis, and review support.
+No AI workflow is authoritative without human approval.
+
+---
+
+## Document Map
+
+| Document | Scope |
+|---------|-------|
+| [PROJECT_TRUTH.md](./PROJECT_TRUTH.md) | Canonical decisions and constraints |
+| [docs/EXECUTIVE_OS.md](./docs/EXECUTIVE_OS.md) | Strategic planning and review operating system |
+| [docs/BUSINESS_OS.md](./docs/BUSINESS_OS.md) | Business and commercial operating system |
+| [docs/PROJECT_OS.md](./docs/PROJECT_OS.md) | Execution and delivery operating system |
+| [docs/KNOWLEDGE_OS.md](./docs/KNOWLEDGE_OS.md) | Knowledge capture, retrieval, and governance |
+| [docs/LEARNING_OS.md](./docs/LEARNING_OS.md) | Learning design and capability development |
+| [docs/AI_OS.md](./docs/AI_OS.md) | AI augmentation architecture |
+| [docs/AUTOMATION_SPEC.md](./docs/AUTOMATION_SPEC.md) | Automation control plane |
+| [docs/DASHBOARD_SPEC.md](./docs/DASHBOARD_SPEC.md) | Dashboard read-layer architecture |
+| [docs/PLUGIN_STACK.md](./docs/PLUGIN_STACK.md) | Plugin capability architecture |
+| [docs/INTEGRATION_ROADMAP.md](./docs/INTEGRATION_ROADMAP.md) | Internal and external integration sequencing |
 
 ---
 
 ## Design Constraints
 
-1. **Markdown only** — No proprietary formats. All notes must be readable outside of Obsidian.
-2. **No vendor lock-in** — Plugin choices prioritize portability. The system must be operable at reduced capability without any specific plugin.
-3. **Performance** — Vault must remain responsive at 10,000+ notes. Dataview queries must be scoped and optimized.
-4. **Privacy** — No sensitive data leaves the local machine without explicit user action.
-5. **Maintainability** — Any contributor should be able to understand the system from the documentation alone.
-
----
-
-## TODO
-
-- [ ] Define the complete object type taxonomy
-- [ ] Finalize plugin stack selection
-- [ ] Define AI provider and integration method
-- [ ] Define sync strategy (iCloud, Obsidian Sync, git, etc.)
-- [ ] Create architecture decision records (ADRs) for major choices
+1. **Markdown remains the source format.** No subsystem may require proprietary storage.
+2. **Canonical ownership is explicit.** Each fact belongs to one note and one system of record.
+3. **Higher layers degrade gracefully.** Dashboards, automation, plugins, and AI are optional accelerators.
+4. **Implementation is deferred.** This phase defines architecture only; no templates, Dataview queries, plugin configuration, or operational automation are introduced here.
+5. **Privacy is architectural.** Sensitive data handling must be explicit before any cloud integration.
+6. **Every subsystem must be reviewable.** Reviews are part of the design, not future polish.

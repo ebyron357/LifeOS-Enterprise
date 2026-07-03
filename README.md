@@ -18,11 +18,12 @@ This repository is the **canonical source** for all specifications, templates, d
 |-------|------|--------|
 | 0 | Repository Foundation | 🟡 In Progress |
 | 1 | Core Vault Architecture | ⬜ Planned |
-| 2 | Template System | ⬜ Planned |
-| 3 | Dashboard Layer | ⬜ Planned |
-| 4 | Automation & Scripting | ⬜ Planned |
-| 5 | AI Integration | ⬜ Planned |
-| 6 | Review & Governance System | ⬜ Planned |
+| 2 | Enterprise Architecture Blueprint | 🟡 In Progress |
+| 3 | Template System | ⬜ Planned |
+| 4 | Dashboard Layer | ⬜ Planned |
+| 5 | Automation & Scripting | ⬜ Planned |
+| 6 | AI Integration | ⬜ Planned |
+| 7 | Review & Governance System | ⬜ Planned |
 
 ---
 
@@ -32,6 +33,11 @@ This repository is the **canonical source** for all specifications, templates, d
 LifeOS-Enterprise/
 ├── docs/                    # Specifications and design documents
 │   ├── VISION.md
+│   ├── EXECUTIVE_OS.md
+│   ├── BUSINESS_OS.md
+│   ├── PROJECT_OS.md
+│   ├── KNOWLEDGE_OS.md
+│   ├── LEARNING_OS.md
 │   ├── OBJECT_MODEL.md
 │   ├── METADATA_SCHEMA.md
 │   ├── FOLDER_STRUCTURE.md
@@ -40,7 +46,8 @@ LifeOS-Enterprise/
 │   ├── PLUGIN_STACK.md
 │   ├── AI_OS.md
 │   ├── AUTOMATION_SPEC.md
-│   └── REVIEW_SYSTEM.md
+│   ├── REVIEW_SYSTEM.md
+│   └── INTEGRATION_ROADMAP.md
 ├── specifications/          # Detailed technical specifications
 ├── templates/               # Obsidian note templates
 ├── scripts/                 # Automation and utility scripts
@@ -61,31 +68,38 @@ LifeOS-Enterprise/
 
 | Document | Purpose |
 |----------|---------|
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | System architecture and design principles |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | Enterprise operating-system blueprint and interaction model |
 | [PROJECT_TRUTH.md](./PROJECT_TRUTH.md) | Canonical project decisions and constraints |
 | [ROADMAP.md](./ROADMAP.md) | Phase-by-phase development plan |
 | [CONTRIBUTING.md](./CONTRIBUTING.md) | How to contribute to this project |
 | [docs/VISION.md](./docs/VISION.md) | Project vision and goals |
+| [docs/EXECUTIVE_OS.md](./docs/EXECUTIVE_OS.md) | Strategic planning and review architecture |
+| [docs/BUSINESS_OS.md](./docs/BUSINESS_OS.md) | Business and commercial operating model |
+| [docs/PROJECT_OS.md](./docs/PROJECT_OS.md) | Project portfolio and delivery architecture |
+| [docs/KNOWLEDGE_OS.md](./docs/KNOWLEDGE_OS.md) | Knowledge capture, retrieval, and governance |
+| [docs/LEARNING_OS.md](./docs/LEARNING_OS.md) | Learning and capability-development architecture |
 | [docs/OBJECT_MODEL.md](./docs/OBJECT_MODEL.md) | Core data model definitions |
 | [docs/METADATA_SCHEMA.md](./docs/METADATA_SCHEMA.md) | YAML frontmatter schema standards |
 | [docs/FOLDER_STRUCTURE.md](./docs/FOLDER_STRUCTURE.md) | Vault folder hierarchy specification |
 | [docs/TEMPLATE_SPEC.md](./docs/TEMPLATE_SPEC.md) | Template design specification |
-| [docs/DASHBOARD_SPEC.md](./docs/DASHBOARD_SPEC.md) | Dashboard design specification |
-| [docs/PLUGIN_STACK.md](./docs/PLUGIN_STACK.md) | Plugin selection and configuration |
+| [docs/DASHBOARD_SPEC.md](./docs/DASHBOARD_SPEC.md) | Dashboard architecture |
+| [docs/PLUGIN_STACK.md](./docs/PLUGIN_STACK.md) | Plugin capability architecture |
 | [docs/AI_OS.md](./docs/AI_OS.md) | AI integration architecture |
-| [docs/AUTOMATION_SPEC.md](./docs/AUTOMATION_SPEC.md) | Automation workflows specification |
+| [docs/AUTOMATION_SPEC.md](./docs/AUTOMATION_SPEC.md) | Automation operating-system architecture |
 | [docs/REVIEW_SYSTEM.md](./docs/REVIEW_SYSTEM.md) | Review cadence and governance system |
+| [docs/INTEGRATION_ROADMAP.md](./docs/INTEGRATION_ROADMAP.md) | Internal and external integration sequencing |
 
 ---
 
 ## Getting Started
 
-> **Note:** The Obsidian vault implementation has not yet been built. This repository currently contains only specifications and project foundations.
+> **Note:** The Obsidian vault implementation has not yet been built. This repository currently contains architecture, specifications, and project foundations.
 
 1. Read [docs/VISION.md](./docs/VISION.md) to understand the project goals.
-2. Review [ARCHITECTURE.md](./ARCHITECTURE.md) for the system design.
-3. Follow the [ROADMAP.md](./ROADMAP.md) for planned phases.
-4. See [CONTRIBUTING.md](./CONTRIBUTING.md) before contributing.
+2. Review [ARCHITECTURE.md](./ARCHITECTURE.md) for the enterprise blueprint.
+3. Read the operating-system documents in `docs/` before implementation work.
+4. Follow the [ROADMAP.md](./ROADMAP.md) for planned phases.
+5. See [CONTRIBUTING.md](./CONTRIBUTING.md) before contributing.
 
 ---
 

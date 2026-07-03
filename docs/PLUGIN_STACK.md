@@ -1,131 +1,102 @@
-# LifeOS Enterprise — Plugin Stack
+# LifeOS Enterprise — Plugin Architecture
 
-> Defines the Obsidian community plugins used in LifeOS Enterprise, with justification for each.
+> Defines the capability architecture for Obsidian plugins used by LifeOS Enterprise.
 
 ---
 
 ## Overview
 
-The plugin stack is intentionally minimal. Each plugin must earn its place by providing essential capability that cannot be reasonably achieved with native Obsidian features or lighter-weight alternatives.
+LifeOS Enterprise uses plugins as capability providers, not as sources of system policy.
+The plugin architecture answers:
 
-**Plugin selection criteria:**
-1. Active maintenance (last update within 12 months)
-2. Wide community adoption (stability signal)
-3. Clear, non-overlapping purpose
-4. Performance impact is acceptable at scale
-5. Graceful degradation — vault is functional if plugin is disabled
+- Which capabilities must the platform provide?
+- Which plugins are candidates for those capabilities?
+- What dependency boundaries keep the system portable?
 
----
-
-## Plugin Categories
-
-| Category | Purpose |
-|----------|---------|
-| Core Functionality | Capabilities fundamental to the system |
-| Templating | Note creation and dynamic content |
-| Querying | Data aggregation and display |
-| Review & Tracking | Habits, reviews, and periodic notes |
-| AI & Augmentation | AI-assisted workflows |
-| Navigation & UX | Improved vault navigation |
-| Utilities | Supporting tools |
+This phase documents architectural roles only. It does not configure plugins.
 
 ---
 
-## Required Plugins
+## Design Principles
 
-> **Status:** Placeholder — plugin versions and configuration will be finalized in Phase 1.
-
-### Core Functionality
-
-| Plugin | Purpose | Justification |
-|--------|---------|--------------|
-| **Dataview** | Query and display structured note data | Essential for all dashboards and reviews |
-| **Templater** | Advanced note templating and scripting | Required for dynamic template creation |
-| **Periodic Notes** | Daily, weekly, monthly note automation | Drives the review system cadence |
+1. **Capability first** — document the needed capability before naming a plugin.
+2. **Graceful degradation** — the vault remains usable if a plugin is disabled.
+3. **Minimal overlap** — avoid multiple plugins competing for the same core job.
+4. **Portability** — notes remain valid Markdown with YAML frontmatter.
+5. **Configuration later** — architecture precedes setup.
 
 ---
 
-### Navigation & UX
+## Capability Layers
 
-| Plugin | Purpose | Justification |
-|--------|---------|--------------|
-| **Omnisearch** | Full-text search across vault | Native search is insufficient at scale |
-| **Quick Switcher++** | Enhanced note switching | Productivity multiplier for navigation |
+```mermaid
+flowchart TD
+    O[Obsidian core]
+    Q[Query and dashboard capabilities]
+    T[Template and creation capabilities]
+    R[Review cadence capabilities]
+    A[AI augmentation capabilities]
+    U[Utility capabilities]
 
----
-
-### Review & Tracking
-
-| Plugin | Purpose | Justification |
-|--------|---------|--------------|
-| **Tasks** | Task tracking and filtering | Required for task management across notes |
-| **Habit Tracker** | Habit visualization | TBD — evaluate in Phase 2 |
-
----
-
-### AI & Augmentation
-
-| Plugin | Purpose | Justification |
-|--------|---------|--------------|
-| **Copilot** | AI chat and note synthesis | TBD — evaluate in Phase 5 |
+    O --> Q
+    O --> T
+    O --> R
+    O --> A
+    O --> U
+```
 
 ---
 
-### Utilities
+## Capability Map
 
-| Plugin | Purpose | Justification |
-|--------|---------|--------------|
-| **Linter** | Frontmatter and Markdown linting | Enforces schema consistency |
-| **Advanced Tables** | Table editing | Improves Markdown table authoring |
-| **File Color** | Visual folder organization | Improves navigability at scale |
-
----
-
-## Deferred / Under Evaluation
-
-These plugins are candidates for inclusion but have not been evaluated against the selection criteria.
-
-| Plugin | Category | Consideration |
-|--------|----------|--------------|
-| Canvas | Visual thinking | Native feature — no plugin needed |
-| Excalidraw | Diagramming | Evaluate for architecture diagrams |
-| Database Folder | Spreadsheet view | May overlap with Dataview |
-| Readwise Official | Book highlights sync | Evaluate for learning workflow |
-| Natural Language Dates | Date parsing | Quality-of-life for date entry |
+| Capability | Architectural Need | Candidate Plugin Role |
+|-----------|--------------------|-----------------------|
+| Querying | Read-layer aggregation for dashboards | Dataview-class capability |
+| Templating | Dynamic note creation and scaffolding | Templater-class capability |
+| Periodic note support | Review cadence and recurring notes | Periodic Notes-class capability |
+| Search and navigation | Fast retrieval at vault scale | Omnisearch / Quick Switcher-class capability |
+| Task visibility | Cross-note action tracking | Tasks-class capability |
+| AI augmentation | Prompted synthesis and note assistance | Copilot-class capability |
+| Linting and hygiene | Content consistency support | Linter-class capability |
+| Authoring utilities | Markdown editing ergonomics | table/editor helpers |
 
 ---
 
-## Prohibited Plugin Patterns
+## Dependency Rules
 
-The following plugin patterns are explicitly **not** permitted:
-
-- **Theme customization plugins** — Themes are selected separately and not managed here
-- **Sync plugins** — Sync strategy is defined separately (see PROJECT_TRUTH.md)
-- **Plugins that write to frontmatter in non-standard formats** — All frontmatter must conform to METADATA_SCHEMA.md
-
----
-
-## Plugin Configuration
-
-All plugin configuration is documented in `specifications/plugin-configs/`. Configuration files are maintained in this repository for version control and reproducibility.
-
-> **TODO:** Plugin configuration files will be created in Phase 1.
+1. Plugin capabilities may enable workflows, but must not define canonical schemas.
+2. Object model, metadata schema, and folder structure remain valid without plugins.
+3. Dashboards may depend on query capability, but not on undocumented conventions.
+4. AI capability is optional and strictly additive.
+5. Utilities may improve authoring, but cannot become required to interpret notes.
 
 ---
 
-## Plugin Update Policy
+## Evaluation Criteria
 
-- Plugins are updated after reviewing the changelog for breaking changes
-- Major plugin updates are tested in a sandbox vault before applying to the production vault
-- Plugin updates are logged in CHANGELOG.md
+| Criterion | Why It Matters |
+|-----------|----------------|
+| Maintenance health | Reduces abandonment risk |
+| Broad adoption | Signals stability |
+| Performance | Protects large-vault usability |
+| Portability impact | Limits lock-in |
+| Role clarity | Prevents capability overlap |
+| Failure mode | Ensures graceful degradation |
 
 ---
 
-## TODO
+## Implementation Deferrals
 
-- [ ] Evaluate and finalize all plugin selections with specific version requirements
-- [ ] Create configuration specifications for each required plugin
-- [ ] Define the vault setup script that installs and configures all plugins
-- [ ] Assess performance impact of each plugin at 5,000+ note scale
-- [ ] Document the minimum Obsidian version required
-- [ ] Create a plugin evaluation rubric
+The following remain deferred to later phases:
+- version pinning
+- plugin configuration files
+- setup scripts
+- plugin-specific workflow instructions
+
+---
+
+## Architectural Notes
+
+- Plugin Architecture is an enablement layer beneath dashboards, automation, and AI.
+- The system must still make sense from the Markdown files alone.
+- Plugin configuration will only be introduced after the blueprint is accepted.

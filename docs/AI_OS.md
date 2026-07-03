@@ -1,132 +1,140 @@
 # LifeOS Enterprise — AI OS
 
-> Defines the AI integration architecture, principles, and workflows for LifeOS Enterprise.
+> Defines the AI service layer, operating boundaries, and cross-system augmentation model for LifeOS Enterprise.
 
 ---
 
 ## Overview
 
-The AI layer is the highest-order layer in the LifeOS architecture. It does not replace any layer below it — it augments the system by providing intelligent assistance, synthesis, and automation on top of the structured vault.
+The AI layer is the highest-order augmentation layer in the LifeOS architecture.
+It does not replace any system below it.
+It provides advisory, synthesis, classification, and retrieval support on top of structured notes.
 
 This document defines:
-- The role of AI in LifeOS
-- Integration principles
-- AI workflow inventory
-- Provider evaluation criteria
-- Privacy and data handling policy
+- AI roles across the operating systems
+- Service boundaries and safety constraints
+- Workflow classes
+- Provider strategy and privacy controls
 
 ---
 
-## The Role of AI in LifeOS
+## Architectural Role
 
-AI in LifeOS serves three functions:
+| AI Role | Function | Human Approval Required? |
+|--------|----------|--------------------------|
+| Capture assistant | Turn raw input into structured drafts | Yes |
+| Synthesizer | Summarize notes, projects, reviews, and resources | Yes |
+| Analyst | Surface patterns, gaps, and anomalies | Yes |
+| Retrieval augmenter | Assemble relevant context from existing notes | Yes |
+| Review support | Draft briefings and prompts for reviews | Yes |
 
-### 1. Capture Assistance
-Reducing friction at the point of information entry. AI helps transform raw, unstructured captures into properly typed and tagged notes.
-
-### 2. Synthesis
-Identifying patterns, connections, and insights across notes that a human reader would miss or not have time to find.
-
-### 3. Review Support
-Assisting with periodic reviews by summarizing recent activity, flagging stale items, and generating review prompts tailored to current context.
+AI is never the canonical owner of metadata, decisions, or note state.
 
 ---
 
-## Integration Principles
+## Operating Principles
 
 ### Principle 1: AI Augments, Structure Governs
-AI outputs are suggestions, not authoritative. The human user approves all structural changes to the vault. AI never autonomously modifies note metadata or folder placement.
+Structured notes remain the operating API for AI.
 
-### Principle 2: Structured Input, Structured Output
-AI prompts are designed to receive well-structured note content (with frontmatter context) and return structured Markdown or JSON responses. The vault's schema is the AI's "API."
+### Principle 2: Local First, Cloud Optional
+Local models are preferred for sensitive workflows.
 
-### Principle 3: Local First, Cloud Optional
-Where possible, AI capabilities run locally (e.g., Ollama with a local model). Cloud AI providers are opt-in with explicit user consent.
+### Principle 3: Prompt as Code
+Prompts and agents are documented, versioned, and reviewable.
 
-### Principle 4: Prompt as Code
-AI prompts are version-controlled, named, and documented like code. Prompt templates live in `03-Resources/Prompts/` and this repository's `specifications/prompts/`.
+### Principle 4: Bounded Context
+AI receives only the minimum context needed for a task.
 
-### Principle 5: No Raw Data Exfiltration
-Sensitive personal data is never sent to cloud AI providers without explicit anonymization or user acknowledgment.
+### Principle 5: Human-in-the-Loop
+AI may draft or suggest, but humans approve structural changes.
 
 ---
 
-## AI Workflow Inventory
+## Cross-System Service Map
 
-> **Status:** Placeholder — AI workflows will be built in Phase 5.
+```mermaid
+flowchart TD
+    AI[AI OS]
+    E[Executive OS]
+    B[Business OS]
+    P[Project OS]
+    K[Knowledge OS]
+    L[Learning OS]
+
+    AI --> E
+    AI --> B
+    AI --> P
+    AI --> K
+    AI --> L
+```
+
+| Target System | Primary AI Services |
+|--------------|---------------------|
+| Executive OS | review briefings, risk summaries, goal alignment checks |
+| Business OS | relationship prep, document summaries, operating snapshots |
+| Project OS | project context briefs, meeting extraction, blocker summaries |
+| Knowledge OS | synthesis, related-note suggestions, classification support |
+| Learning OS | tutoring, curriculum synthesis, reflection prompts |
+
+---
+
+## Workflow Inventory
 
 ### Capture Workflows
-
-| Workflow | Description | Priority |
-|----------|-------------|---------|
-| Smart Capture | Convert raw text captures into typed notes | P0 |
-| Voice-to-Note | Transcribe voice memos and route to inbox | P1 |
-| Email Digest | Parse important emails into meeting/task notes | P2 |
+- Smart capture normalization
+- Voice or raw-text conversion to note drafts
+- Meeting action-item extraction
 
 ### Synthesis Workflows
+- Weekly and monthly synthesis
+- Project context brief assembly
+- Knowledge connection discovery
 
-| Workflow | Description | Priority |
-|----------|-------------|---------|
-| Weekly Synthesis | Summarize last 7 days' journal entries | P0 |
-| Project Context Brief | Summarize project history before a work session | P1 |
-| Knowledge Connection | Find related notes for a given topic | P1 |
-| Relationship Summary | Summarize recent interactions with a person | P2 |
-
-### Review Support Workflows
-
-| Workflow | Description | Priority |
-|----------|-------------|---------|
-| Daily Briefing | Morning summary of priorities and context | P0 |
-| Review Prompt Generator | Generate tailored review questions from recent notes | P1 |
-| Stale Item Detection | Flag notes that haven't been accessed in a configurable period | P1 |
-| Goal Alignment Check | Assess whether current projects align with stated goals | P2 |
+### Review Workflows
+- Daily briefing drafts
+- Review question generation
+- Stale-item and alignment checks
 
 ---
 
-## AI Provider Evaluation Criteria
+## AI Interaction Pattern
 
-When selecting AI providers, evaluate against:
-
-| Criterion | Weight | Notes |
-|-----------|--------|-------|
-| Privacy & data handling | High | No training on personal data |
-| Local operation capability | High | Prefer offline-capable models |
-| API quality and reliability | Medium | REST API required |
-| Cost | Medium | Per-token costs at vault scale |
-| Model quality for personal use | Medium | Writing, summarization, tagging |
-| Obsidian plugin availability | Low | Nice to have, not required |
+1. A human or automation requests an AI workflow.
+2. The workflow assembles approved context from typed notes.
+3. AI returns a bounded output: summary, draft, classification, or suggestion.
+4. A human accepts, edits, or rejects the output.
+5. Only approved changes become part of the vault.
 
 ---
 
-## Candidate AI Providers
+## Provider Strategy
 
-> **Status:** Under evaluation — no selection has been made.
+| Criterion | Priority |
+|-----------|----------|
+| Privacy and data handling | High |
+| Local operation capability | High |
+| Output quality for synthesis and planning | High |
+| Reliability and API stability | Medium |
+| Cost | Medium |
+| Native Obsidian ecosystem support | Low |
 
-| Provider | Local? | Notes |
-|----------|--------|-------|
-| Ollama (local) | ✅ | Open source, runs locally, no data privacy concerns |
-| OpenAI GPT-4o | ❌ | High quality, cloud-only, privacy requires careful data handling |
-| Anthropic Claude | ❌ | Strong writing/synthesis, cloud-only |
-| Google Gemini | ❌ | Multimodal, cloud-only |
-| Mistral (local via Ollama) | ✅ | Good quality, fully local |
-
----
-
-## Privacy and Data Handling Policy
-
-1. **Sensitive categories** (health data, financial data, personal relationships) require explicit opt-in before being included in AI prompts.
-2. **Cloud prompts** include only the data necessary for the task — not full vault exports.
-3. **Prompt logs** are stored locally and can be reviewed by the user.
-4. **No AI provider** is permitted to use submitted data for model training (governed by provider terms of service at selection time).
+Candidate providers remain under evaluation. No provider is ratified in this phase.
 
 ---
 
-## TODO
+## Privacy and Security Rules
 
-- [ ] Select and ratify the AI provider(s) in PROJECT_TRUTH.md
-- [ ] Build the prompt library in `specifications/prompts/`
-- [ ] Define the AI plugin architecture within Obsidian
-- [ ] Create a data classification schema for privacy-aware prompting
-- [ ] Document the local AI setup procedure (Ollama)
-- [ ] Build and test the Daily Briefing workflow
-- [ ] Define the AI workflow testing methodology
+1. Sensitive data requires explicit opt-in before cloud submission.
+2. Prompts should use the minimum viable context.
+3. Prompt logs must remain reviewable.
+4. AI outputs are suggestions, not authoritative records.
+5. Cloud use must respect the no-training requirement when provider terms allow it.
+
+---
+
+## Architectural Notes
+
+- AI OS overlays every other operating system.
+- It is intentionally valuable but non-essential.
+- If disabled, the vault must remain fully functional through native notes, reviews, and dashboards.
