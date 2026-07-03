@@ -19,6 +19,8 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) co
 ### Changed
 - `ARCHITECTURE.md` — Expanded into the enterprise operating-system blueprint with interaction contracts and Mermaid diagrams
 - `README.md` — Updated repository map and architecture document index
+- `PROJECT_TRUTH.md` — Added canonical decisions for the multi-system architecture and architecture-first implementation sequencing
+- `ROADMAP.md` — Added the Enterprise Architecture phase and renumbered downstream phases
 - `docs/AI_OS.md` — Expanded into a full AI service-layer architecture
 - `docs/AUTOMATION_SPEC.md` — Expanded into the automation operating-system architecture
 - `docs/DASHBOARD_SPEC.md` — Expanded into the dashboard read-layer architecture

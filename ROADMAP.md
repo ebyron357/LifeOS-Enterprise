@@ -16,12 +16,13 @@ Build the **specification** before the **implementation**. Every phase begins wi
 |-------|------|--------|-------------|
 | 0 | Repository Foundation | 🟡 In Progress | Project scaffolding, documentation structure, governance |
 | 1 | Core Vault Architecture | ⬜ Planned | Folder structure, object model, metadata schema |
-| 2 | Template System | ⬜ Planned | Note templates for all object types |
-| 3 | Dashboard Layer | ⬜ Planned | Dataview dashboards and command center |
-| 4 | Automation & Scripting | ⬜ Planned | Templater scripts, external automation |
-| 5 | AI Integration | ⬜ Planned | AI OS layer, prompt engineering, synthesis workflows |
-| 6 | Review & Governance System | ⬜ Planned | Review cadences, health checks, system governance |
-| 7 | Hardening & Optimization | ⬜ Planned | Performance, testing, edge case handling |
+| 2 | Enterprise Architecture | 🟡 In Progress | Cross-system blueprint, interaction model, and integration roadmap |
+| 3 | Template System | ⬜ Planned | Note templates for all object types |
+| 4 | Dashboard Layer | ⬜ Planned | Dataview dashboards and command center |
+| 5 | Automation & Scripting | ⬜ Planned | Templater scripts, external automation |
+| 6 | AI Integration | ⬜ Planned | AI OS layer, prompt engineering, synthesis workflows |
+| 7 | Review & Governance System | ⬜ Planned | Review cadences, health checks, system governance |
+| 8 | Hardening & Optimization | ⬜ Planned | Performance, testing, edge case handling |
 
 ---
 
@@ -65,7 +66,31 @@ Build the **specification** before the **implementation**. Every phase begins wi
 
 ---
 
-## Phase 2 — Template System
+## Phase 2 — Enterprise Architecture
+
+**Goal:** Complete the enterprise operating-system blueprint before implementation begins.
+
+**Deliverables:**
+- [x] Expand `ARCHITECTURE.md` into the enterprise interaction model
+- [x] Create `docs/EXECUTIVE_OS.md`
+- [x] Create `docs/BUSINESS_OS.md`
+- [x] Create `docs/PROJECT_OS.md`
+- [x] Create `docs/KNOWLEDGE_OS.md`
+- [x] Create `docs/LEARNING_OS.md`
+- [x] Expand `docs/AI_OS.md`
+- [x] Expand `docs/AUTOMATION_SPEC.md`
+- [x] Expand `docs/DASHBOARD_SPEC.md`
+- [x] Expand `docs/PLUGIN_STACK.md`
+- [x] Create `docs/INTEGRATION_ROADMAP.md`
+- [x] Define how all operating systems interact
+- [x] Add Mermaid diagrams where appropriate
+- [x] Defer templates, Dataview queries, and plugin configuration
+
+**Exit Criteria:** The architectural blueprint fully defines subsystem boundaries, interactions, and implementation sequencing without introducing implementation artifacts.
+
+---
+
+## Phase 3 — Template System
 
 **Goal:** Build a complete library of note templates covering all object types.
 
@@ -90,7 +115,7 @@ Build the **specification** before the **implementation**. Every phase begins wi
 
 ---
 
-## Phase 3 — Dashboard Layer
+## Phase 4 — Dashboard Layer
 
 **Goal:** Build Dataview-powered dashboards for all major life domains and system overviews.
 
@@ -109,7 +134,7 @@ Build the **specification** before the **implementation**. Every phase begins wi
 
 ---
 
-## Phase 4 — Automation & Scripting
+## Phase 5 — Automation & Scripting
 
 **Goal:** Automate repetitive vault operations and build external integrations.
 
@@ -126,7 +151,7 @@ Build the **specification** before the **implementation**. Every phase begins wi
 
 ---
 
-## Phase 5 — AI Integration
+## Phase 6 — AI Integration
 
 **Goal:** Layer AI capabilities on top of the structured vault.
 
@@ -143,7 +168,7 @@ Build the **specification** before the **implementation**. Every phase begins wi
 
 ---
 
-## Phase 6 — Review & Governance System
+## Phase 7 — Review & Governance System
 
 **Goal:** Implement the full review cadence and system health monitoring.
 
@@ -161,7 +186,7 @@ Build the **specification** before the **implementation**. Every phase begins wi
 
 ---
 
-## Phase 7 — Hardening & Optimization
+## Phase 8 — Hardening & Optimization
 
 **Goal:** Harden the system for long-term use.
 

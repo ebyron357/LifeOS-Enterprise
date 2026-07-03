@@ -89,6 +89,20 @@ AI capabilities are integrated as a higher-order layer that enhances the system.
 
 ---
 
+### Decision 9: LifeOS is a Multi-System Enterprise Architecture
+LifeOS Enterprise is organized into interacting operating systems: Executive OS, Business OS, Project OS, Knowledge OS, Learning OS, AI OS, Automation OS, Dashboard Architecture, and Plugin Architecture. Their boundaries and interaction model are defined in [ARCHITECTURE.md](./ARCHITECTURE.md) and the corresponding documents in `docs/`.
+
+**Rationale:** Explicit subsystem boundaries reduce architectural drift and make future implementation phases coherent.
+
+---
+
+### Decision 10: Architecture Precedes Implementation
+Enterprise architecture must be completed and ratified before implementing Obsidian templates, Dataview queries, plugin configuration, or automation wiring. During the architecture phase, documentation defines the blueprint only.
+
+**Rationale:** Prevents premature implementation from hard-coding assumptions before the blueprint is stable.
+
+---
+
 ## Definitions
 
 | Term | Definition |
@@ -103,6 +117,7 @@ AI capabilities are integrated as a higher-order layer that enhances the system.
 | **MOC** | Map of Content — a manually curated index note for a topic or domain |
 | **Review** | A structured, periodic assessment of a domain or system component |
 | **Frontmatter** | YAML metadata block at the top of a Markdown file |
+| **Operating System** | A bounded subsystem with a defined purpose, owned data, and documented interfaces to other subsystems |
 
 ---
 
@@ -114,12 +129,14 @@ The following are explicitly **not** part of LifeOS Enterprise:
 - Public publishing workflows (out of scope for this phase)
 - Task management replacement for dedicated tools (the system integrates with, not replaces, GTD-class tools unless explicitly decided otherwise)
 - Financial accounting (the system tracks financial awareness, not accounting ledgers)
+- Implementation of Obsidian templates during the architecture blueprint phase
+- Creation of Dataview queries during the architecture blueprint phase
+- Plugin configuration during the architecture blueprint phase
 
 ---
 
 ## TODO
 
-- [ ] Formalize all canonical object types and add them to this document
 - [ ] Define the sync strategy as a canonical decision
 - [ ] Define the AI provider as a canonical decision once evaluated
 - [ ] Add architecture decision record (ADR) format and process
