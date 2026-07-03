@@ -95,9 +95,9 @@ flowchart TD
 | Knowledge OS | Store, relate, retrieve, and govern durable knowledge | meetings, documents, resources, project lessons | knowledge notes, decision history, reference systems | [docs/KNOWLEDGE_OS.md](./docs/KNOWLEDGE_OS.md) |
 | Learning OS | Turn resources and practice into skill development | resources, knowledge notes, goals, projects | learning plans, study workflows, capability growth | [docs/LEARNING_OS.md](./docs/LEARNING_OS.md) |
 | AI OS | Provide AI-assisted capture, synthesis, and review support | structured note context and approved prompts | suggestions, summaries, classifications, briefings | [docs/AI_OS.md](./docs/AI_OS.md) |
-| Automation OS | Run deterministic orchestration across the vault | typed metadata, schedules, events | created notes, reminders, validations, logs | [docs/AUTOMATION_SPEC.md](./docs/AUTOMATION_SPEC.md) |
-| Dashboard Architecture | Surface system state through role-based views | typed notes and review outputs | command centers, dashboards, review surfaces | [docs/DASHBOARD_SPEC.md](./docs/DASHBOARD_SPEC.md) |
-| Plugin Architecture | Define capability boundaries for Obsidian extensions | platform constraints and system requirements | approved plugin roles and dependency rules | [docs/PLUGIN_STACK.md](./docs/PLUGIN_STACK.md) |
+| Automation OS | Run deterministic orchestration across the vault | typed metadata, schedules, events | created notes, reminders, validations, logs | [docs/AUTOMATION_OS.md](./docs/AUTOMATION_OS.md) |
+| Dashboard Architecture | Surface system state through role-based views | typed notes and review outputs | command centers, dashboards, review surfaces | [docs/DASHBOARD_ARCHITECTURE.md](./docs/DASHBOARD_ARCHITECTURE.md) |
+| Plugin Architecture | Define capability boundaries for Obsidian extensions | platform constraints and system requirements | approved plugin roles and dependency rules | [docs/PLUGIN_ARCHITECTURE.md](./docs/PLUGIN_ARCHITECTURE.md) |
 
 ---
 
@@ -165,11 +165,15 @@ No AI workflow is authoritative without human approval.
 | [docs/PROJECT_OS.md](./docs/PROJECT_OS.md) | Execution and delivery operating system |
 | [docs/KNOWLEDGE_OS.md](./docs/KNOWLEDGE_OS.md) | Knowledge capture, retrieval, and governance |
 | [docs/LEARNING_OS.md](./docs/LEARNING_OS.md) | Learning design and capability development |
-| [docs/AI_OS.md](./docs/AI_OS.md) | AI augmentation architecture |
-| [docs/AUTOMATION_SPEC.md](./docs/AUTOMATION_SPEC.md) | Automation control plane |
-| [docs/DASHBOARD_SPEC.md](./docs/DASHBOARD_SPEC.md) | Dashboard read-layer architecture |
-| [docs/PLUGIN_STACK.md](./docs/PLUGIN_STACK.md) | Plugin capability architecture |
-| [docs/INTEGRATION_ROADMAP.md](./docs/INTEGRATION_ROADMAP.md) | Internal and external integration sequencing |
+| [docs/AI_OS.md](./docs/AI_OS.md) | AI operating-system architecture, role registry, governance, and evaluation |
+| [docs/AUTOMATION_OS.md](./docs/AUTOMATION_OS.md) | Automation operating-system architecture |
+| [docs/DASHBOARD_ARCHITECTURE.md](./docs/DASHBOARD_ARCHITECTURE.md) | Dashboard read-layer architecture and dashboard specifications |
+| [docs/PLUGIN_ARCHITECTURE.md](./docs/PLUGIN_ARCHITECTURE.md) | Plugin capability architecture and plugin evaluations |
+| [docs/INTEGRATION_ARCHITECTURE.md](./docs/INTEGRATION_ARCHITECTURE.md) | External integration architecture and security model |
+| [docs/AUTOMATION_SPEC.md](./docs/AUTOMATION_SPEC.md) | Legacy automation control-plane summary |
+| [docs/DASHBOARD_SPEC.md](./docs/DASHBOARD_SPEC.md) | Legacy dashboard summary |
+| [docs/PLUGIN_STACK.md](./docs/PLUGIN_STACK.md) | Legacy plugin capability summary |
+| [docs/INTEGRATION_ROADMAP.md](./docs/INTEGRATION_ROADMAP.md) | Legacy internal/external integration sequencing roadmap |
 
 ---
 

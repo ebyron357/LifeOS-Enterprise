@@ -69,7 +69,7 @@ This repository is the version-controlled home for all specifications, templates
 ---
 
 ### Decision 6: Plugin Minimalism
-Plugins are added only when the capability they provide is essential to the system and cannot be reasonably achieved without them. Every plugin is documented in [docs/PLUGIN_STACK.md](./docs/PLUGIN_STACK.md) with an explicit justification.
+Plugins are added only when the capability they provide is essential to the system and cannot be reasonably achieved without them. Every plugin is documented in [docs/PLUGIN_ARCHITECTURE.md](./docs/PLUGIN_ARCHITECTURE.md) with an explicit justification.
 
 **Rationale:** Reduces fragility and dependency on third-party maintainers.
 

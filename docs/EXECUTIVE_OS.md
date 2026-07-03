@@ -4,62 +4,80 @@
 
 ---
 
-## Overview
+## Purpose
 
-The Executive Operating System is the strategy layer of LifeOS Enterprise.
-It answers five recurring questions:
+Executive OS is the strategic control plane for LifeOS Enterprise.
+It translates vision into priorities, priorities into portfolio choices, and review evidence into directional decisions.
 
-1. What matters most right now?
-2. What outcomes are we committed to?
-3. Where is risk increasing?
-4. What opportunities deserve attention?
-5. What should stop, continue, or change?
+## Responsibilities
 
-Executive OS does not execute work directly. It governs portfolios, reviews evidence, and issues direction to the systems below it.
-
----
+- Set strategic priorities across life and business domains
+- Approve, pause, or retire major initiatives
+- Maintain goal hierarchy, decision records, and risk posture
+- Run weekly, monthly, quarterly, and annual strategic reviews
+- Resolve conflicts between competing priorities or systems
 
 ## Scope
 
 ### In Scope
-- Goal hierarchy and strategic priorities
-- Review cadences above the daily level
-- Decision logging and decision review
+- Goal hierarchy and strategic themes
+- Portfolio-level prioritization
+- Strategic decisions and review outcomes
 - Risk and opportunity oversight
-- Portfolio alignment across areas, projects, and businesses
+- Cross-system governance
 
 ### Out of Scope
-- Day-to-day task execution
+- Daily task execution
 - Detailed project delivery mechanics
-- Raw knowledge capture
-- Plugin or automation implementation details
+- Raw capture and filing workflows
+- Plugin, automation, or Dataview implementation
 
----
+## Inputs
 
-## Core Components
+- Goals and constraints from long-horizon planning
+- Portfolio status from Project OS
+- Operating metrics and risk posture from Business OS
+- Patterns and evidence from Knowledge OS
+- Capability gaps from Learning OS
+- Summaries and alerts from AI OS and Automation OS
 
-| Component | Primary Objects | Responsibility |
-|----------|-----------------|----------------|
-| Strategic Intent | `goal`, `area` | Define desired outcomes and domain priorities |
-| Governance | `decision`, `review` notes | Record strategic choices and their rationale |
-| Portfolio Control | `project`, `business` | Approve, pause, accelerate, or retire work |
-| Risk Posture | `risk`, `opportunity` | Monitor downside and upside across the system |
-| Review Loop | weekly, monthly, quarterly, annual reviews | Turn evidence into direction |
+## Outputs
 
----
+- Approved goals and strategic priorities
+- Start / stop / continue / redesign decisions
+- Portfolio directives for Project OS and Business OS
+- Review conclusions, risks, and opportunity calls
+- KPI targets and governance thresholds
 
-## Planning Horizons
+## Core Objects
 
-| Horizon | Primary Question | Main Outputs |
-|--------|------------------|--------------|
-| Weekly | What needs attention now? | short-cycle priority updates |
-| Monthly | Are active efforts aligned? | project and area corrections |
-| Quarterly | Are we advancing the right bets? | goal resets, portfolio changes |
-| Annual | What kind of year are we designing? | major goals, themes, retirement decisions |
+| Object | Role |
+|--------|------|
+| `goal` | Defines intended strategic outcomes |
+| `area` | Groups responsibilities and long-term domains |
+| `decision` | Records strategic choices and rationale |
+| `review` | Captures periodic strategic assessment |
+| `risk` | Tracks downside exposure requiring attention |
+| `opportunity` | Tracks upside bets requiring evaluation |
+| `project` | Receives strategic authorization and constraints |
+| `business` | Receives strategic priorities and portfolio direction |
 
----
+## Metadata Requirements
 
-## Operating Model
+Executive objects rely on the common schema in [METADATA_SCHEMA.md](./METADATA_SCHEMA.md) and should emphasize `status`, `priority`, `owner`, `review`, `deadline`, `impact`, `effort`, and explicit links to related `area`, `project`, and `business` notes.
+
+## Relationships
+
+| Adjacent System | Executive OS Sends | Executive OS Receives |
+|-----------------|-------------------|------------------------|
+| Business OS | business priorities, growth constraints, risk appetite | operating metrics, financial posture, entity health |
+| Project OS | approved goals, portfolio priorities, stop/start directives | project status, blockers, completion outcomes |
+| Knowledge OS | review questions, synthesis demand | decisions, lessons, pattern summaries |
+| Learning OS | capability priorities, learning themes | skill gaps, learning progress, curriculum outcomes |
+| AI OS | approved use cases and guardrails | summaries, decision support drafts |
+| Automation OS | cadence rules and governance triggers | reminders, validation signals, audit logs |
+
+## Workflows
 
 ```mermaid
 flowchart LR
@@ -74,56 +92,50 @@ flowchart LR
     K --> D
 ```
 
-### Control Loop
+### Strategic Control Loop
+1. Gather evidence from dashboards, reviews, and operating-system outputs.
+2. Compare current state against goals, constraints, and risk tolerance.
+3. Decide what to start, stop, continue, accelerate, or redesign.
+4. Push directives into Business OS, Project OS, and Learning OS.
+5. Inspect the next review cycle for proof of improvement or drift.
 
-1. Executive OS receives review evidence from dashboards, reviews, and knowledge synthesis.
-2. It compares current state against goals and strategic constraints.
-3. It issues decisions: continue, pause, start, stop, or redesign.
-4. Those decisions feed Business OS, Project OS, and Learning OS.
-5. The next review cycle evaluates whether the decision improved reality.
+## Dashboards
 
----
+- Executive Command Center
+- Weekly Review
+- Monthly Review
+- Business Dashboard
+- Project Dashboard
+- KPI Dashboard
 
-## Interfaces to Other Systems
+## Review Process
 
-| Adjacent System | Executive OS Sends | Executive OS Receives |
-|-----------------|-------------------|------------------------|
-| Business OS | business priorities, growth constraints, risk appetite | operating metrics, financial posture, entity health |
-| Project OS | approved goals, portfolio priorities, stop/start directives | project status, blockers, completion outcomes |
-| Knowledge OS | review questions, synthesis demand | decisions, lessons, pattern summaries |
-| Learning OS | capability priorities, learning themes | skill gaps, learning progress, curriculum outcomes |
-| AI OS | approved use cases and guardrails | summaries, decision support drafts |
-| Automation OS | cadence rules and governance triggers | reminders, validation signals, audit logs |
+| Cadence | Purpose | Primary Outputs |
+|---------|---------|-----------------|
+| Weekly | Reprioritize and surface urgent drift | priority updates, follow-up decisions |
+| Monthly | Evaluate portfolio health | project corrections, business focus changes |
+| Quarterly | Reassess strategic bets | goal resets, major resource shifts |
+| Annual | Redesign the next operating year | themes, outcomes, retirement decisions |
 
----
+## KPIs
 
-## Executive Views
+- Percentage of active goals linked to active initiatives
+- Percentage of strategic decisions reviewed on time
+- Number of unmanaged high-impact risks
+- Goal progress velocity by quarter
+- Ratio of active projects aligned to current priorities
 
-The Executive OS requires read-only views, not new sources of truth.
+## Success Criteria
 
-| View | Purpose |
-|------|---------|
-| Executive Home | Current priorities, critical risks, strategic commitments |
-| Quarterly Portfolio Review | Goal-to-project alignment and project mix |
-| Decision Register | Open and reviewed strategic decisions |
-| Risk & Opportunity Board | Active downside and upside positions |
-| Annual Design View | Themes, major goals, system redesign items |
+- Strategic priorities remain current and visible
+- Every major initiative has explicit executive sponsorship or approval logic
+- Risks and opportunities are reviewed before they become surprises
+- Lower operating systems can explain why work is active
+- Reviews consistently produce concrete decisions
 
----
+## Future Expansion
 
-## Governance Rules
-
-1. Every active major goal must map to at least one active project, business initiative, or learning objective.
-2. Every strategic decision must have an explicit review mechanism.
-3. Risks without owners are governance failures.
-4. Opportunities without a go/no-go decision age into noise and must be resolved.
-5. Executive OS can pause lower-level work when alignment is broken.
-
----
-
-## Architectural Notes
-
-- Executive OS is the highest human-decision layer.
-- It depends on evidence from other systems, not intuition alone.
-- It should remain effective even if AI, automation, or dashboards are unavailable.
-- Strategic reviews must be possible from canonical notes only.
+- Scenario planning support for major decisions
+- Portfolio balancing rules across time, money, and attention
+- Deeper finance and CRM rollups
+- Formal architecture decision record workflow

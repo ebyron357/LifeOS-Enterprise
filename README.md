@@ -43,11 +43,15 @@ LifeOS-Enterprise/
 │   ├── FOLDER_STRUCTURE.md
 │   ├── TEMPLATE_SPEC.md
 │   ├── DASHBOARD_SPEC.md
+│   ├── DASHBOARD_ARCHITECTURE.md
 │   ├── PLUGIN_STACK.md
+│   ├── PLUGIN_ARCHITECTURE.md
 │   ├── AI_OS.md
 │   ├── AUTOMATION_SPEC.md
+│   ├── AUTOMATION_OS.md
 │   ├── REVIEW_SYSTEM.md
-│   └── INTEGRATION_ROADMAP.md
+│   ├── INTEGRATION_ROADMAP.md
+│   └── INTEGRATION_ARCHITECTURE.md
 ├── specifications/          # Detailed technical specifications
 ├── templates/               # Obsidian note templates
 ├── scripts/                 # Automation and utility scripts
@@ -71,6 +75,7 @@ LifeOS-Enterprise/
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Enterprise operating-system blueprint and interaction model |
 | [PROJECT_TRUTH.md](./PROJECT_TRUTH.md) | Canonical project decisions and constraints |
 | [ROADMAP.md](./ROADMAP.md) | Phase-by-phase development plan |
+| [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md) | Release-based implementation roadmap |
 | [CONTRIBUTING.md](./CONTRIBUTING.md) | How to contribute to this project |
 | [docs/VISION.md](./docs/VISION.md) | Project vision and goals |
 | [docs/EXECUTIVE_OS.md](./docs/EXECUTIVE_OS.md) | Strategic planning and review architecture |
@@ -82,12 +87,16 @@ LifeOS-Enterprise/
 | [docs/METADATA_SCHEMA.md](./docs/METADATA_SCHEMA.md) | YAML frontmatter schema standards |
 | [docs/FOLDER_STRUCTURE.md](./docs/FOLDER_STRUCTURE.md) | Vault folder hierarchy specification |
 | [docs/TEMPLATE_SPEC.md](./docs/TEMPLATE_SPEC.md) | Template design specification |
-| [docs/DASHBOARD_SPEC.md](./docs/DASHBOARD_SPEC.md) | Dashboard architecture |
-| [docs/PLUGIN_STACK.md](./docs/PLUGIN_STACK.md) | Plugin capability architecture |
-| [docs/AI_OS.md](./docs/AI_OS.md) | AI integration architecture |
-| [docs/AUTOMATION_SPEC.md](./docs/AUTOMATION_SPEC.md) | Automation operating-system architecture |
+| [docs/DASHBOARD_SPEC.md](./docs/DASHBOARD_SPEC.md) | Legacy dashboard read-layer summary |
+| [docs/DASHBOARD_ARCHITECTURE.md](./docs/DASHBOARD_ARCHITECTURE.md) | Dashboard architecture and per-dashboard specifications |
+| [docs/PLUGIN_STACK.md](./docs/PLUGIN_STACK.md) | Legacy plugin capability summary |
+| [docs/PLUGIN_ARCHITECTURE.md](./docs/PLUGIN_ARCHITECTURE.md) | Complete plugin architecture and evaluations |
+| [docs/AI_OS.md](./docs/AI_OS.md) | AI operating-system architecture and role registry |
+| [docs/AUTOMATION_SPEC.md](./docs/AUTOMATION_SPEC.md) | Legacy automation control-plane summary |
+| [docs/AUTOMATION_OS.md](./docs/AUTOMATION_OS.md) | Automation operating-system architecture |
 | [docs/REVIEW_SYSTEM.md](./docs/REVIEW_SYSTEM.md) | Review cadence and governance system |
-| [docs/INTEGRATION_ROADMAP.md](./docs/INTEGRATION_ROADMAP.md) | Internal and external integration sequencing |
+| [docs/INTEGRATION_ROADMAP.md](./docs/INTEGRATION_ROADMAP.md) | Legacy integration sequencing roadmap |
+| [docs/INTEGRATION_ARCHITECTURE.md](./docs/INTEGRATION_ARCHITECTURE.md) | Integration architecture and system-by-system strategy |
 
 ---
 

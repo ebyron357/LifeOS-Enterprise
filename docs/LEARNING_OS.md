@@ -4,49 +4,77 @@
 
 ---
 
-## Overview
+## Purpose
 
-Learning OS manages intentional skill development.
-It answers:
+Learning OS manages intentional capability development inside LifeOS Enterprise.
+It ensures learning is connected to real goals, real work, and measurable growth rather than passive consumption.
 
-- What am I trying to learn?
-- Why does it matter now?
-- Which resources support it?
-- How is learning being applied in real work or life?
-- What capabilities are strengthening over time?
+## Responsibilities
 
-Learning OS is distinct from Knowledge OS: learning is the process of acquiring capability; knowledge is the durable memory produced by that process.
-
----
+- Define learning priorities and capability gaps
+- Select and sequence resources for active learning goals
+- Connect practice to projects, exercises, and operational needs
+- Convert learning into applied behavior and durable knowledge
+- Review whether capability is improving over time
 
 ## Scope
 
 ### In Scope
-- Learning priorities and capability themes
-- Resource selection and study flows
+- Learning goals and capability themes
+- Resource selection and study workflows
 - Practice, reflection, and synthesis loops
-- Learning-linked goals, projects, and reviews
+- Learning-linked reviews, projects, and dashboards
 
 ### Out of Scope
-- LMS implementation
-- Spaced repetition tooling details
-- Plugin or sync configuration
+- LMS implementation or course-platform replacement
+- Spaced repetition tooling configuration
+- External sync or plugin setup details
 
----
+## Inputs
 
-## Learning Model
+- Capability priorities from Executive OS
+- Role and domain demands from Business OS
+- Practice opportunities from Project OS
+- Resources and prior knowledge from Knowledge OS
+- Learning prompts and tutoring help from AI OS
+- Reminder and cadence support from Automation OS
 
-| Layer | Primary Objects | Responsibility |
-|------|-----------------|----------------|
-| Intent | `goal`, `area`, `project` | Why this learning matters |
-| Input | `resource`, `workflow` | What is being studied and how |
-| Practice | projects, tasks, exercises | Where learning becomes performance |
-| Synthesis | `knowledge`, review notes | What understanding is retained |
-| Review | monthly, quarterly reviews | Whether capability is actually improving |
+## Outputs
 
----
+- Learning plans and active study priorities
+- Resource pipelines and practice commitments
+- Applied skill evidence tied to projects or operations
+- Synthesized notes and reflections for Knowledge OS
+- Capability trend visibility for strategic review
 
-## Learning Loop
+## Core Objects
+
+| Object | Role |
+|--------|------|
+| `goal` | Defines why the capability matters |
+| `resource` | Provides learning input |
+| `workflow` | Encodes recurring study or review process |
+| `project` | Supplies applied practice context |
+| `knowledge` | Stores what is retained and usable |
+| `review` | Captures periodic capability assessment |
+| `area` | Anchors learning to a life or work domain |
+
+## Metadata Requirements
+
+Learning notes should emphasize `status`, `priority`, `owner`, `review`, explicit links from learning items to `goal`, `area`, `project`, and `resource`, plus `impact` and timebox markers when learning supports a live initiative.
+
+## Relationships
+
+| Adjacent System | Learning OS Sends | Learning OS Receives |
+|-----------------|-------------------|----------------------|
+| Executive OS | capability progress, skill gaps, learning outcomes | strategic priorities and long-horizon capability needs |
+| Business OS | role readiness and domain knowledge growth | commercial demands and role-specific capability gaps |
+| Project OS | applied skills, practice outputs, readiness signals | real-world practice opportunities |
+| Knowledge OS | synthesized lessons and applied insights | curated resources and durable concepts |
+| AI OS | tutoring, curriculum synthesis, reflection prompts | bounded prompts and structured learning context |
+| Automation OS | reminders, reading cadences, review schedules | workflow creation and stale-learning signals |
+
+## Workflows
 
 ```mermaid
 flowchart TD
@@ -57,52 +85,48 @@ flowchart TD
     Q --> G
 ```
 
-### Core Workflows
+### Learning Workflow
+1. Identify a capability gap or growth target.
+2. Select resources and define a learning path.
+3. Attach practice to live work or deliberate exercises.
+4. Convert takeaways into durable knowledge.
+5. Review whether behavior, output quality, or confidence improved.
 
-1. Identify a capability gap from Executive OS, Business OS, or Project OS.
-2. Define the learning objective and supporting resources.
-3. Attach practice to live projects or dedicated exercises.
-4. Convert takeaways into knowledge notes.
-5. Review whether learning changed behavior or outcomes.
+## Dashboards
 
----
+- Learning Dashboard
+- Daily Dashboard
+- Weekly Review
+- Knowledge Dashboard
+- Executive Command Center
 
-## Interfaces to Other Systems
+## Review Process
 
-| Adjacent System | Learning OS Sends | Learning OS Receives |
-|-----------------|-------------------|----------------------|
-| Executive OS | capability progress, skill gaps, learning outcomes | strategic priorities and long-horizon capability needs |
-| Business OS | role readiness and domain knowledge growth | commercial demands and role-specific capability gaps |
-| Project OS | applied skills, practice outputs, readiness signals | real-world practice opportunities |
-| Knowledge OS | synthesized lessons and applied insights | curated resources and durable concepts |
-| Automation OS | reminders, reading cadences, review schedules | workflow creation and stale-learning signals |
-| AI OS | tutoring, summarization, curriculum support | bounded prompts and structured learning context |
+| Cadence | Purpose | Primary Outputs |
+|---------|---------|-----------------|
+| Weekly | Maintain learning momentum | next study actions, synthesis prompts |
+| Monthly | Evaluate active learning themes | continue / pause / refocus decisions |
+| Quarterly | Assess meaningful capability change | growth summary, new capability targets |
 
----
+## KPIs
 
-## Learning Views
+- Percentage of active learning goals tied to a goal, area, or project
+- Percentage of active resources with a next step or synthesis outcome
+- Number of stalled learning efforts past review cadence
+- Frequency of learning insights applied to projects or operations
+- Capability growth trend by quarter
 
-| View | Purpose |
-|------|---------|
-| Learning Dashboard | Active study themes, resources in progress, next reviews |
-| Resource Pipeline | What is queued, active, or synthesized |
-| Skill Growth Review | Capability changes over time |
-| Application Tracker | Which projects are exercising which skills |
+## Success Criteria
 
----
+- Learning efforts are tied to meaningful outcomes instead of vague aspiration
+- Active resources are either being used, synthesized, or intentionally parked
+- Practice is visible, not assumed
+- Learning produces durable knowledge and measurable behavior change
+- Review cadence prevents learning clutter from accumulating
 
-## Governance Rules
+## Future Expansion
 
-1. Learning should map to an area, goal, or active role.
-2. Resources without synthesis eventually become clutter.
-3. Learning is complete only when applied or deliberately parked.
-4. Capability reviews should focus on changed behavior, not consumed volume.
-5. Learning history remains valuable even after topics are archived.
-
----
-
-## Architectural Notes
-
-- Learning OS bridges aspiration and applied competence.
-- It shares resources with Knowledge OS but owns the developmental workflow.
-- It becomes more valuable when tied directly to live projects and reviews.
+- Explicit capability taxonomy and skill-level rubric
+- Resource quality scoring and curation rules
+- Optional spaced-repetition layer that respects markdown portability
+- Better project-to-learning matching for just-in-time growth

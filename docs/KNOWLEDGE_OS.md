@@ -4,19 +4,18 @@
 
 ---
 
-## Overview
+## Purpose
 
 Knowledge OS is the memory layer of LifeOS Enterprise.
-It ensures that information does not remain trapped inside meetings, projects, or consumed resources.
-It answers:
+It converts information, meetings, documents, and work output into durable notes that can be retrieved, linked, and applied later.
 
-- What do I know?
-- Why do I believe it?
-- Where did it come from?
-- Where does it apply?
-- How can I retrieve it when needed?
+## Responsibilities
 
----
+- Capture and synthesize durable knowledge from source material
+- Preserve source lineage and application context
+- Maintain links between knowledge, decisions, resources, and work
+- Support retrieval during execution, reviews, and learning
+- Keep the knowledge graph coherent through review and archival
 
 ## Scope
 
@@ -25,28 +24,61 @@ It answers:
 - Resource-to-knowledge conversion
 - Decision and document memory
 - Relationship mapping between notes
-- Retrieval surfaces and review support
+- Retrieval surfaces and governance rules
 
 ### Out of Scope
-- Search engine implementation details
-- External knowledge sync tooling
-- Query implementation details
+- Search engine implementation specifics
+- External sync tooling configuration
+- Dataview query implementation details
+- Raw source storage outside markdown and metadata conventions
 
----
+## Inputs
 
-## Knowledge Architecture
+- Meetings, documents, and resources from daily work
+- Deliverables, decisions, and lessons from Project OS
+- Strategic questions from Executive OS
+- Commercial memory from Business OS
+- Learning reflections and resource takeaways from Learning OS
+- Suggested links, summaries, and extraction help from AI OS
 
-| Domain | Primary Objects | Function |
-|-------|-----------------|----------|
-| Source Material | `resource`, `document`, `meeting` | Raw inputs and evidence |
-| Durable Memory | `knowledge`, `decision` | Codified understanding and rationale |
-| Applicability | `area`, `project`, `goal`, `business` links | Where knowledge matters |
-| Retrieval | dashboards, MOCs, indexes | Surface what is relevant |
-| Governance | reviews, metadata rules, archival | Keep the graph coherent |
+## Outputs
 
----
+- Durable `knowledge` notes and decision memory
+- Application links to goals, projects, businesses, and areas
+- Retrieval surfaces for dashboards, maps, and reviews
+- Evidence packages for executive, business, and learning reviews
+- Governance signals for automation and integrity checks
 
-## Capture-to-Insight Flow
+## Core Objects
+
+| Object | Role |
+|--------|------|
+| `knowledge` | Stores synthesized understanding |
+| `decision` | Stores rationale and historical choices |
+| `resource` | Represents source material |
+| `document` | Stores formal source artifacts |
+| `meeting` | Captures discussion context and action evidence |
+| `moc` | Curates a manual retrieval surface |
+| `area` | Provides domain context |
+| `project` | Provides application context |
+| `business` | Provides commercial application context |
+
+## Metadata Requirements
+
+Knowledge notes should prioritize `type`, `status`, `created`, `updated`, `tags`, source references, related-note links, `confidence`, `review`, and explicit applicability markers to `resource`, `project`, `area`, `business`, or `decision` notes.
+
+## Relationships
+
+| Adjacent System | Knowledge OS Sends | Knowledge OS Receives |
+|-----------------|-------------------|----------------------|
+| Executive OS | patterns, decision history, evidence for prioritization | strategic review questions and synthesis demand |
+| Business OS | commercial memory, reusable operating playbooks | contracts, reports, meeting context |
+| Project OS | prior art, references, project history | execution outputs and lessons learned |
+| Learning OS | durable concepts, linked resources, knowledge gaps | highlighted resources and study reflections |
+| AI OS | structured context for synthesis and retrieval | suggested links, summaries, classification support |
+| Automation OS | validation targets, review targets, archival rules | indexing, stale-note checks, integrity checks |
+
+## Workflows
 
 ```mermaid
 flowchart LR
@@ -59,53 +91,48 @@ flowchart LR
     R --> K
 ```
 
-### Knowledge Pipeline
-
-1. Capture source context from meetings, resources, and documents.
+### Knowledge Workflow
+1. Capture source context from meetings, resources, documents, or operations.
 2. Distill the durable idea into a typed note.
-3. Link the note to the areas, goals, or projects where it matters.
-4. Surface it during reviews, planning, and active work.
-5. Update or archive it as reality changes.
+3. Link the note to the places where it matters.
+4. Surface the note during work, reviews, and planning.
+5. Update, supersede, or archive the note as reality changes.
 
----
+## Dashboards
 
-## Retrieval Model
+- Knowledge Dashboard
+- Weekly Review
+- Project Dashboard
+- Learning Dashboard
+- Executive Command Center
 
-| Retrieval Surface | Purpose |
-|------------------|---------|
-| Area knowledge maps | Domain-specific operating memory |
-| Project context packs | Prior art, decisions, and reference material |
-| Review synthesis | Patterns and lessons for executive review |
-| Learning review surfaces | Resources converted into understanding |
-| Search and backlinks | Direct lookup and discovery |
+## Review Process
 
----
+| Cadence | Purpose | Primary Outputs |
+|---------|---------|-----------------|
+| Weekly | Convert fresh inputs into durable notes | new knowledge notes, clarified links |
+| Monthly | Clean retrieval structures and stale notes | relinked notes, archive candidates |
+| Quarterly | Reassess high-value domains and knowledge gaps | map refreshes, research priorities |
 
-## Interfaces to Other Systems
+## KPIs
 
-| Adjacent System | Knowledge OS Sends | Knowledge OS Receives |
-|-----------------|-------------------|----------------------|
-| Executive OS | patterns, decision history, evidence for prioritization | strategic review questions and synthesis demand |
-| Business OS | commercial memory, reusable operating playbooks | contracts, reports, meeting context |
-| Project OS | prior art, references, project history | execution outputs and lessons learned |
-| Learning OS | durable concepts, linked resources, knowledge gaps | highlighted resources and study reflections |
-| Automation OS | validation targets, review targets, archival rules | indexing, stale-note checks, integrity checks |
-| AI OS | structured context for synthesis and retrieval | suggested links, summaries, classification support |
+- Percentage of high-value projects with linked lessons or decisions
+- Percentage of active resources converted into synthesized knowledge
+- Number of stale high-value notes missing review
+- Average time from capture to synthesis
+- Retrieval success during reviews or active work
 
----
+## Success Criteria
 
-## Governance Rules
+- Important knowledge is retrievable without remembering its folder path
+- Source lineage is recoverable for durable claims
+- Work outputs become reusable context instead of dead artifacts
+- Retrieval surfaces reduce search friction during execution and review
+- Archival preserves reasoning instead of destroying context
 
-1. Knowledge notes store synthesized understanding, not copied source dumps.
-2. Source lineage should always be recoverable.
-3. Knowledge is linked to application contexts whenever possible.
-4. Retrieval structures are views; the note remains the source of truth.
-5. Archival should preserve historical reasoning, not erase it.
+## Future Expansion
 
----
-
-## Architectural Notes
-
-- Knowledge OS is the compounding asset of the whole architecture.
-- It is fed by every other operating system.
-- It must remain useful without AI or automation, though both can improve its reach.
+- Stronger note confidence and evidence-weight conventions
+- Topic-level review cadences for deep domains
+- Decision-to-knowledge promotion rules
+- Local-first semantic retrieval augmentation layered on top of links
