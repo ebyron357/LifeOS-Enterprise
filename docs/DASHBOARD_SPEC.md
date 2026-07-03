@@ -101,20 +101,20 @@ The Home dashboard is the single entry point for daily use.
 
 ---
 
-## Query Design Guidelines
+## Future Query Considerations
 
-> **Note:** Dataview query implementation is deferred to Phase 3. These are design guidelines.
+> **Note:** Dashboard query implementation is deferred to Phase 3. This section records only high-level constraints for future work.
 
-### Performance Rules
-- Always use `FROM "folder"` to scope queries
-- Avoid `WHERE` clauses that require scanning all note properties
-- Limit result sets with `LIMIT N` for list views
-- Use `SORT` only on indexed fields (date, status)
+### Performance Principles
+- Scope every dashboard to a clearly defined slice of the vault
+- Prefer predictable metadata fields over ad hoc text parsing
+- Limit large result sets to the items most useful in the current view
+- Design dashboards to remain responsive as the vault grows
 
-### Standard Query Patterns
-- Active projects: `FROM "01-Projects/Active" WHERE type = "project" AND status = "active"`
-- Recent captures: `FROM "00-Inbox/Capture" SORT file.ctime DESC LIMIT 10`
-- Goals due soon: `FROM "02-Areas" WHERE type = "goal" AND target-date <= date(today) + dur(30 days)`
+### Design Constraints
+- Dashboard logic must live in dashboard notes, not in content notes
+- Query behavior must align with the canonical object model and metadata schema
+- Query implementation must be documented when it is introduced in a later phase
 
 ---
 
