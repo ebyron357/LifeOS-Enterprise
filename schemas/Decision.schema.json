@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.enterprise/schemas/Decision.schema.json",
+  "title": "Decision",
+  "description": "Defines a logged decision in LifeOS. Decisions are immutable records that explain why a choice was made.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "decision",
+    "made_by",
+    "date",
+    "status",
+    "created",
+    "updated"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^DEC-[A-Z0-9]{4,}$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "context": {
+      "type": "string",
+      "description": "Situation that led to this decision"
+    },
+    "decision": {
+      "type": "string",
+      "description": "The exact decision made"
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Why this option was chosen"
+    },
+    "made_by": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Proposed",
+        "Final",
+        "Reversed",
+        "Superseded"
+      ]
+    },
+    "impact": {
+      "type": "string",
+      "enum": [
+        "High",
+        "Medium",
+        "Low"
+      ]
+    },
+    "reversible": {
+      "type": "boolean"
+    },
+    "reversal_conditions": {
+      "type": "string"
+    },
+    "options_considered": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Option"
+      }
+    },
+    "implications": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "business_id": {
+      "type": "string",
+      "pattern": "^BIZ-"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^PRJ-"
+    },
+    "review_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "$defs": {
+    "Option": {
+      "type": "object",
+      "required": [
+        "label"
+      ],
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "pros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "selected": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

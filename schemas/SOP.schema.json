@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.enterprise/schemas/SOP.schema.json",
+  "title": "SOP",
+  "description": "Defines a Standard Operating Procedure in LifeOS. SOPs are versioned, executable, and AI-readable process documents.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "version",
+    "status",
+    "owner",
+    "steps",
+    "created",
+    "updated"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^SOP-[A-Z0-9]{4,}$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Active",
+        "Under Review",
+        "Deprecated",
+        "Archived"
+      ]
+    },
+    "owner": {
+      "type": "string"
+    },
+    "business_id": {
+      "type": "string",
+      "pattern": "^BIZ-"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Operations",
+        "Sales",
+        "Marketing",
+        "Finance",
+        "Engineering",
+        "HR",
+        "Legal",
+        "Customer Success",
+        "Other"
+      ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "trigger": {
+      "type": "string",
+      "description": "When is this SOP executed?"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SOPStep"
+      },
+      "minItems": 1
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "estimated_duration_minutes": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "ai_executable": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether an AI agent can execute this SOP"
+    },
+    "related_sops": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^SOP-"
+      }
+    },
+    "review_frequency_days": {
+      "type": "integer"
+    },
+    "last_reviewed": {
+      "type": "string",
+      "format": "date"
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "$defs": {
+    "SOPStep": {
+      "type": "object",
+      "required": [
+        "step",
+        "title",
+        "instruction"
+      ],
+      "properties": {
+        "step": {
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "instruction": {
+          "type": "string"
+        },
+        "responsible": {
+          "type": "string"
+        },
+        "tool": {
+          "type": "string"
+        },
+        "expected_output": {
+          "type": "string"
+        },
+        "decision_point": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

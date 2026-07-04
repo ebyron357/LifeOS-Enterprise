@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.enterprise/schemas/Automation.schema.json",
+  "title": "Automation",
+  "description": "Defines an automation rule in LifeOS. Automations are lightweight trigger-action pairs that keep the system running without manual intervention.",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "trigger",
+    "action",
+    "status",
+    "created",
+    "updated"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^AUT-[A-Z0-9]{4,}$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "trigger": {
+      "$ref": "#/$defs/Trigger"
+    },
+    "action": {
+      "$ref": "#/$defs/Action"
+    },
+    "conditions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Condition"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Active",
+        "Paused",
+        "Testing",
+        "Deprecated"
+      ]
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "n8n",
+        "Zapier",
+        "GitHub Actions",
+        "Native",
+        "Other"
+      ]
+    },
+    "business_id": {
+      "type": "string",
+      "pattern": "^BIZ-"
+    },
+    "run_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "last_run": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "error_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "$defs": {
+    "Trigger": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Schedule",
+            "Event",
+            "Webhook",
+            "StateChange",
+            "Threshold"
+          ]
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "Action": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "RunWorkflow",
+            "AssignAgent",
+            "UpdateRecord",
+            "SendNotification",
+            "CreateRecord",
+            "Archive"
+          ]
+        },
+        "target": {
+          "type": "string"
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "Condition": {
+      "type": "object",
+      "required": [
+        "field",
+        "operator",
+        "value"
+      ],
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "equals",
+            "not_equals",
+            "greater_than",
+            "less_than",
+            "contains",
+            "exists"
+          ]
+        },
+        "value": {}
+      }
+    }
+  },
+  "additionalProperties": false
+}

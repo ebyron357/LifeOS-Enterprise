@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.enterprise/schemas/Risk.schema.json",
+  "title": "Risk",
+  "description": "Defines a risk entry in the LifeOS risk register. Risks are scored, owned, and tracked to resolution.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "category",
+    "likelihood",
+    "impact",
+    "score",
+    "owner",
+    "status",
+    "created",
+    "updated"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^RISK-[A-Z0-9]{4,}$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Strategic",
+        "Operational",
+        "Financial",
+        "Technical",
+        "Legal",
+        "Reputational",
+        "Security"
+      ]
+    },
+    "likelihood": {
+      "type": "string",
+      "enum": [
+        "High",
+        "Medium",
+        "Low"
+      ]
+    },
+    "impact": {
+      "type": "string",
+      "enum": [
+        "High",
+        "Medium",
+        "Low"
+      ]
+    },
+    "score": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9,
+      "description": "Likelihood \u00d7 Impact (H=3, M=2, L=1)"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "Critical",
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "description": "Critical \u22659, High \u22656, Medium \u22654, Low \u22642"
+    },
+    "owner": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Open",
+        "Mitigated",
+        "Closed",
+        "Accepted"
+      ]
+    },
+    "mitigation": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/MitigationAction"
+      }
+    },
+    "contingency": {
+      "type": "string"
+    },
+    "business_id": {
+      "type": "string",
+      "pattern": "^BIZ-"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^PRJ-"
+    },
+    "identified": {
+      "type": "string",
+      "format": "date"
+    },
+    "target_closure": {
+      "type": "string",
+      "format": "date"
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "$defs": {
+    "MitigationAction": {
+      "type": "object",
+      "required": [
+        "action",
+        "owner"
+      ],
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Planned",
+            "In Progress",
+            "Done"
+          ]
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

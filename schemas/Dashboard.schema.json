@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.enterprise/schemas/Dashboard.schema.json",
+  "title": "Dashboard",
+  "description": "Defines a LifeOS dashboard specification including data sources, layout, and refresh configuration.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "type",
+    "owner",
+    "data_sources",
+    "created",
+    "updated"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^DSH-[A-Z0-9]{4,}$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Daily",
+        "Weekly",
+        "Monthly",
+        "Business",
+        "Project",
+        "AI",
+        "Automation",
+        "Knowledge",
+        "GitHub",
+        "Financial",
+        "Custom"
+      ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "owner": {
+      "type": "string"
+    },
+    "audience": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "data_sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/DataSource"
+      },
+      "minItems": 1
+    },
+    "widgets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Widget"
+      }
+    },
+    "refresh_interval_minutes": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "business_id": {
+      "type": "string",
+      "pattern": "^BIZ-"
+    },
+    "is_public": {
+      "type": "boolean",
+      "default": false
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "$defs": {
+    "DataSource": {
+      "type": "object",
+      "required": [
+        "id",
+        "module",
+        "field"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "module": {
+          "type": "string"
+        },
+        "field": {
+          "type": "string"
+        },
+        "filter": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "Widget": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "title",
+        "data_source_id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Counter",
+            "Table",
+            "List",
+            "Chart",
+            "Status",
+            "Text",
+            "Progress",
+            "Trend"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "data_source_id": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

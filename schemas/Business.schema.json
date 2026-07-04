@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.enterprise/schemas/Business.schema.json",
+  "title": "Business",
+  "description": "Defines the structure and metadata for a LifeOS business entity. Each business is an independent operating system within the platform.",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "status",
+    "owner",
+    "created",
+    "updated"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^BIZ-[A-Z0-9]{4,}$",
+      "description": "Unique business identifier. Format: BIZ-XXXX"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 100,
+      "description": "Official business name"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "URL-safe lowercase slug used for folder naming"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Pre-Launch",
+        "Active",
+        "Scaling",
+        "Mature",
+        "Paused",
+        "Closed"
+      ],
+      "description": "Current lifecycle stage of the business"
+    },
+    "owner": {
+      "type": "string",
+      "description": "Primary human owner (person ID or name)"
+    },
+    "ai_owner": {
+      "type": "string",
+      "description": "Assigned Chief of Staff or primary AI agent"
+    },
+    "model": {
+      "type": "string",
+      "enum": [
+        "B2B SaaS",
+        "B2C SaaS",
+        "E-commerce",
+        "Services",
+        "Marketplace",
+        "Agency",
+        "Product",
+        "Other"
+      ],
+      "description": "Business model classification"
+    },
+    "industry": {
+      "type": "string",
+      "description": "Industry vertical"
+    },
+    "founded": {
+      "type": "string",
+      "format": "date",
+      "description": "Business founding date (ISO 8601)"
+    },
+    "website": {
+      "type": "string",
+      "format": "uri",
+      "description": "Primary website URL"
+    },
+    "github_org": {
+      "type": "string",
+      "description": "GitHub organization or user name for this business"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "One-paragraph business description"
+    },
+    "kpis": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of tracked KPI IDs"
+    },
+    "projects": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^PRJ-"
+      },
+      "description": "List of linked project IDs"
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of assigned agent IDs"
+    },
+    "mcp_connectors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of active MCP connector IDs"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created": {
+      "type": "string",
+      "format": "date",
+      "description": "Record creation date"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date",
+      "description": "Last modification date"
+    },
+    "archived": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this business is archived"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional key-value pairs for extensibility",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
