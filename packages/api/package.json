@@ -23,7 +23,9 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
+    "@lifeos/db": "workspace:*",
     "@trpc/server": "^11.0.0",
+    "drizzle-orm": "^0.36.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
