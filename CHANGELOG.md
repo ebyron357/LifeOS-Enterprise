@@ -8,6 +8,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- `DrizzleBusinessRepository` PostgreSQL implementation for the full `IBusinessRepository` contract.
+- Drizzle migration configuration at `packages/db/drizzle.config.ts`.
+- Versioned SQL migrations in `packages/db/drizzle/` for Business Engine tables.
+- `RelationshipEngine.getMap()` unit coverage via `packages/api/src/__tests__/relationship.engine.test.ts`.
+- Foundation hardening validation report at `docs/FOUNDATION_HARDENING_REPORT.md`.
+
+### Changed
+- Validators coverage config now excludes `packages/validators/src/index.ts`.
+- API coverage config now excludes `business.repository.postgres.ts` until DB-backed repository integration tests are added.
+- Database schema now stores `business_key` on `kpis` and `business_relationships` for contract compatibility with business service records.
+
 ---
 
 ## [2.0.0] — Sprint 3: Business Engine

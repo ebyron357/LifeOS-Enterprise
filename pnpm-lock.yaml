@@ -35,9 +35,15 @@ importers:
 
   packages/api:
     dependencies:
+      '@lifeos/db':
+        specifier: workspace:*
+        version: link:../db
       '@trpc/server':
         specifier: ^11.0.0
         version: 11.18.0(typescript@5.9.3)
+      drizzle-orm:
+        specifier: ^0.36.4
+        version: 0.36.4(postgres@3.4.9)
       zod:
         specifier: ^3.23.8
         version: 3.25.76

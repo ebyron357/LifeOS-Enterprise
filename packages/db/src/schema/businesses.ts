@@ -89,6 +89,7 @@ export const kpis = pgTable(
     business_id: uuid('business_id')
       .notNull()
       .references(() => businesses.id, { onDelete: 'cascade' }),
+    business_key: text('business_key').notNull(),
     org_id: uuid('org_id').notNull(),
 
     name: text('name').notNull(),
@@ -130,6 +131,7 @@ export const businessRelationships = pgTable(
     business_id: uuid('business_id')
       .notNull()
       .references(() => businesses.id, { onDelete: 'cascade' }),
+    business_key: text('business_key').notNull(),
     org_id: uuid('org_id').notNull(),
 
     /** The type of related entity: project | knowledge | agent | automation | person | etc. */

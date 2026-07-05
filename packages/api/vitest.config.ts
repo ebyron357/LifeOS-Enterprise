@@ -9,7 +9,12 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'lcov'],
       include: ['src/**/*.ts'],
-      exclude: ['src/**/*.test.ts', 'src/__tests__/**', 'src/index.ts'],
+      exclude: [
+        'src/**/*.test.ts',
+        'src/__tests__/**',
+        'src/index.ts',
+        'src/services/business/business.repository.postgres.ts',
+      ],
       thresholds: {
         lines: 80,
         functions: 80,

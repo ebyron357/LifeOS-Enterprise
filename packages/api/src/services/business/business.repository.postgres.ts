@@ -30,9 +30,18 @@ import type { IBusinessRepository } from './business.repository.js'
 
 type DatabaseLike = LifeOSDatabase
 
+type BusinessInsert = typeof businesses.$inferInsert
+type KPIInsert = typeof kpis.$inferInsert
+
 function toISO(value: Date | string | null | undefined): string | undefined {
   if (value === null || value === undefined) return undefined
   return value instanceof Date ? value.toISOString() : value
+}
+
+function toDate(value: string | undefined): Date | null | undefined {
+  if (value === undefined) return undefined
+  if (value === '') return null
+  return new Date(value)
 }
 
 function toNumber(value: unknown): number | undefined {
@@ -43,6 +52,12 @@ function toNumber(value: unknown): number | undefined {
     return Number.isFinite(parsed) ? parsed : undefined
   }
   return undefined
+}
+
+function numToDb(value: number | undefined): string | null | undefined {
+  if (value === undefined) return undefined
+  if (value === null) return null
+  return value.toString()
 }
 
 function computeChangeDiff(
@@ -65,12 +80,13 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
   constructor(private readonly db: DatabaseLike = getDatabase()) {}
 
   async withTransaction<T>(fn: (repo: DrizzleBusinessRepository) => Promise<T>): Promise<T> {
-    return this.db.transaction(async (tx) => fn(new DrizzleBusinessRepository(tx as DatabaseLike)))
+    return this.db.transaction(async (tx) => fn(new DrizzleBusinessRepository(tx as unknown as DatabaseLike)))
   }
 
   private mapBusiness(row: typeof businesses.$inferSelect): BusinessRecord {
     return {
       ...row,
+      business_key: row.business_key as `BIZ-${string}`,
       status: row.status as BusinessRecord['status'],
       metadata: (row.metadata ?? {}) as Record<string, unknown>,
       created_at: toISO(row.created_at) ?? new Date(0).toISOString(),
@@ -92,6 +108,7 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
   private mapKPI(row: typeof kpis.$inferSelect): KPIRecord {
     return {
       ...row,
+      business_key: row.business_key as `BIZ-${string}`,
       direction: row.direction as KPIRecord['direction'],
       measurement_period: row.measurement_period as KPIRecord['measurement_period'],
       status: row.status as KPIRecord['status'],
@@ -109,6 +126,7 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
   private mapRelationship(row: typeof businessRelationships.$inferSelect): BusinessRelationshipRecord {
     return {
       ...row,
+      business_key: row.business_key as `BIZ-${string}`,
       metadata: (row.metadata ?? {}) as Record<string, unknown>,
       created_at: toISO(row.created_at) ?? new Date(0).toISOString(),
     }
@@ -152,20 +170,30 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
   }
 
   async findById(id: string, orgId: string): Promise<BusinessRecord | null> {
-    const row = await this.db.query.businesses.findFirst({
-      where: and(eq(businesses.id, id), eq(businesses.org_id, orgId), isNull(businesses.deleted_at)),
-    })
+    const rows = await this.db
+      .select()
+      .from(businesses)
+      .where(and(eq(businesses.id, id), eq(businesses.org_id, orgId), isNull(businesses.deleted_at)))
+      .limit(1)
+
+    const row = rows[0]
     return row ? this.mapBusiness(row) : null
   }
 
   async findByKey(businessKey: string, orgId: string): Promise<BusinessRecord | null> {
-    const row = await this.db.query.businesses.findFirst({
-      where: and(
-        eq(businesses.business_key, businessKey),
-        eq(businesses.org_id, orgId),
-        isNull(businesses.deleted_at),
-      ),
-    })
+    const rows = await this.db
+      .select()
+      .from(businesses)
+      .where(
+        and(
+          eq(businesses.business_key, businessKey),
+          eq(businesses.org_id, orgId),
+          isNull(businesses.deleted_at),
+        ),
+      )
+      .limit(1)
+
+    const row = rows[0]
     return row ? this.mapBusiness(row) : null
   }
 
@@ -189,7 +217,7 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
       options.filter?.tags?.length
         ? sql<boolean>`${businesses.tags} && ${options.filter.tags}`
         : undefined,
-    ].filter(Boolean)
+    ].filter((f) => f !== undefined)
 
     const where = and(...filters)
 
@@ -221,7 +249,7 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
       this.db.select({ total: count() }).from(businesses).where(where),
     ])
 
-    const total = totalRows[0]?.total ?? 0
+    const total = Number(totalRows[0]?.total ?? 0)
 
     return {
       items: rows.map((row) => this.mapBusiness(row)),
@@ -235,44 +263,70 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
   async create(
     data: Omit<BusinessRecord, 'id' | 'created_at' | 'updated_at' | 'version'>,
   ): Promise<BusinessRecord> {
-    const [row] = await this.db
-      .insert(businesses)
-      .values({
-        ...data,
-        metadata: data.metadata ?? {},
-        tags: data.tags ?? [],
-      })
-      .returning()
-
-    if (!row) {
-      throw new Error('Failed to create business')
+    const values: BusinessInsert = {
+      business_key: data.business_key,
+      org_id: data.org_id,
+      name: data.name,
+      slug: data.slug,
+      status: data.status,
+      model: data.model,
+      industry: data.industry,
+      founded: data.founded,
+      website: data.website,
+      github_org: data.github_org,
+      description: data.description,
+      owner_id: data.owner_id,
+      ai_owner_id: data.ai_owner_id,
+      tags: data.tags ?? [],
+      metadata: data.metadata ?? {},
+      archived: data.archived,
+      archived_at: toDate(data.archived_at),
+      archived_by: data.archived_by,
+      archive_reason: data.archive_reason,
+      deleted_at: toDate(data.deleted_at),
     }
 
+    const [row] = await this.db.insert(businesses).values(values).returning()
+    if (!row) throw new Error('Failed to create business')
     return this.mapBusiness(row)
   }
 
   async update(id: string, orgId: string, data: Partial<BusinessRecord>): Promise<BusinessRecord> {
     const existing = await this.findById(id, orgId)
-    if (!existing) {
-      throw new Error(`Business not found: ${id}`)
+    if (!existing) throw new Error(`Business not found: ${id}`)
+
+    const patch: Partial<BusinessInsert> = {
+      updated_at: new Date(),
+      version: existing.version + 1,
     }
+
+    if (data.business_key !== undefined) patch.business_key = data.business_key
+    if (data.name !== undefined) patch.name = data.name
+    if (data.slug !== undefined) patch.slug = data.slug
+    if (data.status !== undefined) patch.status = data.status
+    if (data.model !== undefined) patch.model = data.model
+    if (data.industry !== undefined) patch.industry = data.industry
+    if (data.founded !== undefined) patch.founded = data.founded
+    if (data.website !== undefined) patch.website = data.website
+    if (data.github_org !== undefined) patch.github_org = data.github_org
+    if (data.description !== undefined) patch.description = data.description
+    if (data.owner_id !== undefined) patch.owner_id = data.owner_id
+    if (data.ai_owner_id !== undefined) patch.ai_owner_id = data.ai_owner_id
+    if (data.tags !== undefined) patch.tags = data.tags
+    if (data.metadata !== undefined) patch.metadata = data.metadata
+    if (data.archived !== undefined) patch.archived = data.archived
+    if (data.archived_at !== undefined) patch.archived_at = toDate(data.archived_at)
+    if (data.archived_by !== undefined) patch.archived_by = data.archived_by
+    if (data.archive_reason !== undefined) patch.archive_reason = data.archive_reason
+    if (data.deleted_at !== undefined) patch.deleted_at = toDate(data.deleted_at)
 
     const [row] = await this.db
       .update(businesses)
-      .set({
-        ...data,
-        org_id: existing.org_id,
-        id: existing.id,
-        version: existing.version + 1,
-        updated_at: new Date(),
-      })
+      .set(patch)
       .where(and(eq(businesses.id, id), eq(businesses.org_id, orgId), isNull(businesses.deleted_at)))
       .returning()
 
-    if (!row) {
-      throw new Error(`Business not found: ${id}`)
-    }
-
+    if (!row) throw new Error(`Business not found: ${id}`)
     return this.mapBusiness(row)
   }
 
@@ -293,7 +347,7 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
   async restore(id: string, orgId: string, _restoredBy: string): Promise<BusinessRecord> {
     return this.update(id, orgId, {
       archived: false,
-      archived_at: undefined,
+      archived_at: '',
       archived_by: undefined,
       archive_reason: undefined,
     })
@@ -304,11 +358,7 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
   }
 
   async search(options: BusinessSearchOptions): Promise<BusinessSearchResult> {
-    const q = `%${options.query.trim().toLowerCase()}%`
-    const filterStatus = options.filter?.status?.length
-      ? inArray(businesses.status, options.filter.status)
-      : undefined
-
+    const query = `%${options.query.trim()}%`
     const rows = await this.db
       .select()
       .from(businesses)
@@ -317,16 +367,12 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
           eq(businesses.org_id, options.org_id),
           isNull(businesses.deleted_at),
           eq(businesses.archived, false),
-          filterStatus,
+          options.filter?.status?.length ? inArray(businesses.status, options.filter.status) : undefined,
           or(
-            ilike(sql`lower(${businesses.name})`, q),
-            ilike(sql`lower(coalesce(${businesses.description}, ''))`, q),
-            ilike(sql`lower(coalesce(${businesses.industry}, ''))`, q),
-            sql<boolean>`exists (
-              select 1
-              from unnest(${businesses.tags}) as tag
-              where lower(tag) like ${q}
-            )`,
+            ilike(businesses.name, query),
+            ilike(sql<string>`coalesce(${businesses.description}, '')`, query),
+            ilike(sql<string>`coalesce(${businesses.industry}, '')`, query),
+            sql<boolean>`exists (select 1 from unnest(${businesses.tags}) tag where tag ilike ${query})`,
           ),
         ),
       )
@@ -338,7 +384,7 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
   }
 
   async slugExists(slug: string, orgId: string, excludeId?: string): Promise<boolean> {
-    const row = await this.db
+    const rows = await this.db
       .select({ total: count() })
       .from(businesses)
       .where(
@@ -350,7 +396,7 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
         ),
       )
 
-    return (row[0]?.total ?? 0) > 0
+    return Number(rows[0]?.total ?? 0) > 0
   }
 
   async saveVersion(
@@ -371,10 +417,7 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
       })
       .returning()
 
-    if (!row) {
-      throw new Error('Failed to save business version')
-    }
-
+    if (!row) throw new Error('Failed to save business version')
     return this.mapVersion(row)
   }
 
@@ -398,10 +441,13 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
     version: number,
     _orgId: string,
   ): Promise<BusinessVersionRecord | null> {
-    const row = await this.db.query.businessVersions.findFirst({
-      where: and(eq(businessVersions.business_id, businessId), eq(businessVersions.version, version)),
-    })
+    const rows = await this.db
+      .select()
+      .from(businessVersions)
+      .where(and(eq(businessVersions.business_id, businessId), eq(businessVersions.version, version)))
+      .limit(1)
 
+    const row = rows[0]
     return row ? this.mapVersion(row) : null
   }
 
@@ -446,18 +492,26 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
       critical_threshold: data.critical_threshold,
     })
 
-    const [row] = await this.db
-      .insert(kpis)
-      .values({
-        ...data,
-        status,
-      })
-      .returning()
-
-    if (!row) {
-      throw new Error('Failed to create KPI')
+    const values: KPIInsert = {
+      business_id: data.business_id,
+      business_key: data.business_key,
+      org_id: data.org_id,
+      name: data.name,
+      description: data.description,
+      unit: data.unit,
+      direction: data.direction,
+      measurement_period: data.measurement_period,
+      target_value: data.target_value.toString(),
+      current_value: numToDb(data.current_value),
+      previous_value: null,
+      warning_threshold: numToDb(data.warning_threshold),
+      critical_threshold: numToDb(data.critical_threshold),
+      status,
+      tags: data.tags,
     }
 
+    const [row] = await this.db.insert(kpis).values(values).returning()
+    if (!row) throw new Error('Failed to create KPI')
     return this.mapKPI(row)
   }
 
@@ -466,7 +520,7 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
     if (!existing) throw new Error(`KPI not found: ${id}`)
 
     const nextCurrent = data.current_value ?? existing.current_value
-    const updatedStatus = this.computeKPIStatus({
+    const status = this.computeKPIStatus({
       target_value: data.target_value ?? existing.target_value,
       current_value: nextCurrent,
       direction: data.direction ?? existing.direction,
@@ -474,19 +528,31 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
       critical_threshold: data.critical_threshold ?? existing.critical_threshold,
     })
 
+    const patch: Partial<KPIInsert> = {
+      updated_at: new Date(),
+      status,
+      previous_value:
+        data.current_value !== undefined ? numToDb(existing.current_value) : numToDb(existing.previous_value),
+    }
+
+    if (data.name !== undefined) patch.name = data.name
+    if (data.description !== undefined) patch.description = data.description
+    if (data.unit !== undefined) patch.unit = data.unit
+    if (data.direction !== undefined) patch.direction = data.direction
+    if (data.measurement_period !== undefined) patch.measurement_period = data.measurement_period
+    if (data.target_value !== undefined) patch.target_value = data.target_value.toString()
+    if (data.current_value !== undefined) patch.current_value = data.current_value.toString()
+    if (data.warning_threshold !== undefined) patch.warning_threshold = data.warning_threshold.toString()
+    if (data.critical_threshold !== undefined) patch.critical_threshold = data.critical_threshold.toString()
+    if (data.tags !== undefined) patch.tags = data.tags
+
     const [row] = await this.db
       .update(kpis)
-      .set({
-        ...data,
-        previous_value: data.current_value !== undefined ? existing.current_value : existing.previous_value,
-        status: updatedStatus,
-        updated_at: new Date(),
-      })
+      .set(patch)
       .where(and(eq(kpis.id, id), eq(kpis.org_id, orgId)))
       .returning()
 
     if (!row) throw new Error(`KPI not found: ${id}`)
-
     return this.mapKPI(row)
   }
 
@@ -498,9 +564,13 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
   }
 
   async getKPI(id: string, orgId: string): Promise<KPIRecord | null> {
-    const row = await this.db.query.kpis.findFirst({
-      where: and(eq(kpis.id, id), eq(kpis.org_id, orgId)),
-    })
+    const rows = await this.db
+      .select()
+      .from(kpis)
+      .where(and(eq(kpis.id, id), eq(kpis.org_id, orgId)))
+      .limit(1)
+
+    const row = rows[0]
     return row ? this.mapKPI(row) : null
   }
 
@@ -515,19 +585,30 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
   }
 
   async addRelationship(data: AddRelationshipData): Promise<BusinessRelationshipRecord> {
-    const existing = await this.db.query.businessRelationships.findFirst({
-      where: and(
-        eq(businessRelationships.business_id, data.business_id),
-        eq(businessRelationships.entity_type, data.entity_type),
-        eq(businessRelationships.entity_key, data.entity_key),
-      ),
-    })
+    const existingRows = await this.db
+      .select()
+      .from(businessRelationships)
+      .where(
+        and(
+          eq(businessRelationships.business_id, data.business_id),
+          eq(businessRelationships.entity_type, data.entity_type),
+          eq(businessRelationships.entity_key, data.entity_key),
+        ),
+      )
+      .limit(1)
+
+    const existing = existingRows[0]
     if (existing) return this.mapRelationship(existing)
 
-    const [row] = await this.db.insert(businessRelationships).values(data).returning()
-    if (!row) {
-      throw new Error('Failed to add relationship')
-    }
+    const [row] = await this.db
+      .insert(businessRelationships)
+      .values({
+        ...data,
+        metadata: data.metadata ?? {},
+      })
+      .returning()
+
+    if (!row) throw new Error('Failed to add relationship')
     return this.mapRelationship(row)
   }
 
@@ -581,10 +662,7 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
       })
       .returning()
 
-    if (!row) {
-      throw new Error('Failed to create audit entry')
-    }
-
+    if (!row) throw new Error('Failed to create audit entry')
     return this.mapAudit(row)
   }
 
@@ -613,10 +691,15 @@ export class DrizzleBusinessRepository implements IBusinessRepository {
   }
 
   async createActivityEvent(data: CreateActivityEventData): Promise<ActivityEventRecord> {
-    const [row] = await this.db.insert(activityTimeline).values(data).returning()
-    if (!row) {
-      throw new Error('Failed to create activity event')
-    }
+    const [row] = await this.db
+      .insert(activityTimeline)
+      .values({
+        ...data,
+        metadata: data.metadata ?? {},
+      })
+      .returning()
+
+    if (!row) throw new Error('Failed to create activity event')
     return this.mapActivity(row)
   }
 
