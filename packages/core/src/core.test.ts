@@ -43,9 +43,15 @@ describe('core infrastructure', () => {
     bus.subscribe('test.event', spy);
 
     await bus.publish({
-      type: 'test.event',
-      payload: { ok: true },
+      eventId: 'evt_test-1',
+      eventType: 'test.event',
+      entityId: 'entity-1',
+      entityType: 'Test',
+      businessUnitId: 'bu_test-1',
       occurredAt: new Date().toISOString(),
+      actorId: 'usr_test-1',
+      schemaVersion: '1.0',
+      payload: { ok: true },
     });
     expect(spy).toHaveBeenCalledTimes(1);
   });

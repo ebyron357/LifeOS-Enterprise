@@ -5,5 +5,6 @@ export * from './event-bus';
 export * from './health';
 export * from './logging';
 export * from './observability';
+export * from './project-events';
 export * from './repository';
 export * from './validation';

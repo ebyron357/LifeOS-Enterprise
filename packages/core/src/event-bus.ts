@@ -5,13 +5,13 @@ type EventHandler = (event: DomainEvent) => Promise<void>;
 export class AppEventBus {
   private readonly handlers = new Map<string, EventHandler[]>();
 
-  subscribe(type: string, handler: EventHandler) {
-    const current = this.handlers.get(type) ?? [];
-    this.handlers.set(type, [...current, handler]);
+  subscribe(eventType: string, handler: EventHandler) {
+    const current = this.handlers.get(eventType) ?? [];
+    this.handlers.set(eventType, [...current, handler]);
   }
 
   async publish(event: DomainEvent) {
-    const handlers = this.handlers.get(event.type) ?? [];
+    const handlers = this.handlers.get(event.eventType) ?? [];
     await Promise.all(handlers.map(async (handler) => handler(event)));
   }
 }

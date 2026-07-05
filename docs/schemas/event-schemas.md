@@ -12,16 +12,17 @@ Every event conforms to this envelope:
 
 ```typescript
 type DomainEvent<T = unknown> = {
-  eventId: `evt_${string}`
-  eventType: string               // e.g., "TaskCreated"
-  entityId: string                // ID of the primary entity
-  entityType: string              // entity type name
-  businessUnitId: `bu_${string}`
-  occurredAt: string              // UTC ISO 8601
-  actorId: string                 // usr_... or agent:agent_...
-  schemaVersion: string           // e.g., "1.0"
-  payload: T
-}
+  eventId: `evt_${string}`;
+  eventType: string; // e.g., "TaskCreated"
+  entityId: string; // ID of the primary entity
+  entityType: string; // entity type name
+  businessUnitId: `bu_${string}`;
+  occurredAt: string; // UTC ISO 8601
+  actorId: string; // usr_... or agent:agent_...
+  schemaVersion: string; // e.g., "1.0"
+  correlationId?: string; // optional; links related events across actions
+  payload: T;
+};
 ```
 
 ---
@@ -29,24 +30,27 @@ type DomainEvent<T = unknown> = {
 ## User Events
 
 ### UserRegistered
+
 ```typescript
 {
-  userId: string
-  email: string
+  userId: string;
+  email: string;
 }
 ```
 
 ### UserEmailVerified
+
 ```typescript
 {
-  userId: string
+  userId: string;
 }
 ```
 
 ### UserPasswordChanged
+
 ```typescript
 {
-  userId: string
+  userId: string;
 }
 ```
 
@@ -55,20 +59,22 @@ type DomainEvent<T = unknown> = {
 ## BusinessUnit Events
 
 ### BusinessUnitCreated
+
 ```typescript
 {
-  businessUnitId: string
-  name: string
-  type: BusinessUnitType
-  ownerId: string
+  businessUnitId: string;
+  name: string;
+  type: BusinessUnitType;
+  ownerId: string;
 }
 ```
 
 ### BusinessUnitArchived
+
 ```typescript
 {
-  businessUnitId: string
-  archivedBy: string
+  businessUnitId: string;
+  archivedBy: string;
 }
 ```
 
@@ -77,6 +83,7 @@ type DomainEvent<T = unknown> = {
 ## Project Events
 
 ### ProjectCreated
+
 ```typescript
 {
   projectId: string
@@ -84,48 +91,111 @@ type DomainEvent<T = unknown> = {
   goal?: string
   nextAction?: string
   status: ProjectStatus
+  ownerId: string
+  businessUnitId: string
 }
 ```
 
-### ProjectStatusUpdated
+### ProjectUpdated
+
 ```typescript
 {
-  projectId: string
-  previousStatus: ProjectStatus
-  newStatus: ProjectStatus
+  projectId: string;
+  changedFields: Partial<{
+    name: string;
+    goal: string | null;
+    nextAction: string | null;
+    dueDate: string | null;
+    tags: string[];
+  }>;
 }
 ```
 
-### ProjectNextActionUpdated
+### ProjectStatusChanged
+
 ```typescript
 {
-  projectId: string
-  previousNextAction: string | null
-  newNextAction: string | null
+  projectId: string;
+  previousStatus: ProjectStatus;
+  newStatus: ProjectStatus;
 }
 ```
 
-### ProjectNextActionCleared
+### ProjectOwnerChanged
+
 ```typescript
 {
-  projectId: string
-  clearedBy: string
+  projectId: string;
+  previousOwnerId: string;
+  newOwnerId: string;
 }
 ```
 
-### ProjectCompleted
+### ProjectPriorityChanged
+
 ```typescript
 {
-  projectId: string
-  completedAt: string
+  projectId: string;
+  previousPriority: ProjectPriority;
+  newPriority: ProjectPriority;
 }
 ```
 
 ### ProjectArchived
+
 ```typescript
 {
-  projectId: string
-  archivedBy: string
+  projectId: string;
+  archivedBy: string;
+}
+```
+
+### ProjectRestored
+
+```typescript
+{
+  projectId: string;
+  restoredBy: string;
+}
+```
+
+### ProjectDeleted
+
+> Soft delete only — the entity is never physically removed.
+
+```typescript
+{
+  projectId: string;
+  deletedBy: string;
+  deletedAt: string; // UTC ISO 8601
+}
+```
+
+### ProjectNextActionUpdated
+
+```typescript
+{
+  projectId: string;
+  previousNextAction: string | null;
+  newNextAction: string | null;
+}
+```
+
+### ProjectNextActionCleared
+
+```typescript
+{
+  projectId: string;
+  clearedBy: string;
+}
+```
+
+### ProjectCompleted
+
+```typescript
+{
+  projectId: string;
+  completedAt: string;
 }
 ```
 
@@ -134,6 +204,7 @@ type DomainEvent<T = unknown> = {
 ## Task Events
 
 ### TaskCreated
+
 ```typescript
 {
   taskId: string
@@ -147,42 +218,47 @@ type DomainEvent<T = unknown> = {
 ```
 
 ### TaskStatusUpdated
+
 ```typescript
 {
-  taskId: string
-  previousStatus: TaskStatus
-  newStatus: TaskStatus
+  taskId: string;
+  previousStatus: TaskStatus;
+  newStatus: TaskStatus;
 }
 ```
 
 ### TaskCompleted
+
 ```typescript
 {
-  taskId: string
-  completedAt: string
-  completedBy: string
+  taskId: string;
+  completedAt: string;
+  completedBy: string;
 }
 ```
 
 ### TaskDueDateChanged
+
 ```typescript
 {
-  taskId: string
-  previousDueDate: string | null
-  newDueDate: string | null
+  taskId: string;
+  previousDueDate: string | null;
+  newDueDate: string | null;
 }
 ```
 
 ### TaskAssigned
+
 ```typescript
 {
-  taskId: string
-  previousAssigneeId: string | null
-  newAssigneeId: string
+  taskId: string;
+  previousAssigneeId: string | null;
+  newAssigneeId: string;
 }
 ```
 
 ### TaskOverdue
+
 ```typescript
 {
   taskId: string
@@ -196,19 +272,21 @@ type DomainEvent<T = unknown> = {
 ## Contact Events
 
 ### ContactCreated
+
 ```typescript
 {
-  contactId: string
-  type: ContactType
-  name: string
+  contactId: string;
+  type: ContactType;
+  name: string;
 }
 ```
 
 ### ContactLinkedToProject
+
 ```typescript
 {
-  contactId: string
-  projectId: string
+  contactId: string;
+  projectId: string;
 }
 ```
 
@@ -217,6 +295,7 @@ type DomainEvent<T = unknown> = {
 ## Note Events
 
 ### NoteCreated
+
 ```typescript
 {
   noteId: string
@@ -226,11 +305,12 @@ type DomainEvent<T = unknown> = {
 ```
 
 ### NoteUpdated
+
 ```typescript
 {
-  noteId: string
-  titleChanged: boolean
-  bodyChanged: boolean
+  noteId: string;
+  titleChanged: boolean;
+  bodyChanged: boolean;
 }
 ```
 
@@ -239,25 +319,28 @@ type DomainEvent<T = unknown> = {
 ## Agent Events
 
 ### AgentActionQueued
+
 ```typescript
 {
-  agentActionId: string
-  agentId: string
-  actionType: string
-  confidence: number
-  requiresApproval: boolean
+  agentActionId: string;
+  agentId: string;
+  actionType: string;
+  confidence: number;
+  requiresApproval: boolean;
 }
 ```
 
 ### AgentActionApproved
+
 ```typescript
 {
-  agentActionId: string
-  approvedBy: string
+  agentActionId: string;
+  approvedBy: string;
 }
 ```
 
 ### AgentActionExecuted
+
 ```typescript
 {
   agentActionId: string
@@ -267,18 +350,20 @@ type DomainEvent<T = unknown> = {
 ```
 
 ### AgentActionRejected
+
 ```typescript
 {
-  agentActionId: string
-  rejectedBy: string
+  agentActionId: string;
+  rejectedBy: string;
 }
 ```
 
 ### AgentActionUndone
+
 ```typescript
 {
-  agentActionId: string
-  undoneby: string
+  agentActionId: string;
+  undoneby: string;
 }
 ```
 
@@ -287,30 +372,33 @@ type DomainEvent<T = unknown> = {
 ## Automation Events
 
 ### AutomationTriggered
+
 ```typescript
 {
-  automationId: string
-  triggerType: TriggerType
-  triggerDetails: Record<string, unknown>
+  automationId: string;
+  triggerType: TriggerType;
+  triggerDetails: Record<string, unknown>;
 }
 ```
 
 ### AutomationCompleted
+
 ```typescript
 {
-  automationId: string
-  actionsExecuted: number
-  durationMs: number
+  automationId: string;
+  actionsExecuted: number;
+  durationMs: number;
 }
 ```
 
 ### AutomationFailed
+
 ```typescript
 {
-  automationId: string
-  failedAtStep: number
-  errorCode: string
-  errorMessage: string
+  automationId: string;
+  failedAtStep: number;
+  errorCode: string;
+  errorMessage: string;
 }
 ```
 
@@ -319,6 +407,7 @@ type DomainEvent<T = unknown> = {
 ## Event Versioning
 
 When an event's payload schema changes in a breaking way:
+
 1. The `schemaVersion` field is incremented (e.g., `"1.0"` → `"2.0"`)
 2. Consumers must handle both versions during the transition period
 3. Old version events are not emitted after all consumers are updated

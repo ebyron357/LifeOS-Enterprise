@@ -11,9 +11,15 @@ describe('core event bus', () => {
     });
 
     await bus.publish({
-      type: 'health.ping',
-      payload: { ok: true },
+      eventId: 'evt_health-1',
+      eventType: 'health.ping',
+      entityId: 'system',
+      entityType: 'System',
+      businessUnitId: 'bu_system',
       occurredAt: new Date().toISOString(),
+      actorId: 'system',
+      schemaVersion: '1.0',
+      payload: { ok: true },
     });
     expect(handled).toBe(true);
   });
