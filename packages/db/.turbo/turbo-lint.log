@@ -1,0 +1,4 @@
+
+> @lifeos/db@2.0.0 lint /home/runner/work/LifeOS-Enterprise/LifeOS-Enterprise/packages/db
+> eslint src --ext .ts
+
