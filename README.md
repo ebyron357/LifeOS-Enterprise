@@ -1,36 +1,42 @@
-# LifeOS Enterprise
+# LifeOS Core Implementation Monorepo
 
-## Vision
-LifeOS Enterprise is the central operating system for managing businesses, projects, knowledge, AI agents, automations, and execution.
+This repository contains executable software for LifeOS Core.
 
-## Core Principles
-- One source of truth
-- Capture once, reuse many times
-- Every project has a next action
-- AI augments human decision-making
-- Automation reduces repetitive work
+## Canonical Specification
 
-## Repository Structure
-- /docs
-- /architecture
-- /businesses
-- /projects
-- /agents
-- /mcp
-- /workflows
-- /templates
-- /automation
+The canonical product and architecture specification lives in the LifeOS Enterprise specification repository. This implementation references that source of truth and does not redefine PRDs/ADRs/standards.
 
-## Businesses
-- TradeIQ
-- Alternative
-- ClientVerse
+Key references:
 
-## Roadmap
-1. Foundation
-2. Knowledge Graph
-3. AI Agents
-4. MCP Integrations
-5. Business Modules
-6. Automation
-7. SaaS Platform
+- `docs/architecture/overview.md`
+- `docs/architecture/decisions/ADR-001-spec-first.md`
+- `docs/standards/engineering.md`
+- `docs/standards/security.md`
+- `docs/standards/testing.md`
+
+## Quick Start
+
+```bash
+pnpm install
+pnpm dev
+```
+
+## Monorepo
+
+- `apps/web` — Next.js App Router web shell
+- `apps/api` — API runtime shell
+- `packages/core` — platform core infrastructure modules
+- `packages/database` — database and cache clients
+- `packages/api` — tRPC router package
+- `packages/shared-types` — shared contracts
+- `packages/shared-config` — validated runtime configuration
+- `packages/shared-ui` — reusable UI components
+- `services/worker` — background service scaffold
+
+## Quality & Security
+
+- Strict TypeScript, ESLint, Prettier
+- Husky + lint-staged + Changesets
+- Vitest + Playwright with coverage thresholds
+- GitHub Actions CI, CodeQL, secret scanning
+- Dependabot and Renovate

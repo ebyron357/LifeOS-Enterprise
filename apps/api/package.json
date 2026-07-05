@@ -1,0 +1,10 @@
+{
+  "name": "@lifeos/api-app",
+  "private": true,
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "dev": "node --watch src/index.ts",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  }
+}
