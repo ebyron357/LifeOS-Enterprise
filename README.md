@@ -35,6 +35,7 @@ docs/
   schemas/             Data schemas for core entities, APIs, events
   api/                 API specifications and authentication
   release/             Release process and version plans
+  governance/          Repository governance, change control, quality gates
 businesses/            Per-business context and requirements
 agents/                AI agent framework and agent definitions
 mcp/                   Model Context Protocol integration specs
@@ -83,4 +84,22 @@ automation/            Automation patterns and trigger definitions
 
 This repository uses markdown exclusively. All changes to the specification must be made via pull request. No application code, package managers, or runtime dependencies belong here.
 
-See [Engineering Standards](docs/standards/engineering.md) for contribution guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide, including branch naming, commit conventions, PR requirements, and documentation standards.
+
+---
+
+## Governance
+
+This repository has a formal governance framework that ensures consistency, traceability, and long-term maintainability.
+
+| Document | Purpose |
+|----------|---------|
+| [Repository Governance](docs/governance/REPOSITORY_GOVERNANCE.md) | Ownership, approval requirements, review cadence, deprecation and breaking change policies |
+| [Document Lifecycle](docs/governance/DOCUMENT_LIFECYCLE.md) | Lifecycle stages for all documents (Draft → Active → Deprecated) |
+| [Change Control](docs/governance/CHANGE_CONTROL.md) | 5-class change process from editorial fixes to breaking changes |
+| [Versioning Policy](docs/governance/VERSIONING_POLICY.md) | Repository tags, document versions, schema and API versioning |
+| [Review Process](docs/governance/REVIEW_PROCESS.md) | Reviewer roles, review criteria, SLAs, terminology consistency |
+| [Decision Process](docs/governance/DECISION_PROCESS.md) | ADR lifecycle, conflict resolution, decision communication |
+| [Quality Gates](docs/governance/QUALITY_GATES.md) | 12 mandatory quality gates enforced at review time |
+| [Traceability Matrix](docs/governance/TRACEABILITY_MATRIX.md) | Cross-reference map linking all artifacts to their dependencies |
+| [Repository Index](docs/governance/REPOSITORY_INDEX.md) | Master index of every document in the repository |
