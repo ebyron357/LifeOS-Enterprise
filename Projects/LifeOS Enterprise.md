@@ -4,7 +4,7 @@ status: active
 priority: P0
 owner: Byron
 business: LifeOS
-next_action: Run and document one complete Obsidian operating cycle, then resolve all P0/P1 defects.
+next_action: Open the vault in Obsidian, verify all core dashboards, and resolve any P0/P1 runtime defects.
 effort: medium
 impact: high
 review_date: 2026-07-17
@@ -36,8 +36,8 @@ Verified foundation assets include:
 
 ## Next Action
 
-- [ ] Run and document one complete Obsidian operating cycle.
-- [ ] Resolve all P0/P1 defects discovered during validation.
+- [x] Complete and record the static operating-cycle validation.\n- [ ] Open the vault in Obsidian and verify all core dashboards.
+- [ ] Resolve any P0/P1 runtime defects discovered during visual validation.
 
 ## Key Links
 
