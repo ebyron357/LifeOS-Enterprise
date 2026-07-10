@@ -1,0 +1,16 @@
+# Obsidian runtime and machine-specific state
+.obsidian/
+
+# Keep shared examples outside .obsidian under config/obsidian/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.bak
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
