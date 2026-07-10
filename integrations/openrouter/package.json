@@ -5,7 +5,8 @@
   "description": "OpenRouter test bridge for LifeOS Enterprise.",
   "type": "module",
   "scripts": {
-    "test": "node openrouter-test.js"
+    "test": "node openrouter-test.js",
+    "lifeos": "node lifeos-cli.js"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
