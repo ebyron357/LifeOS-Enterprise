@@ -1,6 +1,14 @@
+---
+type: dashboard
+dashboard: monthly-review
+status: active
+review_date: 2026-08-01
+tags: [dashboard, monthly-review]
+---
+
 # Monthly Review
 
-Purpose: Review goals, KPIs, systems, and archive what no longer matters.
+> Review goals, KPIs, system health, and archive what no longer matters.
 
 ## 1. Monthly Goals
 
@@ -11,51 +19,58 @@ Purpose: Review goals, KPIs, systems, and archive what no longer matters.
 ## 2. Business KPIs
 
 ```dataview
-TABLE kpi_focus, status, review_date
+TABLE priority, kpi_focus, status, review_date
 FROM "Businesses"
-WHERE status != "archived"
+WHERE type = "business" AND status != "archived"
 SORT priority ASC
 ```
 
 ## 3. Project Portfolio
 
 ```dataview
-TABLE status, priority, business, impact, effort, next_action
+TABLE status, priority, business, impact, effort, next_action, review_date
 FROM "Projects"
-WHERE status != "archived"
-SORT status ASC, priority ASC
+WHERE type = "project" AND status != "archived"
+SORT status ASC, priority ASC, impact DESC
 ```
 
-## 4. Systems Review
+## 4. Stale Active Projects
 
-Review:
-
-- Capture
-- Processing
-- Dashboards
-- Templates
-- AI workflows
-- Automations
-- Review cadence
+```dataview
+TABLE priority, business, next_action, review_date
+FROM "Projects"
+WHERE type = "project" AND status = "active" AND review_date AND review_date < date(today)
+SORT review_date ASC
+```
 
 ## 5. Archive Candidates
 
 ```dataview
-TABLE status, review_date, next_action
+TABLE type, status, review_date, next_action
 FROM "Projects" OR "Knowledge" OR "Tools" OR "URLs"
-WHERE status = "paused" OR status = "complete"
+WHERE type AND file.name != "README" AND (status = "paused" OR status = "complete")
 SORT review_date ASC
 ```
 
-## 6. Improvements
+## 6. System Health
+
+```dataview
+TABLE type, status, review_date
+FROM "Dashboards" OR "workflows" OR "AI"
+WHERE file.name != "README" AND type
+SORT file.folder ASC, file.name ASC
+```
+
+## 7. Improvements
 
 - What created leverage?
 - What created noise?
 - What should be automated?
 - What should be deleted?
+- Which project should be paused?
 
-## 7. Next Month Focus
+## 8. Next Month Focus
 
-- [ ] 
-- [ ] 
-- [ ] 
+- [ ] Choose three measurable outcomes.
+- [ ] Confirm business KPI focus.
+- [ ] Archive completed or irrelevant work.
