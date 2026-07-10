@@ -1,0 +1,33 @@
+filters:
+  and:
+    - 'file.ext == "md"'
+    - 'type == "goal"'
+    - 'status == "active"'
+properties:
+  file.name:
+    displayName: Goal
+  timeframe:
+    displayName: Timeframe
+  area:
+    displayName: Area
+  current_value:
+    displayName: Current
+  target_value:
+    displayName: Target
+  target_date:
+    displayName: Target date
+  review_date:
+    displayName: Review date
+views:
+  - type: table
+    name: Goals by Timeframe
+    groupBy:
+      property: timeframe
+      direction: ASC
+    order:
+      - file.name
+      - area
+      - current_value
+      - target_value
+      - target_date
+      - review_date
