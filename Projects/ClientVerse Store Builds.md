@@ -1,18 +1,18 @@
 ---
 type: project
-status: active
+status: waiting
 priority: P0
 owner: Byron
 business: ClientVerse
 next_action: Complete credential workflow and connect production settings.
 effort: medium
 impact: high
-review_date: 2026-07-08
+review_date: 2026-07-17
 waiting_on: API credentials
 blocker: Credentials and final catalog are not fully available.
 tags: [project, clientverse]
 created: 2026-07-07
-updated: 2026-07-07
+updated: 2026-07-10
 ---
 
 # ClientVerse Store Builds
