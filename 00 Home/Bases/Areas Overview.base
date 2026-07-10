@@ -1,0 +1,28 @@
+filters:
+  and:
+    - 'file.ext == "md"'
+    - 'type == "area"'
+    - 'status == "active"'
+properties:
+  file.name:
+    displayName: Area
+  standard:
+    displayName: Standard
+  review_frequency:
+    displayName: Review frequency
+  current_condition:
+    displayName: Current condition
+  review_date:
+    displayName: Review date
+  owner:
+    displayName: Owner
+views:
+  - type: table
+    name: Areas Overview
+    order:
+      - file.name
+      - standard
+      - review_frequency
+      - current_condition
+      - review_date
+      - owner
