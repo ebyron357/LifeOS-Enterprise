@@ -1,32 +1,40 @@
+---
+type: dashboard
+dashboard: daily-command-center
+status: active
+review_date: 2026-07-17
+tags: [dashboard, daily, command-center]
+---
+
 # Daily Command Center
 
-Purpose: Open this note first. It should show what deserves attention today.
+> Open this note first. It should show what deserves attention today in under one minute.
 
-## Today’s Priorities
+## Highest-Impact Next Actions
 
-- [ ] 
-- [ ] 
-- [ ] 
-
-## Highest-Impact Next Action
-
-- [ ] 
+```dataview
+TABLE priority, business, impact, effort, next_action, blocker
+FROM "Projects"
+WHERE type = "project" AND status = "active" AND next_action
+SORT priority ASC, impact DESC, effort ASC
+LIMIT 5
+```
 
 ## Deadlines
 
 ```dataview
 TABLE deadline, priority, next_action, business
 FROM "Projects"
-WHERE deadline AND status != "complete" AND status != "archived"
+WHERE type = "project" AND deadline AND status != "complete" AND status != "archived"
 SORT deadline ASC
 ```
 
-## Waiting On
+## Waiting On / Blocked
 
 ```dataview
-TABLE waiting_on, next_action, review_date
+TABLE waiting_on, blocker, next_action, review_date
 FROM "Projects"
-WHERE status = "waiting" OR waiting_on
+WHERE type = "project" AND (status = "waiting" OR waiting_on OR blocker)
 SORT review_date ASC
 ```
 
@@ -35,7 +43,7 @@ SORT review_date ASC
 ```dataview
 TABLE priority, business, impact, effort, next_action, review_date
 FROM "Projects"
-WHERE status = "active"
+WHERE type = "project" AND status = "active"
 SORT priority ASC, impact DESC, effort ASC
 ```
 
@@ -44,27 +52,30 @@ SORT priority ASC, impact DESC, effort ASC
 ```dataview
 TABLE type, status, next_action, review_date
 FROM "Projects" OR "Businesses" OR "Knowledge" OR "SOPs" OR "Tools"
-WHERE review_date <= date(today)
+WHERE type AND file.name != "README" AND review_date AND review_date <= date(today)
 SORT review_date ASC
 ```
 
 ## Learning Due
 
 ```dataview
-TABLE mastery, next_action, review_date
+TABLE topic, mastery, next_action, review_date
 FROM "Learning"
-WHERE review_date <= date(today)
+WHERE type = "learning" AND review_date AND review_date <= date(today)
 SORT review_date ASC
 ```
 
-## Capture Inbox
+## Inbox Count
 
-Drop unprocessed thoughts here, then move them later.
-
-- 
+```dataview
+TABLE file.mtime AS "Last Modified"
+FROM "Inbox"
+WHERE file.name != "README"
+SORT file.mtime DESC
+```
 
 ## End-of-Day Closeout
 
-- What got completed?
-- What is still open?
-- What is tomorrow’s highest-impact action?
+- [ ] Update completed project tasks.
+- [ ] Set tomorrow's highest-impact next action.
+- [ ] Process or intentionally defer Inbox items.
