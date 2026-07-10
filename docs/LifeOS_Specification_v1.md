@@ -1,206 +1,233 @@
-# LifeOS Specification v1
+# Obsidian Life OS Specification v1.0
 
 ## Purpose
 
-Build a long-term personal operating system in Obsidian that serves as the command center for life, business, learning, knowledge, and execution.
+Create a practical, maintainable operating system for life, business, relationships, knowledge, and AI work using Obsidian native features first.
 
-## Core Principles
+## Core Operating Model
 
-- One source of truth.
-- Capture once, reuse many times.
-- Every project has a next action.
-- Every piece of knowledge becomes a reusable asset.
-- Dashboards are generated from metadata.
-- AI supports decisions; it does not replace judgment.
-- Automation reduces repetitive work.
+```text
+Daily Notes
+    ↓
+Weekly Reviews
+    ↓
+Projects and Areas
+    ↓
+Goals and Life Direction
+```
 
-## Top-Level Structure
+Business and AI work extends the model:
 
-- Command Center
-- Inbox
-- Dashboards
-- Businesses
-- Projects
-- Learning
-- Knowledge
-- Tools
-- URLs
-- Automations
-- SOPs
-- AI
-- People
-- Resources
+```text
+Projects
+    ↓
+Decisions
+    ↓
+SOPs
+    ↓
+Agents
+    ↓
+Experiments
+```
+
+## Canonical Vault Structure
+
+```text
+00 Home/
+01 Inbox/
+10 Projects/
+20 Areas/
+30 Goals/
+40 Resources/
+50 People/
+60 Reviews/
+70 Journal/
+80 SOPs/
+90 Archive/
+99 Templates/
+```
+
+### Folder Responsibilities
+
+- `00 Home` — dashboards, navigation, and Bases.
+- `01 Inbox` — unprocessed captures only.
+- `10 Projects` — outcomes with a finish line.
+- `20 Areas` — ongoing responsibilities and standards.
+- `30 Goals` — measurable targets connected to areas and projects.
+- `40 Resources` — decisions, research, tools, ideas, agents, experiments, content, and automation records.
+- `50 People` — relationship and contact notes.
+- `60 Reviews` — weekly, monthly, quarterly, annual, and project reviews.
+- `70 Journal` — daily notes and personal logs.
+- `80 SOPs` — tested repeatable procedures.
+- `90 Archive` — inactive or completed material.
+- `99 Templates` — the only canonical template folder.
+
+## Note Types
+
+The supported types are defined in `architecture/METADATA_SCHEMA.md`. Do not create duplicate types or near-synonyms.
+
+## Required Templates
+
+- Daily Note
+- Weekly Review
+- Monthly Review
+- Project
+- Area
+- Goal
+- Meeting
+- Person
+- Decision
+- Resource
+- SOP
+- Agent Specification
+- Experiment
+- Business or Product Idea
+- Content Brief
+- Automation Workflow
+
+## Required Bases
+
+Located in `00 Home/Bases/`:
+
+- Active Projects
+- Projects Needing Review
+- Goals by Timeframe
+- Areas Overview
+- People to Contact
+- Recently Added Resources
+- Active SOPs
+- Agent Registry
+- Decisions Needing Review
 - Archive
 
-## Information Types
+## Required Dashboards
 
-### Projects
+### Life OS
 
-Properties:
+The main dashboard links to today, the inbox, reviews, active work, goals, areas, relationships, operations, and AI work.
 
-- status
-- priority
-- owner
-- deadline
-- next_action
-- business
-- effort
-- impact
-- review_date
+### Business Dashboard
 
-### Areas
+Shows revenue focus, active business projects, clients and people, content, SOPs, decisions, and risks.
 
-Ongoing responsibilities:
+### Personal Dashboard
 
-- Health
-- Finances
-- Home
-- Family
-- Personal Development
+Shows health, finances, relationships, home, learning, journal, and personal projects.
 
-### Businesses
+### Agentic Work Dashboard
 
-Each business contains:
+Shows active agents, experiments, automations, decisions, evaluations, approval workflows, and risks.
 
-- Vision
-- Strategy
-- KPIs
-- Marketing
-- Sales
-- Operations
-- Finance
-- SOPs
-- Projects
-- Meetings
-- Risks
-- Opportunities
+## Native Plugin Policy
 
-### Learning
+Enable these core plugins first:
 
-Track:
+- Templates
+- Daily notes
+- Properties view
+- Bases
+- Bookmarks
+- Canvas
 
-- Topics
-- Courses
-- Books
-- Videos
-- Podcasts
-- Practice
-- Mastery
-- Review schedule
+Community plugins are optional:
 
-### Tools
+- Templater — advanced dynamic templates.
+- QuickAdd — repeatable capture commands.
+- Tasks — recurring tasks and vault-wide task reporting.
+- Calendar — visual daily-note navigation.
+- Dataview — only when Bases cannot express a required view.
 
-Each tool stores:
+## Daily Workflow
 
-- Name
-- Category
-- URL
-- Documentation
-- Login URL
-- Cost
-- Projects Using It
-- Notes
-- Last Used
-- Review Date
+1. Open today’s Daily Note.
+2. Select three outcomes.
+3. Review the calendar.
+4. Add immediate tasks.
+5. Capture notes during the day.
+6. Complete a brief reflection.
+7. Move durable information to the correct permanent note.
 
-### URLs
+## Weekly Workflow
 
-Each URL stores:
+1. Review wins and friction.
+2. Review every active project.
+3. Review goals and important areas.
+4. Process `01 Inbox/`.
+5. Review people needing follow-up.
+6. Review the calendar and deadlines.
+7. Select next week’s three outcomes.
+8. Pause, archive, or cancel unnecessary commitments.
 
-- Website
-- Purpose
-- Category
-- Tags
-- Related Tool
-- Notes
+## Project Standard
 
-### Knowledge
+Every active project must have:
 
-One idea per note:
+- one desired outcome;
+- measurable success criteria;
+- one current next action;
+- an owner;
+- a status;
+- a priority;
+- a review date;
+- an area link;
+- a due date when appropriate.
 
-- Summary
-- Evidence
-- Applications
-- Related Concepts
-- Confidence
-- Source
+## Goal Standard
 
-### SOPs
+Every active goal must have:
 
-- Purpose
-- Inputs
-- Steps
-- Quality Check
-- Failure Points
-- Outputs
+- a measurable outcome;
+- a target date;
+- a current value;
+- a target value;
+- a related area;
+- related projects;
+- lead and lag measures.
 
-### AI
+## SOP Standard
 
-- Prompt Library
-- Agents
-- Workflows
-- Experiments
+Every active SOP must include:
 
-## Dashboards
+- purpose;
+- trigger;
+- inputs and requirements;
+- exact numbered procedure;
+- expected result;
+- validation checklist;
+- exceptions and troubleshooting;
+- owner, version, last-tested date, and review date.
 
-### Daily Command Center
+## Agent Standard
 
-- Today's priorities
-- Deadlines
-- Waiting On
-- Active projects
-- Learning due
-- Reviews due
-- Highest-impact next action
+Every agent specification must define:
 
-### Weekly Review
+- objective and user;
+- trigger, inputs, and outputs;
+- allowed tools and permissions;
+- prohibited behavior;
+- human approval points;
+- memory and data-access rules;
+- failure and fallback behavior;
+- evaluation cases;
+- success metrics and risks.
 
-- Projects
-- Open loops
-- Learning
-- Businesses
-- Automations
-- Decisions
+## Implementation Order
 
-### Monthly Review
-
-- Goals
-- KPIs
-- Systems
-- Archive
-- Improvements
-
-## AI Roles
-
-- Chief of Staff
-- Knowledge Engineer
-- Librarian
-- Project Manager
-- Automation Advisor
-
-## Automation Roadmap
-
-1. Capture source
-2. Process with AI
-3. Extract assets
-4. Create or update notes
-5. Link knowledge
-6. Update dashboards
-7. Queue reviews
-
-## Build Order
-
-1. Vault
-2. Metadata
-3. Templates
-4. Dashboards
-5. AI workflows
-6. Automation
-7. Continuous improvement
+1. Foundation — folders, properties, core templates.
+2. Navigation — dashboards, Bases, bookmarks.
+3. Relationships and operations — people, meetings, SOPs.
+4. Decisions and knowledge — decisions and resources.
+5. Business and AI — agents, experiments, automation, content.
+6. Automation — only after repeated manual friction is verified.
 
 ## Success Criteria
 
-- You know what deserves attention within one minute of opening Obsidian.
-- Projects always have a next action.
-- Learning turns into execution.
-- Information is easy to retrieve.
+The system succeeds when:
+
+- the correct next action is visible within one minute;
+- every active project is trustworthy and current;
+- goals connect to projects and areas;
+- the inbox is processed during weekly review;
+- relationships needing follow-up are visible;
+- dashboards render using native Bases;
+- the system works on desktop and mobile without requiring a large plugin stack.

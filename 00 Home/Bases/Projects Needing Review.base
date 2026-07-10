@@ -1,0 +1,30 @@
+filters:
+  and:
+    - 'file.ext == "md"'
+    - 'type == "project"'
+    - 'status == "active"'
+    - 'review_date'
+    - 'review_date <= today()'
+properties:
+  file.name:
+    displayName: Project
+  status:
+    displayName: Status
+  priority:
+    displayName: Priority
+  review_date:
+    displayName: Review date
+  next_action:
+    displayName: Next action
+  blocker:
+    displayName: Blocker
+views:
+  - type: table
+    name: Projects Needing Review
+    order:
+      - file.name
+      - status
+      - priority
+      - review_date
+      - next_action
+      - blocker

@@ -1,0 +1,28 @@
+filters:
+  and:
+    - 'file.ext == "md"'
+    - 'type == "sop"'
+    - 'status == "active"'
+properties:
+  file.name:
+    displayName: SOP
+  area:
+    displayName: Area
+  owner:
+    displayName: Owner
+  version:
+    displayName: Version
+  last_tested:
+    displayName: Last tested
+  review_date:
+    displayName: Review date
+views:
+  - type: table
+    name: Active SOPs
+    order:
+      - file.name
+      - area
+      - owner
+      - version
+      - last_tested
+      - review_date

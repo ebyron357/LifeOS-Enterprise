@@ -1,0 +1,29 @@
+filters:
+  and:
+    - 'file.ext == "md"'
+    - or:
+        - 'status == "archived"'
+        - 'file.inFolder("90 Archive")'
+properties:
+  file.name:
+    displayName: Note
+  type:
+    displayName: Type
+  area:
+    displayName: Area
+  project:
+    displayName: Project
+  updated:
+    displayName: Updated
+  status:
+    displayName: Status
+views:
+  - type: table
+    name: Archive
+    order:
+      - file.name
+      - type
+      - area
+      - project
+      - updated
+      - status

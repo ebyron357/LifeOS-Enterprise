@@ -1,0 +1,31 @@
+filters:
+  and:
+    - 'file.ext == "md"'
+    - 'type == "agent"'
+    - 'status != "archived"'
+properties:
+  file.name:
+    displayName: Agent
+  status:
+    displayName: Status
+  project:
+    displayName: Project
+  owner:
+    displayName: Owner
+  risk_level:
+    displayName: Risk level
+  version:
+    displayName: Version
+  review_date:
+    displayName: Review date
+views:
+  - type: table
+    name: Agent Registry
+    order:
+      - file.name
+      - status
+      - project
+      - owner
+      - risk_level
+      - version
+      - review_date

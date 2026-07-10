@@ -1,0 +1,29 @@
+filters:
+  and:
+    - 'file.ext == "md"'
+    - 'type == "person"'
+    - 'next_contact'
+    - 'next_contact <= today()'
+properties:
+  file.name:
+    displayName: Person
+  relationship:
+    displayName: Relationship
+  company:
+    displayName: Company
+  role:
+    displayName: Role
+  last_contact:
+    displayName: Last contact
+  next_contact:
+    displayName: Next contact
+views:
+  - type: table
+    name: People to Contact
+    order:
+      - file.name
+      - relationship
+      - company
+      - role
+      - last_contact
+      - next_contact

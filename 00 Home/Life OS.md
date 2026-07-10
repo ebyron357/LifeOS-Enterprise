@@ -1,0 +1,72 @@
+---
+type: dashboard
+status: active
+created: 2026-07-10
+updated: 2026-07-10
+tags:
+  - dashboard
+  - life-os
+---
+
+# Life OS
+
+> [!tip] Start here
+> Run **Daily notes: Open today's daily note**, choose three outcomes, then return here to review active work.
+
+## Navigation
+
+- [[00 Home/Business Dashboard|Business]]
+- [[00 Home/Personal Dashboard|Personal]]
+- [[00 Home/Agentic Work Dashboard|Agentic Work]]
+- [[01 Inbox/Inbox|Inbox]]
+- [[60 Reviews/README|Reviews]]
+- [[99 Templates/README|Templates]]
+
+## Active Work
+
+![[00 Home/Bases/Active Projects.base]]
+
+## Projects Needing Review
+
+![[00 Home/Bases/Projects Needing Review.base]]
+
+## Goals
+
+![[00 Home/Bases/Goals by Timeframe.base]]
+
+## Areas
+
+![[00 Home/Bases/Areas Overview.base]]
+
+## Relationships
+
+![[00 Home/Bases/People to Contact.base]]
+
+## Operations
+
+![[00 Home/Bases/Active SOPs.base]]
+
+## Agent Registry
+
+![[00 Home/Bases/Agent Registry.base]]
+
+## Decisions Needing Review
+
+![[00 Home/Bases/Decisions Needing Review.base]]
+
+## Recent Resources
+
+![[00 Home/Bases/Recently Added Resources.base]]
+
+## Archive
+
+![[00 Home/Bases/Archive.base]]
+
+## Weekly Control Loop
+
+1. Process `01 Inbox`.
+2. Review every active project.
+3. Update next actions and review dates.
+4. Review goals, areas, and relationships.
+5. Select next week's three outcomes.
+6. Pause, cancel, complete, or archive work that no longer deserves attention.

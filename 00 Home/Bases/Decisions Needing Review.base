@@ -1,0 +1,29 @@
+filters:
+  and:
+    - 'file.ext == "md"'
+    - 'type == "decision"'
+    - 'review_date'
+    - 'review_date <= today()'
+properties:
+  file.name:
+    displayName: Decision
+  project:
+    displayName: Project
+  area:
+    displayName: Area
+  date:
+    displayName: Decision date
+  review_date:
+    displayName: Review date
+  status:
+    displayName: Status
+views:
+  - type: table
+    name: Decisions Needing Review
+    order:
+      - file.name
+      - project
+      - area
+      - date
+      - review_date
+      - status
