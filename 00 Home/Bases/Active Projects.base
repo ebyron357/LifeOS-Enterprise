@@ -1,0 +1,34 @@
+filters:
+  and:
+    - 'file.ext == "md"'
+    - 'type == "project"'
+    - 'status == "active"'
+properties:
+  file.name:
+    displayName: Project
+  area:
+    displayName: Area
+  goal:
+    displayName: Goal
+  priority:
+    displayName: Priority
+  due_date:
+    displayName: Due date
+  review_date:
+    displayName: Review date
+  next_action:
+    displayName: Next action
+  owner:
+    displayName: Owner
+views:
+  - type: table
+    name: Active Projects
+    order:
+      - file.name
+      - area
+      - goal
+      - priority
+      - due_date
+      - review_date
+      - next_action
+      - owner
