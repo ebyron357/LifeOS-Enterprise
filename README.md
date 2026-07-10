@@ -1,64 +1,91 @@
-# LifeOS Enterprise
+# Obsidian Life OS
 
-## Vision
+A practical, maintainable Life OS built for Obsidian with native features first, consistent properties, reusable templates, and Bases-powered dashboards.
 
-LifeOS Enterprise is the central operating system for managing businesses, projects, knowledge, AI agents, automations, and execution.
+## Canonical Vault Structure
 
-## Core Principles
+```text
+00 Home/
+01 Inbox/
+10 Projects/
+20 Areas/
+30 Goals/
+40 Resources/
+50 People/
+60 Reviews/
+70 Journal/
+80 SOPs/
+90 Archive/
+99 Templates/
+```
 
-- One source of truth
-- Capture once, reuse many times
-- Every project has a next action
-- AI augments human decision-making
-- Automation reduces repetitive work
+Legacy folders remain temporarily so existing notes are not destroyed. New notes must use the numbered structure. Migrate legacy notes only after reviewing links and metadata.
 
-## Current Status
+## Operating Model
 
-Foundation v1 is now being built as an Obsidian-first command center.
+```text
+Daily Notes
+    ↓
+Weekly Reviews
+    ↓
+Projects and Areas
+    ↓
+Goals and Life Direction
+```
 
-Completed foundation files:
+Business and AI work extends the loop:
 
-- `docs/CURRENT_STATE_AUDIT.md`
-- `docs/LifeOS_Specification_v1.md`
-- `architecture/METADATA_SCHEMA.md`
-- `templates/project-template.md`
-- `templates/business-template.md`
-- `templates/knowledge-template.md`
-- `templates/sop-template.md`
-- `Command Center/Daily Command Center.md`
-- `Dashboards/Weekly Review.md`
-- `Dashboards/Monthly Review.md`
+```text
+Projects → Decisions → SOPs → Agents → Experiments
+```
 
-## Repository Structure
+## Start Here
 
-- `/docs`
-- `/architecture`
-- `/Command Center`
-- `/Dashboards`
-- `/businesses`
-- `/projects`
-- `/agents`
-- `/mcp`
-- `/workflows`
-- `/templates`
-- `/automation`
+1. Open this repository as an Obsidian vault.
+2. Follow `docs/OBSIDIAN_SETUP.md`.
+3. Open `00 Home/Life OS.md`.
+4. Create notes from `99 Templates/`.
+5. Run `powershell -ExecutionPolicy Bypass -File scripts/audit-vault.ps1` after changes.
 
-## Businesses
+## Native Features
 
-- TradeIQ
-- Alternative
-- ClientVerse
+Enable these Obsidian core plugins:
 
-## Roadmap
+- Templates
+- Daily notes
+- Properties view
+- Bases
+- Bookmarks
+- Canvas
 
-1. Foundation
-2. Knowledge Graph
-3. AI Agents
-4. MCP Integrations
-5. Business Modules
-6. Automation
-7. SaaS Platform
+Community plugins are optional. Add Templater, QuickAdd, Tasks, Calendar, or Dataview only after a repeated limitation appears.
 
-## Foundation Rule
+## Foundation Rules
 
-No active project should exist without metadata and a clear `next_action`.
+- Every active project has one clear outcome, one next action, an owner, and a review date.
+- Goals are measurable; projects contain the work.
+- Areas are ongoing responsibilities, not finish-line outcomes.
+- Capture into `01 Inbox/`, then process during daily or weekly review.
+- Prefer Bases before Dataview.
+- Do not automate an unstable workflow.
+
+## Key Files
+
+- `00 Home/Life OS.md` — main dashboard
+- `00 Home/Bases/` — structured dashboards
+- `99 Templates/` — canonical templates
+- `architecture/METADATA_SCHEMA.md` — property contract
+- `docs/OBSIDIAN_SETUP.md` — exact setup instructions
+- `docs/LifeOS_Specification_v1.md` — operating specification
+- `scripts/setup-obsidian.ps1` — non-destructive local setup
+- `scripts/audit-vault.ps1` — structural and metadata validation
+
+## Definition of Done
+
+The vault is operational when it can answer these questions in under one minute:
+
+- What deserves attention today?
+- Which projects are active, blocked, waiting, or due for review?
+- Which goals are progressing?
+- Who needs follow-up?
+- Which SOPs, decisions, and agents need review?
