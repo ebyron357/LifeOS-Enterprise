@@ -1,124 +1,245 @@
-# LifeOS Metadata Schema
+# Life OS Metadata Schema
 
-Purpose: Standardize every note so dashboards can be generated from metadata instead of manual tracking.
+This file is the property contract for the vault. Properties exist only when they support filtering, sorting, grouping, review, automation, or reporting.
 
 ## Global Properties
 
-Use these properties where applicable.
+Use these where applicable:
 
 ```yaml
-status: active | paused | waiting | complete | archived
-priority: P0 | P1 | P2 | P3
-owner: Byron
-business:
-deadline:
-next_action:
-effort: low | medium | high
-impact: low | medium | high
-review_date:
-tags: []
+---
+type:
+status:
+area:
+project:
+goal:
+owner:
 created:
 updated:
+review_date:
+tags:
+---
 ```
 
-## Project Properties
+## Controlled Values
+
+### `type`
+
+```text
+daily
+weekly-review
+monthly-review
+quarterly-review
+annual-review
+project
+area
+goal
+meeting
+person
+decision
+resource
+sop
+agent
+experiment
+content
+idea
+automation
+```
+
+### `status`
+
+```text
+inbox
+planned
+active
+waiting
+blocked
+paused
+complete
+archived
+cancelled
+draft
+review
+approved
+decided
+design
+```
+
+### `priority`
+
+```text
+P0
+P1
+P2
+P3
+```
+
+### Dates
+
+Use ISO dates:
 
 ```yaml
+created: 2026-07-10
+updated: 2026-07-10
+review_date: 2026-07-17
+due_date: 2026-08-01
+```
+
+### Links
+
+Use Obsidian links for relationships when possible:
+
+```yaml
+area: "[[Business]]"
+project: "[[Build Agentic Shopify Store]]"
+goal: "[[Launch Store by Q4]]"
+```
+
+## Required Properties by Type
+
+### Project
+
+```yaml
+---
 type: project
 status: active
+area:
+goal:
+owner:
 priority: P1
-owner: Byron
-business:
-deadline:
+start_date:
+due_date:
+review_date:
 next_action:
-effort:
-impact:
-review_date:
-waiting_on:
-blocker:
+tags:
+  - project
+---
 ```
 
-Required fields:
+Required: `type`, `status`, `owner`, `priority`, `review_date`, `next_action`.
 
-- `status`
-- `priority`
-- `next_action`
-- `review_date`
-
-## Business Properties
+### Area
 
 ```yaml
-type: business
+---
+type: area
 status: active
-priority: P1
-owner: Byron
-kpi_focus:
-active_projects: []
+owner:
+review_frequency: monthly
+standard:
 review_date:
+tags:
+  - area
+---
 ```
 
-## Knowledge Properties
+### Goal
 
 ```yaml
-type: knowledge
-summary:
+---
+type: goal
+status: active
+area:
+timeframe:
+target_date:
+metric:
+starting_value:
+target_value:
+current_value:
+review_date:
+tags:
+  - goal
+---
+```
+
+Required: `type`, `status`, `area`, `target_date`, `metric`, `current_value`, `target_value`.
+
+### Person
+
+```yaml
+---
+type: person
+status: active
+relationship:
+company:
+role:
+last_contact:
+next_contact:
+tags:
+  - person
+---
+```
+
+### Decision
+
+```yaml
+---
+type: decision
+status: decided
+date:
+project:
+area:
+review_date:
+tags:
+  - decision
+---
+```
+
+### Resource
+
+```yaml
+---
+type: resource
+status: active
 source:
-confidence: low | medium | high
-related_concepts: []
-applications: []
+author:
+topic:
+created:
 review_date:
+tags:
+  - resource
+---
 ```
 
-## SOP Properties
+### SOP
 
 ```yaml
+---
 type: sop
 status: active
-owner: Byron
-purpose:
-inputs: []
-outputs: []
-quality_check:
+area:
+owner:
+version: 1.0
+last_tested:
 review_date:
+tags:
+  - sop
+---
 ```
 
-## Tool Properties
+### Agent
 
 ```yaml
-type: tool
-category:
-url:
-login_url:
-cost:
-projects_using_it: []
-last_used:
+---
+type: agent
+status: design
+project:
+owner:
+risk_level:
+version: 0.1
 review_date:
-status: active
+tags:
+  - agent
+---
 ```
 
-## URL Properties
+## Validation Rules
 
-```yaml
-type: url
-website:
-purpose:
-category:
-related_tool:
-tags: []
-review_date:
-```
-
-## Dashboard Logic
-
-Dashboards should prioritize notes by:
-
-1. `status = active`
-2. `priority = P0` or `P1`
-3. nearest `deadline`
-4. highest `impact`
-5. lowest `effort`
-6. oldest `review_date`
-
-## Rule
-
-No active project is allowed to exist without a `next_action`.
+1. No active project may have a blank `next_action`.
+2. Every active project must have an owner and review date.
+3. Every goal must be measurable and connected to an area.
+4. Use links for `area`, `project`, and `goal` relationships when possible.
+5. Do not invent new property names when an existing standard property fits.
+6. Property names use lowercase snake_case.
+7. Empty optional properties may remain blank; required properties may not.
+8. Archived notes use `status: archived` and live under `90 Archive/` when practical.
