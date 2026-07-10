@@ -1,0 +1,27 @@
+filters:
+  and:
+    - 'file.ext == "md"'
+    - 'type == "resource"'
+properties:
+  file.name:
+    displayName: Resource
+  topic:
+    displayName: Topic
+  author:
+    displayName: Author
+  source:
+    displayName: Source
+  project:
+    displayName: Related project
+  created:
+    displayName: Created
+views:
+  - type: table
+    name: Recently Added Resources
+    order:
+      - file.name
+      - topic
+      - author
+      - source
+      - project
+      - created
