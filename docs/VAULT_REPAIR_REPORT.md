@@ -1,125 +1,141 @@
-# LifeOS Vault Repair Report
+# Obsidian Life OS Vault Repair Report
 
-Date: 2026-07-10
+Date: 2026-07-10  
 Repository: `ebyron357/LifeOS-Enterprise`
 
 ## Executive Summary
 
-The vault was failing to pull because local Obsidian runtime files were also committed to GitHub. Obsidian changes those files automatically, so Git treated the local copies as untracked files that would be overwritten by the incoming merge.
-
-The conflict architecture has been repaired.
-
-## Root Cause
-
-These machine-specific files were tracked in Git:
-
-- `.obsidian/app.json`
-- `.obsidian/community-plugins.json`
-- `.obsidian/plugins/homepage/data.json`
-- `.obsidian/templates.json`
-
-Those files are modified locally by Obsidian and plugins. They should not be shared as live tracked files.
+The repository previously mixed a legacy folder model, Dataview-first dashboards, hard-coded local paths, and machine-specific Obsidian settings. The repair establishes a native-first, numbered Life OS while preserving existing notes and links.
 
 ## Repairs Completed
 
 ### Git safety
 
-- Added `.gitignore` rule for the entire `.obsidian/` directory.
-- Removed tracked machine-specific Obsidian files.
-- Added ignore rules for OS noise, temporary files, backups, and local environment files.
+- `.obsidian/` remains ignored because it contains machine-specific runtime state.
+- `.local-backups/` is now ignored.
+- Shared defaults remain version controlled under `config/obsidian/`.
+- Local secrets, temporary files, and OS noise remain ignored.
+
+### Canonical vault structure
+
+Added:
+
+```text
+00 Home/
+01 Inbox/
+10 Projects/
+20 Areas/
+30 Goals/
+40 Resources/
+50 People/
+60 Reviews/
+70 Journal/
+80 SOPs/
+90 Archive/
+99 Templates/
+```
+
+Existing legacy folders were not deleted or moved automatically. This prevents broken links and data loss.
+
+### Dashboards and Bases
+
+Added four dashboards:
+
+- Life OS
+- Business
+- Personal
+- Agentic Work
+
+Added ten native Obsidian Bases:
+
+- Active Projects
+- Projects Needing Review
+- Goals by Timeframe
+- Areas Overview
+- People to Contact
+- Recently Added Resources
+- Active SOPs
+- Agent Registry
+- Decisions Needing Review
+- Archive
+
+The primary system no longer requires Dataview.
+
+### Template system
+
+Added sixteen canonical templates under `99 Templates/`, covering daily and periodic reviews, projects, areas, goals, meetings, people, decisions, resources, SOPs, agents, experiments, ideas, content, and automation.
 
 ### Shared configuration
 
-Moved reusable defaults into version-controlled templates:
+Updated shared defaults:
 
-- `config/obsidian/app.json`
-- `config/obsidian/templates.json`
-- `config/obsidian/homepage.json`
+- new notes → `01 Inbox`
+- attachments → `40 Resources/Attachments`
+- templates → `99 Templates`
+- daily notes → `70 Journal/Daily`
+- daily template → `99 Templates/Daily Note`
+- home dashboard → `00 Home/Life OS.md`
 
 ### Setup workflow
 
-Replaced `scripts/setup-obsidian.ps1` with a non-destructive setup script.
+`scripts/setup-obsidian.ps1` now:
 
-The script now:
-
-- Verifies the repository path.
-- Verifies Git exists in the folder.
-- Creates required local folders.
-- Installs shared defaults only when the local file is missing.
-- Preserves existing plugin settings.
-- Supports `-Force` only for intentional replacement.
+1. resolves the repository from its own location;
+2. creates the canonical folders;
+3. installs shared settings only when safe;
+4. preserves existing local settings unless `-Force` is explicitly used;
+5. skips Homepage plugin configuration when that optional plugin is absent;
+6. runs the vault audit;
+7. prints the exact core plugins and success target.
 
 ### Recovery workflow
 
-Added `scripts/repair-local-vault.ps1`.
+`scripts/repair-local-vault.ps1` now:
 
-The repair script:
+1. resolves the repository without a hard-coded username;
+2. backs up `.obsidian/` into an ignored local backup folder;
+3. uses `git pull --ff-only origin main`;
+4. leaves local settings untouched if the pull fails;
+5. applies the canonical safe setup;
+6. opens the workflow toward `00 Home/Life OS.md`.
 
-1. Backs up the local `.obsidian` folder.
-2. Pulls the repaired Git repository.
-3. Applies shared defaults without overwriting local plugin state.
-4. Leaves user notes and installed plugins intact.
+### Validation workflow
 
-## Verified Core Files
+`scripts/audit-vault.ps1` now checks:
 
-- `Command Center/Daily Command Center.md`
-- `Dashboards/Weekly Review.md`
-- `Dashboards/Monthly Review.md`
-- `architecture/METADATA_SCHEMA.md`
-- `templates/project-template.md`
-- `templates/business-template.md`
-- `templates/knowledge-template.md`
-- `templates/sop-template.md`
-- `templates/tool-template.md`
-- `templates/url-template.md`
-- `templates/person-template.md`
-
-## Verified Core Folders
-
-- AI
-- architecture
-- Businesses
-- Command Center
-- Dashboards
-- docs
-- Inbox
-- integrations
-- Projects
-- Reviews
-- scripts
-- templates
-- workflows
-- Knowledge
-- Tools
-- URLs
-- SOPs
-- Learning
-- People
-- Resources
-
-## Operating Rule
-
-Git tracks vault content and shared configuration templates.
-
-Git does not track live `.obsidian` runtime state.
-
-This prevents future pulls from colliding with local plugin and workspace files.
+- canonical folders;
+- dashboards;
+- all ten Bases;
+- all sixteen templates;
+- shared JSON settings;
+- required template properties;
+- strict metadata for new canonical projects;
+- migration warnings for legacy projects;
+- missing Base embeds on the Home dashboard.
 
 ## Local Repair Command
 
-Run from PowerShell:
+From the cloned repository:
 
 ```powershell
-cd "$env:USERPROFILE\Documents\GitHub\LifeOS-Enterprise"
-powershell -ExecutionPolicy Bypass -File ".\scripts\repair-local-vault.ps1"
+powershell -ExecutionPolicy Bypass -File .\scripts\repair-local-vault.ps1
+```
+
+For a first-time setup without a pull or backup:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\setup-obsidian.ps1
 ```
 
 ## Success Criteria
 
-Repair is complete when:
+Repair is accepted when:
 
-- `git pull origin main` succeeds.
-- Obsidian opens the `LifeOS-Enterprise` vault.
-- `Command Center/Daily Command Center.md` opens.
-- Installed plugins remain present.
-- Future Git pulls do not report `.obsidian` overwrite errors.
+- the script returns the audit PASS message;
+- Obsidian opens the repository as a vault;
+- `00 Home/Life OS.md` opens;
+- all embedded `.base` views render;
+- Daily Notes create files under `70 Journal/Daily` using `99 Templates/Daily Note`;
+- new notes default to `01 Inbox`;
+- existing legacy notes remain available;
+- future pulls do not collide with local `.obsidian` or backup files.
