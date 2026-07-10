@@ -1,6 +1,9 @@
 # Obsidian runtime and machine-specific state
 .obsidian/
 
+# Local repair backups
+.local-backups/
+
 # Keep shared examples outside .obsidian under config/obsidian/
 
 # OS/editor noise
