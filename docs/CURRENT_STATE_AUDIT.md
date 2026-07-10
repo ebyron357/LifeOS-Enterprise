@@ -1,131 +1,136 @@
-# LifeOS Enterprise — Current State Review
+# Obsidian Life OS — Current State Audit
 
-Date: 2026-07-10
+Date: 2026-07-10  
 Repository: `ebyron357/LifeOS-Enterprise`
-Status: Foundation v1 structure implemented; operational validation and recurring use remain.
 
-## 1. Verified Repository State
+## Status
 
-- Repository is accessible and uses `main` as its default branch.
-- Visibility is private.
-- The project is organized as an Obsidian-first LifeOS command center.
-- The repository contains active business and project records, reusable templates, dashboards, AI role definitions, metadata guidance, and a capture-processing workflow.
+**Canonical Life OS v1 structure: implemented**  
+**Repository-level structural validation: complete**  
+**Local Obsidian runtime validation: required after pull**
 
-## 2. Verified Foundation Deliverables
+## Implemented Foundation
 
-### Documentation and architecture
+### Canonical structure
 
-- `README.md`
-- `docs/LifeOS_Specification_v1.md`
-- `docs/OBSIDIAN_SETUP.md`
-- `architecture/METADATA_SCHEMA.md`
-- `PROJECT_REPO_REGISTRY.md`
+```text
+00 Home/
+01 Inbox/
+10 Projects/
+20 Areas/
+30 Goals/
+40 Resources/
+50 People/
+60 Reviews/
+70 Journal/
+80 SOPs/
+90 Archive/
+99 Templates/
+```
 
-### Command center and reviews
+Legacy folders remain in place so existing notes and links are not destroyed. All new work uses the numbered structure.
 
-- `Command Center/Daily Command Center.md`
-- `Dashboards/Weekly Review.md`
-- `Dashboards/Monthly Review.md`
+### Dashboards
 
-### Reusable templates
+- `00 Home/Life OS.md`
+- `00 Home/Business Dashboard.md`
+- `00 Home/Personal Dashboard.md`
+- `00 Home/Agentic Work Dashboard.md`
 
+### Native Bases
+
+- Active Projects
+- Projects Needing Review
+- Goals by Timeframe
+- Areas Overview
+- People to Contact
+- Recently Added Resources
+- Active SOPs
+- Agent Registry
+- Decisions Needing Review
+- Archive
+
+### Canonical templates
+
+Sixteen templates exist in `99 Templates/`:
+
+- Daily Note
+- Weekly Review
+- Monthly Review
 - Project
-- Business
-- Knowledge
-- SOP
-- Tool
-- URL
+- Area
+- Goal
+- Meeting
 - Person
+- Decision
+- Resource
+- SOP
+- Agent Specification
+- Experiment
+- Business or Product Idea
+- Content Brief
+- Automation Workflow
 
-### Operating records
+### Shared Obsidian defaults
 
-Verified project records include:
+Version-controlled defaults now point to:
 
-- LifeOS Enterprise
-- TradeIQ
-- ClientVerse Store Builds
-- Charlotte Real Estate System
+- new notes: `01 Inbox`
+- attachments: `40 Resources/Attachments`
+- templates: `99 Templates`
+- daily notes: `70 Journal/Daily`
+- daily template: `99 Templates/Daily Note`
+- home: `00 Home/Life OS.md`
 
-Verified business records include:
+Live `.obsidian/` runtime state remains ignored by Git.
 
-- LifeOS
-- TradeIQ
-- ClientVerse
+### Automation and validation
 
-### AI and workflows
+- `scripts/setup-obsidian.ps1` is repository-relative and non-destructive.
+- `scripts/repair-local-vault.ps1` backs up local Obsidian state, performs a fast-forward-only pull, and applies shared defaults.
+- `scripts/audit-vault.ps1` validates canonical folders, required files, Base markers, JSON settings, templates, dashboard embeds, and project metadata.
+- `.local-backups/` is ignored by Git.
 
-Verified AI role definitions include:
+## Closed Structural Defects
 
-- Chief of Staff
-- Project Manager
-- Librarian
-- Automation Advisor
+- Dataview is no longer required for the primary dashboards.
+- The old non-numbered folder model is no longer the default.
+- Template and Daily Note paths no longer point to legacy folders.
+- Setup and repair scripts no longer depend on a hard-coded Windows username path.
+- The recovery workflow no longer opens the old Daily Command Center.
+- Local repair backups no longer risk being committed.
+- Existing notes were preserved instead of destructively moved.
 
-Verified workflow:
+## Validation Boundary
 
-- `workflows/CAPTURE_PROCESSING_WORKFLOW.md`
+GitHub verification confirms that the repair branch is based directly on `main`, contains the complete required file set, and has no branch divergence.
 
-## 3. Foundation Review
+The connected GitHub environment cannot launch the desktop Obsidian application. Final runtime acceptance therefore occurs locally by opening the vault and confirming that Obsidian renders the `.base` files.
 
-The original structural gap list is substantially closed. The specification, metadata schema, templates, dashboards, business/project records, AI roles, and capture workflow now exist.
+## Local Acceptance Test
 
-Foundation v1 should not yet be treated as operationally complete because repository presence alone does not verify that:
+From the repository folder, run:
 
-- the vault opens cleanly in Obsidian;
-- Dataview queries render without errors;
-- every active record conforms to the metadata schema;
-- every active project has a current, actionable `next_action`;
-- review dates and status fields are maintained through an actual weekly cycle;
-- capture, processing, and review workflows work end to end.
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\repair-local-vault.ps1
+```
 
-## 4. Current Risks
+Then in Obsidian:
 
-- Metadata drift can silently break dashboards.
-- Stale `review_date` and `next_action` values reduce trust in the command center.
-- Adding new modules before validating daily use would increase complexity.
-- Automation work may begin before the manual operating loop is stable.
-- Repository documentation may diverge from actual vault behavior without recurring validation.
+1. Open the `LifeOS-Enterprise` folder as a vault.
+2. Enable Templates, Daily notes, Properties view, Bases, Bookmarks, and Canvas.
+3. Open `00 Home/Life OS.md`.
+4. Confirm all embedded Base views render.
+5. Run **Daily notes: Open today's daily note**.
+6. Confirm the note is created in `70 Journal/Daily` from the canonical Daily Note template.
 
-## 5. Highest-Priority Milestone
+## Definition of Done
 
-Run and document one complete operating cycle:
+Foundation v1 is fully accepted when:
 
-1. Open the repository as an Obsidian vault.
-2. Install and enable required plugins documented in the setup guide.
-3. Verify the Daily Command Center, Weekly Review, and Monthly Review.
-4. Validate active project and business metadata against the schema.
-5. Process at least one Inbox item through the capture workflow.
-6. Update every active project's next action and review date.
-7. Record defects and resolve all P0/P1 issues.
-
-## 6. Definition of Done for Foundation v1
-
-Foundation v1 is complete only when verified use demonstrates that the vault can answer these questions in under one minute:
-
-- What deserves attention today?
-- What projects are active?
-- What is blocked?
-- What is waiting on someone else?
-- What has a deadline?
-- What is the highest-impact next action?
-
-Additional acceptance criteria:
-
-- Core dashboard queries render without errors.
-- Every active project has valid metadata and a concrete next action.
-- Business and project records link correctly.
-- Capture-to-processing flow has been exercised successfully.
-- Weekly review has been completed once with decisions and next-week outcomes recorded.
-- No P0 or P1 foundation defects remain.
-
-## 7. Review Decision
-
-Foundation structure: **complete**
-
-Operational validation: **pending**
-
-Next milestone: **complete one verified Obsidian operating cycle before expanding the system**
-
-## 8. Working Rule
-
-Do not add new systems until the foundation has passed operational validation and every active project has current metadata, a clear next action, and a review date.
+- `scripts/audit-vault.ps1` returns PASS;
+- the Life OS dashboard opens without missing embeds;
+- all ten Bases render in Obsidian;
+- today’s Daily Note is created in the correct folder from the correct template;
+- a new Project created from `99 Templates/Project.md` appears in Active Projects after its required properties are completed;
+- existing legacy notes remain available.
