@@ -13,9 +13,19 @@ tags: [dashboard, daily, command-center]
 ## Highest-Impact Next Actions
 
 ```dataview
-TABLE priority, business, impact, effort, next_action, blocker
+TABLE WITHOUT ID
+  file.link AS "Project",
+  priority AS "Priority",
+  business AS "Business",
+  impact AS "Impact",
+  effort AS "Effort",
+  next_action AS "Next Action",
+  blocker AS "Blocker"
 FROM "Projects"
-WHERE type = "project" AND status = "active" AND next_action
+WHERE type = "project"
+  AND status = "active"
+  AND next_action
+  AND lower(file.name) != "readme"
 SORT priority ASC, impact DESC, effort ASC
 LIMIT 5
 ```
@@ -23,54 +33,108 @@ LIMIT 5
 ## Deadlines
 
 ```dataview
-TABLE deadline, priority, next_action, business
+TABLE WITHOUT ID
+  file.link AS "Project",
+  deadline AS "Deadline",
+  priority AS "Priority",
+  next_action AS "Next Action",
+  business AS "Business"
 FROM "Projects"
-WHERE type = "project" AND deadline AND status != "complete" AND status != "archived"
+WHERE type = "project"
+  AND deadline
+  AND status != "complete"
+  AND status != "archived"
+  AND lower(file.name) != "readme"
 SORT deadline ASC
 ```
 
 ## Waiting On / Blocked
 
 ```dataview
-TABLE waiting_on, blocker, next_action, review_date
+TABLE WITHOUT ID
+  file.link AS "Project",
+  waiting_on AS "Waiting On",
+  blocker AS "Blocker",
+  next_action AS "Next Action",
+  review_date AS "Review Date"
 FROM "Projects"
-WHERE type = "project" AND (status = "waiting" OR waiting_on OR blocker)
+WHERE type = "project"
+  AND (status = "waiting" OR waiting_on OR blocker)
+  AND lower(file.name) != "readme"
 SORT review_date ASC
 ```
 
 ## Active Projects
 
 ```dataview
-TABLE priority, business, impact, effort, next_action, review_date
+TABLE WITHOUT ID
+  file.link AS "Project",
+  priority AS "Priority",
+  business AS "Business",
+  impact AS "Impact",
+  effort AS "Effort",
+  next_action AS "Next Action",
+  review_date AS "Review Date"
 FROM "Projects"
-WHERE type = "project" AND status = "active"
+WHERE type = "project"
+  AND status = "active"
+  AND lower(file.name) != "readme"
 SORT priority ASC, impact DESC, effort ASC
 ```
 
 ## Reviews Due
 
 ```dataview
-TABLE type, status, next_action, review_date
-FROM "Projects" OR "Businesses" OR "Knowledge" OR "SOPs" OR "Tools"
-WHERE type AND file.name != "README" AND review_date AND review_date <= date(today)
-SORT review_date ASC
+TABLE WITHOUT ID
+  file.link AS "Item",
+  type AS "Type",
+  status AS "Status",
+  next_action AS "Next Action",
+  review_date AS "Review Date"
+FROM ""
+WHERE (startswith(file.path, "Projects/")
+    OR startswith(file.path, "Businesses/")
+    OR startswith(file.path, "Knowledge/")
+    OR startswith(file.path, "SOPs/")
+    OR startswith(file.path, "Tools/"))
+  AND lower(file.name) != "readme"
+  AND type
+  AND review_date
+  AND date(review_date) <= date(today)
+SORT date(review_date) ASC
 ```
 
 ## Learning Due
 
 ```dataview
-TABLE topic, mastery, next_action, review_date
+TABLE WITHOUT ID
+  file.link AS "Learning Item",
+  topic AS "Topic",
+  mastery AS "Mastery",
+  next_action AS "Next Action",
+  review_date AS "Review Date"
 FROM "Learning"
-WHERE type = "learning" AND review_date AND review_date <= date(today)
-SORT review_date ASC
+WHERE type = "learning"
+  AND lower(file.name) != "readme"
+  AND review_date
+  AND date(review_date) <= date(today)
+SORT date(review_date) ASC
 ```
 
-## Inbox Count
+## Capture Inbox
+
+Drop unprocessed thoughts here, then move them later.
+
+- [ ] 
+
+## Inbox Items
 
 ```dataview
-TABLE file.mtime AS "Last Modified"
+TABLE WITHOUT ID
+  file.link AS "Inbox Item",
+  file.mtime AS "Last Modified"
 FROM "Inbox"
-WHERE file.name != "README"
+WHERE lower(file.name) != "readme"
 SORT file.mtime DESC
 ```
 
