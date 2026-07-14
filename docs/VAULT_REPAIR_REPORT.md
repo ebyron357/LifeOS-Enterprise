@@ -1,11 +1,13 @@
 # Obsidian Life OS Vault Repair Report
 
-Date: 2026-07-10  
+Date: 2026-07-14
 Repository: `ebyron357/LifeOS-Enterprise`
 
 ## Executive Summary
 
 The repository previously mixed a legacy folder model, Dataview-first dashboards, hard-coded local paths, and machine-specific Obsidian settings. The repair establishes a native-first, numbered Life OS while preserving existing notes and links.
+
+The final hardening pass also removes the last tracked machine-specific plugin file, repairs malformed Markdown, validates business metadata and internal Wikilinks, enforces README exclusions in operational dashboards, and runs the canonical audit in GitHub Actions on Windows.
 
 ## Repairs Completed
 
@@ -15,6 +17,7 @@ The repository previously mixed a legacy folder model, Dataview-first dashboards
 - `.local-backups/` is now ignored.
 - Shared defaults remain version controlled under `config/obsidian/`.
 - Local secrets, temporary files, and OS noise remain ignored.
+- No file under `.obsidian/` remains tracked by Git.
 
 ### Canonical vault structure
 
@@ -112,6 +115,29 @@ Updated shared defaults:
 - strict metadata for new canonical projects;
 - migration warnings for legacy projects;
 - missing Base embeds on the Home dashboard.
+- required legacy and canonical operational folders and dashboards;
+- active business metadata;
+- README exclusions in the Daily, Weekly, and Monthly operational dashboards;
+- unresolved internal Wikilinks outside reusable templates;
+- literal `\n` corruption in Markdown;
+- tracked `.obsidian` machine state.
+
+GitHub Actions now runs `scripts/audit-vault.ps1` on `windows-latest` for every pull request and push to `main`.
+
+## Final Validation Evidence
+
+- JSON configuration parsing: PASS
+- Markdown corruption scan: PASS
+- Internal Wikilink resolution scan: PASS
+- Tracked `.obsidian` state: PASS (none tracked after this repair)
+- Git diff whitespace validation: PASS
+- Canonical PowerShell audit: enforced by the `Vault Health` GitHub Actions workflow
+
+## Final Status
+
+Repository repair: **PASS pending the first GitHub Actions run on this change.**
+
+The only remaining local-UI action is to open the vault in Obsidian and visually confirm that native Bases and optional Dataview tables render with the locally installed plugin versions. This action needs no repository change unless a runtime defect is observed.
 
 ## Local Repair Command
 
