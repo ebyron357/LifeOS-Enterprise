@@ -131,11 +131,11 @@ GitHub Actions now runs `scripts/audit-vault.ps1` on `windows-latest` for every 
 - Internal Wikilink resolution scan: PASS
 - Tracked `.obsidian` state: PASS (none tracked after this repair)
 - Git diff whitespace validation: PASS
-- Canonical PowerShell audit: enforced by the `Vault Health` GitHub Actions workflow
+- Canonical PowerShell audit: PASS (`Vault Health` run #2 on PR #7)
 
 ## Final Status
 
-Repository repair: **PASS pending the first GitHub Actions run on this change.**
+Repository repair: **PASS.**
 
 The only remaining local-UI action is to open the vault in Obsidian and visually confirm that native Bases and optional Dataview tables render with the locally installed plugin versions. This action needs no repository change unless a runtime defect is observed.
 
