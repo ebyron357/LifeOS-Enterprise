@@ -28,7 +28,8 @@ Stabilize an Obsidian-first command center, prove the daily and weekly operating
 | Active projects with a current next action | 100% | Requires operational validation | Review |
 | Core templates present | Complete | Complete | Complete |
 | Core dashboards present | Daily, weekly, monthly | Complete | Complete |
-| Static repository validation | Pass | Passed 2026-07-10 | Complete |\n| Core dashboards validated in Obsidian | 100% | Not yet verified | Pending |
+| Static repository validation | Pass | Passed 2026-07-10 | Complete |
+| Core dashboards validated in Obsidian | 100% | Not yet verified | Pending |
 | Capture workflow exercised end to end | 1 successful cycle | Not yet verified | Pending |
 | P0/P1 foundation defects | 0 | Not yet assessed in Obsidian | Pending |
 
