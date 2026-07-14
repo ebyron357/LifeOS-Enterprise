@@ -17,7 +17,29 @@ $requiredFolders = @(
   "70 Journal/Daily",
   "80 SOPs",
   "90 Archive",
-  "99 Templates"
+  "99 Templates",
+  "AI",
+  "Automations",
+  "Businesses",
+  "Command Center",
+  "Dashboards",
+  "Inbox",
+  "Knowledge",
+  "Learning",
+  "People",
+  "Projects",
+  "Resources",
+  "Reviews",
+  "SOPs",
+  "Tools",
+  "URLs",
+  "architecture",
+  "config",
+  "docs",
+  "integrations",
+  "scripts",
+  "templates",
+  "workflows"
 )
 
 $requiredBases = @(
@@ -65,7 +87,13 @@ $requiredFiles = @(
   "config/obsidian/app.json",
   "config/obsidian/templates.json",
   "config/obsidian/daily-notes.json",
-  "config/obsidian/homepage.json"
+  "config/obsidian/homepage.json",
+  "Command Center/Daily Command Center.md",
+  "Dashboards/Weekly Review.md",
+  "Dashboards/Monthly Review.md",
+  "docs/VAULT_REPAIR_REPORT.md",
+  "scripts/setup-obsidian.ps1",
+  "scripts/repair-local-vault.ps1"
 ) + $requiredBases + $requiredTemplates
 
 $errors = New-Object System.Collections.Generic.List[string]
@@ -90,6 +118,11 @@ function Test-PropertyHasValue {
     [string]$Property
   )
   return $Content -match "(?m)^$([regex]::Escape($Property)):\s*\S.+$"
+}
+
+function Get-MarkdownWithoutCodeBlocks {
+  param([string]$Content)
+  return [regex]::Replace($Content, '(?ms)^```.*?^```\s*', '')
 }
 
 foreach ($folder in $requiredFolders) {
@@ -196,6 +229,92 @@ if (Test-Path $legacyProjectsPath) {
   $legacyProjectFiles = @()
 }
 
+$businessFiles = Get-ChildItem (Join-Path $repo "Businesses") -Filter *.md -File -ErrorAction SilentlyContinue |
+  Where-Object { $_.Name -ne "README.md" }
+
+foreach ($file in $businessFiles) {
+  $content = Get-Content $file.FullName -Raw
+  $relative = Get-RelativePath $file.FullName
+
+  if ($content -notmatch "(?m)^type:\s*business\s*$") {
+    $errors.Add("$relative must contain: type: business")
+  }
+
+  foreach ($field in @("status", "priority", "review_date")) {
+    if (-not (Test-PropertyHasValue $content $field)) {
+      $errors.Add("$relative has a blank or missing required business property: $field")
+    }
+  }
+}
+
+$dashboardFiles = @(
+  "Command Center/Daily Command Center.md",
+  "Dashboards/Weekly Review.md",
+  "Dashboards/Monthly Review.md"
+)
+
+foreach ($dashboard in $dashboardFiles) {
+  $path = Join-Path $repo $dashboard
+  if (-not (Test-Path $path)) { continue }
+  $content = Get-Content $path -Raw
+
+  if ($content -notmatch '(?i)(file\.name|lower\(file\.name\))\s*(!=|<>)\s*"readme"') {
+    $errors.Add("$dashboard must explicitly exclude README notes from operational queries")
+  }
+}
+
+$trackedObsidian = @(git ls-files -- ".obsidian")
+if ($LASTEXITCODE -ne 0) {
+  $errors.Add("Unable to verify tracked .obsidian state")
+} elseif ($trackedObsidian.Count -gt 0) {
+  $errors.Add("Machine-specific .obsidian state is tracked: $($trackedObsidian -join ', ')")
+}
+
+$allMarkdownFiles = Get-ChildItem $repo -Recurse -Filter *.md -File |
+  Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' }
+
+$markdownFiles = $allMarkdownFiles |
+  Where-Object {
+    $_.FullName -notmatch '[\\/]99 Templates[\\/]' -and
+    $_.FullName -notmatch '[\\/]templates[\\/]'
+  }
+
+$noteIndex = @{}
+foreach ($file in $allMarkdownFiles) {
+  $relative = Get-RelativePath $file.FullName
+  $withoutExtension = $relative.Substring(0, $relative.Length - 3)
+  $noteIndex[$withoutExtension.ToLowerInvariant()] = $true
+  $noteIndex[[System.IO.Path]::GetFileNameWithoutExtension($file.Name).ToLowerInvariant()] = $true
+}
+
+foreach ($file in $markdownFiles) {
+  $content = Get-MarkdownWithoutCodeBlocks (Get-Content $file.FullName -Raw)
+  $relative = Get-RelativePath $file.FullName
+  $matches = [regex]::Matches($content, '(?<!!)\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]')
+
+  foreach ($match in $matches) {
+    $target = $match.Groups[1].Value.Trim().Replace("\\", "/")
+    if ([string]::IsNullOrWhiteSpace($target)) { continue }
+    $normalized = $target
+    if ($normalized.EndsWith(".md", [System.StringComparison]::OrdinalIgnoreCase)) {
+      $normalized = $normalized.Substring(0, $normalized.Length - 3)
+    }
+    if (-not $noteIndex.ContainsKey($normalized.ToLowerInvariant())) {
+      $errors.Add("Unresolved Wikilink in ${relative}: [[$target]]")
+    }
+  }
+}
+
+$literalEscapeFiles = Get-ChildItem $repo -Recurse -Filter *.md -File |
+  Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' }
+foreach ($file in $literalEscapeFiles) {
+  $content = Get-MarkdownWithoutCodeBlocks (Get-Content $file.FullName -Raw)
+  $content = [regex]::Replace($content, '`[^`]*`', '')
+  if ($content.Contains('\n')) {
+    $errors.Add("Literal \\n escape found in Markdown: $(Get-RelativePath $file.FullName)")
+  }
+}
+
 $homePath = Join-Path $repo "00 Home/Life OS.md"
 if (Test-Path $homePath) {
   $homeContent = Get-Content $homePath -Raw
@@ -221,6 +340,8 @@ Write-Host "Bases checked: $($requiredBases.Count)"
 Write-Host "Templates checked: $($requiredTemplates.Count)"
 Write-Host "Canonical project notes checked: $($canonicalProjectFiles.Count)"
 Write-Host "Legacy project notes checked: $($legacyProjectFiles.Count)"
+Write-Host "Business notes checked: $($businessFiles.Count)"
+Write-Host "Markdown links checked: $($markdownFiles.Count) notes"
 Write-Host ""
 
 if ($warnings.Count -gt 0) {

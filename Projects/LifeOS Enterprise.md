@@ -36,7 +36,8 @@ Verified foundation assets include:
 
 ## Next Action
 
-- [x] Complete and record the static operating-cycle validation.\n- [ ] Open the vault in Obsidian and verify all core dashboards.
+- [x] Complete and record the static operating-cycle validation.
+- [ ] Open the vault in Obsidian and verify all core dashboards.
 - [ ] Resolve any P0/P1 runtime defects discovered during visual validation.
 
 ## Key Links
