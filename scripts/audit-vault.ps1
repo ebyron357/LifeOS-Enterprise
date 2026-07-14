@@ -308,7 +308,8 @@ foreach ($file in $markdownFiles) {
 $literalEscapeFiles = Get-ChildItem $repo -Recurse -Filter *.md -File |
   Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' }
 foreach ($file in $literalEscapeFiles) {
-  $content = Get-Content $file.FullName -Raw
+  $content = Get-MarkdownWithoutCodeBlocks (Get-Content $file.FullName -Raw)
+  $content = [regex]::Replace($content, '`[^`]*`', '')
   if ($content.Contains('\n')) {
     $errors.Add("Literal \\n escape found in Markdown: $(Get-RelativePath $file.FullName)")
   }
