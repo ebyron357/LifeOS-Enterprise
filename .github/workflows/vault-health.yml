@@ -1,0 +1,22 @@
+name: Vault Health
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: PowerShell vault audit
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run canonical vault audit
+        shell: pwsh
+        run: ./scripts/audit-vault.ps1
