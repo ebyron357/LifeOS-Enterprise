@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.enterprise/schemas/Meeting.schema.json",
+  "title": "Meeting",
+  "description": "Defines a meeting record in LifeOS including agenda, outcomes, decisions, and action items.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "type",
+    "date",
+    "status",
+    "created",
+    "updated"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^MTG-[A-Z0-9]{4,}$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Daily Standup",
+        "Weekly Review",
+        "Monthly Review",
+        "Quarterly Strategy",
+        "Ad-hoc",
+        "Client",
+        "1-on-1",
+        "Other"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "ISO 8601 time (HH:MM)"
+    },
+    "duration_minutes": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Scheduled",
+        "In Progress",
+        "Completed",
+        "Cancelled"
+      ]
+    },
+    "organizer": {
+      "type": "string"
+    },
+    "attendees": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "agenda": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^DEC-"
+      }
+    },
+    "action_items": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ActionItem"
+      }
+    },
+    "business_id": {
+      "type": "string",
+      "pattern": "^BIZ-"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^PRJ-"
+    },
+    "recording_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "$defs": {
+    "ActionItem": {
+      "type": "object",
+      "required": [
+        "title",
+        "owner"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Open",
+            "In Progress",
+            "Done",
+            "Dropped"
+          ]
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

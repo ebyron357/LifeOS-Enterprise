@@ -1,0 +1,4 @@
+
+> @lifeos/db@2.0.0 typecheck /home/runner/work/LifeOS-Enterprise/LifeOS-Enterprise/packages/db
+> tsc --noEmit
+

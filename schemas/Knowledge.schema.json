@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.enterprise/schemas/Knowledge.schema.json",
+  "title": "Knowledge",
+  "description": "Defines an atomic knowledge object in the LifeOS knowledge engine. Knowledge objects are discrete, linkable, and versioned.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "summary",
+    "confidence",
+    "status",
+    "created",
+    "updated"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^KNW-[A-Z0-9]{4,}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 2000,
+      "description": "Plain-language summary for a smart generalist"
+    },
+    "domain": {
+      "type": "string",
+      "enum": [
+        "business",
+        "technology",
+        "marketing",
+        "finance",
+        "legal",
+        "operations",
+        "science",
+        "other"
+      ]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Confidence score from 0.0 (speculation) to 1.0 (verified fact)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Active",
+        "Deprecated",
+        "Needs Review",
+        "Archived"
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/EvidenceItem"
+      }
+    },
+    "applications": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Where and how this knowledge can be applied"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Source"
+      }
+    },
+    "related_concepts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^KNW-"
+      },
+      "description": "Linked knowledge object IDs"
+    },
+    "businesses": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^BIZ-"
+      }
+    },
+    "projects": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^PRJ-"
+      }
+    },
+    "ai_usage": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/AIUsageEntry"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "$defs": {
+    "EvidenceItem": {
+      "type": "object",
+      "required": [
+        "description",
+        "quality"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Empirical",
+            "Anecdotal",
+            "Theoretical",
+            "Expert Opinion"
+          ]
+        },
+        "quality": {
+          "type": "string",
+          "enum": [
+            "Strong",
+            "Moderate",
+            "Weak"
+          ]
+        }
+      }
+    },
+    "Source": {
+      "type": "object",
+      "required": [
+        "title"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "date_accessed": {
+          "type": "string",
+          "format": "date"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Primary",
+            "Secondary",
+            "Tertiary"
+          ]
+        }
+      }
+    },
+    "AIUsageEntry": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "agent_id": {
+          "type": "string"
+        },
+        "task": {
+          "type": "string"
+        },
+        "outcome": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

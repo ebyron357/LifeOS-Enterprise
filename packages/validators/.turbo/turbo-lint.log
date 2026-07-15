@@ -1,0 +1,4 @@
+
+> @lifeos/validators@2.0.0 lint /home/runner/work/LifeOS-Enterprise/LifeOS-Enterprise/packages/validators
+> eslint src --ext .ts
+

@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.enterprise/schemas/Agent.schema.json",
+  "title": "Agent",
+  "description": "Defines an AI agent configuration in the LifeOS agent registry.",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "type",
+    "status",
+    "model",
+    "created",
+    "updated"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^AGT-[A-Z0-9]{4,}$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Orchestrator",
+        "Specialist",
+        "Analyst",
+        "Builder",
+        "Reviewer"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Active",
+        "Testing",
+        "Paused",
+        "Deprecated"
+      ]
+    },
+    "model": {
+      "type": "string",
+      "description": "AI model identifier (e.g. claude-3-opus, gpt-4o)"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "purpose": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of MCP connector IDs this agent uses"
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/IOSpec"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/IOSpec"
+      }
+    },
+    "memory_config": {
+      "$ref": "#/$defs/MemoryConfig"
+    },
+    "escalation_rules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/EscalationRule"
+      }
+    },
+    "businesses": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^BIZ-"
+      }
+    },
+    "metrics": {
+      "$ref": "#/$defs/AgentMetrics"
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "$defs": {
+    "IOSpec": {
+      "type": "object",
+      "required": [
+        "name",
+        "source",
+        "format"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "MemoryConfig": {
+      "type": "object",
+      "properties": {
+        "short_term_window": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "long_term_sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "injected_context": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "EscalationRule": {
+      "type": "object",
+      "required": [
+        "condition",
+        "action",
+        "target"
+      ],
+      "properties": {
+        "condition": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        }
+      }
+    },
+    "AgentMetrics": {
+      "type": "object",
+      "properties": {
+        "tasks_per_week": {
+          "type": "number"
+        },
+        "accuracy_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "escalation_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "avg_task_duration_minutes": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

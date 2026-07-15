@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.enterprise/schemas/HealthScore.schema.json",
+  "title": "HealthScore",
+  "description": "Defines a computed health score snapshot for a LifeOS entity or the system as a whole. Scores are metadata-derived and never manually entered.",
+  "type": "object",
+  "required": [
+    "id",
+    "entity_type",
+    "entity_id",
+    "computed_at",
+    "scores"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^HSC-[A-Z0-9]{4,}$",
+      "description": "Unique health score record ID. Format: HSC-XXXX"
+    },
+    "entity_type": {
+      "type": "string",
+      "enum": [
+        "system",
+        "business",
+        "project",
+        "repository",
+        "agent",
+        "automation",
+        "knowledge"
+      ],
+      "description": "The type of entity being scored"
+    },
+    "entity_id": {
+      "type": "string",
+      "description": "ID of the entity being scored (e.g. BIZ-XXXX, PRJ-XXXX, or 'system' for global)"
+    },
+    "computed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the score was computed"
+    },
+    "scores": {
+      "$ref": "#/$defs/ScoreSet",
+      "description": "All score dimensions applicable to this entity type"
+    },
+    "aggregate_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Weighted average of all applicable scores"
+    },
+    "label": {
+      "type": "string",
+      "enum": [
+        "Excellent",
+        "Good",
+        "Needs Attention",
+        "At Risk"
+      ],
+      "description": "Human-readable label derived from aggregate_score"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Object IDs and fields that contributed to this score computation"
+    },
+    "flags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/HealthFlag"
+      },
+      "description": "Specific issues detected during score computation"
+    }
+  },
+  "$defs": {
+    "ScoreSet": {
+      "type": "object",
+      "description": "Individual dimension scores. Only populate dimensions applicable to the entity type.",
+      "properties": {
+        "execution_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "How well work is being executed. See HEALTH_SCORING.md."
+        },
+        "knowledge_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Breadth, depth, and quality of the knowledge base."
+        },
+        "automation_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Reliability and coverage of automations."
+        },
+        "business_health_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "KPI performance, risk posture, and strategic execution for a business."
+        },
+        "repository_health_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "GitHub repository activity, CI health, and documentation."
+        },
+        "documentation_health_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Completeness and freshness of documentation."
+        },
+        "project_health_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Next action presence, deliverable status, and risk posture for a project."
+        },
+        "ai_usage_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "How actively AI agents are being leveraged."
+        },
+        "decision_velocity_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Speed of resolving Proposed decisions to Final."
+        }
+      },
+      "additionalProperties": false
+    },
+    "HealthFlag": {
+      "type": "object",
+      "required": [
+        "type",
+        "severity",
+        "message",
+        "source_id"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "overdue_deliverable",
+            "missing_next_action",
+            "open_high_risk",
+            "unresolved_decision",
+            "automation_failure",
+            "stale_project",
+            "stale_repository",
+            "idle_agent",
+            "knowledge_needs_review",
+            "kpi_off_track"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "critical",
+            "warning",
+            "info"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable description of the issue"
+        },
+        "source_id": {
+          "type": "string",
+          "description": "ID of the object that triggered this flag"
+        },
+        "days": {
+          "type": "integer",
+          "description": "Days overdue, stale, or open — where applicable"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

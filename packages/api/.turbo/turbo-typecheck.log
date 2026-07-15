@@ -1,0 +1,4 @@
+
+> @lifeos/api@2.0.0 typecheck /home/runner/work/LifeOS-Enterprise/LifeOS-Enterprise/packages/api
+> tsc --noEmit
+

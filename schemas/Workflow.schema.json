@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.enterprise/schemas/Workflow.schema.json",
+  "title": "Workflow",
+  "description": "Defines an automation workflow in LifeOS. Workflows are sequences of steps connecting agents, tools, and data.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "trigger_type",
+    "status",
+    "created",
+    "updated"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^WFL-[A-Z0-9]{4,}$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "trigger_type": {
+      "type": "string",
+      "enum": [
+        "Manual",
+        "Scheduled",
+        "Event",
+        "Webhook",
+        "Agent"
+      ]
+    },
+    "trigger_config": {
+      "type": "object",
+      "description": "Trigger-specific configuration",
+      "additionalProperties": true
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Active",
+        "Paused",
+        "Deprecated"
+      ]
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "n8n",
+        "Zapier",
+        "GitHub Actions",
+        "Native",
+        "Other"
+      ]
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/WorkflowStep"
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "mcp_connectors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "business_id": {
+      "type": "string",
+      "pattern": "^BIZ-"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^PRJ-"
+    },
+    "version": {
+      "type": "string"
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "$defs": {
+    "WorkflowStep": {
+      "type": "object",
+      "required": [
+        "step",
+        "type"
+      ],
+      "properties": {
+        "step": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Agent",
+            "MCP",
+            "Condition",
+            "Transform",
+            "Notify",
+            "Wait"
+          ]
+        },
+        "executor": {
+          "type": "string"
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "on_error": {
+          "type": "string",
+          "enum": [
+            "Stop",
+            "Skip",
+            "Retry",
+            "Escalate"
+          ]
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

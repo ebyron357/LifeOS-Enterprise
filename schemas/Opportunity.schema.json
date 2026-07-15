@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.enterprise/schemas/Opportunity.schema.json",
+  "title": "Opportunity",
+  "description": "Defines an opportunity in LifeOS \u2014 a potential revenue, partnership, strategic, or operational gain worth pursuing.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "type",
+    "status",
+    "owner",
+    "created",
+    "updated"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^OPP-[A-Z0-9]{4,}$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Revenue",
+        "Partnership",
+        "Strategic",
+        "Operational",
+        "Learning",
+        "Talent",
+        "Technology"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Identified",
+        "Evaluating",
+        "Pursuing",
+        "Won",
+        "Lost",
+        "Deferred"
+      ]
+    },
+    "owner": {
+      "type": "string"
+    },
+    "value_estimate": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Estimated value in base currency"
+    },
+    "probability": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Probability of capture (0.0\u20131.0)"
+    },
+    "expected_value": {
+      "type": "number",
+      "minimum": 0,
+      "description": "value_estimate \u00d7 probability"
+    },
+    "effort": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Very High"
+      ]
+    },
+    "time_sensitive": {
+      "type": "boolean",
+      "default": false
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date"
+    },
+    "business_id": {
+      "type": "string",
+      "pattern": "^BIZ-"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^PRJ-"
+    },
+    "next_action": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "additionalProperties": false
+}

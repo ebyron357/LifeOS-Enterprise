@@ -1,0 +1,10 @@
+
+> @lifeos/api@2.0.0 test:coverage /home/runner/work/LifeOS-Enterprise/LifeOS-Enterprise/packages/api
+> vitest run --coverage
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90m/home/runner/work/LifeOS-Enterprise/LifeOS-Enterprise/packages/api[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+ [32m✓[39m src/__tests__/business.repository.test.ts [2m([22m[2m46 tests[22m[2m)[22m[90m 112[2mms[22m[39m

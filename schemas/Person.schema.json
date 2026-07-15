@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.enterprise/schemas/Person.schema.json",
+  "title": "Person",
+  "description": "Defines a human participant in LifeOS \u2014 team members, operators, stakeholders, and collaborators.",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "type",
+    "status",
+    "created",
+    "updated"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^PER-[A-Z0-9]{4,}$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Operator",
+        "Team Member",
+        "Contractor",
+        "Stakeholder",
+        "Advisor",
+        "External"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Active",
+        "Inactive",
+        "Onboarding",
+        "Offboarded"
+      ]
+    },
+    "role": {
+      "type": "string"
+    },
+    "businesses": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^BIZ-"
+      }
+    },
+    "projects": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^PRJ-"
+      }
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ai_agent": {
+      "type": "string",
+      "description": "Paired AI agent ID"
+    },
+    "timezone": {
+      "type": "string",
+      "description": "IANA timezone string (e.g. America/New_York)"
+    },
+    "github_username": {
+      "type": "string"
+    },
+    "slack_id": {
+      "type": "string"
+    },
+    "availability_hours_per_week": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 168
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "additionalProperties": false
+}

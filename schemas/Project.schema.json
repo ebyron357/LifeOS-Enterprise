@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifeos.enterprise/schemas/Project.schema.json",
+  "title": "Project",
+  "description": "Defines the structure for a LifeOS project. Projects are the primary unit of execution, linking strategy to deliverables.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "business_id",
+    "status",
+    "priority",
+    "owner",
+    "created",
+    "updated"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^PRJ-[A-Z0-9]{4,}$",
+      "description": "Unique project identifier. Format: PRJ-XXXX"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 150
+    },
+    "business_id": {
+      "type": "string",
+      "pattern": "^BIZ-",
+      "description": "Parent business ID"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Active",
+        "On Hold",
+        "In Review",
+        "Completed",
+        "Cancelled"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "Critical",
+        "High",
+        "Medium",
+        "Low"
+      ]
+    },
+    "owner": {
+      "type": "string",
+      "description": "Responsible human owner"
+    },
+    "ai_owner": {
+      "type": "string",
+      "description": "Assigned AI agent"
+    },
+    "github_repo": {
+      "type": "string",
+      "format": "uri",
+      "description": "Linked GitHub repository URL"
+    },
+    "review_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Next scheduled review date"
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "next_action": {
+      "type": "string",
+      "description": "The single most important next step"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of blocking project or task IDs"
+    },
+    "deliverables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Deliverable"
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^RISK-"
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^DEC-"
+      }
+    },
+    "mcp_connections": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "automations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "documentation": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date"
+    },
+    "completed_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "$defs": {
+    "Deliverable": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^DEL-"
+        },
+        "title": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Not Started",
+            "In Progress",
+            "In Review",
+            "Done",
+            "Blocked"
+          ]
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

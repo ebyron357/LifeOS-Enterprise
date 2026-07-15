@@ -1,0 +1,45 @@
+{
+  "name": "@lifeos/db",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Database schema, migrations, and client for LifeOS (Drizzle ORM + PostgreSQL)",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./schema": {
+      "types": "./src/schema/index.ts",
+      "default": "./src/schema/index.ts"
+    }
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.36.4"
+  },
+  "devDependencies": {
+    "@lifeos/config": "workspace:*",
+    "@lifeos/types": "workspace:*",
+    "@types/node": "^26.1.0",
+    "drizzle-kit": "^0.28.1",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.6.3"
+  },
+  "peerDependencies": {
+    "postgres": "^3.4.5"
+  },
+  "peerDependenciesMeta": {
+    "postgres": {
+      "optional": true
+    }
+  }
+}
