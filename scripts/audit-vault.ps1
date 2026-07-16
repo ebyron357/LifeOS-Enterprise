@@ -93,7 +93,8 @@ $requiredFiles = @(
   "Dashboards/Monthly Review.md",
   "docs/VAULT_REPAIR_REPORT.md",
   "scripts/setup-obsidian.ps1",
-  "scripts/repair-local-vault.ps1"
+  "scripts/repair-local-vault.ps1",
+  "scripts/validate-vault-links.ps1"
 ) + $requiredBases + $requiredTemplates
 
 $errors = New-Object System.Collections.Generic.List[string]
@@ -118,11 +119,6 @@ function Test-PropertyHasValue {
     [string]$Property
   )
   return $Content -match "(?m)^$([regex]::Escape($Property)):\s*\S.+$"
-}
-
-function Get-MarkdownWithoutCodeBlocks {
-  param([string]$Content)
-  return [regex]::Replace($Content, '(?ms)^```.*?^```\s*', '')
 }
 
 foreach ($folder in $requiredFolders) {
@@ -192,8 +188,10 @@ foreach ($template in $templateRequirements.Keys) {
   }
 }
 
-$canonicalProjectFiles = Get-ChildItem (Join-Path $repo "10 Projects") -Filter *.md -File -ErrorAction SilentlyContinue |
-  Where-Object { $_.Name -ne "README.md" }
+$canonicalProjectFiles = @(
+  Get-ChildItem (Join-Path $repo "10 Projects") -Filter *.md -File -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -ne "README.md" }
+)
 
 foreach ($file in $canonicalProjectFiles) {
   $content = Get-Content $file.FullName -Raw
@@ -212,8 +210,10 @@ foreach ($file in $canonicalProjectFiles) {
 
 $legacyProjectsPath = Join-Path $repo "Projects"
 if (Test-Path $legacyProjectsPath) {
-  $legacyProjectFiles = Get-ChildItem $legacyProjectsPath -Filter *.md -File -ErrorAction SilentlyContinue |
-    Where-Object { $_.Name -ne "README.md" }
+  $legacyProjectFiles = @(
+    Get-ChildItem $legacyProjectsPath -Filter *.md -File -ErrorAction SilentlyContinue |
+      Where-Object { $_.Name -ne "README.md" }
+  )
 
   foreach ($file in $legacyProjectFiles) {
     $content = Get-Content $file.FullName -Raw
@@ -229,8 +229,10 @@ if (Test-Path $legacyProjectsPath) {
   $legacyProjectFiles = @()
 }
 
-$businessFiles = Get-ChildItem (Join-Path $repo "Businesses") -Filter *.md -File -ErrorAction SilentlyContinue |
-  Where-Object { $_.Name -ne "README.md" }
+$businessFiles = @(
+  Get-ChildItem (Join-Path $repo "Businesses") -Filter *.md -File -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -ne "README.md" }
+)
 
 foreach ($file in $businessFiles) {
   $content = Get-Content $file.FullName -Raw
@@ -270,60 +272,23 @@ if ($LASTEXITCODE -ne 0) {
   $errors.Add("Machine-specific .obsidian state is tracked: $($trackedObsidian -join ', ')")
 }
 
-$allMarkdownFiles = Get-ChildItem $repo -Recurse -Filter *.md -File |
-  Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' }
-
-$markdownFiles = $allMarkdownFiles |
-  Where-Object {
-    $_.FullName -notmatch '[\\/]99 Templates[\\/]' -and
-    $_.FullName -notmatch '[\\/]templates[\\/]'
-  }
-
-$noteIndex = @{}
-foreach ($file in $allMarkdownFiles) {
-  $relative = Get-RelativePath $file.FullName
-  $withoutExtension = $relative.Substring(0, $relative.Length - 3)
-  $noteIndex[$withoutExtension.ToLowerInvariant()] = $true
-  $noteIndex[[System.IO.Path]::GetFileNameWithoutExtension($file.Name).ToLowerInvariant()] = $true
-}
-
-foreach ($file in $markdownFiles) {
-  $content = Get-MarkdownWithoutCodeBlocks (Get-Content $file.FullName -Raw)
-  $relative = Get-RelativePath $file.FullName
-  $matches = [regex]::Matches($content, '(?<!!)\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]')
-
-  foreach ($match in $matches) {
-    $target = $match.Groups[1].Value.Trim().Replace("\\", "/")
-    if ([string]::IsNullOrWhiteSpace($target)) { continue }
-    $normalized = $target
-    if ($normalized.EndsWith(".md", [System.StringComparison]::OrdinalIgnoreCase)) {
-      $normalized = $normalized.Substring(0, $normalized.Length - 3)
-    }
-    if (-not $noteIndex.ContainsKey($normalized.ToLowerInvariant())) {
-      $errors.Add("Unresolved Wikilink in ${relative}: [[$target]]")
-    }
-  }
-}
-
-$literalEscapeFiles = Get-ChildItem $repo -Recurse -Filter *.md -File |
-  Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' }
-foreach ($file in $literalEscapeFiles) {
-  $content = Get-MarkdownWithoutCodeBlocks (Get-Content $file.FullName -Raw)
-  $content = [regex]::Replace($content, '`[^`]*`', '')
-  if ($content.Contains('\n')) {
-    $errors.Add("Literal \\n escape found in Markdown: $(Get-RelativePath $file.FullName)")
-  }
+$linkValidator = Join-Path $PSScriptRoot "validate-vault-links.ps1"
+$markdownChecked = 0
+if (Test-Path $linkValidator) {
+  $markdownChecked = & $linkValidator -RepositoryRoot $repo -Errors $errors
+} else {
+  $errors.Add("Missing vault link validator: scripts/validate-vault-links.ps1")
 }
 
 $homePath = Join-Path $repo "00 Home/Life OS.md"
 if (Test-Path $homePath) {
   $homeContent = Get-Content $homePath -Raw
-  $baseEmbeds = [regex]::Matches($homeContent, '!\[\[([^\]]+\.base)\]\]')
+  $baseEmbeds = [regex]::Matches($homeContent, '!\[\[([^\]|#]+\.base)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]')
 
   foreach ($embed in $baseEmbeds) {
-    $target = $embed.Groups[1].Value
+    $target = $embed.Groups[1].Value.Replace("/", [System.IO.Path]::DirectorySeparatorChar)
     if (-not (Test-Path (Join-Path $repo $target))) {
-      $errors.Add("Home dashboard embeds a missing Base: $target")
+      $errors.Add("Home dashboard embeds a missing Base: $($embed.Groups[1].Value)")
     }
   }
 
@@ -341,7 +306,7 @@ Write-Host "Templates checked: $($requiredTemplates.Count)"
 Write-Host "Canonical project notes checked: $($canonicalProjectFiles.Count)"
 Write-Host "Legacy project notes checked: $($legacyProjectFiles.Count)"
 Write-Host "Business notes checked: $($businessFiles.Count)"
-Write-Host "Markdown links checked: $($markdownFiles.Count) notes"
+Write-Host "Markdown links and embeds checked: $markdownChecked notes"
 Write-Host ""
 
 if ($warnings.Count -gt 0) {
@@ -356,4 +321,4 @@ if ($errors.Count -gt 0) {
   exit 1
 }
 
-Write-Host "PASS: canonical vault structure, templates, Bases, and required metadata are valid." -ForegroundColor Green
+Write-Host "PASS: canonical vault structure, templates, Bases, metadata, links, and embeds are valid." -ForegroundColor Green
