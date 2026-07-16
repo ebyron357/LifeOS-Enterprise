@@ -83,10 +83,10 @@ $markdownPaths = @(
 foreach ($relativePath in $markdownPaths) {
   $absolutePath = Join-Path $RepositoryRoot $relativePath
   $content = Get-MarkdownWithoutCode (Get-Content $absolutePath -Raw)
-  $matches = [regex]::Matches($content, '(?<embed>!)?\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]')
+  $matches = [regex]::Matches($content, '(?<embed>!)?\[\[(?<target>[^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]')
 
   foreach ($match in $matches) {
-    $target = $match.Groups[2].Value.Trim()
+    $target = $match.Groups["target"].Value.Trim()
     if (-not (Test-VaultTargetExists $target)) {
       $kind = if ($match.Groups["embed"].Success) { "embed" } else { "Wikilink" }
       $Errors.Add("Unresolved $kind in ${relativePath}: [[$target]]")
