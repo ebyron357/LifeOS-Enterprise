@@ -20,3 +20,39 @@ jobs:
       - name: Run canonical vault audit
         shell: pwsh
         run: ./scripts/audit-vault.ps1
+
+      - name: Prove ignored dependency Markdown is excluded
+        shell: pwsh
+        run: |
+          Add-Content -LiteralPath .git/info/exclude -Value "integrations/openrouter/node_modules/"
+          $fixture = "integrations/openrouter/node_modules/lifeos-audit-fixture/README.md"
+          New-Item -ItemType Directory -Path (Split-Path -Parent $fixture) -Force | Out-Null
+          Set-Content -LiteralPath $fixture -Value @(
+            "![[Missing dependency note]]",
+            'Literal \n from ignored dependency documentation'
+          )
+
+          ./scripts/audit-vault.ps1
+          Remove-Item -LiteralPath "integrations/openrouter/node_modules" -Recurse -Force
+
+      - name: Prove broken embedded Wikilinks fail
+        shell: pwsh
+        run: |
+          $fixture = "01 Inbox/Audit Regression Fixture.md"
+          Set-Content -LiteralPath $fixture -Value "![[Missing Embedded Fixture]]"
+
+          $output = & pwsh -NoProfile -File ./scripts/audit-vault.ps1 2>&1
+          $exitCode = $LASTEXITCODE
+          Remove-Item -LiteralPath $fixture -Force
+
+          if ($exitCode -eq 0) {
+            throw "Audit accepted a broken embedded Wikilink"
+          }
+
+          if (($output -join "`n") -notmatch "Unresolved embed") {
+            throw "Audit failed for the wrong reason: $($output -join "`n")"
+          }
+
+      - name: Run final clean audit
+        shell: pwsh
+        run: ./scripts/audit-vault.ps1
