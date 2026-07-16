@@ -61,10 +61,19 @@ jobs:
         shell: pwsh
         run: |
           $fixture = "01 Inbox/Audit Regression Fixture.md"
+          $stdout = "broken-embed-audit-output.txt"
+          $stderr = "broken-embed-audit-error.txt"
           Set-Content -LiteralPath $fixture -Value "![[Missing Embedded Fixture]]"
 
-          $output = & pwsh -NoProfile -File ./scripts/audit-vault.ps1 2>&1
-          $exitCode = $LASTEXITCODE
+          $process = Start-Process pwsh `
+            -ArgumentList @("-NoProfile", "-File", "./scripts/audit-vault.ps1") `
+            -Wait `
+            -PassThru `
+            -NoNewWindow `
+            -RedirectStandardOutput $stdout `
+            -RedirectStandardError $stderr
+
+          $exitCode = $process.ExitCode
           Remove-Item -LiteralPath $fixture -Force
 
           if ($exitCode -eq 0) {
@@ -72,6 +81,11 @@ jobs:
           }
 
           Write-Host "PASS: audit rejected the injected broken embed."
+          Get-Content -LiteralPath $stdout | ForEach-Object { Write-Host $_ }
+          if (Test-Path $stderr) {
+            Get-Content -LiteralPath $stderr | ForEach-Object { Write-Host $_ }
+          }
+          Remove-Item -LiteralPath $stdout, $stderr -Force -ErrorAction SilentlyContinue
 
       - name: Run final clean audit
         shell: pwsh
