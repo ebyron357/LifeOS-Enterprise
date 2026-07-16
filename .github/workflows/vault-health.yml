@@ -16,7 +16,77 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          show-progress: false
 
       - name: Run canonical vault audit
+        id: canonical
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $output = & pwsh -NoProfile -File ./scripts/audit-vault.ps1 2>&1
+          $exitCode = $LASTEXITCODE
+          $output | Set-Content -LiteralPath vault-audit-output.txt
+          $output | ForEach-Object { Write-Host $_ }
+          exit $exitCode
+
+      - name: Preserve vault audit diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vault-audit-output
+          path: vault-audit-output.txt
+          if-no-files-found: error
+
+      - name: Enforce canonical vault audit
+        if: steps.canonical.outcome != 'success'
+        shell: pwsh
+        run: throw "Canonical LifeOS vault audit failed. See the vault-audit-output artifact."
+
+      - name: Prove ignored dependency Markdown is excluded
+        shell: pwsh
+        run: |
+          Add-Content -LiteralPath .git/info/exclude -Value "integrations/openrouter/node_modules/"
+          $fixture = "integrations/openrouter/node_modules/lifeos-audit-fixture/README.md"
+          New-Item -ItemType Directory -Path (Split-Path -Parent $fixture) -Force | Out-Null
+          Set-Content -LiteralPath $fixture -Value @(
+            "![[Missing dependency note]]",
+            'Literal \n from ignored dependency documentation'
+          )
+
+          ./scripts/audit-vault.ps1
+          Remove-Item -LiteralPath "integrations/openrouter/node_modules" -Recurse -Force
+
+      - name: Prove broken embedded Wikilinks fail
+        shell: pwsh
+        run: |
+          $fixture = "01 Inbox/Audit Regression Fixture.md"
+          $stdout = "broken-embed-audit-output.txt"
+          $stderr = "broken-embed-audit-error.txt"
+          Set-Content -LiteralPath $fixture -Value "![[Missing Embedded Fixture]]"
+
+          $process = Start-Process pwsh `
+            -ArgumentList @("-NoProfile", "-File", "./scripts/audit-vault.ps1") `
+            -Wait `
+            -PassThru `
+            -NoNewWindow `
+            -RedirectStandardOutput $stdout `
+            -RedirectStandardError $stderr
+
+          $exitCode = $process.ExitCode
+          Remove-Item -LiteralPath $fixture -Force
+
+          if ($exitCode -eq 0) {
+            throw "Audit accepted a broken embedded Wikilink"
+          }
+
+          Write-Host "PASS: audit rejected the injected broken embed."
+          Get-Content -LiteralPath $stdout | ForEach-Object { Write-Host $_ }
+          if (Test-Path $stderr) {
+            Get-Content -LiteralPath $stderr | ForEach-Object { Write-Host $_ }
+          }
+          Remove-Item -LiteralPath $stdout, $stderr -Force -ErrorAction SilentlyContinue
+
+      - name: Run final clean audit
         shell: pwsh
         run: ./scripts/audit-vault.ps1
