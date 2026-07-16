@@ -1,6 +1,8 @@
 param(
   [Parameter(Mandatory = $true)][string]$RepositoryRoot,
-  [Parameter(Mandatory = $true)][System.Collections.Generic.List[string]]$Errors
+  [Parameter(Mandatory = $true)]
+  [AllowEmptyCollection()]
+  [System.Collections.Generic.List[string]]$Errors
 )
 
 $ErrorActionPreference = "Stop"
