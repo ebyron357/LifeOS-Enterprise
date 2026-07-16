@@ -16,10 +16,32 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          show-progress: false
 
       - name: Run canonical vault audit
+        id: canonical
+        continue-on-error: true
         shell: pwsh
-        run: ./scripts/audit-vault.ps1
+        run: |
+          $output = & pwsh -NoProfile -File ./scripts/audit-vault.ps1 2>&1
+          $exitCode = $LASTEXITCODE
+          $output | Set-Content -LiteralPath vault-audit-output.txt
+          $output | ForEach-Object { Write-Host $_ }
+          exit $exitCode
+
+      - name: Preserve vault audit diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vault-audit-output
+          path: vault-audit-output.txt
+          if-no-files-found: error
+
+      - name: Enforce canonical vault audit
+        if: steps.canonical.outcome != 'success'
+        shell: pwsh
+        run: throw "Canonical LifeOS vault audit failed. See the vault-audit-output artifact."
 
       - name: Prove ignored dependency Markdown is excluded
         shell: pwsh
