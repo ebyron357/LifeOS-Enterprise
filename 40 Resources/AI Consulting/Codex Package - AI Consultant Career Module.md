@@ -43,6 +43,8 @@ Do **not**:
 - `20 Areas/AI Consulting Career.md`
 - `10 Projects/Build AI Consultant Portfolio.md`
 - `40 Resources/AI Consulting/AI Consultant Certification Tracker.md`
+- `40 Resources/AI Consulting/AI Portfolio Showcase Plan.md`
+- `40 Resources/AI Consulting/Codex Package - AI Portfolio Showcase System.md`
 - `architecture/METADATA_SCHEMA.md`
 - `00 Home/Personal Dashboard.md`
 - `00 Home/Life OS.md`
@@ -195,8 +197,12 @@ Add a section after `Current Focus`:
 - [[20 Areas/AI Consulting Career|AI Consulting Career Area]]
 - [[10 Projects/Build AI Consultant Portfolio|Build AI Consultant Portfolio]]
 - [[40 Resources/AI Consulting/AI Consultant Certification Tracker|Certification Strategy and Scorecard]]
+- [[40 Resources/AI Consulting/AI Portfolio Showcase Plan|AI Portfolio Showcase Plan]]
+- [[40 Resources/AI Consulting/Codex Package - AI Consultant Career Module|Codex Career Engineering Package]]
+- [[40 Resources/AI Consulting/Codex Package - AI Portfolio Showcase System|Codex Portfolio Engineering Package]]
 
 ![[00 Home/Bases/AI Consultant Certifications.base]]
+![[00 Home/Bases/AI Portfolio Showcase.base]]
 ```
 
 Do not remove existing dashboard content.
@@ -256,6 +262,27 @@ Seed it with:
 - AI Inventory and Risk Register;
 - Consultant Capability Statement.
 
+Extend this proof register using the requirements in `Codex Package - AI Portfolio Showcase System.md`. Do not create a duplicate register.
+
+### 8. Implement the Portfolio Showcase System
+
+Execute the LifeOS-vault phase of:
+
+`40 Resources/AI Consulting/Codex Package - AI Portfolio Showcase System.md`
+
+This includes:
+
+- AI Portfolio Case Study template;
+- metadata extensions;
+- eight candidate case-study records;
+- AI Portfolio Showcase Base;
+- Portfolio Command Index;
+- Personal Dashboard integration;
+- safe public-export specification;
+- content-repurposing template.
+
+Do not execute the future public-site phase until the target repository is identified and implementation is authorized.
+
 ## Validation
 
 Run:
@@ -268,10 +295,12 @@ Then manually verify in Obsidian:
 
 1. `00 Home/Personal Dashboard.md` opens without broken embeds.
 2. The certification Base renders.
-3. Each credential appears in the appropriate view.
-4. Existing dashboards and links remain functional.
-5. No duplicate template folder or duplicate note type was introduced.
-6. Every active record has a next action and review date where required.
+3. The portfolio showcase Base renders.
+4. Each credential appears in the appropriate view.
+5. Each seeded portfolio candidate appears and remains private until approved.
+6. Existing dashboards and links remain functional.
+7. No duplicate template folder or duplicate note type was introduced.
+8. Every active record has a next action and review date where required.
 
 ## Tests and Checks
 
@@ -279,6 +308,7 @@ Then manually verify in Obsidian:
 - Markdown frontmatter is valid YAML.
 - All internal links resolve.
 - Base filters return the expected five credential records.
+- Portfolio Base returns the expected eight candidate records.
 - No unrelated files changed.
 - No secrets or private credentials committed.
 - Mobile Obsidian view remains usable.
@@ -301,7 +331,10 @@ The feature is complete when Bwa can open the Personal Dashboard and answer in u
 - What portfolio artifact must be built with it?
 - Which credentials are planned, studying, passed, deferred, or rejected?
 - Which market evidence supports the roadmap?
+- Which three portfolio candidates are strongest?
+- Which proof is missing or blocked by permission?
 - Which proof is ready to publish?
+- What public asset should be produced next?
 
 ## Commit Strategy
 
@@ -309,7 +342,8 @@ Use logical commits:
 
 1. `add AI consultant career templates and schema`
 2. `add certification records and Bases tracker`
-3. `integrate AI career tracker into dashboard`
-4. `add market review and portfolio proof documentation`
+3. `add portfolio case study system and candidate records`
+4. `integrate AI career and portfolio trackers into dashboard`
+5. `add market review, public export, and portfolio proof documentation`
 
 Open a draft pull request. Do not merge until the structural audit and Obsidian rendering checks pass.
