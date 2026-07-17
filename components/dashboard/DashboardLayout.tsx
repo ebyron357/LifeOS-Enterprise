@@ -17,11 +17,11 @@ export function DashboardLayout({ widgets, data }: DashboardLayoutProps) {
       <header className="dashboard-header">
         <div>
           <p className="eyebrow">Executive command center</p>
-          <h1>Good morning, Byron.</h1>
-          <p className="date-line">{today} · Your highest-leverage work, in one view.</p>
+          <h1>Good morning, Bwa.</h1>
+          <p className="date-line">{today}</p>
         </div>
         <div className="system-pill" aria-label="LifeOS systems operational">
-          <span aria-hidden="true" /> Systems operational
+          <span aria-hidden="true" /> LifeOS online
         </div>
       </header>
 
