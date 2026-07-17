@@ -8,7 +8,7 @@ priority: P0
 start_date: 2026-07-16
 due_date: 2026-10-31
 review_date: 2026-07-23
-next_action: Confirm existing credentials and begin the Microsoft AI Transformation Leader learning path.
+next_action: Classify and score the eight candidate portfolio projects by context, ownership, permission, evidence strength, consulting relevance, and readiness.
 tags:
   - project
   - ai-consulting
@@ -30,12 +30,19 @@ By October 31, 2026, establish a credible AI consulting portfolio that combines 
 - [ ] Google Cloud Generative AI Leader is earned.
 - [ ] AWS Certified AI Practitioner is earned or formally replaced by a higher-value implementation credential based on market evidence.
 - [ ] At least one implementation credential or lab-based skill is earned.
-- [ ] Three portfolio case studies are complete and accurately labeled by operating context.
-- [ ] One live AI agent or automation demonstration is documented.
+- [ ] Eight candidate projects are classified by operating context, ownership, permission, privacy, and evidence status.
+- [ ] Three flagship case studies are selected using the portfolio score.
+- [ ] Three portfolio case studies are complete, accurately labeled, and score at least 40/50 with no evidence, privacy, or claim-accuracy failure.
+- [ ] Two live AI agent or automation demonstrations are documented with testing, limitations, approvals, and fallback behavior.
 - [ ] One AI Readiness Assessment and one AI Adoption Roadmap are client-ready.
 - [ ] One responsible-AI policy pack and risk register are client-ready.
+- [ ] One AI Consultant Portfolio Command Index is operational in LifeOS.
+- [ ] One capability statement and one canonical public portfolio destination are published.
+- [ ] Each flagship case study is repurposed across GitHub, LinkedIn, Substack, video, and sales material.
 - [ ] LinkedIn, portfolio, GitHub, and Substack profiles tell one consistent professional story.
 - [ ] A consulting offer, discovery process, proposal template, and proof package are ready to use.
+- [ ] Permission and privacy status are visible for every portfolio candidate.
+- [ ] No unverified public claims are present.
 - [ ] The certification tracker is reviewed weekly and refreshed against current market demand monthly.
 
 ## 90-Day Execution Plan
@@ -53,12 +60,15 @@ By October 31, 2026, establish a credible AI consulting portfolio that combines 
 - AI Readiness Assessment.
 - AI Opportunity Scoring Matrix.
 - Executive AI Adoption Roadmap.
-- One sanitized case study from completed work with evidence.
+- Inventory and classify all portfolio candidates.
+- Select the first three flagship case studies using the evidence-based portfolio score.
+- Gather the first evidence package: repositories, commits, deployments, screenshots, tests, workflow diagrams, metrics, and permissions.
 
 **Professional proof**
 
 - Rewrite LinkedIn headline, About section, Featured section, and services around verified capabilities.
 - Create a one-page consultant capability statement.
+- Complete the public portfolio site specification without placing a public app inside the private LifeOS vault.
 - Publish one practical LinkedIn post or Substack article per week.
 
 ### Days 31–60 — Add Cross-Cloud Credibility
@@ -72,6 +82,8 @@ By October 31, 2026, establish a credible AI consulting portfolio that combines 
 
 - Compare Microsoft, Google Cloud, AWS, and model-agnostic options for three business use cases.
 - Build a vendor-selection decision matrix.
+- Complete and publish Flagship Case Study 1.
+- Complete its GitHub proof, short video, walkthrough, LinkedIn distribution, and Substack analysis.
 - Publish a case study explaining how the recommendation was made without exaggerating results.
 
 **Consulting system**
@@ -95,14 +107,18 @@ By October 31, 2026, establish a credible AI consulting portfolio that combines 
 - Responsible AI starter policy.
 - AI inventory and risk register.
 - Evaluation scorecard showing accuracy, completion rate, reliability, cost, and human editing time.
+- Complete and publish Flagship Case Studies 2 and 3.
+- Complete two working demonstration videos.
 
 **Go to market**
 
-- Publish the portfolio page.
-- Add credentials and artifacts to LinkedIn.
+- Publish the canonical portfolio destination.
+- Add credentials and flagship proof to LinkedIn Featured.
+- Publish the capability statement.
 - Create a 10-account outreach list.
 - Run five discovery conversations.
-- Record objections and update the offer.
+- Track which proof generates professional conversations and opportunities.
+- Record objections and update the offer and positioning.
 
 ## Credential Gates
 
@@ -134,11 +150,44 @@ By October 31, 2026, establish a credible AI consulting portfolio that combines 
 - [ ] Case study or demonstration available.
 - [ ] Contract or statement-of-work language reviewed where appropriate.
 
+## Portfolio Publication Gates
+
+### Gate 1 — Candidate Selection
+
+- [ ] Operating context classified.
+- [ ] Ownership identified.
+- [ ] Permission status recorded.
+- [ ] Privacy status recorded.
+- [ ] Consulting capability identified.
+- [ ] Available evidence inventoried.
+- [ ] Candidate scored.
+
+### Gate 2 — Ready to Publish
+
+- [ ] Evidence supports every result claim.
+- [ ] Client or shared work has written approval.
+- [ ] Private information has been removed.
+- [ ] Architecture and workflow are understandable.
+- [ ] Testing method and limitations are disclosed.
+- [ ] Screenshots, links, and videos are current.
+- [ ] Portfolio score is at least 40/50.
+- [ ] One clear call to action is present.
+
+### Gate 3 — Public Distribution
+
+- [ ] Canonical portfolio page is live.
+- [ ] GitHub proof is clean and safe.
+- [ ] LinkedIn launch and lesson posts are prepared.
+- [ ] Substack article is prepared.
+- [ ] Short and walkthrough videos are prepared.
+- [ ] Capability statement and proposal proof block are updated.
+- [ ] Public URLs are recorded in LifeOS.
+
 ## Portfolio Case Study Standard
 
 Every case study must include:
 
-1. Operating context: personal, internal venture, client-approved, nonprofit, research, or demonstration.
+1. Operating context: personal, internal venture, client-approved, nonprofit, research, demonstration, or open source.
 2. Problem and baseline.
 3. Constraints and risks.
 4. Workflow before the intervention.
@@ -147,7 +196,10 @@ Every case study must include:
 7. Measurement method.
 8. Result with evidence.
 9. What did not work.
-10. Next improvement.
+10. Limitations.
+11. Next improvement.
+12. Public asset and repurposing checklist.
+13. One call to action.
 
 Never present a demonstration, internal experiment, or unfinished project as a paid client result.
 
@@ -157,11 +209,14 @@ Never present a demonstration, internal experiment, or unfinished project as a p
 |---|---:|
 | Focused certification study | 5 hours/week |
 | Portfolio build time | 5 hours/week |
+| Evidence items collected | 5/week |
+| Case-study sections completed | 2/week |
 | Public authority content | 1 item/week |
 | New professional relationships | 5/week |
-| Discovery conversations | 1/week after Day 30 |
+| Discovery conversations | 1/week after first flagship is live |
 | Credentials in progress | Maximum 1 primary + 1 practical lab |
 | Unapplied courses | 0 new purchases |
+| Unverified public claims | 0 |
 
 ## Risks
 
@@ -169,11 +224,16 @@ Never present a demonstration, internal experiment, or unfinished project as a p
 - Buying expensive training before validating consulting demand.
 - Spreading study time across too many platforms.
 - Claiming expertise beyond demonstrated capability.
-- Allowing branding work to replace outreach and delivery practice.
+- Allowing branding work to replace evidence collection, outreach, and delivery practice.
 - Using private or client information without permission.
+- Building a public portfolio site before selecting strong flagship proof.
+- Publishing screenshots without business context or measurable evidence.
+- Duplicating public content without one canonical source of truth.
 
 ## Linked Records
 
 - [[20 Areas/AI Consulting Career]]
 - [[40 Resources/AI Consulting/AI Consultant Certification Tracker]]
+- [[40 Resources/AI Consulting/AI Portfolio Showcase Plan]]
 - [[40 Resources/AI Consulting/Codex Package - AI Consultant Career Module]]
+- [[40 Resources/AI Consulting/Codex Package - AI Portfolio Showcase System]]
