@@ -8,7 +8,7 @@ priority: P0
 start_date: 2026-07-16
 due_date: 2026-10-31
 review_date: 2026-07-23
-next_action: Classify and score the eight candidate portfolio projects by context, ownership, permission, evidence strength, consulting relevance, and readiness.
+next_action: Complete the LifeOS Enterprise Evidence Package: structural audit, dashboard screenshots, architecture diagram, one before-and-after workflow, one measurable operational result, privacy-safe export review, and walkthrough outline.
 tags:
   - project
   - ai-consulting
@@ -30,8 +30,8 @@ By October 31, 2026, establish a credible AI consulting portfolio that combines 
 - [ ] Google Cloud Generative AI Leader is earned.
 - [ ] AWS Certified AI Practitioner is earned or formally replaced by a higher-value implementation credential based on market evidence.
 - [ ] At least one implementation credential or lab-based skill is earned.
-- [ ] Eight candidate projects are classified by operating context, ownership, permission, privacy, and evidence status.
-- [ ] Three flagship case studies are selected using the portfolio score.
+- [x] Eight candidate projects are classified by operating context, ownership, permission, privacy, and evidence status.
+- [x] Three flagship case studies are selected using the portfolio score.
 - [ ] Three portfolio case studies are complete, accurately labeled, and score at least 40/50 with no evidence, privacy, or claim-accuracy failure.
 - [ ] Two live AI agent or automation demonstrations are documented with testing, limitations, approvals, and fallback behavior.
 - [ ] One AI Readiness Assessment and one AI Adoption Roadmap are client-ready.
@@ -154,13 +154,13 @@ By October 31, 2026, establish a credible AI consulting portfolio that combines 
 
 ### Gate 1 — Candidate Selection
 
-- [ ] Operating context classified.
-- [ ] Ownership identified.
-- [ ] Permission status recorded.
-- [ ] Privacy status recorded.
-- [ ] Consulting capability identified.
-- [ ] Available evidence inventoried.
-- [ ] Candidate scored.
+- [x] Operating context classified.
+- [x] Ownership identified or marked for account inspection.
+- [x] Permission status recorded.
+- [x] Privacy status recorded.
+- [x] Consulting capability identified.
+- [x] Available evidence inventoried.
+- [x] Candidate scored.
 
 ### Gate 2 — Ready to Publish
 
@@ -235,5 +235,6 @@ Never present a demonstration, internal experiment, or unfinished project as a p
 - [[20 Areas/AI Consulting Career]]
 - [[40 Resources/AI Consulting/AI Consultant Certification Tracker]]
 - [[40 Resources/AI Consulting/AI Portfolio Showcase Plan]]
+- [[40 Resources/AI Consulting/AI Portfolio Candidate Scoring v1]]
 - [[40 Resources/AI Consulting/Codex Package - AI Consultant Career Module]]
 - [[40 Resources/AI Consulting/Codex Package - AI Portfolio Showcase System]]
