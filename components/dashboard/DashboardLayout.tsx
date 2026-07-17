@@ -1,8 +1,11 @@
 import type { WidgetDefinition } from "@/components/widgets/registry";
+import { AIStatus } from "@/components/widgets/AIStatus";
+import { MorningBrief } from "@/components/widgets/MorningBrief";
+import type { VaultDashboardData } from "@/lib/lifeos/types";
 
-type DashboardLayoutProps = { widgets: readonly WidgetDefinition[] };
+type DashboardLayoutProps = { widgets: readonly WidgetDefinition[]; data: VaultDashboardData };
 
-export function DashboardLayout({ widgets }: DashboardLayoutProps) {
+export function DashboardLayout({ widgets, data }: DashboardLayoutProps) {
   const today = new Intl.DateTimeFormat("en-US", {
     weekday: "long",
     month: "long",
@@ -23,11 +26,17 @@ export function DashboardLayout({ widgets }: DashboardLayoutProps) {
       </header>
 
       <section className="dashboard-grid" aria-label="Executive dashboard widgets">
+        <div className="widget-slot widget-slot--wide" data-widget-id="morning-brief">
+          <MorningBrief priorities={data.priorities} activeProjects={data.activeProjects} waitingOn={data.waitingOn} reviewsDue={data.reviewsDue} />
+        </div>
         {widgets.map(({ id, Component, size }) => (
           <div className={`widget-slot widget-slot--${size}`} key={id} data-widget-id={id}>
             <Component />
           </div>
         ))}
+        <div className="widget-slot widget-slot--standard" data-widget-id="ai-workforce">
+          <AIStatus agents={data.agents} />
+        </div>
       </section>
     </main>
   );
