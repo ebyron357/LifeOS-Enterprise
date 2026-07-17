@@ -1,0 +1,68 @@
+filters:
+  and:
+    - 'file.ext == "md"'
+    - 'type == "resource"'
+    - 'topic == "lead-prospect"'
+    - 'status != "archived"'
+properties:
+  file.name:
+    displayName: Prospect
+  account_name:
+    displayName: Account
+  industry:
+    displayName: Industry
+  location:
+    displayName: Location
+  source_platform:
+    displayName: Source
+  observed_gap:
+    displayName: Observed gap
+  icp_score:
+    displayName: ICP score
+  qualification_status:
+    displayName: Qualification
+  contact_name:
+    displayName: Contact
+  contact_role:
+    displayName: Role
+  email_verification_status:
+    displayName: Email verification
+  suppression_status:
+    displayName: Suppression
+  campaign:
+    displayName: Campaign
+  reply_status:
+    displayName: Reply
+  opportunity_status:
+    displayName: Opportunity
+  owner:
+    displayName: Owner
+  priority:
+    displayName: Priority
+  next_action:
+    displayName: Next action
+  review_date:
+    displayName: Review date
+views:
+  - type: table
+    name: Lead Prospecting Pipeline
+    order:
+      - file.name
+      - account_name
+      - industry
+      - location
+      - source_platform
+      - observed_gap
+      - icp_score
+      - qualification_status
+      - contact_name
+      - contact_role
+      - email_verification_status
+      - suppression_status
+      - campaign
+      - reply_status
+      - opportunity_status
+      - owner
+      - priority
+      - next_action
+      - review_date
