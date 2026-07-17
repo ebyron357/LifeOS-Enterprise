@@ -2,10 +2,12 @@ import type { WidgetDefinition } from "@/components/widgets/registry";
 import { AIStatus } from "@/components/widgets/AIStatus";
 import { MorningBrief } from "@/components/widgets/MorningBrief";
 import type { VaultDashboardData } from "@/lib/lifeos/types";
+import { GitHubHealth } from "@/components/widgets/GitHubHealth";
+import type { GitHubHealthData } from "@/lib/github/health";
 
-type DashboardLayoutProps = { widgets: readonly WidgetDefinition[]; data: VaultDashboardData };
+type DashboardLayoutProps = { widgets: readonly WidgetDefinition[]; data: VaultDashboardData; github: GitHubHealthData };
 
-export function DashboardLayout({ widgets, data }: DashboardLayoutProps) {
+export function DashboardLayout({ widgets, data, github }: DashboardLayoutProps) {
   const today = new Intl.DateTimeFormat("en-US", {
     weekday: "long",
     month: "long",
@@ -42,6 +44,9 @@ export function DashboardLayout({ widgets, data }: DashboardLayoutProps) {
             <Component />
           </div>
         ))}
+        <div className="widget-slot widget-slot--standard" data-widget-id="github-health">
+          <GitHubHealth data={github} />
+        </div>
         <div className="widget-slot widget-slot--standard" data-widget-id="ai-workforce">
           <AIStatus agents={data.agents} />
         </div>

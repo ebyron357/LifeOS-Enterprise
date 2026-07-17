@@ -206,6 +206,17 @@ blockquote cite { display:block; margin-top:18px; color:var(--violet); font:700 
 .empty-state > strong { max-width:470px; font-family:Arial,Helvetica,sans-serif; font-size:1.45rem; font-weight:700; letter-spacing:-.035em; }
 .empty-state p { max-width:500px; color:var(--muted); font-size:.72rem; line-height:1.7; }
 .connection-tag { margin-top:12px; padding:8px 10px; border:1px solid rgba(53,231,255,.24); color:var(--cyan); background:rgba(53,231,255,.045); font-size:.56rem; letter-spacing:.07em; text-transform:uppercase; }
+.telemetry-grid { display:grid; grid-template-columns:repeat(3,1fr); margin:34px 0 30px; border-block:1px solid var(--line); }
+.telemetry-grid>div { min-height:112px; padding:24px 18px; border-left:1px solid var(--line); }
+.telemetry-grid>div:first-child { border-left:0; padding-left:0; }
+.telemetry-grid span { display:block; color:var(--muted); font-size:.57rem; letter-spacing:.08em; text-transform:uppercase; }
+.telemetry-grid strong { display:block; margin-top:10px; font-family:Arial,sans-serif; font-size:2rem; }
+.telemetry-grid .telemetry-word { font-size:1rem; padding-top:9px; text-transform:uppercase; }
+.metric-good { color:var(--green); }.metric-alert { color:var(--red); }
+.repo-signal { display:grid; grid-template-columns:9px minmax(0,1fr) auto; align-items:center; gap:14px; }
+.repo-signal strong { display:block; font-family:Arial,sans-serif; font-size:.86rem; }.repo-signal small { display:block; margin-top:5px; color:var(--muted); font-size:.6rem; }
+.repo-signal time { color:var(--muted); font-size:.57rem; }
+.signal-dot { width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 10px var(--green); }.signal-dot--alert { background:var(--red); box-shadow:0 0 10px var(--red); }
 
 @keyframes pulse { 50% { opacity:.45; box-shadow:0 0 4px var(--green); } }
 

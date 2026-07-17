@@ -10,10 +10,11 @@ const data = {
   reviewsDue: 1,
   agents: [{ name: "Chief of Staff", status: "active", reviewDate: "2026-07-17", purpose: "Choose what deserves attention." }],
 };
+const github = { connected: true, openPullRequests: 1, failedWorkflows: 0, defaultBranch: "main", lastWorkflow: "success", updatedAt: "2026-07-17T00:00:00Z" };
 
 describe("executive dashboard", () => {
   it("registers each required LifeOS widget exactly once", () => {
-    expect(widgetRegistry.map((widget) => widget.id)).toEqual(["prayer", "revenue-radar", "github-health"]);
+    expect(widgetRegistry.map((widget) => widget.id)).toEqual(["prayer", "revenue-radar"]);
     expect(new Set(widgetRegistry.map((widget) => widget.id)).size).toBe(widgetRegistry.length);
   });
 
@@ -22,12 +23,12 @@ describe("executive dashboard", () => {
   });
 
   it("renders the complete executive dashboard", () => {
-    render(<DashboardLayout widgets={widgetRegistry} data={data} />);
+    render(<DashboardLayout widgets={widgetRegistry} data={data} github={github} />);
     expect(screen.getByRole("heading", { name: /good morning,\s*bwa/i })).toBeInTheDocument();
     expect(screen.getByText("What deserves attention")).toBeInTheDocument();
     expect(screen.getByText("Lead with wisdom")).toBeInTheDocument();
     expect(screen.getByText("Revenue radar")).toBeInTheDocument();
     expect(screen.getByText(/AI workforce/i)).toBeInTheDocument();
-    expect(screen.getByText("GitHub health")).toBeInTheDocument();
+    expect(screen.getByText(/GitHub health/i)).toBeInTheDocument();
   });
 });
