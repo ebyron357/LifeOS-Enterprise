@@ -2,7 +2,7 @@
 type: dashboard
 status: active
 created: 2026-07-10
-updated: 2026-07-10
+updated: 2026-07-16
 tags:
   - dashboard
   - life-os
@@ -18,6 +18,7 @@ tags:
 - [[00 Home/Business Dashboard|Business]]
 - [[00 Home/Personal Dashboard|Personal]]
 - [[00 Home/Agentic Work Dashboard|Agentic Work]]
+- [[40 Resources/YouTube Knowledge/YouTube Knowledge Command Index|YouTube Knowledge]]
 - [[01 Inbox/Inbox|Inbox]]
 - [[60 Reviews/README|Reviews]]
 - [[99 Templates/README|Templates]]
