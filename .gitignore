@@ -17,3 +17,10 @@ desktop.ini
 .env
 .env.*
 !.env.example
+
+# Next.js dashboard build and dependency output
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo

@@ -1,0 +1,46 @@
+:root { color-scheme: dark; --bg:#080d13; --panel:#101821; --panel-2:#151f2a; --line:#263443; --text:#f5f7f8; --muted:#8f9eaa; --gold:#d6aa62; --green:#55c69a; --red:#ee766f; --blue:#70a5dd; }
+* { box-sizing: border-box; }
+html { background:var(--bg); }
+body { margin:0; color:var(--text); background:radial-gradient(circle at 80% 0%, #17222c 0, transparent 28rem), var(--bg); font-family:Arial, Helvetica, sans-serif; }
+button, input { font:inherit; }
+.dashboard-shell { width:min(1400px, calc(100% - 48px)); margin:0 auto; padding:64px 0 80px; }
+.dashboard-header { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:40px; }
+.eyebrow,.widget-eyebrow { margin:0 0 10px; color:var(--gold); font-size:.7rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+.dashboard-header h1 { margin:0; font-family:Georgia, serif; font-size:clamp(2.4rem,5vw,4.8rem); font-weight:500; letter-spacing:-.045em; }
+.date-line { margin:12px 0 0; color:var(--muted); }
+.system-pill { display:flex; align-items:center; gap:9px; padding:10px 14px; border:1px solid var(--line); border-radius:999px; color:#bdc8cf; font-size:.78rem; background:#0d141b; white-space:nowrap; }
+.system-pill span,.status-mark { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 0 4px rgba(85,198,154,.1); }
+.dashboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+.widget-slot--wide { grid-column:1/-1; }
+.widget { height:100%; min-height:360px; padding:28px; border:1px solid var(--line); border-radius:18px; background:linear-gradient(150deg,rgba(21,31,42,.98),rgba(13,20,27,.98)); box-shadow:0 18px 55px rgba(0,0,0,.16); overflow:hidden; }
+.widget--prayer { background:linear-gradient(145deg,#1d1b17,#111820); border-color:#3e3528; }
+.widget-header { display:flex; justify-content:space-between; gap:20px; align-items:flex-start; margin-bottom:24px; }
+.widget-header h2 { margin:0; font-family:Georgia,serif; font-size:1.65rem; font-weight:500; }
+.widget-action { color:var(--muted); font-size:.74rem; padding-top:4px; }
+.priority-list,.revenue-list,.agent-list { list-style:none; padding:0; margin:0; }
+.priority-list li { display:grid; grid-template-columns:48px 1fr auto; align-items:center; gap:16px; padding:16px 0; border-top:1px solid var(--line); }
+.priority-number { color:#5f7180; font-family:Georgia,serif; font-size:1.3rem; }
+.priority-list strong,.agent-list strong { display:block; font-size:.94rem; }
+.priority-list small,.agent-list small,.repo-status small { display:block; color:var(--muted); margin-top:5px; }
+.priority-dot { width:8px; height:8px; border-radius:50%; }
+.priority-dot--critical { background:var(--red); }.priority-dot--high { background:var(--gold); }.priority-dot--medium { background:var(--blue); }
+.brief-footer { display:grid; grid-template-columns:repeat(3,1fr); margin-top:8px; padding-top:20px; border-top:1px solid var(--line); }
+.brief-footer div { padding-left:20px; border-left:1px solid var(--line); }.brief-footer div:first-child { padding-left:0;border:0; }
+.brief-footer span,.prayer-focus span,.revenue-summary span { display:block;color:var(--muted);font-size:.72rem;margin-bottom:7px; }
+blockquote { margin:38px 0 26px; max-width:560px; font-family:Georgia,serif; font-size:clamp(1.45rem,3vw,2.3rem); line-height:1.3; color:#f1e6d1; }
+blockquote cite { display:block; margin-top:14px; color:var(--gold); font:700 .68rem Arial,sans-serif; letter-spacing:.12em; text-transform:uppercase; }
+.reflection { color:#b7b1a8; line-height:1.65; }
+.prayer-focus { margin-top:26px; padding:18px 0 0; border-top:1px solid #3e3528; }
+.revenue-summary { display:flex; justify-content:space-between; align-items:center; }.revenue-summary span { margin:0; }
+.progress-track,.mini-track { height:5px; border-radius:999px; background:#26323d; overflow:hidden; }.progress-track span,.mini-track span { display:block;height:100%;background:linear-gradient(90deg,var(--gold),#ead19d); }
+.progress-track { margin:13px 0 25px; }.mini-track { height:3px;margin-top:10px; }
+.revenue-list li { padding:15px 0; border-top:1px solid var(--line); }
+.revenue-row { display:flex;justify-content:space-between;gap:16px; }.revenue-row em { color:var(--green); font-style:normal; font-size:.72rem;margin-left:8px; }
+.agent-list li { display:grid; grid-template-columns:10px 1fr auto; align-items:center; gap:14px; padding:14px 0; border-top:1px solid var(--line); }
+.agent-status { width:8px;height:8px;border-radius:50%;background:#596673; }.agent-status--active { background:var(--green);box-shadow:0 0 0 4px rgba(85,198,154,.08); }.agent-status--queued { background:var(--gold); }
+.agent-state { color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.08em; }
+.health-score { display:flex;align-items:end;gap:10px;margin:4px 0 24px; }.health-score>strong { font-family:Georgia,serif;font-size:4rem;font-weight:400;line-height:.9; }.health-score>span { color:var(--muted);font-size:.7rem;line-height:1.45; }
+.health-metrics { display:grid;grid-template-columns:repeat(3,1fr);margin:0 0 24px;border-block:1px solid var(--line); }.health-metrics div { padding:18px 10px;border-left:1px solid var(--line); }.health-metrics div:first-child { border:0;padding-left:0; }.health-metrics dt { color:var(--muted);font-size:.69rem; }.health-metrics dd { margin:7px 0 0;font-size:1.25rem;font-weight:700; }.healthy { color:var(--green); }
+.repo-status { display:grid;grid-template-columns:10px 1fr auto;align-items:center;gap:13px; }.repo-status time { color:var(--muted);font-size:.7rem; }
+@media (max-width:760px) { .dashboard-shell{width:min(100% - 28px,1400px);padding-top:36px}.dashboard-header{display:block}.system-pill{margin-top:20px;width:max-content}.dashboard-grid{grid-template-columns:1fr}.widget-slot--wide{grid-column:auto}.widget{padding:22px;min-height:auto}.brief-footer{gap:10px}.brief-footer div{padding-left:10px}.health-metrics{grid-template-columns:repeat(3,1fr)} }
+@media (prefers-reduced-motion:no-preference) { .widget { transition:transform .2s ease,border-color .2s ease; }.widget:hover { transform:translateY(-2px);border-color:#3c4e5f; } }
