@@ -10,7 +10,7 @@ The LifeOS web dashboard provides a one-screen executive view at `/dashboard` wh
 - AI Workforce: agent availability and current work.
 - GitHub Health: repository checks, pull requests, stale branches, and overall health.
 
-The first release uses typed sample data to establish the presentation contract. The next integration increment should replace each widget's data with server-side adapters for vault metadata, accounting/CRM sources, agent runs, and the GitHub API. Do not expose service credentials to client components.
+Morning Brief and AI Workforce are loaded server-side from the canonical `Projects/` and `AI/` Markdown metadata. Revenue Radar and GitHub Health intentionally display connection-required states until approved sources are configured; the dashboard never invents operational or financial results. GitHub API and financial integrations remain credential-gated server-side adapters. Do not expose service credentials to client components.
 
 ## Widget registry
 
