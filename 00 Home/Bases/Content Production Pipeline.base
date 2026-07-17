@@ -1,0 +1,64 @@
+filters:
+  and:
+    - 'file.ext == "md"'
+    - 'type == "content"'
+    - 'status != "archived"'
+properties:
+  file.name:
+    displayName: Content asset
+  client:
+    displayName: Client
+  content_type:
+    displayName: Type
+  primary_topic:
+    displayName: Topic
+  search_intent:
+    displayName: Search intent
+  funnel_stage:
+    displayName: Funnel
+  status:
+    displayName: Status
+  owner:
+    displayName: Owner
+  reviewer:
+    displayName: Reviewer
+  due_date:
+    displayName: Due
+  publication_date:
+    displayName: Publish date
+  primary_cta:
+    displayName: CTA
+  related_lead_magnet:
+    displayName: Lead magnet
+  conversion_goal:
+    displayName: Conversion goal
+  published_url:
+    displayName: Published URL
+  evidence_status:
+    displayName: Evidence
+  next_action:
+    displayName: Next action
+  review_date:
+    displayName: Review date
+views:
+  - type: table
+    name: Content Production Pipeline
+    order:
+      - file.name
+      - client
+      - content_type
+      - primary_topic
+      - search_intent
+      - funnel_stage
+      - status
+      - owner
+      - reviewer
+      - due_date
+      - publication_date
+      - primary_cta
+      - related_lead_magnet
+      - conversion_goal
+      - published_url
+      - evidence_status
+      - next_action
+      - review_date
