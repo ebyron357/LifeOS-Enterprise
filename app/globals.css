@@ -206,6 +206,13 @@ blockquote cite { display:block; margin-top:18px; color:var(--violet); font:700 
 .empty-state > strong { max-width:470px; font-family:Arial,Helvetica,sans-serif; font-size:1.45rem; font-weight:700; letter-spacing:-.035em; }
 .empty-state p { max-width:500px; color:var(--muted); font-size:.72rem; line-height:1.7; }
 .connection-tag { margin-top:12px; padding:8px 10px; border:1px solid rgba(53,231,255,.24); color:var(--cyan); background:rgba(53,231,255,.045); font-size:.56rem; letter-spacing:.07em; text-transform:uppercase; }
+.revenue-hero { display:grid; grid-template-columns:repeat(2,1fr); margin:30px 0 24px; border-block:1px solid var(--line); }
+.revenue-hero>div { padding:22px 18px; border-left:1px solid var(--line); }.revenue-hero>div:first-child { padding-left:0; border-left:0; }
+.revenue-hero span,.revenue-target span,.revenue-businesses span { display:block; color:var(--muted); font-size:.56rem; letter-spacing:.08em; text-transform:uppercase; }
+.revenue-hero strong { display:block; margin-top:10px; color:var(--cyan); font-family:Arial,sans-serif; font-size:2rem; }
+.revenue-target>div:first-child { display:flex; justify-content:space-between; align-items:center; }.revenue-target b { color:var(--green); font-size:.62rem; text-transform:uppercase; }
+.revenue-track { height:5px; margin-top:11px; background:rgba(117,136,154,.18); overflow:hidden; }.revenue-track i { display:block; height:100%; background:linear-gradient(90deg,var(--cyan),var(--violet)); box-shadow:0 0 12px var(--cyan); }
+.revenue-businesses { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:28px; }.revenue-businesses>div { padding:12px; border:1px solid var(--line); background:rgba(53,231,255,.025); }.revenue-businesses strong { display:block; margin-top:8px; font-family:Arial,sans-serif; font-size:.9rem; }
 .telemetry-grid { display:grid; grid-template-columns:repeat(3,1fr); margin:34px 0 30px; border-block:1px solid var(--line); }
 .telemetry-grid>div { min-height:112px; padding:24px 18px; border-left:1px solid var(--line); }
 .telemetry-grid>div:first-child { border-left:0; padding-left:0; }

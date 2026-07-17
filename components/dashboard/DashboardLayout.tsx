@@ -4,10 +4,12 @@ import { MorningBrief } from "@/components/widgets/MorningBrief";
 import type { VaultDashboardData } from "@/lib/lifeos/types";
 import { GitHubHealth } from "@/components/widgets/GitHubHealth";
 import type { GitHubHealthData } from "@/lib/github/health";
+import type { RevenueRadarData } from "@/lib/google/revenue";
+import { RevenueRadar } from "@/components/widgets/RevenueRadar";
 
-type DashboardLayoutProps = { widgets: readonly WidgetDefinition[]; data: VaultDashboardData; github: GitHubHealthData };
+type DashboardLayoutProps = { widgets: readonly WidgetDefinition[]; data: VaultDashboardData; github: GitHubHealthData; revenue?: RevenueRadarData };
 
-export function DashboardLayout({ widgets, data, github }: DashboardLayoutProps) {
+export function DashboardLayout({ widgets, data, github, revenue }: DashboardLayoutProps) {
   const today = new Intl.DateTimeFormat("en-US", {
     weekday: "long",
     month: "long",
@@ -41,7 +43,7 @@ export function DashboardLayout({ widgets, data, github }: DashboardLayoutProps)
         </div>
         {widgets.map(({ id, Component, size }) => (
           <div className={`widget-slot widget-slot--${size}`} key={id} data-widget-id={id}>
-            <Component />
+            {id === "revenue-radar" ? <RevenueRadar data={revenue} /> : <Component />}
           </div>
         ))}
         <div className="widget-slot widget-slot--standard" data-widget-id="github-health">
