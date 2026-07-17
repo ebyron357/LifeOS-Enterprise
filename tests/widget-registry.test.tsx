@@ -23,7 +23,7 @@ describe("executive dashboard", () => {
 
   it("renders the complete executive dashboard", () => {
     render(<DashboardLayout widgets={widgetRegistry} data={data} />);
-    expect(screen.getByRole("heading", { name: /good morning, byron/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /good morning, bwa/i })).toBeInTheDocument();
     expect(screen.getByText("What deserves attention")).toBeInTheDocument();
     expect(screen.getByText("Lead with wisdom")).toBeInTheDocument();
     expect(screen.getByText("Revenue radar")).toBeInTheDocument();
