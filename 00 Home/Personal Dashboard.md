@@ -18,6 +18,17 @@ tags:
 - Home:
 - Learning:
 
+## Learning and Knowledge
+
+- [[20 Areas/Learning and Knowledge|Learning and Knowledge Area]]
+- [[10 Projects/Build YouTube to Knowledge Engine|Build YouTube to Knowledge Engine]]
+- [[40 Resources/YouTube Knowledge/YouTube Knowledge Command Index|YouTube Knowledge Command Index]]
+- [[80 SOPs/Process YouTube Video into LifeOS Knowledge|YouTube Processing SOP]]
+- [[40 Resources/Prompts/YouTube Transcript Knowledge Extraction Prompt|Transcript Analysis Prompt]]
+- [[40 Resources/YouTube Knowledge/Codex Package - YouTube Knowledge Engine|Codex Engineering Package]]
+
+![[00 Home/Bases/YouTube Knowledge Pipeline.base]]
+
 ## AI Consultant Career
 
 - [[20 Areas/AI Consulting Career|AI Consulting Career Area]]
@@ -56,5 +67,6 @@ tags:
 - [ ] Review people needing attention.
 - [ ] Review home responsibilities.
 - [ ] Review learning and personal development.
+- [ ] Review YouTube transcripts, extracted URLs, generated SOPs, action items, and blocked outputs.
 - [ ] Review AI consulting credentials, flagship evidence gaps, and public publishing queue.
 - [ ] Remove one unnecessary commitment.

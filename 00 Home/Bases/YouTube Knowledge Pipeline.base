@@ -1,0 +1,77 @@
+filters:
+  and:
+    - 'file.ext == "md"'
+    - 'type == "resource"'
+    - 'topic == "youtube-knowledge"'
+properties:
+  file.name:
+    displayName: Video / Source
+  video_title:
+    displayName: Video title
+  channel:
+    displayName: Channel
+  operating_context:
+    displayName: Context
+  purpose:
+    displayName: Purpose
+  transcript_status:
+    displayName: Transcript
+  transcript_source:
+    displayName: Transcript source
+  rights_status:
+    displayName: Rights
+  evidence_status:
+    displayName: Evidence
+  notebooklm_url:
+    displayName: NotebookLM
+  url_count:
+    displayName: URLs
+  tool_count:
+    displayName: Tools
+  command_count:
+    displayName: Commands
+  code_count:
+    displayName: Code
+  book_count:
+    displayName: Books
+  action_count:
+    displayName: Actions
+  course_status:
+    displayName: Course
+  sop_status:
+    displayName: SOP
+  checklist_status:
+    displayName: Checklist
+  flashcards_status:
+    displayName: Flashcards
+  quiz_status:
+    displayName: Quiz
+  markdown_status:
+    displayName: Markdown
+  pdf_status:
+    displayName: PDF
+  next_action:
+    displayName: Next action
+  review_date:
+    displayName: Review date
+views:
+  - type: table
+    name: YouTube Knowledge Pipeline
+    order:
+      - file.name
+      - operating_context
+      - purpose
+      - transcript_status
+      - rights_status
+      - evidence_status
+      - url_count
+      - tool_count
+      - action_count
+      - course_status
+      - sop_status
+      - flashcards_status
+      - quiz_status
+      - markdown_status
+      - pdf_status
+      - next_action
+      - review_date
