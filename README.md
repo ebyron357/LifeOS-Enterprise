@@ -79,6 +79,12 @@ Community plugins are optional. Add Templater, QuickAdd, Tasks, Calendar, or Dat
 - `docs/LifeOS_Specification_v1.md` — operating specification
 - `scripts/setup-obsidian.ps1` — non-destructive local setup
 - `scripts/audit-vault.ps1` — structural and metadata validation
+- `app/dashboard/page.tsx` — optional executive web dashboard
+- `docs/EXECUTIVE_DASHBOARD.md` — dashboard architecture, registry, and validation
+
+## Executive Web Dashboard
+
+Run `npm install` and `npm run dev`, then open `/dashboard` for the Morning Brief, Prayer, Revenue Radar, AI Workforce, and GitHub Health widgets. Obsidian remains the canonical LifeOS interface; the web dashboard is an executive summary surface.
 
 ## Definition of Done
 

@@ -165,3 +165,11 @@ Repair is accepted when:
 - new notes default to `01 Inbox`;
 - existing legacy notes remain available;
 - future pulls do not collide with local `.obsidian` or backup files.
+
+# Executive Dashboard Addition - 2026-07-16
+
+- Added the optional Next.js executive summary surface at `/dashboard` without changing the canonical Obsidian vault structure.
+- Added Morning Brief, Prayer, Revenue Radar, AI Workforce, and GitHub Health widgets behind a typed widget registry.
+- Added responsive layout styling, automated component/registry tests, and dashboard operating documentation.
+- Web validation: ESLint PASS; TypeScript PASS; Vitest 3/3 PASS; Next.js production build PASS.
+- Vault PowerShell audit was not rerun in the Linux verification environment because PowerShell is unavailable. No vault files, metadata, Bases, templates, or shared Obsidian settings were changed by this feature.

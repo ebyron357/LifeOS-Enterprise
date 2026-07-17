@@ -29,6 +29,16 @@ tags:
 
 ![[00 Home/Bases/YouTube Knowledge Pipeline.base]]
 
+## AI Consultant Career
+
+- [[20 Areas/AI Consulting Career|AI Consulting Career Area]]
+- [[10 Projects/Build AI Consultant Portfolio|Build AI Consultant Portfolio]]
+- [[40 Resources/AI Consulting/AI Consultant Certification Tracker|Certification Strategy and Scorecard]]
+- [[40 Resources/AI Consulting/AI Portfolio Showcase Plan|AI Portfolio Showcase Plan]]
+- [[40 Resources/AI Consulting/AI Portfolio Candidate Scoring v1|Portfolio Candidate Scoring and Flagship Decision]]
+- [[40 Resources/AI Consulting/Codex Package - AI Consultant Career Module|Codex Career Engineering Package]]
+- [[40 Resources/AI Consulting/Codex Package - AI Portfolio Showcase System|Codex Portfolio Engineering Package]]
+
 ## Areas
 
 ![[00 Home/Bases/Areas Overview.base]]
@@ -58,4 +68,5 @@ tags:
 - [ ] Review home responsibilities.
 - [ ] Review learning and personal development.
 - [ ] Review YouTube transcripts, extracted URLs, generated SOPs, action items, and blocked outputs.
+- [ ] Review AI consulting credentials, flagship evidence gaps, and public publishing queue.
 - [ ] Remove one unnecessary commitment.
