@@ -16,10 +16,19 @@ export type AgentBrief = {
   purpose: string;
 };
 
+export type GrowthBrief = {
+  focus: string;
+  currentValue: string;
+  targetValue: string;
+  reviewDate: string;
+};
+
 export type VaultDashboardData = {
   priorities: ProjectBrief[];
+  projects: ProjectBrief[];
   activeProjects: number;
   waitingOn: number;
   reviewsDue: number;
   agents: AgentBrief[];
+  growth: GrowthBrief;
 };
