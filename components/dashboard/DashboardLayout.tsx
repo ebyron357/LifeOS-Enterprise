@@ -3,6 +3,7 @@ import { AIStatus } from "@/components/widgets/AIStatus";
 import { MorningBrief } from "@/components/widgets/MorningBrief";
 import { PersonalGrowthWidget } from "@/components/widgets/PersonalGrowthWidget";
 import { InteractiveCommandCenter } from "@/components/dashboard/InteractiveCommandCenter";
+import { LifeOSNavigation } from "@/components/dashboard/LifeOSNavigation";
 import type { VaultDashboardData } from "@/lib/lifeos/types";
 import { GitHubHealth } from "@/components/widgets/GitHubHealth";
 import type { GitHubHealthData } from "@/lib/github/health";
@@ -13,53 +14,74 @@ type DashboardLayoutProps = { widgets: readonly WidgetDefinition[]; data: VaultD
 
 export function DashboardLayout({ widgets, data, github, revenue }: DashboardLayoutProps) {
   const today = new Intl.DateTimeFormat("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
+    weekday: "long", month: "long", day: "numeric",
   }).format(new Date());
+  const blocked = data.projects.filter((project) => project.status === "blocked" || project.blocker).length;
 
   return (
-    <main className="dashboard-shell">
-      <nav className="command-bar" aria-label="LifeOS command status">
-        <div className="command-brand"><span className="brand-mark">L</span><strong>LIFEOS</strong><em>EXECUTIVE INTELLIGENCE</em></div>
-        <div className="command-signals">
-          <span>CORE <b>ONLINE</b></span>
-          <span>VAULT <b>SYNCED</b></span>
-          <span className="signal-time">{today}</span>
-        </div>
-      </nav>
-      <header className="dashboard-header">
-        <div>
-          <p className="eyebrow"><span>01</span> Interactive command center</p>
-          <h1>Good morning,<br /><em>Bwa.</em></h1>
-          <p className="date-line">See what is true. Choose what matters. Move one clear action.</p>
-        </div>
-        <div className="system-pill" aria-label="LifeOS data loaded">
-          <span aria-hidden="true" /> Live vault data loaded
-        </div>
-      </header>
+    <div className="lifeos-app">
+      <LifeOSNavigation projects={data.projects} reviewsDue={data.reviewsDue} />
 
-      <InteractiveCommandCenter projects={data.projects} />
+      <main className="dashboard-shell">
+        <section id="overview" className="app-section">
+          <nav className="command-bar" aria-label="LifeOS command status">
+            <div className="command-brand"><span className="brand-mark">L</span><strong>LIVE INTELLIGENCE</strong><em>Verified vault signals</em></div>
+            <div className="command-signals"><span className="signal-time">{today}</span></div>
+          </nav>
 
-      <section className="dashboard-grid" aria-label="Executive dashboard widgets">
-        <div className="widget-slot widget-slot--wide" data-widget-id="morning-brief">
-          <MorningBrief priorities={data.priorities} activeProjects={data.activeProjects} waitingOn={data.waitingOn} reviewsDue={data.reviewsDue} />
-        </div>
-        <div className="widget-slot widget-slot--wide" data-widget-id="personal-growth">
-          <PersonalGrowthWidget growth={data.growth} />
-        </div>
-        {widgets.map(({ id, Component, size }) => (
-          <div className={`widget-slot widget-slot--${size}`} key={id} data-widget-id={id}>
-            {id === "revenue-radar" ? <RevenueRadar data={revenue} /> : <Component />}
+          <header className="dashboard-header">
+            <div>
+              <p className="eyebrow"><span>01</span> Your command center</p>
+              <h1>Control the day.<br /><em>Build the life.</em></h1>
+              <p className="date-line">One screen for decisions, execution, growth, and verified progress.</p>
+            </div>
+            <div className="system-pill" aria-label="LifeOS data loaded"><span aria-hidden="true" /> Live vault data</div>
+          </header>
+
+          <div className="mission-strip" aria-label="Current operating status">
+            <article><span>Active work</span><strong>{data.activeProjects}</strong><small>projects moving</small></article>
+            <article className={blocked ? "has-alert" : ""}><span>Blocked</span><strong>{blocked}</strong><small>need intervention</small></article>
+            <article><span>Waiting</span><strong>{data.waitingOn}</strong><small>outside response</small></article>
+            <article className={data.reviewsDue ? "has-alert" : ""}><span>Reviews due</span><strong>{data.reviewsDue}</strong><small>records need truth</small></article>
           </div>
-        ))}
-        <div className="widget-slot widget-slot--standard" data-widget-id="github-health">
-          <GitHubHealth data={github} />
-        </div>
-        <div className="widget-slot widget-slot--standard" data-widget-id="ai-workforce">
-          <AIStatus agents={data.agents} />
-        </div>
-      </section>
-    </main>
+        </section>
+
+        <section id="projects" className="app-section">
+          <div className="section-heading"><span>02</span><div><p>Execution control</p><h2>Projects and decisions</h2></div></div>
+          <InteractiveCommandCenter projects={data.projects} />
+          <div className="widget-slot widget-slot--wide" data-widget-id="morning-brief">
+            <MorningBrief priorities={data.priorities} activeProjects={data.activeProjects} waitingOn={data.waitingOn} reviewsDue={data.reviewsDue} />
+          </div>
+        </section>
+
+        <section id="growth" className="app-section">
+          <div className="section-heading"><span>03</span><div><p>Personal operating system</p><h2>Growth without overload</h2></div></div>
+          <div className="widget-slot widget-slot--wide" data-widget-id="personal-growth">
+            <PersonalGrowthWidget growth={data.growth} />
+          </div>
+        </section>
+
+        <section id="intelligence" className="app-section">
+          <div className="section-heading"><span>04</span><div><p>Connected signals</p><h2>Business intelligence</h2></div></div>
+          <div className="dashboard-grid">
+            {widgets.map(({ id, Component, size }) => (
+              <div className={`widget-slot widget-slot--${size}`} key={id} data-widget-id={id}>
+                {id === "revenue-radar" ? <RevenueRadar data={revenue} /> : <Component />}
+              </div>
+            ))}
+            <div className="widget-slot widget-slot--standard" data-widget-id="github-health">
+              <GitHubHealth data={github} />
+            </div>
+          </div>
+        </section>
+
+        <section id="agents" className="app-section">
+          <div className="section-heading"><span>05</span><div><p>Accountable automation</p><h2>AI workforce</h2></div></div>
+          <div className="widget-slot widget-slot--wide" data-widget-id="ai-workforce">
+            <AIStatus agents={data.agents} />
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }
