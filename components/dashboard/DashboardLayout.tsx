@@ -4,6 +4,7 @@ import { MorningBrief } from "@/components/widgets/MorningBrief";
 import { PersonalGrowthWidget } from "@/components/widgets/PersonalGrowthWidget";
 import { InteractiveCommandCenter } from "@/components/dashboard/InteractiveCommandCenter";
 import { LifeOSNavigation } from "@/components/dashboard/LifeOSNavigation";
+import { CognitiveSupportCenter } from "@/components/dashboard/CognitiveSupportCenter";
 import type { VaultDashboardData } from "@/lib/lifeos/types";
 import { GitHubHealth } from "@/components/widgets/GitHubHealth";
 import type { GitHubHealthData } from "@/lib/github/health";
@@ -29,11 +30,11 @@ export function DashboardLayout({ widgets, data, github, revenue }: DashboardLay
             <div className="command-signals"><span className="signal-time">{today}</span></div>
           </nav>
 
-          <header className="dashboard-header">
+          <header className="dashboard-header dashboard-header--calm">
             <div>
-              <p className="eyebrow"><span>01</span> Your command center</p>
-              <h1>Control the day.<br /><em>Build the life.</em></h1>
-              <p className="date-line">One screen for decisions, execution, growth, and verified progress.</p>
+              <p className="eyebrow"><span>01</span> Today</p>
+              <h1>Good day, <em>Bwa.</em></h1>
+              <p className="date-line">Start with one clear action. Everything else stays safely recorded.</p>
             </div>
             <div className="system-pill" aria-label="LifeOS data loaded"><span aria-hidden="true" /> Live vault data</div>
           </header>
@@ -44,6 +45,8 @@ export function DashboardLayout({ widgets, data, github, revenue }: DashboardLay
             <article><span>Waiting</span><strong>{data.waitingOn}</strong><small>outside response</small></article>
             <article className={data.reviewsDue ? "has-alert" : ""}><span>Reviews due</span><strong>{data.reviewsDue}</strong><small>records need truth</small></article>
           </div>
+
+          <CognitiveSupportCenter projects={data.projects} />
         </section>
 
         <section id="projects" className="app-section">
