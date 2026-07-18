@@ -33,6 +33,12 @@ Projects and Areas
 Goals and Life Direction
 ```
 
+Personal growth follows a light loop:
+
+```text
+Notice → Weekly Check-In → One Small Action → Evidence
+```
+
 Business and AI work extends the loop:
 
 ```text
@@ -44,8 +50,9 @@ Projects → Decisions → SOPs → Agents → Experiments
 1. Open this repository as an Obsidian vault.
 2. Follow `docs/OBSIDIAN_SETUP.md`.
 3. Open `00 Home/Life OS.md`.
-4. Create notes from `99 Templates/`.
-5. Run `powershell -ExecutionPolicy Bypass -File scripts/audit-vault.ps1` after changes.
+4. Open `00 Home/Personal Growth Dashboard.md` for the growth system.
+5. Create notes from `99 Templates/`.
+6. Run `powershell -ExecutionPolicy Bypass -File scripts/audit-vault.ps1` after changes.
 
 ## Native Features
 
@@ -65,6 +72,7 @@ Community plugins are optional. Add Templater, QuickAdd, Tasks, Calendar, or Dat
 - Every active project has one clear outcome, one next action, an owner, and a review date.
 - Goals are measurable; projects contain the work.
 - Areas are ongoing responsibilities, not finish-line outcomes.
+- Personal growth uses honest evidence and self-reported states; the system does not invent scores.
 - Capture into `01 Inbox/`, then process during daily or weekly review.
 - Prefer Bases before Dataview.
 - Do not automate an unstable workflow.
@@ -72,6 +80,10 @@ Community plugins are optional. Add Templater, QuickAdd, Tasks, Calendar, or Dat
 ## Key Files
 
 - `00 Home/Life OS.md` — main dashboard
+- `00 Home/Personal Growth Dashboard.md` — personal growth home
+- `20 Areas/Personal Growth.md` — growth standards and focus
+- `30 Goals/Become My Best Self.md` — measurable growth goal
+- `99 Templates/Personal Growth Check-In.md` — weekly growth review
 - `00 Home/Bases/` — structured dashboards
 - `99 Templates/` — canonical templates
 - `architecture/METADATA_SCHEMA.md` — property contract
@@ -93,5 +105,6 @@ The vault is operational when it can answer these questions in under one minute:
 - What deserves attention today?
 - Which projects are active, blocked, waiting, or due for review?
 - Which goals are progressing?
+- What is my current personal growth focus and next action?
 - Who needs follow-up?
 - Which SOPs, decisions, and agents need review?
