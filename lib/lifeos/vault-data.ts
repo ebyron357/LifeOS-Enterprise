@@ -2,7 +2,7 @@ import "server-only";
 
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
-import type { AgentBrief, ProjectBrief, VaultDashboardData } from "./types";
+import type { AgentBrief, GrowthBrief, ProjectBrief, VaultDashboardData } from "./types";
 
 type Frontmatter = Record<string, string>;
 
@@ -35,6 +35,14 @@ async function markdownFiles(directory: string) {
   })));
 }
 
+async function optionalMarkdown(file: string) {
+  try {
+    return await readFile(path.join(process.cwd(), file), "utf8");
+  } catch {
+    return "";
+  }
+}
+
 const priorityRank: Record<string, number> = { P0: 0, P1: 1, P2: 2, P3: 3 };
 
 function isDue(date: string, today: string) {
@@ -43,7 +51,12 @@ function isDue(date: string, today: string) {
 
 export async function getVaultDashboardData(now = new Date()): Promise<VaultDashboardData> {
   const today = now.toISOString().slice(0, 10);
-  const [projectFiles, agentFiles] = await Promise.all([markdownFiles("Projects"), markdownFiles("AI")]);
+  const [projectFiles, agentFiles, growthAreaSource, growthGoalSource] = await Promise.all([
+    markdownFiles("Projects"),
+    markdownFiles("AI"),
+    optionalMarkdown("20 Areas/Personal Growth.md"),
+    optionalMarkdown("30 Goals/Become My Best Self.md"),
+  ]);
 
   const projects: ProjectBrief[] = projectFiles.map(({ name, source }) => {
     const meta = parseFrontmatter(source);
@@ -69,6 +82,15 @@ export async function getVaultDashboardData(now = new Date()): Promise<VaultDash
     };
   });
 
+  const growthArea = parseFrontmatter(growthAreaSource);
+  const growthGoal = parseFrontmatter(growthGoalSource);
+  const growth: GrowthBrief = {
+    focus: section(growthAreaSource, "Current Focus") || growthArea.standard || "Choose one small, useful action.",
+    currentValue: growthGoal.current_value || "0",
+    targetValue: growthGoal.target_value || "24",
+    reviewDate: growthGoal.review_date || "",
+  };
+
   const active = projects.filter((project) => ["active", "waiting", "blocked"].includes(project.status));
   const priorities = [...active]
     .sort((a, b) => (priorityRank[a.priority] ?? 9) - (priorityRank[b.priority] ?? 9) || a.reviewDate.localeCompare(b.reviewDate))
@@ -76,9 +98,11 @@ export async function getVaultDashboardData(now = new Date()): Promise<VaultDash
 
   return {
     priorities,
+    projects: active,
     activeProjects: active.filter((project) => project.status === "active").length,
     waitingOn: active.filter((project) => project.status === "waiting" || Boolean(project.waitingOn)).length,
     reviewsDue: active.filter((project) => isDue(project.reviewDate, today)).length,
     agents: agents.sort((a, b) => a.name.localeCompare(b.name)),
+    growth,
   };
 }
