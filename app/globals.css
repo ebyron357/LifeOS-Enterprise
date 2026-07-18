@@ -312,3 +312,101 @@ blockquote cite { display:block; margin-top:18px; color:var(--violet); font:700 
   .control-header { display:grid; }
   .growth-dimensions { grid-template-columns:repeat(2,1fr); }
 }
+
+
+/* LifeOS application shell — visual control center */
+html { scroll-behavior:smooth; }
+.lifeos-app { min-height:100vh; }
+.lifeos-sidebar {
+  position:fixed;
+  z-index:20;
+  inset:0 auto 0 0;
+  width:250px;
+  display:flex;
+  flex-direction:column;
+  padding:24px 18px;
+  border-right:1px solid var(--line);
+  background:rgba(5,8,13,.96);
+  backdrop-filter:blur(22px);
+}
+.sidebar-brand { display:flex; align-items:center; gap:12px; min-height:58px; padding:0 8px 22px; border-bottom:1px solid var(--line); }
+.sidebar-brand>span { display:grid; place-items:center; width:38px; height:38px; color:#031014; background:linear-gradient(135deg,var(--cyan),#91aaff); font:900 1rem Arial,sans-serif; box-shadow:0 0 28px rgba(53,231,255,.22); }
+.sidebar-brand strong,.sidebar-brand small { display:block; }
+.sidebar-brand strong { font:800 .82rem Arial,sans-serif; letter-spacing:.18em; }
+.sidebar-brand small { margin-top:5px; color:var(--muted); font-size:.5rem; letter-spacing:.12em; }
+.lifeos-sidebar nav { display:grid; gap:5px; margin-top:28px; }
+.lifeos-sidebar nav button,.sidebar-actions button {
+  width:100%;
+  border:0;
+  color:#8da0b1;
+  background:transparent;
+  text-align:left;
+  cursor:pointer;
+  font:650 .67rem ui-monospace,monospace;
+  letter-spacing:.04em;
+}
+.lifeos-sidebar nav button { display:grid; grid-template-columns:30px 1fr; align-items:center; min-height:42px; padding:0 11px; border-left:2px solid transparent; }
+.lifeos-sidebar nav button span { color:#385167; font-size:.55rem; }
+.lifeos-sidebar nav button:hover { color:var(--text); border-color:var(--cyan); background:linear-gradient(90deg,rgba(53,231,255,.1),transparent); }
+.sidebar-actions { display:grid; gap:8px; margin-top:auto; padding-top:20px; border-top:1px solid var(--line); }
+.sidebar-actions button { min-height:45px; padding:0 12px; border:1px solid var(--line); }
+.sidebar-actions button:hover { color:var(--text); border-color:var(--line-hot); }
+.voice-brief-button { color:var(--cyan)!important; background:rgba(53,231,255,.05)!important; }
+.voice-wave { display:inline-block; margin-right:8px; }
+.voice-wave.is-speaking { color:var(--green); animation:pulse 1s ease-in-out infinite; }
+.capture-open-button span { margin-right:8px; color:var(--violet); font-size:1rem; }
+.sidebar-status { display:grid; grid-template-columns:9px 1fr; gap:4px 9px; align-items:center; margin-top:18px; padding:14px 10px; border:1px solid var(--line); }
+.sidebar-status i { width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 10px var(--green); }
+.sidebar-status span { color:#b9c8d4; font-size:.57rem; text-transform:uppercase; }
+.sidebar-status small { grid-column:2; color:var(--muted); font-size:.5rem; }
+.lifeos-app .dashboard-shell { width:auto; max-width:1600px; margin-left:250px; padding:24px 34px 90px; }
+.app-section { scroll-margin-top:20px; margin-bottom:70px; }
+.section-heading { display:flex; align-items:center; gap:16px; margin:0 0 18px; padding-bottom:14px; border-bottom:1px solid var(--line); }
+.section-heading>span { display:grid; place-items:center; width:40px; height:40px; border:1px solid var(--line-hot); color:var(--cyan); font-size:.65rem; }
+.section-heading p,.section-heading h2 { margin:0; }
+.section-heading p { color:var(--muted); font-size:.54rem; letter-spacing:.12em; text-transform:uppercase; }
+.section-heading h2 { margin-top:4px; font:700 1.35rem Arial,sans-serif; letter-spacing:-.03em; }
+.mission-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; margin-bottom:54px; border:1px solid var(--line); background:var(--line); }
+.mission-strip article { min-height:132px; padding:22px; background:linear-gradient(145deg,rgba(15,23,34,.98),rgba(7,11,17,.98)); }
+.mission-strip article span,.mission-strip article small { display:block; }
+.mission-strip article span { color:var(--muted); font-size:.55rem; letter-spacing:.1em; text-transform:uppercase; }
+.mission-strip article strong { display:block; margin:11px 0 7px; color:var(--cyan); font:750 2.35rem Arial,sans-serif; }
+.mission-strip article small { color:#637789; font-size:.56rem; }
+.mission-strip article.has-alert strong { color:var(--red); }
+.mobile-command-button { display:none; }
+.capture-overlay { position:fixed; z-index:100; inset:0; display:grid; place-items:center; padding:20px; background:rgba(1,3,6,.8); backdrop-filter:blur(12px); }
+.capture-panel { width:min(680px,100%); max-height:min(720px,90vh); overflow:auto; padding:28px; border:1px solid var(--line-hot); background:#0a1018; box-shadow:0 30px 100px rgba(0,0,0,.7),0 0 80px rgba(53,231,255,.08); }
+.capture-panel header { display:flex; align-items:flex-start; justify-content:space-between; }
+.capture-panel h2 { margin:0; font:750 2rem Arial,sans-serif; letter-spacing:-.04em; }
+.capture-panel header button { border:1px solid var(--line); color:var(--muted); background:transparent; width:36px; height:36px; font-size:1.2rem; cursor:pointer; }
+.capture-entry { display:grid; grid-template-columns:1fr auto; margin-top:28px; }
+.capture-entry input { min-width:0; border:1px solid var(--line); border-right:0; color:var(--text); background:#070b11; padding:15px; font:600 .72rem ui-monospace,monospace; outline:none; }
+.capture-entry input:focus { border-color:var(--cyan); }
+.capture-entry button { border:0; padding:0 22px; color:#041014; background:var(--cyan); font:800 .62rem ui-monospace,monospace; text-transform:uppercase; cursor:pointer; }
+.capture-note { color:var(--muted); font-size:.58rem; line-height:1.5; }
+.capture-items { display:grid; gap:6px; margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
+.capture-items button { display:grid; grid-template-columns:24px 1fr; width:100%; padding:13px; border:1px solid var(--line); color:#c4d2dc; background:rgba(53,231,255,.02); text-align:left; cursor:pointer; }
+.capture-items button span { color:var(--cyan); }
+.capture-items button.is-done { color:var(--muted); text-decoration:line-through; opacity:.65; }
+.capture-items>p { color:var(--muted); font-size:.65rem; }
+
+@media (max-width:1050px) {
+  .lifeos-sidebar { position:sticky; top:0; width:100%; height:auto; flex-direction:row; align-items:center; padding:10px 12px; }
+  .sidebar-brand { min-height:44px; padding:0 14px 0 0; border:0; border-right:1px solid var(--line); }
+  .sidebar-brand>span { width:32px; height:32px; }
+  .sidebar-brand small,.lifeos-sidebar nav button span,.sidebar-status,.sidebar-actions { display:none; }
+  .lifeos-sidebar nav { display:flex; gap:2px; margin:0 0 0 10px; overflow:auto; }
+  .lifeos-sidebar nav button { display:block; min-height:38px; padding:0 10px; border-left:0; border-bottom:2px solid transparent; white-space:nowrap; }
+  .lifeos-app .dashboard-shell { margin-left:0; padding:18px 20px 80px; }
+  .mobile-command-button { display:block; position:fixed; z-index:30; right:14px; bottom:14px; padding:12px 15px; border:1px solid var(--line-hot); color:#041014; background:var(--cyan); font:800 .6rem ui-monospace,monospace; text-transform:uppercase; box-shadow:0 8px 35px rgba(0,0,0,.45); }
+}
+@media (max-width:680px) {
+  .sidebar-brand div { display:none; }
+  .lifeos-sidebar nav { width:calc(100% - 48px); }
+  .mission-strip { grid-template-columns:repeat(2,1fr); }
+  .mission-strip article { min-height:110px; padding:17px; }
+  .mission-strip article strong { font-size:1.9rem; }
+  .lifeos-app .dashboard-header { min-height:330px; }
+  .lifeos-app .dashboard-header h1 { font-size:clamp(3rem,15vw,5rem); }
+  .capture-panel { padding:20px; }
+}
