@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Create a practical, maintainable operating system for life, business, relationships, knowledge, and AI work using Obsidian native features first.
+Create a practical, maintainable operating system for life, business, relationships, knowledge, personal growth, and AI work using Obsidian native features first.
 
 ## Core Operating Model
 
@@ -14,6 +14,18 @@ Weekly Reviews
 Projects and Areas
     ↓
 Goals and Life Direction
+```
+
+Personal growth uses the same trusted loop:
+
+```text
+Daily Awareness
+    ↓
+Weekly Growth Check-In
+    ↓
+One Small Next Action
+    ↓
+Evidence-Based Goal Progress
 ```
 
 Business and AI work extends the model:
@@ -52,11 +64,11 @@ Experiments
 - `00 Home` — dashboards, navigation, and Bases.
 - `01 Inbox` — unprocessed captures only.
 - `10 Projects` — outcomes with a finish line.
-- `20 Areas` — ongoing responsibilities and standards.
+- `20 Areas` — ongoing responsibilities and standards, including Personal Growth.
 - `30 Goals` — measurable targets connected to areas and projects.
 - `40 Resources` — decisions, research, tools, ideas, agents, experiments, content, and automation records.
 - `50 People` — relationship and contact notes.
-- `60 Reviews` — weekly, monthly, quarterly, annual, and project reviews.
+- `60 Reviews` — weekly, monthly, quarterly, annual, project, and personal growth reviews.
 - `70 Journal` — daily notes and personal logs.
 - `80 SOPs` — tested repeatable procedures.
 - `90 Archive` — inactive or completed material.
@@ -70,6 +82,7 @@ The supported types are defined in `architecture/METADATA_SCHEMA.md`. Do not cre
 
 - Daily Note
 - Weekly Review
+- Personal Growth Check-In
 - Monthly Review
 - Project
 - Area
@@ -104,7 +117,7 @@ Located in `00 Home/Bases/`:
 
 ### Life OS
 
-The main dashboard links to today, the inbox, reviews, active work, goals, areas, relationships, operations, and AI work.
+The main dashboard links to today, the inbox, reviews, active work, goals, areas, relationships, personal growth, operations, and AI work.
 
 ### Business Dashboard
 
@@ -114,9 +127,29 @@ Shows revenue focus, active business projects, clients and people, content, SOPs
 
 Shows health, finances, relationships, home, learning, journal, and personal projects.
 
+### Personal Growth Dashboard
+
+Shows the active growth goal, recent check-ins, the current focus, and a small next action. It must not invent personal ratings or turn a difficult week into a failure state.
+
 ### Agentic Work Dashboard
 
 Shows active agents, experiments, automations, decisions, evaluations, approval workflows, and risks.
+
+## Personal Growth Standard
+
+The Personal Growth system contains:
+
+- one ongoing Personal Growth area;
+- measurable goals connected to that area;
+- a short daily awareness prompt;
+- one weekly check-in;
+- wins supported by evidence;
+- one clear point of friction;
+- one small next action;
+- support or automation opportunities;
+- human approval for health, money, relationship, or other sensitive actions.
+
+The system may summarize information the user provides. It may not invent scores, diagnoses, feelings, or completed actions.
 
 ## Native Plugin Policy
 
@@ -143,20 +176,22 @@ Community plugins are optional:
 2. Select three outcomes.
 3. Review the calendar.
 4. Add immediate tasks.
-5. Capture notes during the day.
-6. Complete a brief reflection.
-7. Move durable information to the correct permanent note.
+5. Use the 60-second personal growth reflection when useful.
+6. Capture notes during the day.
+7. Complete a brief reflection.
+8. Move durable information to the correct permanent note.
 
 ## Weekly Workflow
 
-1. Review wins and friction.
-2. Review every active project.
-3. Review goals and important areas.
-4. Process `01 Inbox/`.
-5. Review people needing follow-up.
-6. Review the calendar and deadlines.
-7. Select next week’s three outcomes.
-8. Pause, archive, or cancel unnecessary commitments.
+1. Complete the personal growth check-in.
+2. Review wins and friction.
+3. Review every active project.
+4. Review goals and important areas.
+5. Process `01 Inbox/`.
+6. Review people needing follow-up.
+7. Review the calendar and deadlines.
+8. Select next week’s three outcomes.
+9. Pause, archive, or cancel unnecessary commitments.
 
 ## Project Standard
 
@@ -226,6 +261,7 @@ The system succeeds when:
 
 - the correct next action is visible within one minute;
 - every active project is trustworthy and current;
+- personal growth is reviewed without overload or invented data;
 - goals connect to projects and areas;
 - the inbox is processed during weekly review;
 - relationships needing follow-up are visible;

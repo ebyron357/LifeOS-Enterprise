@@ -31,6 +31,7 @@ weekly-review
 monthly-review
 quarterly-review
 annual-review
+growth-checkin
 project
 area
 goal
@@ -154,6 +155,26 @@ tags:
 
 Required: `type`, `status`, `area`, `target_date`, `metric`, `current_value`, `target_value`.
 
+### Personal Growth Check-In
+
+```yaml
+---
+type: growth-checkin
+status: active
+date:
+overall_state:
+next_action:
+review_date:
+tags:
+  - review
+  - personal-growth
+---
+```
+
+Required: `type`, `date`, `next_action`, and `review_date`.
+
+Use words or evidence for `overall_state`. A numeric score is optional and must come from the user's own assessment; the system must not invent it.
+
 ### Person
 
 ```yaml
@@ -243,3 +264,4 @@ tags:
 6. Property names use lowercase snake_case.
 7. Empty optional properties may remain blank; required properties may not.
 8. Archived notes use `status: archived` and live under `90 Archive/` when practical.
+9. Personal growth ratings must be self-reported or evidence-based; automation may summarize them but may not fabricate them.

@@ -2,7 +2,7 @@
 type: dashboard
 status: active
 created: 2026-07-10
-updated: 2026-07-16
+updated: 2026-07-18
 tags:
   - dashboard
   - life-os
@@ -17,11 +17,18 @@ tags:
 
 - [[00 Home/Business Dashboard|Business]]
 - [[00 Home/Personal Dashboard|Personal]]
+- [[00 Home/Personal Growth Dashboard|Personal Growth]]
 - [[00 Home/Agentic Work Dashboard|Agentic Work]]
 - [[40 Resources/YouTube Knowledge/YouTube Knowledge Command Index|YouTube Knowledge]]
 - [[01 Inbox/Inbox|Inbox]]
 - [[60 Reviews/README|Reviews]]
 - [[99 Templates/README|Templates]]
+
+## Personal Growth
+
+- [[20 Areas/Personal Growth|Personal Growth Area]]
+- [[30 Goals/Become My Best Self|Become My Best Self]]
+- [[99 Templates/Personal Growth Check-In|Weekly Check-In Template]]
 
 ## Active Work
 
@@ -68,6 +75,7 @@ tags:
 1. Process `01 Inbox`.
 2. Review every active project.
 3. Update next actions and review dates.
-4. Review goals, areas, and relationships.
-5. Select next week's three outcomes.
-6. Pause, cancel, complete, or archive work that no longer deserves attention.
+4. Complete the personal growth check-in.
+5. Review goals, areas, and relationships.
+6. Select next week's three outcomes.
+7. Pause, cancel, complete, or archive work that no longer deserves attention.

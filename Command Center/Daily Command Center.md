@@ -2,13 +2,20 @@
 type: dashboard
 dashboard: daily-command-center
 status: active
-review_date: 2026-07-17
+review_date: 2026-07-20
 tags: [dashboard, daily, command-center]
 ---
 
 # Daily Command Center
 
 > Open this note first. It should show what deserves attention today in under one minute.
+
+## Personal Growth — 60 Seconds
+
+- What strengthened me today?
+- What drained me?
+- What is one small next action?
+- [[00 Home/Personal Growth Dashboard|Open Personal Growth Dashboard]]
 
 ## Highest-Impact Next Actions
 
@@ -96,7 +103,10 @@ WHERE (startswith(file.path, "Projects/")
     OR startswith(file.path, "Businesses/")
     OR startswith(file.path, "Knowledge/")
     OR startswith(file.path, "SOPs/")
-    OR startswith(file.path, "Tools/"))
+    OR startswith(file.path, "Tools/")
+    OR startswith(file.path, "20 Areas/")
+    OR startswith(file.path, "30 Goals/")
+    OR startswith(file.path, "60 Reviews/"))
   AND lower(file.name) != "readme"
   AND type
   AND review_date
