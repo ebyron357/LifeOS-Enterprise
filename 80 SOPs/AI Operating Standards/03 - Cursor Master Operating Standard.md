@@ -171,6 +171,15 @@ Keep context efficient:
 
 Do not rely on chat memory for repository facts that can be read.
 
+### 11.1 Long-running and background work
+
+- A Cursor Agent or background process is active only while the actual task, process, or configured environment remains active.
+- Never claim that Cursor will keep working after the session, computer, terminal, or agent has stopped unless a verified persistent system was configured.
+- Distinguish an active agent, queued task, terminal process, scheduled workflow, and completed result.
+- Save a durable checkpoint before leaving a long task: branch, commit or working-tree state, commands run, evidence, remaining work, and next action.
+- Verify the final files and command results after a background agent or terminal process finishes. A completion message alone is not proof.
+- Do not use multiple background agents on overlapping files without ownership boundaries and a merge plan.
+
 ## 12. Terminal and command execution
 
 Before running a command:
