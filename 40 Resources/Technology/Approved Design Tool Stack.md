@@ -1,238 +1,397 @@
-# Approved Design Tool Stack
+# Approved Technology, Platform, Repository, and Goal Stack
 
 **Status:** Canonical  
 **Owner:** EAB Byron  
 **Last reviewed:** 2026-07-19  
-**Review cadence:** Quarterly or when a repeated workflow limitation appears
+**Review cadence:** Quarterly or when a repeated limitation, new goal, security concern, or major platform change appears
 
 ## Purpose
 
-This document is the canonical source of truth for design tools approved for active use across LifeOS projects. It replaces scattered tool suggestions and prevents duplicate subscriptions, unnecessary platform switching, and unstructured experimentation.
+This document is the canonical source of truth for approved tools, platforms, repositories, and controlled pilots used across LifeOS projects and goals. It replaces scattered recommendations and prevents duplicate subscriptions, disconnected experiments, unverified imports, and tools that do not advance a measurable outcome.
 
-Tools are approved only when they strengthen a real workflow involving website design, brand systems, packaging, marketing content, accessibility, design-to-code, or production quality control.
+Every approved item must answer four questions:
+
+1. Which goal does it advance?
+2. Which project or life area will use it?
+3. Which concrete problem does it solve?
+4. What evidence will prove it created value?
 
 ## Operating Rules
 
-1. Use the smallest effective tool stack.
-2. Do not add another general-purpose website generator when an approved tool already performs the same job.
-3. Every project must identify its primary design tool, production tool, and quality-control tool.
-4. Experimental tools must be tested on one controlled project before broader adoption.
-5. Final production assets must remain in the appropriate source-of-truth system: Figma for interface systems, Adobe Illustrator for vector and print masters, GitHub for code and governed documentation, and approved project repositories for implementation.
-6. AI-generated output is never considered final until it passes visual, accessibility, brand, and production review.
+1. Use the smallest effective stack.
+2. Do not add a tool merely because it is popular, impressive, or free.
+3. Every active tool must have a goal, project, owner, next action, and success measure.
+4. GitHub is the source of truth for code, governed documentation, and change history.
+5. Figma is the source of truth for approved interface systems.
+6. Adobe Illustrator is the source of truth for production vector and print artwork.
+7. Experimental repositories must be inspected before installation and tested on one controlled project.
+8. AI-generated output is not complete until it passes relevant visual, accessibility, security, functional, and production quality control.
+9. Replit is for rapid prototypes and demonstrations; approved production code must be preserved in GitHub.
+10. Vercel is the preferred production and preview platform for supported web projects unless a project has a documented reason to use another host.
+11. Manus is for delegated research, audits, browser work, and structured project execution; it does not replace the project repository or verification evidence.
+12. A tool that no longer supports a current goal must move to the research watchlist or be removed.
 
-# Approved Core Stack
+# Strategic Goals
+
+## Goal 1 — Generate Income and Business Growth
+
+**Outcomes:** Increase qualified leads, booked appointments, completed orders, proposals, recurring revenue, and monetizable services.
+
+**Projects:** ClientVerse, D’Affordable Homes, Take A Sweet Bakery, THE ALTERNATIVE, STAXX, Jasmine Parker real estate, Haitian Creole business agent.
+
+**Success evidence:** Leads captured, response time reduced, appointments booked, orders completed, proposals sent, revenue confirmed, or a paid pilot launched.
+
+## Goal 2 — Complete and Launch Current Projects
+
+**Outcomes:** Move active websites, agents, packaging systems, and operating standards to verified production readiness.
+
+**Success evidence:** Builds pass, deployments are live, P0 issues are resolved, required integrations work, documentation is current, and remaining work has an owner and next action.
+
+## Goal 3 — Become Technically Elite in AI and Automation
+
+**Outcomes:** Understand and build production-grade agents, cloud systems, local systems, voice workflows, integrations, evaluations, and deployment pipelines.
+
+**Success evidence:** Deployed projects, GitHub commits, technical notes, certifications, portfolio examples, and the ability to explain the architecture in plain language.
+
+## Goal 4 — Organize Life and Reduce Mental Load
+
+**Outcomes:** Maintain one dependable LifeOS for projects, bills, email, calendar, goals, health, finances, decisions, and follow-ups.
+
+**Success evidence:** A useful morning brief, current trackers, visible next actions, fewer forgotten commitments, and fast access to decisions and governing documents.
+
+## Goal 5 — Improve Financial Control and Wealth
+
+**Outcomes:** Track confirmed income, bills, recurring expenses, subscriptions, business profitability, and cash requirements.
+
+**Success evidence:** Current financial trackers, fewer surprise expenses, reviewed subscriptions, and visible business profitability.
+
+## Goal 6 — Build a Voice-First AI Environment
+
+**Outcomes:** Speak naturally with agents across devices, receive understandable low-latency responses, capture information by voice, and access LifeOS hands-free.
+
+**Success evidence:** Reliable speech recognition, spoken briefs, cross-device access, acceptable latency, and successful correction or interruption behavior.
+
+## Goal 7 — Build Haitian Creole Business Technology
+
+**Outcomes:** Deliver Haitian Creole and English customer service, lead capture, appointments, knowledge retrieval, messaging, and voice workflows.
+
+**Success evidence:** Native-speaker testing, accurate business terminology, functional handoff, working appointments or lead flows, and a paid pilot.
+
+## Goal 8 — Build a Reliable Agent Workforce
+
+**Outcomes:** Standardize ChatGPT, Manus, Codex, Cursor, Claude, and other agents around checklists, evidence, verification, quality control, and canonical governing documents.
+
+**Success evidence:** Fewer repeated instructions, fewer false completion claims, visible status, evidence-backed delivery, and reusable operating standards.
+
+# Approved Core Platforms
+
+## GitHub
+
+**Status:** Approved — Canonical code and governance platform  
+**Goals:** 2, 3, 4, 8  
+**Use for:** Repositories, issues, pull requests, version history, Actions, governed documents, and evidence of work.  
+**Success measure:** Every material project change is traceable to a commit or pull request and can be reviewed or rolled back.
+
+## Vercel
+
+**Status:** Approved — Preferred production web and AI platform  
+**Goals:** 1, 2, 3, 4, 7  
+**Use for:** Next.js deployment, preview environments, AI interfaces, production web applications, domains, logs, and environment configuration.  
+**Success measure:** Correct repository-to-project mapping, successful builds, verified live deployments, and clear preview-versus-production status.
+
+## Replit
+
+**Status:** Approved — Prototype and learning platform  
+**Goals:** 1, 3  
+**Use for:** Rapid prototypes, demonstrations, educational experiments, and small internal tools.  
+**Operating rule:** Production-worthy work must be synchronized to GitHub and deployed through the approved production platform.  
+**Success measure:** A working prototype that can be demonstrated, evaluated, and transferred without losing source history.
+
+## Manus
+
+**Status:** Approved — Delegated research and execution platform  
+**Goals:** 1, 2, 3, 4, 8  
+**Use for:** Research, market analysis, browser workflows, audits, project plans, document production, and multi-step delegated work.  
+**Operating rule:** Manus output must be saved to the project source of truth and verified independently.  
+**Success measure:** Completed research or execution artifact with sources, evidence, and a clear project decision or next action.
+
+## Codex, Cursor, Claude Code, and Compatible Coding Agents
+
+**Status:** Approved — Repository implementation agents  
+**Goals:** 2, 3, 8  
+**Use for:** Code changes, testing, debugging, documentation, refactoring, and repository maintenance.  
+**Operating rule:** Agents must read repository instructions, work through branches or approved workflows, run relevant checks, and provide evidence.  
+**Success measure:** Verified commits, passing tests, accurate status, and reduced rework.
 
 ## Figma
 
-**Status:** Approved — Primary interface design system  
-**Use for:** Website and application design, wireframes, prototypes, components, variables, design systems, and developer handoff.
-
-**Required role:**
-- Primary source of truth for approved interface design.
-- Store reusable components, layout rules, typography, colors, spacing, and interaction states.
-- Use before development when visual direction has not already been approved.
+**Status:** Approved — Primary interface-design source of truth  
+**Goals:** 1, 2, 3  
+**Use for:** Wireframes, prototypes, components, variables, design systems, flows, and developer handoff.
 
 ## Adobe Illustrator
 
-**Status:** Approved — Primary vector and print production tool  
-**Use for:** Logos, packaging, labels, dielines, print-ready artwork, vector masters, and manufacturing files.
-
-**Required role:**
-- Source of truth for production vector artwork.
-- Preserve editable master files.
-- Use for packaging geometry, bleeds, safe areas, barcodes, QR codes, and print exports.
+**Status:** Approved — Primary vector and print-production source of truth  
+**Goals:** 1, 2  
+**Use for:** Logos, labels, packaging, dielines, vector masters, barcode placement, QR placement, and manufacturing files.
 
 ## Adobe Photoshop
 
-**Status:** Approved — Primary raster editing tool  
-**Use for:** Photo cleanup, retouching, compositing, resizing, mockup preparation, and image optimization.
-
-**Required role:**
-- Use for image corrections and production-ready raster assets.
-- Do not replace original source photography without preserving the original.
+**Status:** Approved — Primary raster-production tool  
+**Goals:** 1, 2  
+**Use for:** Photo cleanup, compositing, resizing, mockups, retouching, and optimized web imagery.
 
 ## Adobe Express and Canva
 
-**Status:** Approved — Fast branded content production  
-**Use for:** Social posts, flyers, postcards, presentations, simple marketing assets, and rapid branded variations.
-
-**Required role:**
-- Use approved brand colors, typography, logos, and imagery.
-- Do not treat generated templates as final without brand review.
+**Status:** Approved — Fast branded-content production  
+**Goals:** 1, 2  
+**Use for:** Flyers, postcards, social posts, presentations, invitations, and rapid branded variations.
 
 ## v0 and Figma Make
 
-**Status:** Approved — Rapid concept generation  
-**Use for:** Early interface concepts, design exploration, component ideas, and rapid design-to-code prototypes.
+**Status:** Approved — Rapid interface concept generation  
+**Goals:** 1, 2, 3  
+**Use for:** Early concepts, component exploration, prototypes, and design-to-code experiments.  
+**Operating rule:** Generated output must be reviewed and integrated through the project repository.
 
-**Required role:**
-- Use for exploration, not as an automatic production source of truth.
-- Final implementation must be reviewed and integrated through the project repository.
-
-## Codex, GitHub, and Vercel
-
-**Status:** Approved — Production implementation and deployment  
-**Use for:** Code implementation, version control, pull requests, automated checks, preview deployments, and production releases.
-
-**Required role:**
-- GitHub is the source of truth for code and change history.
-- Use branches and pull requests for material changes.
-- Verify builds, responsive behavior, and live deployment before completion.
-
-# Newly Approved Tools
+# Approved Design and Production Tools
 
 ## SuperDesign
 
 **Status:** Approved — Use now  
-**Primary use:** Generate wireframes, interface directions, and multiple design options inside Cursor, VS Code, Windsurf, or compatible agent workflows.
-
-**Best fit:**
-- D’Affordable Homes
-- ClientVerse
-- Take A Sweet Bakery
-- Real-estate platform interfaces
-- Early concept exploration before coding
-
-**Operating rule:** Use SuperDesign to compare visual directions before committing development resources. Do not let it replace the approved Figma design system or production review.
+**Goals:** 1, 2, 3  
+**Projects:** D’Affordable Homes, ClientVerse, Take A Sweet Bakery, real-estate systems.  
+**Use for:** Generate multiple wireframes and design directions before coding.  
+**Success measure:** Faster design decisions and fewer redesign cycles after development begins.
 
 ## Onlook
 
 **Status:** Approved — Use now  
-**Primary use:** Visually inspect and edit supported Next.js and Tailwind interfaces while preserving the underlying code workflow.
-
-**Best fit:**
-- Live visual refinement of Next.js websites
-- Layout, spacing, typography, and responsive corrections
-- Faster collaboration between visual review and code changes
-
-**Operating rule:** Changes must still be committed through GitHub, tested, and reviewed before deployment. Do not edit production without a branch or verified rollback path.
+**Goals:** 2, 3  
+**Projects:** Supported Next.js and Tailwind projects.  
+**Use for:** Visual layout, spacing, typography, and responsive refinement while preserving code.  
+**Success measure:** Verified code changes that improve visual quality without bypassing GitHub.
 
 ## Figma Simple Design System
 
-**Status:** Approved — Use now  
-**Primary use:** Establish a consistent bridge between Figma variables, components, React implementation, Storybook, and code references.
-
-**Best fit:**
-- Creating one reusable design-system standard across websites
-- Preventing code from drifting away from approved design
-- Standardizing components, tokens, states, and documentation
-
-**Operating rule:** Use as a reference architecture, then adapt it to the brand and technical requirements of each project. Do not copy generic styling into production unchanged.
+**Status:** Approved — Reference architecture  
+**Goals:** 2, 3, 8  
+**Use for:** Connect Figma variables, components, React implementation, Storybook, and documentation.  
+**Success measure:** Reduced design-code drift and reuse of consistent component patterns.
 
 ## Adobe React Aria
 
-**Status:** Approved — Use now  
-**Primary use:** Build accessible React interactions and components with strong keyboard, focus, and screen-reader behavior.
-
-**Best fit:**
-- ClientVerse
-- D’Affordable Homes
-- Real-estate portals
-- Forms, dialogs, menus, tabs, selectors, and complex interactive controls
-
-**Operating rule:** Use when it improves accessibility without forcing generic visual styling. Components must still match the project design system and pass accessibility testing.
+**Status:** Approved — Accessible interaction foundation  
+**Goals:** 1, 2, 3  
+**Projects:** ClientVerse, D’Affordable Homes, real-estate portals, complex forms.  
+**Success measure:** Keyboard, focus, screen-reader, and interaction behavior pass accessibility review.
 
 ## PackCAD Mockup with Blender
 
-**Status:** Approved — Use now  
-**Primary use:** Convert packaging artwork and dielines into realistic 3D packaging presentations and product renders.
-
-**Best fit:**
-- THE ALTERNATIVE beverage cans
-- ALT syrups
-- Bravo Paws packaging
-- Boxes, labels, bottles, and presentation mockups
-
-**Operating rule:** 3D renders are presentation assets, not manufacturing proof. Final dimensions, dielines, bleeds, legal copy, barcodes, QR codes, and print files must still be verified in Adobe Illustrator and the production QA process.
-
-# Approved Quality-Control Tools
+**Status:** Approved — Packaging presentation  
+**Goals:** 1, 2  
+**Projects:** THE ALTERNATIVE, ALT syrups, Bravo Paws, boxes and bottles.  
+**Operating rule:** Mockups are presentation assets, not manufacturing proof.  
+**Success measure:** Accurate, high-quality presentations created without changing production artwork.
 
 ## Axe or Accessibility Insights
 
-**Status:** Approved — Required for website accessibility review  
-**Use for:** Automated accessibility checks, keyboard issues, semantic problems, contrast warnings, and developer guidance.
-
-**Operating rule:** Automated checks do not replace manual keyboard, mobile, screen-reader, and visual review.
+**Status:** Approved — Required website quality control  
+**Goals:** 1, 2, 3  
+**Success measure:** Automated issues reviewed and manual keyboard, mobile, and visual checks documented.
 
 ## GSAP
 
-**Status:** Approved — Conditional use  
-**Use for:** High-quality web motion, interaction feedback, premium transitions, and carefully controlled animation.
+**Status:** Approved — Conditional motion tool  
+**Goals:** 1, 2, 3  
+**Operating rule:** Use only when motion improves comprehension, storytelling, hierarchy, or conversion; respect reduced-motion preferences.  
+**Success measure:** Motion works smoothly, does not harm performance, and has a documented user or business purpose.
 
-**Operating rule:** Use only when motion improves comprehension, hierarchy, storytelling, or conversion. Do not add animation merely for decoration. Respect reduced-motion preferences and performance budgets.
+# Approved Repositories and Reference Implementations
 
-# Controlled Pilot Tools
+## `vercel/ai`
 
-The following tools are not approved for broad adoption. They may be tested on one controlled project with documented results.
+**Status:** Approved  
+**Goals:** 1, 2, 3, 4, 7  
+**Projects:** Clara, ClientVerse assistant, LifeOS assistant, Haitian Creole agent, Take A Sweet assistant, real-estate lead qualification.  
+**Use for:** Provider-flexible AI interfaces, streaming, tools, structured output, and agent features.  
+**Owner:** Project coding agent under GitHub review.  
+**Next action:** Use on the next approved customer-facing AI implementation.  
+**Success measure:** A deployed AI feature with working tools, error handling, logging, and evaluation.
 
-## OpenPencil
+## `vercel/chatbot`
+
+**Status:** Approved — Reference template  
+**Goals:** 1, 2, 3, 7  
+**Projects:** Clara, LifeOS, ClientVerse, real estate, Haitian Creole prototype.  
+**Use for:** Authentication, persistent conversations, database-backed chat, and production architecture.  
+**Operating rule:** Use as a reference; do not copy unchanged into every project.  
+**Success measure:** Reduced implementation time without unnecessary inherited features.
+
+## `vercel/chat`
+
+**Status:** Approved — Future multichannel foundation  
+**Goals:** 1, 4, 6, 7  
+**Projects:** Slack agents, WhatsApp business assistants, GitHub bots, internal notifications.  
+**Success measure:** One verified agent workflow operating correctly across at least two approved channels.
+
+## `vercel/sdk`
+
+**Status:** Approved  
+**Goals:** 2, 3, 4, 8  
+**Projects:** LifeOS project-health dashboard and Vercel deployment monitoring.  
+**Use for:** Projects, deployments, domains, environment variables, and deployment status.  
+**Success measure:** LifeOS can identify the live deployment, connected repository, failures, and required owner action.
+
+## `vercel-labs/knowledge-agent-template`
 
 **Status:** Controlled pilot  
-**Potential use:** AI-native vector and interface design experimentation.
+**Goals:** 3, 4, 7, 8  
+**Projects:** LifeOS knowledge agent, AI Operating Standards, packaging knowledge, ClientVerse knowledge.  
+**Success measure:** Accurate answers with source references across an approved document collection.
 
-**Pilot requirement:** Compare output quality, editability, export reliability, learning curve, and duplication against Figma and Adobe tools.
+## `nextjs/deploy-replit`
 
-## Open Design
+**Status:** Approved — Replit reference template  
+**Goals:** 1, 3  
+**Use for:** Running supported Next.js prototypes in Replit.  
+**Success measure:** Prototype launches successfully and can be transferred to GitHub without structural rework.
+
+## `microsoft/skills`
+
+**Status:** Approved — Cross-agent skills reference  
+**Goals:** 3, 8  
+**Projects:** AI Operating Standards and reusable agent workflows.  
+**Operating rule:** Inspect individual skills before importing them.  
+**Success measure:** One governed skill can be reused across multiple coding agents with consistent output.
+
+## `abcnuts/manus-skills`
+
+**Status:** Controlled review  
+**Goals:** 2, 3, 8  
+**Use for:** Manus planning, debugging, verification, browser work, and structured execution patterns.  
+**Success measure:** Selected skills improve completion quality without conflicting with canonical standards.
+
+## `GoogleCloudPlatform/agent-starter-pack`
+
+**Status:** Approved — Learning and controlled cloud prototypes  
+**Goals:** 1, 3, 7  
+**Use for:** Production-oriented cloud agents, evaluation, observability, RAG, and CI/CD.  
+**Success measure:** A monitored cloud agent prototype with documented cost, deployment, evaluation, and limitations.
+
+## `enescingoz/awesome-n8n-templates`
+
+**Status:** Approved — Workflow research library  
+**Goals:** 1, 4, 5, 7  
+**Projects:** Gmail organization, bills, calendar briefs, lead follow-up, ecommerce, Slack, and LifeOS capture.  
+**Operating rule:** Security-review each workflow before credentials are connected.  
+**Success measure:** Reduced manual steps, documented time saved, and no credential or data exposure.
+
+## `AmplifyAutomation/n8n-templates`
 
 **Status:** Controlled pilot  
-**Potential use:** AI design workspaces, reusable skills, plugins, systems, and templates.
+**Goals:** 1, 7  
+**Projects:** D’Affordable Homes, ClientVerse, Jasmine Parker, Take A Sweet.  
+**Use for:** Speed-to-lead, appointments, virtual reception, CRM synchronization, and phone workflows.  
+**Success measure:** Faster verified lead response and increased booked appointments.
 
-**Pilot requirement:** Determine whether it improves LifeOS agent workflows without creating another isolated platform.
+## `OpenVoiceOS/ovos-core`
 
-## Avocado Studio
+**Status:** Controlled technical pilot  
+**Goals:** 3, 4, 6, 7  
+**Use for:** Local or device-based voice-assistant research and potential Haitian Creole localization.  
+**Success measure:** Reliable wake, speech recognition, response, and command execution on approved hardware.
+
+## `RightNow-AI/openfang`
+
+**Status:** Research watchlist  
+**Goals:** 3, 4, 8  
+**Use for:** Scheduled autonomous agent and local/cloud agent-OS research.  
+**Operating rule:** Do not use for core operations while pre-1.0 stability and security remain unverified.
+
+# Approved Label, Barcode, QR, and Physical-Workflow Repositories
+
+## `metafloor/bwip-js`
+
+**Status:** Approved  
+**Goals:** 1, 2  
+**Projects:** THE ALTERNATIVE, ALT syrups, Bravo Paws, STAXX, ecommerce inventory, ClientVerse asset tags.  
+**Use for:** UPC, EAN, GS1, Code 128, QR, Data Matrix, and SVG barcode generation.  
+**Success measure:** Correct symbols generated from verified product data and successfully scanned or validated.
+
+## `heuer/segno`
+
+**Status:** Approved  
+**Goals:** 1, 2, 4  
+**Projects:** Product COAs, bakery ordering, real-estate signs, onboarding cards, LifeOS physical labels.  
+**Use for:** Standards-focused QR generation in SVG, EPS, PDF, and PNG.  
+**Success measure:** QR codes scan from printed proofs and resolve to the correct approved destination.
+
+## `bcbnz/pylabels`
+
+**Status:** Approved — Prototype and internal printing  
+**Goals:** 1, 2, 4  
+**Projects:** Bakery ingredients and orders, product prototypes, mailing labels, event name tags, folders, storage, and devices.  
+**Success measure:** Correct dimensions, readable output, and accurate variable data on printed sheets.
+
+## `receiptline/receiptline`
 
 **Status:** Controlled pilot  
-**Potential use:** Preview-based editing of supported Next.js content and components.
+**Goals:** 1, 2  
+**Projects:** Bakery tickets, ecommerce pick-pack, inventory, shipping, and operational thermal labels.  
+**Success measure:** Reliable thermal output on the selected printer without replacing premium consumer packaging workflows.
 
-**Pilot requirement:** Test only in a branch or non-production environment. Confirm code quality, rollback, security, and compatibility with the existing stack.
+## `galou/inkscape_generator`
 
-## Figma Code Connect
+**Status:** Controlled pilot  
+**Goals:** 1, 2  
+**Use for:** Variable SVG label generation from approved templates.  
+**Operating rule:** Illustrator remains the production master for regulated or manufacturing artwork.
 
-**Status:** Controlled pilot pending plan eligibility and project need  
-**Potential use:** Connect production components to matching Figma components.
+# Project-to-Goal Adoption Matrix
 
-**Pilot requirement:** Confirm Figma plan access, component maturity, and whether the project has a stable design system worth connecting.
-
-# Tool Selection by Work Type
-
-| Work type | Primary tool | Supporting tools | Quality control |
+| Project or area | Primary goals | Approved platforms and repositories | Measurable result |
 |---|---|---|---|
-| Website interface design | Figma | SuperDesign, v0, Figma Make | Brand review, accessibility review |
-| Next.js visual refinement | Figma + project code | Onlook | GitHub PR, build, responsive QA |
-| Production implementation | Codex + GitHub | Vercel | Automated checks and live verification |
-| Accessible React components | Project code | React Aria | Axe or Accessibility Insights |
-| Logo and vector design | Adobe Illustrator | Figma for interface usage | Vector and export QA |
-| Packaging production | Adobe Illustrator | PackCAD Mockup, Blender, Photoshop | Prepress and manufacturing QA |
-| Social and promotional content | Adobe Express or Canva | Photoshop, approved templates | Brand and copy review |
-| Premium website motion | Project code | GSAP | Performance and reduced-motion QA |
+| LifeOS | 3, 4, 5, 6, 8 | GitHub, Vercel, Vercel SDK, knowledge-agent pilot, n8n, OpenVoiceOS pilot | Morning brief, current trackers, visible project health, voice capture |
+| ClientVerse | 1, 2, 3, 7 | Vercel AI SDK, Chatbot, Chat, n8n, Google Agent Starter Pack | Qualified leads, paid automation services, faster delivery |
+| D’Affordable Homes | 1, 2 | Figma, SuperDesign, Vercel, Chatbot, n8n, Segno | Leads captured, appointments booked, accessible production site |
+| Jasmine Parker real estate | 1, 2 | Vercel SDK, Chatbot, n8n, Segno, pylabels | Live site stability, lead response, open-house operations |
+| Take A Sweet Bakery | 1, 2 | Replit prototype, Vercel production, n8n, pylabels, ReceiptLine pilot, Segno | Online orders, payment readiness, correct product and order labels |
+| THE ALTERNATIVE and ALT | 1, 2 | Illustrator, Photoshop, PackCAD, Blender, bwip-js, Segno | Manufacturing-ready artwork and verified barcode/QR assets |
+| Bravo Paws | 1, 2 | Illustrator, PackCAD, bwip-js, Segno, pylabels | Correct production label, COA access, lot and prototype labels |
+| Haitian Creole agent | 1, 3, 6, 7 | Vercel AI, Chat, Google Agent Starter Pack, OpenVoiceOS pilot | Native-speaker-approved text or voice pilot with business workflow |
+| AI Operating Standards | 3, 8 | GitHub, Microsoft Skills, selected Manus Skills | Consistent agent execution and evidence-backed completion |
+| Financial organization | 4, 5 | Gmail workflows, n8n research, LifeOS trackers | Confirmed income and bills tracked with fewer manual steps |
 
-# Project Adoption Priorities
+# Required Record for Every Future Tool or Repository
 
-1. Use SuperDesign during early design exploration before development begins.
-2. Use Onlook on one active Next.js website to validate visual editing and code quality.
-3. Establish a Figma Simple Design System reference for one website, then reuse the operating pattern.
-4. Add React Aria where projects contain complex interactive controls.
-5. Use PackCAD Mockup and Blender for packaging presentations while preserving Illustrator as the manufacturing source of truth.
-6. Add Axe or Accessibility Insights to every active website quality-control process.
-7. Use GSAP only on projects where motion has a clear business or usability purpose.
+Every future entry must include:
+
+- Exact name or repository
+- Platform category
+- Approval status
+- Primary goal
+- Exact project or life area
+- Problem solved
+- Priority: now, next, later, or watchlist
+- Cost and infrastructure implications
+- Complexity
+- Security and privacy risk
+- Owner
+- Next action
+- Success measure
+- Last reviewed date
 
 # Explicitly Not Approved
 
-The following practices are not approved:
-
-- Adding multiple general-purpose website generators that duplicate v0, Figma Make, Replit, Codex, or existing development workflows.
-- Purchasing tools before a specific repeated limitation is documented.
-- Treating AI-generated mockups, logos, interfaces, or packaging as final production work without expert review.
-- Allowing visual-editing tools to bypass GitHub history, testing, or deployment controls.
-- Maintaining separate conflicting tool lists across projects.
+- Adding tools without tying them to a current goal.
+- Importing an entire skills or template repository without inspecting selected files.
+- Duplicating general-purpose website generators.
+- Allowing Replit, Manus, or visual editors to become an untracked source of truth.
+- Connecting credentials to community automation templates before security review.
+- Treating AI-generated design, code, legal copy, health guidance, packaging, or financial classifications as verified without the required review.
+- Maintaining conflicting tool lists across projects.
 
 # Review and Change Control
 
-Any future change to this stack must replace this document with a complete updated version. The update must:
-
-1. Preserve all still-approved tools and rules.
-2. Add newly approved tools in the correct category.
-3. Remove tools that are obsolete, duplicative, insecure, unsupported, or no longer useful.
-4. Record the new review date.
-5. Reconcile duplicates and conflicting guidance.
-6. Keep this file as the single canonical approved design-tool inventory.
+Any future change must replace this document with a complete updated version. The replacement must preserve all still-approved guidance, merge approved changes, remove duplicates, update statuses and dates, reorganize sections when needed, and keep this file as the single canonical technology, platform, repository, and goal inventory.
