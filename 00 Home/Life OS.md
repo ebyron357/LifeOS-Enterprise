@@ -2,7 +2,7 @@
 type: dashboard
 status: active
 created: 2026-07-10
-updated: 2026-07-18
+updated: 2026-07-19
 tags:
   - dashboard
   - life-os
@@ -19,6 +19,9 @@ tags:
 - [[00 Home/Personal Dashboard|Personal]]
 - [[00 Home/Personal Growth Dashboard|Personal Growth]]
 - [[00 Home/Agentic Work Dashboard|Agentic Work]]
+- [[40 Resources/Learning Network/Learning Network Command Center|Learning Network]]
+- [[20 Areas/Physical Health and Mobility|Physical Health and Mobility]]
+- [[40 Resources/Health/Back and Knee Safe Toning Plan|Back and Knee Safe Toning Plan]]
 - [[40 Resources/YouTube Knowledge/YouTube Knowledge Command Index|YouTube Knowledge]]
 - [[01 Inbox/Inbox|Inbox]]
 - [[60 Reviews/README|Reviews]]
