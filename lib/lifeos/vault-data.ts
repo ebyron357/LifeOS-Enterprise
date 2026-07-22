@@ -6,13 +6,18 @@ import type { AgentBrief, GrowthBrief, ProjectBrief, VaultDashboardData } from "
 
 type Frontmatter = Record<string, string>;
 
+function normalizeNewlines(source: string) {
+  return source.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+}
+
 function parseFrontmatter(source: string): Frontmatter {
-  if (!source.startsWith("---\n")) return {};
-  const end = source.indexOf("\n---", 4);
+  const text = normalizeNewlines(source);
+  if (!text.startsWith("---\n")) return {};
+  const end = text.indexOf("\n---", 4);
   if (end === -1) return {};
 
   return Object.fromEntries(
-    source
+    text
       .slice(4, end)
       .split("\n")
       .map((line) => line.match(/^([a-zA-Z0-9_]+):\s*(.*)$/))
@@ -22,7 +27,8 @@ function parseFrontmatter(source: string): Frontmatter {
 }
 
 function section(source: string, heading: string) {
-  const match = source.match(new RegExp(`## ${heading}\\s+([\\s\\S]*?)(?=\\n## |$)`));
+  const text = normalizeNewlines(source);
+  const match = text.match(new RegExp(`## ${heading}\\s+([\\s\\S]*?)(?=\\n## |$)`));
   return match?.[1].trim().split("\n").find((line) => line.trim() && !line.startsWith("-"))?.trim() ?? "";
 }
 
