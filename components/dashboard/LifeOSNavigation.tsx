@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { ProjectBrief } from "@/lib/lifeos/types";
+import { buildMorningBriefSpeech } from "@/lib/lifeos/morning-brief-speech";
+import { useBrowserStorage } from "@/lib/lifeos/use-browser-storage";
 
 type CaptureItem = { id: number; text: string; done: boolean };
 
@@ -13,18 +15,19 @@ const sections = [
   { id: "agents", label: "Agents", code: "05" },
 ];
 
-export function LifeOSNavigation({ projects, reviewsDue }: { projects: ProjectBrief[]; reviewsDue: number }) {
+const emptyCapture: CaptureItem[] = [];
+
+type LifeOSNavigationProps = {
+  projects: ProjectBrief[];
+  activeProjects: number;
+  reviewsDue: number;
+};
+
+export function LifeOSNavigation({ projects, activeProjects, reviewsDue }: LifeOSNavigationProps) {
   const [capture, setCapture] = useState("");
-  const [items, setItems] = useState<CaptureItem[]>([]);
+  const [items, setItems] = useBrowserStorage<CaptureItem[]>("lifeos-capture", emptyCapture);
   const [panelOpen, setPanelOpen] = useState(false);
   const [speaking, setSpeaking] = useState(false);
-
-  useEffect(() => {
-    const saved = window.localStorage.getItem("lifeos-capture");
-    if (saved) {
-      try { setItems(JSON.parse(saved) as CaptureItem[]); } catch { /* keep the capture surface usable */ }
-    }
-  }, []);
 
   function scrollTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -33,25 +36,18 @@ export function LifeOSNavigation({ projects, reviewsDue }: { projects: ProjectBr
   function addCapture() {
     const text = capture.trim();
     if (!text) return;
-    const next = [{ id: Date.now(), text, done: false }, ...items];
-    setItems(next);
-    window.localStorage.setItem("lifeos-capture", JSON.stringify(next));
+    setItems([{ id: Date.now(), text, done: false }, ...items]);
     setCapture("");
   }
 
   function toggleItem(id: number) {
-    const next = items.map((item) => item.id === id ? { ...item, done: !item.done } : item);
-    setItems(next);
-    window.localStorage.setItem("lifeos-capture", JSON.stringify(next));
+    setItems(items.map((item) => item.id === id ? { ...item, done: !item.done } : item));
   }
 
   function readBrief() {
     if (!("speechSynthesis" in window)) return;
     window.speechSynthesis.cancel();
-    const blocked = projects.filter((project) => project.status === "blocked" || project.blocker).length;
-    const waiting = projects.filter((project) => project.status === "waiting" || project.waitingOn).length;
-    const top = projects.slice(0, 3).map((project) => `${project.name}. Next: ${project.nextAction}`).join(" ");
-    const words = `Good day, Bwa. You have ${projects.length} active projects, ${blocked} blocked, ${waiting} waiting, and ${reviewsDue} reviews due. Your top work is: ${top || "No active priorities are recorded."}`;
+    const words = buildMorningBriefSpeech({ activeProjects, projects, reviewsDue });
     const utterance = new SpeechSynthesisUtterance(words);
     utterance.rate = 1.08;
     utterance.onstart = () => setSpeaking(true);
@@ -59,6 +55,9 @@ export function LifeOSNavigation({ projects, reviewsDue }: { projects: ProjectBr
     utterance.onerror = () => setSpeaking(false);
     window.speechSynthesis.speak(utterance);
   }
+
+  const briefLabel = speaking ? "Reading morning briefing" : "Hear my morning briefing";
+  const briefButtonText = speaking ? "Reading brief…" : "Hear my brief";
 
   return (
     <>
@@ -72,18 +71,38 @@ export function LifeOSNavigation({ projects, reviewsDue }: { projects: ProjectBr
           ))}
         </nav>
         <div className="sidebar-actions">
-          <button className="voice-brief-button" onClick={readBrief} type="button">
-            <span className={speaking ? "voice-wave is-speaking" : "voice-wave"}>◉</span>
-            {speaking ? "Reading brief…" : "Hear my brief"}
+          <button
+            className="voice-brief-button"
+            onClick={readBrief}
+            type="button"
+            aria-label={briefLabel}
+            aria-pressed={speaking}
+          >
+            <span className={speaking ? "voice-wave is-speaking" : "voice-wave"} aria-hidden="true">◉</span>
+            {briefButtonText}
           </button>
           <button className="capture-open-button" onClick={() => setPanelOpen(true)} type="button">
-            <span>＋</span> Quick capture
+            <span aria-hidden="true">＋</span> Quick capture
           </button>
         </div>
-        <div className="sidebar-status"><i /><span>System online</span><small>{projects.length} active records</small></div>
+        <div className="sidebar-status"><i /><span>System online</span><small>{activeProjects} active projects</small></div>
       </aside>
 
-      <button className="mobile-command-button" onClick={() => setPanelOpen(true)} type="button">＋ Capture</button>
+      <div className="mobile-command-dock" aria-label="Mobile command actions">
+        <button
+          className="mobile-brief-button"
+          onClick={readBrief}
+          type="button"
+          aria-label={briefLabel}
+          aria-pressed={speaking}
+        >
+          <span className={speaking ? "voice-wave is-speaking" : "voice-wave"} aria-hidden="true">◉</span>
+          {speaking ? "Reading…" : "Hear brief"}
+        </button>
+        <button className="mobile-command-button" onClick={() => setPanelOpen(true)} type="button" aria-label="Open quick capture">
+          ＋ Capture
+        </button>
+      </div>
 
       {panelOpen ? (
         <div className="capture-overlay" role="presentation" onMouseDown={() => setPanelOpen(false)}>

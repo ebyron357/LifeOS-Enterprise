@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { ProjectBrief } from "@/lib/lifeos/types";
+import { useBrowserStorageString } from "@/lib/lifeos/use-browser-storage";
 
 type Density = "calm" | "standard";
 type TextSize = "normal" | "large";
@@ -12,17 +13,13 @@ export function CognitiveSupportCenter({ projects }: { projects: ProjectBrief[] 
   const [density, setDensity] = useState<Density>("calm");
   const [textSize, setTextSize] = useState<TextSize>("normal");
   const [highContrast, setHighContrast] = useState(false);
-  const [resumeNote, setResumeNote] = useState("");
+  const resumeKey = `lifeos-resume-${selectedName}`;
+  const [resumeNote, setResumeNote] = useBrowserStorageString(resumeKey, "");
 
   const selected = useMemo(
     () => projects.find((project) => project.name === selectedName) ?? projects[0],
     [projects, selectedName],
   );
-
-  useEffect(() => {
-    const saved = window.localStorage.getItem(`lifeos-resume-${selectedName}`);
-    setResumeNote(saved ?? "");
-  }, [selectedName]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -34,7 +31,6 @@ export function CognitiveSupportCenter({ projects }: { projects: ProjectBrief[] 
 
   function saveResumeNote(value: string) {
     setResumeNote(value);
-    window.localStorage.setItem(`lifeos-resume-${selectedName}`, value);
   }
 
   function readCurrentStep() {

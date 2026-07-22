@@ -21,7 +21,7 @@ export function DashboardLayout({ widgets, data, github, revenue }: DashboardLay
 
   return (
     <div className="lifeos-app">
-      <LifeOSNavigation projects={data.projects} reviewsDue={data.reviewsDue} />
+      <LifeOSNavigation projects={data.projects} activeProjects={data.activeProjects} reviewsDue={data.reviewsDue} />
 
       <main className="dashboard-shell">
         <section id="overview" className="app-section">
