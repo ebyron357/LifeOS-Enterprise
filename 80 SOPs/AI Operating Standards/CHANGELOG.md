@@ -1,5 +1,9 @@
 # Canonical AI Operating Standards — Changelog
 
+> **Historical source snapshot — not active canonical policy.**
+>
+> This file is preserved as source evidence from LifeOS PR #25. The single authoritative standards repository is [ebyron357/AI-Operating-Standards](https://github.com/ebyron357/AI-Operating-Standards). Use the approved version in that repository; do not install or maintain this LifeOS copy as a competing active standard.
+
 ## Version 2.0 — July 19, 2026
 
 ### Scope
@@ -49,4 +53,4 @@ Repeated language about accuracy, status, alternatives, tool selection, accessib
 
 ### Quality control
 
-All six documents received separate structural and semantic QC reports. Final package status: **Ready for Review** pending repository review and merge.
+All six documents received separate structural and semantic QC reports. Final package status: **Historical source package**. It is superseded by the dedicated canonical repository and must not be merged as an active competing standards set.

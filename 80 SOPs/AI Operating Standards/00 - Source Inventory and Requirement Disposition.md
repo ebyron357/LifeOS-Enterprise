@@ -1,8 +1,12 @@
 # Canonical AI Operating Standards — Source Inventory and Requirement Disposition
 
+> **Historical source snapshot — not active canonical policy.**
+>
+> This file is preserved as source evidence from LifeOS PR #25. The single authoritative standards repository is [ebyron357/AI-Operating-Standards](https://github.com/ebyron357/AI-Operating-Standards). Use the approved version in that repository; do not install or maintain this LifeOS copy as a competing active standard.
+
 **Version:** 2.0  
 **Date:** July 19, 2026  
-**Status:** Canonical build record  
+**Status:** Historical source build record — superseded  
 **Scope:** ChatGPT, Claude, Cursor, Codex, Manus, and Tool Usage Guides
 
 ## 1. Source inventory

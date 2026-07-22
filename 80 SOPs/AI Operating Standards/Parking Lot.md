@@ -1,5 +1,9 @@
 # AI Operating Standards — Parking Lot
 
+> **Historical source snapshot — not active canonical policy.**
+>
+> This file is preserved as source evidence from LifeOS PR #25. The single authoritative standards repository is [ebyron357/AI-Operating-Standards](https://github.com/ebyron357/AI-Operating-Standards). Use the approved version in that repository; do not install or maintain this LifeOS copy as a competing active standard.
+
 **Version:** 2.0  
 **Date:** July 19, 2026  
 **Rule:** Only out-of-scope ideas belong here. No active requirement may be parked to avoid completing a standard.

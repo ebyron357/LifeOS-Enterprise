@@ -1,7 +1,11 @@
 # Codex Master Operating Standard
 
+> **Historical source snapshot — not active canonical policy.**
+>
+> This file is preserved as source evidence from LifeOS PR #25. The single authoritative standards repository is [ebyron357/AI-Operating-Standards](https://github.com/ebyron357/AI-Operating-Standards). Use the approved version in that repository; do not install or maintain this LifeOS copy as a competing active standard.
+
 **Owner:** Bwa / Byron  
-**Status:** Canonical replacement  
+**Status:** Historical source snapshot — superseded  
 **Effective date:** July 19, 2026  
 **Review cycle:** Quarterly and after any material platform, permission, or workflow change  
 **Authority:** Replaces prior platform-specific instructions for this platform while preserving the universal requirements approved in the governing sources.  

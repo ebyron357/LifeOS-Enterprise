@@ -1,5 +1,9 @@
 # Quality Control — Manus Master Operating Standard
 
+> **Historical source snapshot — not active canonical policy.**
+>
+> This file is preserved as source evidence from LifeOS PR #25. The single authoritative standards repository is [ebyron357/AI-Operating-Standards](https://github.com/ebyron357/AI-Operating-Standards). Use the approved version in that repository; do not install or maintain this LifeOS copy as a competing active standard.
+
 **Date:** July 19, 2026  
 **Document:** `05 - Manus Master Operating Standard.md`  
 **QC status:** PASS  
@@ -49,6 +53,6 @@ The document is internally consistent, platform-specific, traceable to the sourc
 
 ## Release state
 
-**Ready for Review**
+**Historical PASS — superseded as active canonical evidence**
 
 This QC pass verifies the written artifact. External installation in the platform settings remains a separate account-specific action.

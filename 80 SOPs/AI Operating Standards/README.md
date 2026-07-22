@@ -1,6 +1,10 @@
-# Canonical AI Operating Standards
+# AI Operating Standards — Historical Version 2 Source Package
 
-This directory is the canonical platform-specific operating layer for Bwa's AI system.
+> **Historical source snapshot — not active canonical policy.**
+>
+> This file is preserved as source evidence from LifeOS PR #25. The single authoritative standards repository is [ebyron357/AI-Operating-Standards](https://github.com/ebyron357/AI-Operating-Standards). Use the approved version in that repository; do not install or maintain this LifeOS copy as a competing active standard.
+
+This directory preserves the fuller version 2 source package from LifeOS PR #25. It is not the active standards location.
 
 ## Documents
 
@@ -20,13 +24,13 @@ Supporting records:
 
 ## Authority
 
-The platform documents are complete replacements for earlier platform adapters in the same scope. Historical universal SOPs remain preserved as source history.
+These documents supplied fuller source material for the dedicated canonical repository. They remain preserved here as history and reference, not as installable active replacements.
 
 ## Source of truth
 
-- GitHub repository: `ebyron357/LifeOS-Enterprise`
-- Obsidian interface: `Documents/ALT-LABEL-System-2/LifeOS-Enterprise`
-- Canonical path: `80 SOPs/AI Operating Standards/`
+- Canonical repository: https://github.com/ebyron357/AI-Operating-Standards
+- This LifeOS directory: historical source snapshot and reference only
+- LifeOS may link to the canonical repository but must not maintain this package as an active competing copy.
 
 ## Change rule
 
