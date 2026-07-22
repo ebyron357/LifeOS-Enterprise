@@ -1,6 +1,6 @@
-# Inbox
+# Inbox (Legacy)
 
-Purpose: Capture fast without organizing during capture.
+> Canonical capture now lives in `01 Inbox/`. Use that folder for new notes. This legacy folder remains during migration so existing links keep working.
 
 ## Use This For
 

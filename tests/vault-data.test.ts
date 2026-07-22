@@ -3,7 +3,7 @@ import { getVaultDashboardData } from "@/lib/lifeos/vault-data";
 
 describe("vault dashboard data", () => {
   it("loads active project priorities from canonical vault notes", async () => {
-    const data = await getVaultDashboardData(new Date("2026-07-17T12:00:00Z"));
+    const data = await getVaultDashboardData(new Date("2026-07-31T12:00:00Z"));
     expect(data.priorities.length).toBeGreaterThan(0);
     expect(data.priorities[0].priority).toBe("P0");
     expect(data.priorities.every((project) => project.nextAction.length > 0)).toBe(true);
@@ -27,6 +27,11 @@ describe("vault dashboard data", () => {
     const data = await getVaultDashboardData(new Date("2026-07-17T12:00:00Z"));
     expect(data.projects.some((project) => project.status === "active")).toBe(true);
     expect(data.activeProjects).toBeGreaterThan(0);
+  });
+
+  it("includes canonical projects from 10 Projects", async () => {
+    const data = await getVaultDashboardData();
+    expect(data.projects.map((project) => project.name)).toContain("Build AI Consultant Portfolio");
   });
 
   it("loads the AI role registry from vault files", async () => {

@@ -5,7 +5,7 @@ priority: P0
 owner: Byron
 kpi_focus: Complete one verified LifeOS operating cycle
 active_projects: [LifeOS Enterprise]
-review_date: 2026-07-17
+review_date: 2026-07-30
 tags: [business, lifeos]
 created: 2026-07-07
 updated: 2026-07-10

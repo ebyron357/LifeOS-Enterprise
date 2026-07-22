@@ -29,7 +29,7 @@ SORT priority ASC
 
 ```dataview
 TABLE status, priority, business, impact, effort, next_action, review_date
-FROM "Projects"
+FROM "Projects" OR "10 Projects"
 WHERE type = "project" AND status != "archived"
 SORT status ASC, priority ASC, impact DESC
 ```
@@ -38,7 +38,7 @@ SORT status ASC, priority ASC, impact DESC
 
 ```dataview
 TABLE priority, business, next_action, review_date
-FROM "Projects"
+FROM "Projects" OR "10 Projects"
 WHERE type = "project" AND status = "active" AND review_date AND review_date < date(today)
 SORT review_date ASC
 ```
@@ -47,7 +47,7 @@ SORT review_date ASC
 
 ```dataview
 TABLE type, status, review_date, next_action
-FROM "Projects" OR "Knowledge" OR "Tools" OR "URLs"
+FROM "Projects" OR "10 Projects" OR "Knowledge" OR "Tools" OR "URLs"
 WHERE type AND file.name != "README" AND (status = "paused" OR status = "complete")
 SORT review_date ASC
 ```

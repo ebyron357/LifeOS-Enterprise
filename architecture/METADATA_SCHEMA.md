@@ -45,6 +45,8 @@ experiment
 content
 idea
 automation
+business
+dashboard
 ```
 
 ### `status`
@@ -118,6 +120,38 @@ tags:
 ```
 
 Required: `type`, `status`, `owner`, `priority`, `review_date`, `next_action`.
+
+### Business
+
+```yaml
+---
+type: business
+status: active
+priority: P1
+owner:
+kpi_focus:
+review_date:
+tags:
+  - business
+---
+```
+
+Required: `type`, `status`, `priority`, `review_date`.
+
+### Dashboard
+
+```yaml
+---
+type: dashboard
+dashboard: daily-command-center
+status: active
+review_date:
+tags:
+  - dashboard
+---
+```
+
+Required: `type`, `status`, `review_date`.
 
 ### Area
 

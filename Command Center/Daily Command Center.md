@@ -2,7 +2,7 @@
 type: dashboard
 dashboard: daily-command-center
 status: active
-review_date: 2026-07-20
+review_date: 2026-07-30
 tags: [dashboard, daily, command-center]
 ---
 
@@ -28,7 +28,7 @@ TABLE WITHOUT ID
   effort AS "Effort",
   next_action AS "Next Action",
   blocker AS "Blocker"
-FROM "Projects"
+FROM "Projects" OR "10 Projects"
 WHERE type = "project"
   AND status = "active"
   AND next_action
@@ -46,7 +46,7 @@ TABLE WITHOUT ID
   priority AS "Priority",
   next_action AS "Next Action",
   business AS "Business"
-FROM "Projects"
+FROM "Projects" OR "10 Projects"
 WHERE type = "project"
   AND deadline
   AND status != "complete"
@@ -64,7 +64,7 @@ TABLE WITHOUT ID
   blocker AS "Blocker",
   next_action AS "Next Action",
   review_date AS "Review Date"
-FROM "Projects"
+FROM "Projects" OR "10 Projects"
 WHERE type = "project"
   AND (status = "waiting" OR waiting_on OR blocker)
   AND lower(file.name) != "readme"
@@ -82,7 +82,7 @@ TABLE WITHOUT ID
   effort AS "Effort",
   next_action AS "Next Action",
   review_date AS "Review Date"
-FROM "Projects"
+FROM "Projects" OR "10 Projects"
 WHERE type = "project"
   AND status = "active"
   AND lower(file.name) != "readme"
@@ -100,6 +100,7 @@ TABLE WITHOUT ID
   review_date AS "Review Date"
 FROM ""
 WHERE (startswith(file.path, "Projects/")
+    OR startswith(file.path, "10 Projects/")
     OR startswith(file.path, "Businesses/")
     OR startswith(file.path, "Knowledge/")
     OR startswith(file.path, "SOPs/")
@@ -143,7 +144,7 @@ Drop unprocessed thoughts here, then move them later.
 TABLE WITHOUT ID
   file.link AS "Inbox Item",
   file.mtime AS "Last Modified"
-FROM "Inbox"
+FROM "01 Inbox" OR "Inbox"
 WHERE lower(file.name) != "readme"
 SORT file.mtime DESC
 ```

@@ -8,7 +8,7 @@ metric: Weekly personal growth check-ins completed
 starting_value: 0
 target_value: 24
 current_value: 0
-review_date: 2026-07-20
+review_date: 2026-07-30
 created: 2026-07-18
 updated: 2026-07-18
 tags:

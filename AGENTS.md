@@ -88,9 +88,10 @@ Every active business must include:
 - `.obsidian` is local-only and ignored by Git.
 - Shared defaults live under `config/obsidian`.
 - Setup scripts must be idempotent and non-destructive.
-- Homepage target: `Command Center/Daily Command Center.md`.
-- Template folder: `templates`.
-- New notes default to `Inbox`.
+- Homepage target: `00 Home/Life OS.md` (Bases-first navigation).
+- Operational command center: `Command Center/Daily Command Center.md`.
+- Template folder: `99 Templates` (canonical); legacy `templates/` remains for migration.
+- New notes default to `01 Inbox`.
 
 ## Validation loop
 

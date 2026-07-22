@@ -4,10 +4,10 @@ status: active
 priority: P0
 owner: Byron
 business: LifeOS
-next_action: Open the vault in Obsidian, verify all core dashboards, and resolve any P0/P1 runtime defects.
+next_action: Complete Obsidian visual validation of Bases and Dataview dashboards, then migrate remaining legacy Projects into 10 Projects when convenient.
 effort: medium
 impact: high
-review_date: 2026-07-17
+review_date: 2026-07-30
 tags: [project, lifeos]
 created: 2026-07-07
 updated: 2026-07-10
@@ -37,7 +37,9 @@ Verified foundation assets include:
 ## Next Action
 
 - [x] Complete and record the static operating-cycle validation.
-- [ ] Open the vault in Obsidian and verify all core dashboards.
+- [x] Unify project visibility across legacy and canonical project folders.
+- [x] Refresh active review dates and record the 2026-07-22 closeout review.
+- [ ] Open the vault in Obsidian and verify all core dashboards render visually.
 - [ ] Resolve any P0/P1 runtime defects discovered during visual validation.
 
 ## Key Links
@@ -67,10 +69,10 @@ Verified foundation assets include:
 - [ ] Open the repository as an Obsidian vault.
 - [ ] Enable the required plugins.
 - [ ] Verify all dashboard queries render without errors.
-- [ ] Validate active project and business metadata.
+- [x] Validate active project and business metadata.
 - [ ] Process one Inbox item end to end.
-- [ ] Update all active next actions and review dates.
-- [ ] Complete and record one weekly review.
+- [x] Update all active next actions and review dates.
+- [x] Complete and record one weekly review.
 - [ ] Resolve all P0/P1 defects.
 
 ## Definition of Done
