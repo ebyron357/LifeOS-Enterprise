@@ -1,7 +1,7 @@
 ---
 type: index
 status: active
-review_date: 2026-07-17
+review_date: 2026-07-30
 tags: [automation, index]
 ---
 

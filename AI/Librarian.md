@@ -2,7 +2,7 @@
 type: ai_role
 status: active
 owner: Byron
-review_date: 2026-07-14
+review_date: 2026-07-30
 tags: [ai, role, librarian]
 created: 2026-07-07
 updated: 2026-07-07
@@ -24,7 +24,8 @@ Keep knowledge, links, tools, and resources organized and findable.
 
 ## Inputs
 
-- `Inbox/`
+- `01 Inbox/` (canonical capture folder)
+- `Inbox/` (legacy capture folder during migration)
 - `Knowledge/`
 - `URLs/`
 - `Tools/`

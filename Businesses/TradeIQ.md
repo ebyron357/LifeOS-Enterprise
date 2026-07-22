@@ -5,7 +5,7 @@ priority: P1
 owner: Byron
 kpi_focus: Product roadmap clarity
 active_projects: [TradeIQ]
-review_date: 2026-07-17
+review_date: 2026-07-30
 tags: [business, tradeiq]
 created: 2026-07-07
 updated: 2026-07-10

@@ -171,5 +171,36 @@ Repair is accepted when:
 - Added the optional Next.js executive summary surface at `/dashboard` without changing the canonical Obsidian vault structure.
 - Added Morning Brief, Prayer, Revenue Radar, AI Workforce, and GitHub Health widgets behind a typed widget registry.
 - Added responsive layout styling, automated component/registry tests, and dashboard operating documentation.
-- Web validation: ESLint PASS; TypeScript PASS; Vitest 3/3 PASS; Next.js production build PASS.
+- Web validation: ESLint PASS; TypeScript PASS; Vitest 15/15 PASS; Next.js production build PASS.
 - Vault PowerShell audit was not rerun in the Linux verification environment because PowerShell is unavailable. No vault files, metadata, Bases, templates, or shared Obsidian settings were changed by this feature.
+
+# LifeOS Core v1 Closeout — 2026-07-22
+
+## Repairs Completed
+
+- Unified project visibility across legacy `Projects/` and canonical `10 Projects/` in Dataview dashboards (`Command Center/Daily Command Center.md`, `Dashboards/Weekly Review.md`, `Dashboards/Monthly Review.md`).
+- Updated `lib/lifeos/vault-data.ts` so the executive web dashboard reads both project folders.
+- Aligned capture workflow and inbox queries to `01 Inbox/` while preserving legacy `Inbox/` compatibility.
+- Reconciled `AGENTS.md` homepage guidance with shared Obsidian config (`00 Home/Life OS.md` for Bases-first navigation; `Command Center/Daily Command Center.md` for daily execution).
+- Extended `architecture/METADATA_SCHEMA.md` with `business` and `dashboard` types and required properties.
+- Refreshed stale review dates across active businesses, projects, AI roles, and dashboards.
+- Recorded weekly closeout review at `60 Reviews/Weekly/2026-07-22 Core v1 Closeout Review.md`.
+- Added GitHub Actions workflow `.github/workflows/dashboard-ci.yml` for lint, test, and build validation.
+
+## Final Validation Evidence
+
+- PowerShell vault audit: PASS
+- ESLint: PASS
+- Vitest: 15/15 PASS
+- Next.js production build: PASS
+- Git diff whitespace validation: PASS
+
+## Final Status
+
+Repository repair: **PASS.**
+
+Remaining actions are local-UI only:
+
+- Open the vault in Obsidian and visually confirm Bases and Dataview tables render.
+- Process one `01 Inbox/` item end to end.
+- Complete visual acceptance of daily note creation under `70 Journal/Daily`.

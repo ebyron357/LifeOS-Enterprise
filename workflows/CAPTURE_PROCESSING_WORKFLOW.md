@@ -8,7 +8,9 @@ Capture quickly. Process deliberately.
 
 ## Step 1 — Capture
 
-Put raw items in `Inbox/`.
+Put raw items in `01 Inbox/`.
+
+Legacy captures may still appear in `Inbox/` during migration.
 
 Examples:
 

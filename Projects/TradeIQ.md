@@ -7,7 +7,7 @@ business: TradeIQ
 next_action: Reconcile current feature plan against competitor app feature sets.
 effort: high
 impact: high
-review_date: 2026-07-17
+review_date: 2026-07-30
 waiting_on:
 blocker:
 tags: [project, tradeiq, software]

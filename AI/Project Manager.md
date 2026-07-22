@@ -2,7 +2,7 @@
 type: ai_role
 status: active
 owner: Byron
-review_date: 2026-07-14
+review_date: 2026-07-30
 tags: [ai, role, project-manager]
 created: 2026-07-07
 updated: 2026-07-07

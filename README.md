@@ -79,7 +79,9 @@ Community plugins are optional. Add Templater, QuickAdd, Tasks, Calendar, or Dat
 
 ## Key Files
 
-- `00 Home/Life OS.md` — main dashboard
+- `00 Home/Life OS.md` — main Bases-first dashboard
+- `Command Center/Daily Command Center.md` — Dataview command center for daily execution
+- `Dashboards/Weekly Review.md` and `Dashboards/Monthly Review.md` — periodic review dashboards
 - `00 Home/Personal Growth Dashboard.md` — personal growth home
 - `20 Areas/Personal Growth.md` — growth standards and focus
 - `30 Goals/Become My Best Self.md` — measurable growth goal

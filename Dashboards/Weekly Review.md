@@ -2,7 +2,7 @@
 type: dashboard
 dashboard: weekly-review
 status: active
-review_date: 2026-07-20
+review_date: 2026-07-30
 tags: [dashboard, weekly-review]
 ---
 
@@ -35,7 +35,7 @@ SORT review_date ASC
 
 ```dataview
 TABLE priority, business, next_action, blocker, review_date
-FROM "Projects"
+FROM "Projects" OR "10 Projects"
 WHERE type = "project" AND status = "active"
 SORT priority ASC, impact DESC
 ```
@@ -44,7 +44,7 @@ SORT priority ASC, impact DESC
 
 ```dataview
 TABLE waiting_on, blocker, next_action, review_date
-FROM "Projects"
+FROM "Projects" OR "10 Projects"
 WHERE type = "project" AND (status = "waiting" OR blocker OR waiting_on)
 SORT review_date ASC
 ```
@@ -80,7 +80,7 @@ SORT review_date ASC
 
 ```dataview
 TABLE type, status, priority, next_action, review_date
-FROM "Projects"
+FROM "Projects" OR "10 Projects"
 WHERE file.name != "README" AND (type != "project" OR !status OR !priority OR !next_action OR !review_date)
 SORT file.name ASC
 ```

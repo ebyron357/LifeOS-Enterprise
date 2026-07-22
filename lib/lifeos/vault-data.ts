@@ -32,13 +32,24 @@ function section(source: string, heading: string) {
   return match?.[1].trim().split("\n").find((line) => line.trim() && !line.startsWith("-"))?.trim() ?? "";
 }
 
+
 async function markdownFiles(directory: string) {
   const absolute = path.join(process.cwd(), directory);
-  const files = (await readdir(absolute)).filter((file) => file.endsWith(".md") && file !== "README.md");
-  return Promise.all(files.map(async (file) => ({
-    name: file.replace(/\.md$/, ""),
-    source: await readFile(path.join(absolute, file), "utf8"),
-  })));
+  try {
+    const files = (await readdir(absolute)).filter((file) => file.endsWith(".md") && file !== "README.md");
+    return Promise.all(files.map(async (file) => ({
+      name: file.replace(/\.md$/, ""),
+      source: await readFile(path.join(absolute, file), "utf8"),
+    })));
+  } catch {
+    return [];
+  }
+}
+
+function projectBusiness(meta: Frontmatter) {
+  if (meta.business) return meta.business;
+  if (!meta.area) return "LifeOS";
+  return meta.area.replace(/\[\[|\]\]/g, "").split("/").pop()?.trim() || "LifeOS";
 }
 
 async function optionalMarkdown(file: string) {
@@ -57,20 +68,22 @@ function isDue(date: string, today: string) {
 
 export async function getVaultDashboardData(now = new Date()): Promise<VaultDashboardData> {
   const today = now.toISOString().slice(0, 10);
-  const [projectFiles, agentFiles, growthAreaSource, growthGoalSource] = await Promise.all([
+  const [legacyProjects, canonicalProjects, agentFiles, growthAreaSource, growthGoalSource] = await Promise.all([
     markdownFiles("Projects"),
+    markdownFiles("10 Projects"),
     markdownFiles("AI"),
     optionalMarkdown("20 Areas/Personal Growth.md"),
     optionalMarkdown("30 Goals/Become My Best Self.md"),
   ]);
 
+  const projectFiles = [...legacyProjects, ...canonicalProjects];
   const projects: ProjectBrief[] = projectFiles.map(({ name, source }) => {
     const meta = parseFrontmatter(source);
     return {
       name,
       status: meta.status ?? "unknown",
       priority: meta.priority ?? "P3",
-      business: meta.business ?? "LifeOS",
+      business: projectBusiness(meta),
       nextAction: meta.next_action ?? "Define the next action.",
       reviewDate: meta.review_date ?? "",
       waitingOn: meta.waiting_on ?? "",

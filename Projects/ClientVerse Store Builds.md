@@ -7,7 +7,7 @@ business: ClientVerse
 next_action: Complete credential workflow and connect production settings.
 effort: medium
 impact: high
-review_date: 2026-07-17
+review_date: 2026-07-30
 waiting_on: API credentials
 blocker: Credentials and final catalog are not fully available.
 tags: [project, clientverse]
