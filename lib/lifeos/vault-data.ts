@@ -1,7 +1,8 @@
 import "server-only";
 
-import { readdir, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { getVaultIndex } from "@/lib/vault/index";
 import type { AgentBrief, GrowthBrief, ProjectBrief, VaultDashboardData } from "./types";
 
 type Frontmatter = Record<string, string>;
@@ -32,26 +33,6 @@ function section(source: string, heading: string) {
   return match?.[1].trim().split("\n").find((line) => line.trim() && !line.startsWith("-"))?.trim() ?? "";
 }
 
-
-async function markdownFiles(directory: string) {
-  const absolute = path.join(process.cwd(), directory);
-  try {
-    const files = (await readdir(absolute)).filter((file) => file.endsWith(".md") && file !== "README.md");
-    return Promise.all(files.map(async (file) => ({
-      name: file.replace(/\.md$/, ""),
-      source: await readFile(path.join(absolute, file), "utf8"),
-    })));
-  } catch {
-    return [];
-  }
-}
-
-function projectBusiness(meta: Frontmatter) {
-  if (meta.business) return meta.business;
-  if (!meta.area) return "LifeOS";
-  return meta.area.replace(/\[\[|\]\]/g, "").split("/").pop()?.trim() || "LifeOS";
-}
-
 async function optionalMarkdown(file: string) {
   try {
     return await readFile(path.join(process.cwd(), file), "utf8");
@@ -68,38 +49,32 @@ function isDue(date: string, today: string) {
 
 export async function getVaultDashboardData(now = new Date()): Promise<VaultDashboardData> {
   const today = now.toISOString().slice(0, 10);
-  const [legacyProjects, canonicalProjects, agentFiles, growthAreaSource, growthGoalSource] = await Promise.all([
-    markdownFiles("Projects"),
-    markdownFiles("10 Projects"),
-    markdownFiles("AI"),
+  const [index, growthAreaSource, growthGoalSource] = await Promise.all([
+    getVaultIndex(),
     optionalMarkdown("20 Areas/Personal Growth.md"),
     optionalMarkdown("30 Goals/Become My Best Self.md"),
   ]);
 
-  const projectFiles = [...legacyProjects, ...canonicalProjects];
-  const projects: ProjectBrief[] = projectFiles.map(({ name, source }) => {
-    const meta = parseFrontmatter(source);
-    return {
-      name,
-      status: meta.status ?? "unknown",
-      priority: meta.priority ?? "P3",
-      business: projectBusiness(meta),
-      nextAction: meta.next_action ?? "Define the next action.",
-      reviewDate: meta.review_date ?? "",
-      waitingOn: meta.waiting_on ?? "",
-      blocker: meta.blocker ?? "",
-    };
-  });
+  const projects: ProjectBrief[] = index.notes
+    .filter((note) => note.type === "project" || note.section === "projects")
+    .map((note) => ({
+      name: note.title,
+      path: note.path,
+      status: note.status ?? "unknown",
+      priority: note.priority ?? "P3",
+      business: note.business ?? (note.area?.replace(/\[\[|\]\]/g, "").split("/").pop()?.trim() || "LifeOS"),
+      nextAction: note.nextAction ?? "Define the next action.",
+      reviewDate: note.reviewDate ?? "",
+      waitingOn: note.waitingOn ?? "",
+      blocker: note.blocker ?? "",
+    }));
 
-  const agents: AgentBrief[] = agentFiles.map(({ name, source }) => {
-    const meta = parseFrontmatter(source);
-    return {
-      name,
-      status: meta.status ?? "unknown",
-      reviewDate: meta.review_date ?? "",
-      purpose: section(source, "Purpose"),
-    };
-  });
+  const agents: AgentBrief[] = (index.bySection.agents ?? []).map((note) => ({
+    name: note.title,
+    status: note.status ?? "unknown",
+    reviewDate: note.reviewDate ?? "",
+    purpose: section(note.body, "Purpose"),
+  }));
 
   const growthArea = parseFrontmatter(growthAreaSource);
   const growthGoal = parseFrontmatter(growthGoalSource);

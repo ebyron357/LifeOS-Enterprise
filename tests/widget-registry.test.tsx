@@ -4,11 +4,11 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { getWidget, widgetRegistry } from "@/components/widgets/registry";
 
 const data = {
-  priorities: [{ name: "LifeOS Enterprise", status: "active", priority: "P0", business: "LifeOS", nextAction: "Verify the dashboard.", reviewDate: "2026-07-17", waitingOn: "", blocker: "" }],
+  priorities: [{ name: "LifeOS Enterprise", path: "Projects/LifeOS Enterprise.md", status: "active", priority: "P0", business: "LifeOS", nextAction: "Verify the dashboard.", reviewDate: "2026-07-17", waitingOn: "", blocker: "" }],
   projects: [
-    { name: "LifeOS Enterprise", status: "active", priority: "P0", business: "LifeOS", nextAction: "Verify the dashboard.", reviewDate: "2026-07-17", waitingOn: "", blocker: "" },
-    { name: "Blocked Ops", status: "blocked", priority: "P1", business: "LifeOS", nextAction: "Clear blocker.", reviewDate: "2026-07-18", waitingOn: "", blocker: "Access" },
-    { name: "Waiting Ops", status: "waiting", priority: "P2", business: "LifeOS", nextAction: "Follow up.", reviewDate: "2026-07-19", waitingOn: "Partner", blocker: "" },
+    { name: "LifeOS Enterprise", path: "Projects/LifeOS Enterprise.md", status: "active", priority: "P0", business: "LifeOS", nextAction: "Verify the dashboard.", reviewDate: "2026-07-17", waitingOn: "", blocker: "" },
+    { name: "Blocked Ops", path: "Projects/Blocked Ops.md", status: "blocked", priority: "P1", business: "LifeOS", nextAction: "Clear blocker.", reviewDate: "2026-07-18", waitingOn: "", blocker: "Access" },
+    { name: "Waiting Ops", path: "Projects/Waiting Ops.md", status: "waiting", priority: "P2", business: "LifeOS", nextAction: "Follow up.", reviewDate: "2026-07-19", waitingOn: "Partner", blocker: "" },
   ],
   activeProjects: 1,
   waitingOn: 1,
@@ -33,13 +33,13 @@ describe("executive dashboard", () => {
   });
 
   it("renders the navigable LifeOS application with verified dashboard counts", () => {
-    render(<DashboardLayout widgets={widgetRegistry} data={data} github={github} />);
+    render(<DashboardLayout widgets={widgetRegistry} data={data} github={github} counts={{ search: 120, projects: 3, tasks: 8 }} />);
     expect(screen.getByRole("heading", { name: /good day,\s*bwa/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /overview/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /projects/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /growth/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /intelligence/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /agents/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /overview/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /projects/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /growth/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /intelligence/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /agents/i })).toBeInTheDocument();
     expect(screen.getByText("What deserves attention")).toBeInTheDocument();
     expect(screen.getByText("Lead with wisdom")).toBeInTheDocument();
     expect(screen.getByText("Revenue radar")).toBeInTheDocument();
@@ -50,6 +50,6 @@ describe("executive dashboard", () => {
     expect(mission).toHaveTextContent(/Blocked\s*1/);
     expect(mission).toHaveTextContent(/Waiting\s*1/);
     expect(mission).toHaveTextContent(/Reviews due\s*1/);
-    expect(screen.getByText("1 active projects")).toBeInTheDocument();
+    expect(screen.getByText("120 indexed notes")).toBeInTheDocument();
   });
 });
