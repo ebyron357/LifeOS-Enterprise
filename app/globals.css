@@ -558,6 +558,21 @@ body::before { display:none; }
 .search-result h2 { margin: 0 0 8px; font-size: 1rem; }
 .search-result mark { background: rgba(53,231,255,.18); color: var(--text); }
 .search-highlights { margin: 10px 0 0; padding-left: 18px; color: var(--muted); font-size: .68rem; }
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 12px;
+  z-index: 100;
+  padding: 10px 14px;
+  border: 1px solid var(--line-hot);
+  background: #061018;
+  color: var(--cyan);
+  text-decoration: none;
+  font-size: .72rem;
+}
+.skip-link:focus {
+  left: 12px;
+}
 .mobile-nav-toggle { display: none; position: fixed; z-index: 40; top: 12px; left: 12px; width: 42px; height: 42px; border: 1px solid var(--line-hot); background: rgba(5,8,13,.95); color: var(--cyan); }
 .mobile-nav-scrim { display: none; }
 .portal-sidebar nav { max-height: calc(100vh - 260px); overflow: auto; }
@@ -584,13 +599,49 @@ html[data-lifeos-density="calm"] .app-section:not(#overview) { margin-top:100px;
 @media (max-width:1000px) {
   .library-columns,.category-grid,.note-reader-grid { grid-template-columns: 1fr; }
   .search-form { grid-template-columns: 1fr; }
-  .mobile-nav-toggle,.mobile-nav-scrim { display: block; }
-  .mobile-nav-scrim { position: fixed; inset: 0; z-index: 24; background: rgba(0,0,0,.55); }
-  .portal-sidebar { transform: translateX(-105%); transition: transform .2s ease; z-index: 30; width: min(86vw, 300px); height: 100vh; flex-direction: column; }
+  .mobile-nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
+  .mobile-nav-scrim { display: block; position: fixed; inset: 0; z-index: 24; background: rgba(0,0,0,.55); }
+  .portal-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    width: min(86vw, 300px);
+    height: 100vh;
+    margin: 0;
+    transform: translateX(-105%);
+    transition: transform .2s ease;
+    z-index: 30;
+    overflow: auto;
+    background: rgba(5, 8, 13, .98);
+    border-right: 1px solid var(--line);
+  }
   .portal-sidebar.is-open { transform: translateX(0); }
-  .portal-sidebar nav { display: grid; width: 100%; max-height: none; overflow: auto; }
-  .sidebar-brand small,.sidebar-status { display: block; }
-  .lifeos-app .dashboard-shell,.lifeos-app .portal-main { margin-left: 0; padding-top: 64px; }
+  .portal-sidebar nav {
+    display: grid;
+    width: 100%;
+    max-height: none;
+    overflow: auto;
+    margin: 0;
+  }
+  .portal-sidebar nav a,
+  .portal-sidebar nav button {
+    display: flex;
+    white-space: normal;
+    border-left: 2px solid transparent;
+    border-bottom: 0;
+  }
+  .portal-sidebar .sidebar-brand small,
+  .portal-sidebar .sidebar-status,
+  .portal-sidebar .sidebar-actions {
+    display: grid;
+  }
+  .lifeos-app .dashboard-shell,
+  .lifeos-app .portal-main {
+    margin-left: 0;
+    padding-top: 64px;
+  }
 }
 @media (max-width:680px) {
   .cognitive-center { padding:18px; }

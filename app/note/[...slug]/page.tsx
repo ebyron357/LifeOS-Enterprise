@@ -13,8 +13,16 @@ export const revalidate = 300;
 
 export default async function NotePage({ params }: NotePageProps) {
   const { slug } = await params;
-  const noteSlug = slug.map((segment) => decodeURIComponent(segment)).join("/");
-  const note = await getNoteBySlug(noteSlug);
+  const noteSlug = slug
+    .map((segment) => {
+      try {
+        return decodeURIComponent(segment);
+      } catch {
+        return segment;
+      }
+    })
+    .join("/");
+  const note = await getNoteBySlug(noteSlug) ?? await getNoteBySlug(slug.join("/"));
 
   if (!note) notFound();
 

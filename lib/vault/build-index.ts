@@ -115,9 +115,6 @@ async function parseVaultNote(root: string, relativePath: string): Promise<{ not
 
 export async function buildVaultIndex(root = process.cwd()): Promise<VaultIndex> {
   const markdownPaths = await walkMarkdownFiles(root);
-  const pathIndex = new Set(markdownPaths);
-  const basenameIndex = buildBasenameIndex(markdownPaths);
-
   const notes: VaultNote[] = [];
   const tasks: VaultTask[] = [];
   const errors: VaultIndex["errors"] = [];
@@ -128,6 +125,11 @@ export async function buildVaultIndex(root = process.cwd()): Promise<VaultIndex>
     if (parsed.note) notes.push(parsed.note);
     tasks.push(...parsed.tasks);
   }
+
+  // Resolve links only against public/indexable notes so private paths never leak.
+  const publicPaths = notes.map((note) => note.path);
+  const pathIndex = new Set(publicPaths);
+  const basenameIndex = buildBasenameIndex(publicPaths);
 
   for (const note of notes) {
     note.links = resolveNoteLinks(note.links, note.path, pathIndex, basenameIndex);

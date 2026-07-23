@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { notFound } from "next/navigation";
-import { isAttachmentPath, isExcludedPath, normalizeVaultPath } from "@/lib/vault/exclusions";
+import { hasPathTraversal, normalizeVaultPath, resolveSafeAttachmentPath } from "@/lib/vault/exclusions";
 
 const MIME: Record<string, string> = {
   ".png": "image/png",
@@ -19,27 +19,36 @@ type AttachmentRouteProps = {
 
 export async function GET(_request: Request, { params }: AttachmentRouteProps) {
   const segments = (await params).path.map((segment) => decodeURIComponent(segment));
+  if (segments.some((segment) => segment.includes("/") || segment.includes("\\") || hasPathTraversal(segment))) {
+    notFound();
+  }
+
   const relative = normalizeVaultPath(segments.join("/"));
-
-  if (!relative || isExcludedPath(relative) || !isAttachmentPath(relative)) {
+  if (!relative || hasPathTraversal(relative)) {
     notFound();
   }
 
-  if (segments.some((segment) => segment === ".." || segment === ".")) {
+  const absolute = resolveSafeAttachmentPath(relative);
+  if (!absolute) {
     notFound();
   }
 
-  const absolute = path.join(process.cwd(), relative);
   const extension = path.extname(relative).toLowerCase();
+  const headers: Record<string, string> = {
+    "Content-Type": MIME[extension] ?? "application/octet-stream",
+    "Cache-Control": "private, max-age=300",
+    "X-Content-Type-Options": "nosniff",
+  };
+
+  // SVGs can carry scripts; force download so they never execute on the portal origin.
+  if (extension === ".svg") {
+    headers["Content-Type"] = "application/octet-stream";
+    headers["Content-Disposition"] = `attachment; filename="${path.basename(relative).replace(/"/g, "")}"`;
+  }
 
   try {
     const file = await readFile(absolute);
-    return new Response(file, {
-      headers: {
-        "Content-Type": MIME[extension] ?? "application/octet-stream",
-        "Cache-Control": "public, max-age=300",
-      },
-    });
+    return new Response(file, { headers });
   } catch {
     notFound();
   }

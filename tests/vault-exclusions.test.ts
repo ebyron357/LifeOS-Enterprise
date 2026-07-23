@@ -24,4 +24,10 @@ describe("vault exclusions", () => {
     expect(isPrivateFrontmatter({ web_visibility: "private" })).toBe(true);
     expect(isPrivateFrontmatter({ status: "active" })).toBe(false);
   });
+
+  it("excludes private directory markers", () => {
+    expect(isExcludedPath("70 Journal/private/secret.md")).toBe(true);
+    expect(isExcludedPath("Knowledge/.private/draft.md")).toBe(true);
+  });
 });
+

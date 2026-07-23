@@ -50,6 +50,19 @@ describe("vault index", () => {
     expect(index.byPath["01 Inbox/Public.md"].title).toBe("Public");
   });
 
+  it("does not resolve wikilinks to private notes", async () => {
+    const root = await makeFixture({
+      "01 Inbox/Public.md": "---\ntype: resource\nstatus: active\n---\n# Public\nSee [[01 Inbox/Secret]].\n",
+      "01 Inbox/Secret.md": "---\nprivate: true\n---\n# Secret\n",
+    });
+
+    const index = await buildVaultIndex(root);
+    expect(index.noteCount).toBe(1);
+    expect(index.byPath["01 Inbox/Secret.md"]).toBeUndefined();
+    expect(index.byPath["01 Inbox/Public.md"].links[0].resolvedPath).toBeNull();
+  });
+
+
   it("handles duplicate note names via full paths", async () => {
     const root = await makeFixture({
       "Projects/Duplicate.md": "---\ntype: project\nstatus: active\npriority: P2\nnext_action: Legacy\nreview_date: 2026-08-01\n---\n# Legacy Duplicate\n",
