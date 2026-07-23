@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ProjectBrief } from "@/lib/lifeos/types";
 import { buildMorningBriefSpeech } from "@/lib/lifeos/morning-brief-speech";
 import { useBrowserStorage } from "@/lib/lifeos/use-browser-storage";
@@ -19,6 +19,25 @@ export function DashboardQuickActions({ projects, activeProjects, reviewsDue }: 
   const [items, setItems] = useBrowserStorage<CaptureItem[]>("lifeos-capture", emptyCapture);
   const [panelOpen, setPanelOpen] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const openButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileOpenButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!panelOpen) return;
+
+    closeButtonRef.current?.focus();
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setPanelOpen(false);
+        (openButtonRef.current ?? mobileOpenButtonRef.current)?.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [panelOpen]);
 
   function addCapture() {
     const text = capture.trim();
@@ -58,7 +77,7 @@ export function DashboardQuickActions({ projects, activeProjects, reviewsDue }: 
         <span className={speaking ? "voice-wave is-speaking" : "voice-wave"} aria-hidden="true">◉</span>
         {briefButtonText}
       </button>
-      <button className="capture-open-button" onClick={() => setPanelOpen(true)} type="button">
+      <button ref={openButtonRef} className="capture-open-button" onClick={() => setPanelOpen(true)} type="button">
         <span aria-hidden="true">＋</span> Quick capture
       </button>
 
@@ -67,7 +86,7 @@ export function DashboardQuickActions({ projects, activeProjects, reviewsDue }: 
           <span className={speaking ? "voice-wave is-speaking" : "voice-wave"} aria-hidden="true">◉</span>
           {speaking ? "Reading…" : "Hear brief"}
         </button>
-        <button className="mobile-command-button" onClick={() => setPanelOpen(true)} type="button" aria-label="Open quick capture">
+        <button ref={mobileOpenButtonRef} className="mobile-command-button" onClick={() => setPanelOpen(true)} type="button" aria-label="Open quick capture">
           ＋ Capture
         </button>
       </div>
@@ -75,7 +94,23 @@ export function DashboardQuickActions({ projects, activeProjects, reviewsDue }: 
       {panelOpen ? (
         <div className="capture-overlay" role="presentation" onMouseDown={() => setPanelOpen(false)}>
           <section className="capture-panel" role="dialog" aria-modal="true" aria-label="Quick capture" onMouseDown={(event) => event.stopPropagation()}>
-            <header><div><p className="widget-eyebrow">Thought to trusted list</p><h2>Quick Capture</h2></div><button onClick={() => setPanelOpen(false)} type="button" aria-label="Close capture">×</button></header>
+            <header>
+              <div>
+                <p className="widget-eyebrow">Thought to trusted list</p>
+                <h2>Quick Capture</h2>
+              </div>
+              <button
+                ref={closeButtonRef}
+                onClick={() => {
+                  setPanelOpen(false);
+                  (openButtonRef.current ?? mobileOpenButtonRef.current)?.focus();
+                }}
+                type="button"
+                aria-label="Close capture"
+              >
+                ×
+              </button>
+            </header>
             <div className="capture-entry">
               <input
                 value={capture}

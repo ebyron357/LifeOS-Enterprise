@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { VaultSection } from "@/lib/vault/types";
 
 export type NavItem = {
@@ -37,25 +37,77 @@ type PortalSidebarProps = {
   dashboardActions?: React.ReactNode;
 };
 
+function useIsMobileNav() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return;
+
+    const media = window.matchMedia("(max-width: 1000px)");
+    const sync = () => setIsMobile(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
+
+  return isMobile;
+}
+
 export function PortalSidebar({ counts = {}, dashboardActions }: PortalSidebarProps) {
   const pathname = usePathname() ?? "";
   const [open, setOpen] = useState(false);
+  const isMobile = useIsMobileNav();
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const navId = useId();
+
+  useEffect(() => {
+    if (!open) return;
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+        toggleRef.current?.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
+  const drawerHidden = isMobile && !open;
 
   return (
     <>
       <button
+        ref={toggleRef}
         className="mobile-nav-toggle"
         type="button"
-        aria-label="Open navigation"
+        aria-label={open ? "Close navigation" : "Open navigation"}
         aria-expanded={open}
-        onClick={() => setOpen(true)}
+        aria-controls={navId}
+        onClick={() => setOpen((value) => !value)}
       >
-        ☰
+        {open ? "✕" : "☰"}
       </button>
 
-      {open ? <div className="mobile-nav-scrim" onClick={() => setOpen(false)} aria-hidden="true" /> : null}
+      {open ? (
+        <div
+          className="mobile-nav-scrim"
+          onClick={() => {
+            setOpen(false);
+            toggleRef.current?.focus();
+          }}
+          aria-hidden="true"
+        />
+      ) : null}
 
-      <aside className={`lifeos-sidebar portal-sidebar ${open ? "is-open" : ""}`} aria-label="LifeOS navigation">
+      <aside
+        id={navId}
+        className={`lifeos-sidebar portal-sidebar ${open ? "is-open" : ""}`}
+        aria-label="LifeOS navigation"
+        aria-hidden={drawerHidden || undefined}
+        inert={drawerHidden || undefined}
+      >
         <div className="sidebar-brand">
           <span>L</span>
           <div>
@@ -73,6 +125,7 @@ export function PortalSidebar({ counts = {}, dashboardActions }: PortalSidebarPr
                 key={item.href}
                 href={item.href}
                 className={active ? "is-active" : ""}
+                tabIndex={drawerHidden ? -1 : undefined}
                 onClick={() => setOpen(false)}
               >
                 <span>{item.code}</span>

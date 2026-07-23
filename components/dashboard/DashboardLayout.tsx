@@ -29,6 +29,7 @@ export function DashboardLayout({ widgets, data, github, revenue, counts }: Dash
 
   return (
     <div className="lifeos-app">
+      <a className="skip-link" href="#main-content">Skip to main content</a>
       <PortalSidebar
         counts={counts}
         dashboardActions={(
@@ -40,7 +41,7 @@ export function DashboardLayout({ widgets, data, github, revenue, counts }: Dash
         )}
       />
 
-      <main className="dashboard-shell">
+      <main id="main-content" className="dashboard-shell" tabIndex={-1}>
         <section id="overview" className="app-section">
           <nav className="command-bar" aria-label="LifeOS command status">
             <div className="command-brand"><span className="brand-mark">L</span><strong>LIVE INTELLIGENCE</strong><em>Verified vault signals</em></div>

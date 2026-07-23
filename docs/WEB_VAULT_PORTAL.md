@@ -32,9 +32,13 @@ Excluded from indexing and all API/UI output:
 - `.git/`, `.github/`, `.obsidian/`, `.vercel/`, `node_modules/`
 - Environment and credential files (`.env*`, `*.pem`, `*.key`)
 - Application source (`app/`, `components/`, `lib/`, `tests/`, `scripts/`, `integrations/`)
+- Directories named `private` or `.private`
 - Notes with `private: true`, `publish: false`, or `web_visibility: private`
+- Wikilinks that target private notes resolve as unresolved (paths are never leaked)
+- Attachments are limited to files under `40 Resources/` after path-containment checks
+- `robots.txt` disallows crawl indexing by default
 
-Canonical exclusion rules live in `lib/vault/exclusions.ts`.
+Canonical exclusion rules live in `lib/vault/exclusions.ts`. See also `docs/THIRD_PARTY.md`.
 
 ## Architecture
 
@@ -67,4 +71,4 @@ powershell -ExecutionPolicy Bypass -File .\scripts\audit-vault.ps1
 
 ## Attribution
 
-Portal patterns were informed by public architecture discussions in [LifeOS-OSS](https://github.com/kcwoodfield/LifeOS-OSS) and [COG Second Brain](https://github.com/huytieu/COG-second-brain). Implementation is original to LifeOS Enterprise. COG Second Brain is MIT-licensed; no COG source files were copied into this repository.
+Portal patterns were informed by public architecture discussions in [LifeOS-OSS](https://github.com/kcwoodfield/LifeOS-OSS) and [COG Second Brain](https://github.com/huytieu/COG-second-brain). Implementation is original to LifeOS Enterprise. COG Second Brain is MIT-licensed; no COG source files were copied into this repository. Dependency licenses are listed in `docs/THIRD_PARTY.md`.

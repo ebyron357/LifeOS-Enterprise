@@ -204,3 +204,71 @@ Remaining actions are local-UI only:
 - Open the vault in Obsidian and visually confirm Bases and Dataview tables render.
 - Process one `01 Inbox/` item end to end.
 - Complete visual acceptance of daily note creation under `70 Journal/Daily`.
+
+# Full-Vault Portal Release Review — 2026-07-23
+
+## Feature summary
+
+Ships a read-only full-vault web portal over the canonical Obsidian Markdown in `ebyron357/LifeOS-Enterprise`. Routes cover Overview, Projects, Tasks, Businesses, Growth, Intelligence, Agents, Resources, People, Learning, Journal, Reviews, SOPs, Templates, Archive, Search, note reader, and approved attachments. Existing spoken brief, quick capture (browser-local), growth, agent, project-health, and overload controls remain on `/dashboard`.
+
+## Architecture summary
+
+```text
+Markdown vault (Git) → lib/vault/build-index.ts → lib/vault/index.ts → Next.js routes/components
+```
+
+- Canonical source of truth: this GitHub repository / Obsidian vault
+- Interface: Obsidian locally; Vercel-hosted Next.js portal for browse/search
+- Shared vault index powers both dashboard widgets (`lib/lifeos/vault-data.ts`) and portal pages
+- Direct web editing remains disabled (no vault write APIs; capture is `localStorage` only)
+
+## Privacy and exclusion rules
+
+- Excluded paths: `.git/`, `.github/`, `.obsidian/`, `.vercel/`, `node_modules/`, app source trees, credential files, `private/` / `.private/`
+- Private frontmatter (`private: true`, `publish: false`, `web_visibility: private`) omitted from index, search, and note routes
+- Wikilinks to private notes resolve as unresolved (no path leakage)
+- Attachments limited to contained paths under `40 Resources/` with traversal rejection; SVGs forced download
+- Default `robots.txt` disallows crawl indexing
+
+## Release-review repairs (P0/P1)
+
+- **P0** Fixed note slug lookup mismatch that 404’d every `/note/...` route
+- **P0** Closed attachment path-traversal (`..` / encoded escapes) via containment checks
+- **P0** Wired inline wikilinks through resolved vault paths (basename links no longer 404)
+- **P1** Private-note paths removed from link-resolution indexes
+- **P1** Enabled `rehype-sanitize`; removed unused `gray-matter`
+- **P1** Hardened SVG attachment responses; added skip-link, Escape/focus handling, mobile drawer a11y/CSS fixes
+- **P1** Added `docs/THIRD_PARTY.md` and `app/robots.ts`
+
+## Validation evidence
+
+| Check | Result |
+|-------|--------|
+| `npm ci` | PASS |
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 36/36 |
+| `npm run build` | PASS |
+| `scripts/audit-vault.ps1` | PASS |
+| `scripts/validate-vault-links.ps1` | PASS — 116 notes |
+| Manual route smoke (Resources/Projects/People/Reviews/Journal/SOPs/Templates/Archive/Search) | HTTP 200 |
+| Attachment traversal probe | HTTP 404 |
+| Spoken brief / quick capture / growth / agents / project-health / overload UI present | Confirmed on `/dashboard` |
+| Direct web vault editing | Disabled |
+
+## Deployment
+
+- GitHub repository homepage: `https://lifeos-enterprise.vercel.app`
+- Live host responds with `server: Vercel` for `ebyron357/LifeOS-Enterprise`
+- GitHub `default_branch`: `main`
+- Portal routes are not on production until this branch merges to `main` and Vercel redeploys (current production still serves the pre-portal dashboard only)
+
+## Final status
+
+Release review validation: **PASS** (awaiting human approval to merge).
+
+Remaining credential/local-UI-only actions:
+
+- Authenticate Vercel MCP/CLI in desktop Cursor if project settings need a live API audit beyond homepage/header evidence
+- After merge, confirm production serves `/resources`, `/search`, and `/robots.txt`
+- Obsidian local visual acceptance of Bases/Dataview unchanged from prior closeout

@@ -21,8 +21,9 @@ export function VaultPageLayout({
 }: VaultPageLayoutProps) {
   return (
     <div className="lifeos-app">
+      <a className="skip-link" href="#main-content">Skip to main content</a>
       <PortalSidebar counts={counts} dashboardActions={dashboardActions} />
-      <main className="dashboard-shell portal-main">
+      <main id="main-content" className="dashboard-shell portal-main" tabIndex={-1}>
         <header className="portal-page-header">
           <p className="widget-eyebrow">{eyebrow}</p>
           <h1>{title}</h1>

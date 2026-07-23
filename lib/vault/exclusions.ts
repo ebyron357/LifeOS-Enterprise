@@ -99,19 +99,46 @@ export function isIndexableMarkdown(relativePath: string): boolean {
   return true;
 }
 
+const ATTACHMENT_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".pdf"]);
+const ATTACHMENT_ROOT = "40 Resources";
+
+export function hasPathTraversal(relativePath: string): boolean {
+  let decoded = normalizeVaultPath(relativePath);
+  try {
+    decoded = normalizeVaultPath(decodeURIComponent(decoded));
+  } catch {
+    return true;
+  }
+
+  if (!decoded || decoded.includes("\0")) return true;
+  if (decoded.includes("\\")) return true;
+  return decoded.split("/").some((segment) => segment === ".." || segment === "." || segment === "");
+}
+
 export function isAttachmentPath(relativePath: string): boolean {
   const normalized = normalizeVaultPath(relativePath);
-  if (isExcludedPath(normalized)) return false;
-
-  const allowedRoots = [
-    "40 Resources/Attachments/",
-    "40 Resources/",
-  ];
+  if (!normalized || isExcludedPath(normalized) || hasPathTraversal(normalized)) return false;
 
   const lower = normalized.toLowerCase();
   const extension = path.extname(normalized).toLowerCase();
-  const imageExtensions = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".pdf"]);
+  if (!ATTACHMENT_EXTENSIONS.has(extension)) return false;
 
-  if (!imageExtensions.has(extension)) return false;
-  return allowedRoots.some((root) => lower.startsWith(root.toLowerCase()));
+  return lower === ATTACHMENT_ROOT.toLowerCase()
+    || lower.startsWith(`${ATTACHMENT_ROOT.toLowerCase()}/`);
+}
+
+/** Resolve an attachment path and ensure it stays under the approved root. */
+export function resolveSafeAttachmentPath(relativePath: string, root = process.cwd()): string | null {
+  const normalized = normalizeVaultPath(relativePath);
+  if (!isAttachmentPath(normalized)) return null;
+
+  const absoluteRoot = path.resolve(root);
+  const allowedRoot = path.resolve(absoluteRoot, ATTACHMENT_ROOT);
+  const resolved = path.resolve(absoluteRoot, normalized);
+
+  if (resolved !== allowedRoot && !resolved.startsWith(`${allowedRoot}${path.sep}`)) {
+    return null;
+  }
+
+  return resolved;
 }
