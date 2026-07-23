@@ -1,37 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ProjectBrief } from "@/lib/lifeos/types";
 import { buildMorningBriefSpeech } from "@/lib/lifeos/morning-brief-speech";
 import { useBrowserStorage } from "@/lib/lifeos/use-browser-storage";
 
 type CaptureItem = { id: number; text: string; done: boolean };
-
-const sections = [
-  { id: "overview", label: "Overview", code: "01" },
-  { id: "projects", label: "Projects", code: "02" },
-  { id: "growth", label: "Growth", code: "03" },
-  { id: "intelligence", label: "Intelligence", code: "04" },
-  { id: "agents", label: "Agents", code: "05" },
-];
-
 const emptyCapture: CaptureItem[] = [];
 
-type LifeOSNavigationProps = {
+type DashboardQuickActionsProps = {
   projects: ProjectBrief[];
   activeProjects: number;
   reviewsDue: number;
 };
 
-export function LifeOSNavigation({ projects, activeProjects, reviewsDue }: LifeOSNavigationProps) {
+export function DashboardQuickActions({ projects, activeProjects, reviewsDue }: DashboardQuickActionsProps) {
   const [capture, setCapture] = useState("");
   const [items, setItems] = useBrowserStorage<CaptureItem[]>("lifeos-capture", emptyCapture);
   const [panelOpen, setPanelOpen] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const openButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileOpenButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  function scrollTo(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
+  useEffect(() => {
+    if (!panelOpen) return;
+
+    closeButtonRef.current?.focus();
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setPanelOpen(false);
+        (openButtonRef.current ?? mobileOpenButtonRef.current)?.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [panelOpen]);
 
   function addCapture() {
     const text = capture.trim();
@@ -61,45 +67,26 @@ export function LifeOSNavigation({ projects, activeProjects, reviewsDue }: LifeO
 
   return (
     <>
-      <aside className="lifeos-sidebar" aria-label="LifeOS navigation">
-        <div className="sidebar-brand"><span>L</span><div><strong>LIFEOS</strong><small>BWA COMMAND</small></div></div>
-        <nav>
-          {sections.map((section) => (
-            <button key={section.id} onClick={() => scrollTo(section.id)} type="button">
-              <span>{section.code}</span>{section.label}
-            </button>
-          ))}
-        </nav>
-        <div className="sidebar-actions">
-          <button
-            className="voice-brief-button"
-            onClick={readBrief}
-            type="button"
-            aria-label={briefLabel}
-            aria-pressed={speaking}
-          >
-            <span className={speaking ? "voice-wave is-speaking" : "voice-wave"} aria-hidden="true">◉</span>
-            {briefButtonText}
-          </button>
-          <button className="capture-open-button" onClick={() => setPanelOpen(true)} type="button">
-            <span aria-hidden="true">＋</span> Quick capture
-          </button>
-        </div>
-        <div className="sidebar-status"><i /><span>System online</span><small>{activeProjects} active projects</small></div>
-      </aside>
+      <button
+        className="voice-brief-button"
+        onClick={readBrief}
+        type="button"
+        aria-label={briefLabel}
+        aria-pressed={speaking}
+      >
+        <span className={speaking ? "voice-wave is-speaking" : "voice-wave"} aria-hidden="true">◉</span>
+        {briefButtonText}
+      </button>
+      <button ref={openButtonRef} className="capture-open-button" onClick={() => setPanelOpen(true)} type="button">
+        <span aria-hidden="true">＋</span> Quick capture
+      </button>
 
       <div className="mobile-command-dock" aria-label="Mobile command actions">
-        <button
-          className="mobile-brief-button"
-          onClick={readBrief}
-          type="button"
-          aria-label={briefLabel}
-          aria-pressed={speaking}
-        >
+        <button className="mobile-brief-button" onClick={readBrief} type="button" aria-label={briefLabel} aria-pressed={speaking}>
           <span className={speaking ? "voice-wave is-speaking" : "voice-wave"} aria-hidden="true">◉</span>
           {speaking ? "Reading…" : "Hear brief"}
         </button>
-        <button className="mobile-command-button" onClick={() => setPanelOpen(true)} type="button" aria-label="Open quick capture">
+        <button ref={mobileOpenButtonRef} className="mobile-command-button" onClick={() => setPanelOpen(true)} type="button" aria-label="Open quick capture">
           ＋ Capture
         </button>
       </div>
@@ -107,7 +94,23 @@ export function LifeOSNavigation({ projects, activeProjects, reviewsDue }: LifeO
       {panelOpen ? (
         <div className="capture-overlay" role="presentation" onMouseDown={() => setPanelOpen(false)}>
           <section className="capture-panel" role="dialog" aria-modal="true" aria-label="Quick capture" onMouseDown={(event) => event.stopPropagation()}>
-            <header><div><p className="widget-eyebrow">Thought to trusted list</p><h2>Quick Capture</h2></div><button onClick={() => setPanelOpen(false)} type="button" aria-label="Close capture">×</button></header>
+            <header>
+              <div>
+                <p className="widget-eyebrow">Thought to trusted list</p>
+                <h2>Quick Capture</h2>
+              </div>
+              <button
+                ref={closeButtonRef}
+                onClick={() => {
+                  setPanelOpen(false);
+                  (openButtonRef.current ?? mobileOpenButtonRef.current)?.focus();
+                }}
+                type="button"
+                aria-label="Close capture"
+              >
+                ×
+              </button>
+            </header>
             <div className="capture-entry">
               <input
                 value={capture}
@@ -118,7 +121,7 @@ export function LifeOSNavigation({ projects, activeProjects, reviewsDue }: LifeO
               />
               <button onClick={addCapture} type="button">Save</button>
             </div>
-            <p className="capture-note">Saved privately in this browser. Obsidian sync will be added in the connection phase.</p>
+            <p className="capture-note">Saved privately in this browser. Vault write sync remains read-only in this release.</p>
             <div className="capture-items">
               {items.map((item) => (
                 <button className={item.done ? "is-done" : ""} key={item.id} onClick={() => toggleItem(item.id)} type="button">
