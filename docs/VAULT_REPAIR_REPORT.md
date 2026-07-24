@@ -205,7 +205,7 @@ Remaining actions are local-UI only:
 - Process one `01 Inbox/` item end to end.
 - Complete visual acceptance of daily note creation under `70 Journal/Daily`.
 
-# Full-Vault Portal Release Review — 2026-07-23
+# Full-Vault Portal Release Review — 2026-07-23 (PR #30)
 
 ## Feature summary
 

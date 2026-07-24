@@ -549,15 +549,18 @@ body::before { display:none; }
 .note-markdown blockquote { margin: 0; padding-left: 14px; border-left: 3px solid var(--violet); color: #b7c4ce; }
 .note-markdown a { color: var(--cyan); }
 .unresolved-link { color: var(--amber); }
+.search-page,.search-results,.search-result,.note-markdown,.portal-main { min-width: 0; }
 .search-form { display: grid; grid-template-columns: 2fr repeat(3, minmax(120px, 1fr)) auto; gap: 10px; margin-bottom: 18px; }
-.search-form input,.search-form select,.search-form button { min-height: 42px; border: 1px solid var(--line); background: #060a0f; color: var(--text); padding: 0 12px; }
+.search-form input,.search-form select,.search-form button { min-height: 42px; width: 100%; border: 1px solid var(--line); background: #060a0f; color: var(--text); padding: 0 12px; }
 .search-form button { cursor: pointer; border-color: var(--line-hot); color: var(--cyan); }
 .search-reset { display: inline-flex; align-items: center; color: var(--muted); text-decoration: none; font-size: .72rem; }
 .search-results { display: grid; gap: 14px; }
-.search-result { padding: 16px; border: 1px solid var(--line); }
+.search-result { padding: 16px; border: 1px solid var(--line); overflow-wrap: anywhere; word-break: break-word; }
 .search-result h2 { margin: 0 0 8px; font-size: 1rem; }
 .search-result mark { background: rgba(53,231,255,.18); color: var(--text); }
 .search-highlights { margin: 10px 0 0; padding-left: 18px; color: var(--muted); font-size: .68rem; }
+.note-markdown { overflow-wrap: anywhere; word-break: break-word; }
+.note-markdown pre,.note-markdown table { max-width: 100%; }
 .skip-link {
   position: absolute;
   left: -999px;
@@ -639,8 +642,15 @@ html[data-lifeos-density="calm"] .app-section:not(#overview) { margin-top:100px;
   }
   .lifeos-app .dashboard-shell,
   .lifeos-app .portal-main {
+    width: 100%;
+    max-width: 100%;
     margin-left: 0;
-    padding-top: 64px;
+    margin-right: 0;
+    padding: 64px 16px 100px;
+    overflow-x: clip;
+  }
+  .search-page,.search-results,.search-result,.note-reader-grid,.note-reader-main {
+    max-width: 100%;
   }
 }
 @media (max-width:680px) {
