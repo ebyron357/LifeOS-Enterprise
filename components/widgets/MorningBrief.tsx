@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { WidgetFrame } from "./WidgetFrame";
 import type { ProjectBrief } from "@/lib/lifeos/types";
+import { noteHref } from "@/lib/vault/slug";
 
 type MorningBriefProps = {
   priorities: ProjectBrief[];
@@ -15,7 +17,7 @@ export function MorningBrief({ priorities, activeProjects, waitingOn, reviewsDue
         {priorities.map((priority, index) => (
           <li key={priority.name}>
             <span className="priority-number">0{index + 1}</span>
-            <div><strong>{priority.nextAction}</strong><small>{priority.business} · {priority.priority} · review {priority.reviewDate || "not set"}</small></div>
+            <div><strong><Link href={noteHref(priority.path)}>{priority.nextAction}</Link></strong><small>{priority.business} · {priority.priority} · review {priority.reviewDate || "not set"}</small></div>
             <span className={`priority-dot priority-dot--${priority.priority === "P0" ? "critical" : priority.priority === "P1" ? "high" : "medium"}`} aria-label={`${priority.priority} priority`} />
           </li>
         ))}
