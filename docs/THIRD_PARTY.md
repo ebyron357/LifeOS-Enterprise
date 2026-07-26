@@ -11,6 +11,9 @@ LifeOS Enterprise includes original application code plus open-source dependenci
 | `react-markdown` | MIT | Markdown rendering |
 | `remark-gfm` | MIT | GFM tables, task lists, strikethrough |
 | `rehype-sanitize` | MIT | HTML sanitization for rendered notes |
+| `react-grid-layout` | MIT | Workspace OS drag/resize grid |
+| `cmdk` | MIT | Workspace OS command palette |
+| `motion` | MIT | Workspace OS panel transitions |
 
 Full license texts are distributed with each package under `node_modules/<package>/LICENSE` (or equivalent) after `npm ci`.
 
