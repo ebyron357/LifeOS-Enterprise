@@ -5,12 +5,18 @@ const REPO = "LifeOS-Enterprise";
 const BASE = "main";
 const ALLOWED_STATUSES = new Set(["active", "waiting", "blocked", "complete"]);
 const ALLOWED_PRIORITIES = new Set(["P0", "P1", "P2", "P3"]);
+const ALLOWED_FIELDS = new Set(["status", "priority", "next_action"]);
+
+type FieldChange = {
+  field: "status" | "priority" | "next_action";
+  from: string;
+  to: string;
+};
 
 type Change = {
   path: string;
   project: string;
-  before: { status: string; priority: string; next_action: string };
-  after: { status: string; priority: string; next_action: string };
+  fields: FieldChange[];
 };
 
 type ChangePlan = {
@@ -33,6 +39,10 @@ function validPath(value: string) {
   );
 }
 
+function getProposedValue(change: Change, field: FieldChange["field"], fallback = "") {
+  return change.fields.find((item) => item.field === field)?.to ?? fallback;
+}
+
 function validatePlan(input: unknown): ChangePlan {
   if (!input || typeof input !== "object") throw new Error("Missing change plan.");
   const plan = input as Partial<ChangePlan>;
@@ -45,11 +55,21 @@ function validatePlan(input: unknown): ChangePlan {
   for (const change of plan.changes) {
     if (!validPath(change.path)) throw new Error(`Path is not allowlisted: ${change.path}`);
     if (!change.project?.trim()) throw new Error("Every change requires a project name.");
-    if (!ALLOWED_STATUSES.has(change.after?.status)) throw new Error(`Invalid status for ${change.project}.`);
-    if (!ALLOWED_PRIORITIES.has(change.after?.priority)) throw new Error(`Invalid priority for ${change.project}.`);
-    if (change.after.status !== "complete" && change.after.next_action.trim().length < 4) {
-      throw new Error(`Next action is required for ${change.project}.`);
+    if (!Array.isArray(change.fields) || change.fields.length < 1 || change.fields.length > 3) {
+      throw new Error(`Invalid field changes for ${change.project}.`);
     }
+    const seen = new Set<string>();
+    for (const field of change.fields) {
+      if (!ALLOWED_FIELDS.has(field.field) || seen.has(field.field)) throw new Error(`Invalid or duplicate field for ${change.project}.`);
+      if (typeof field.from !== "string" || typeof field.to !== "string") throw new Error(`Invalid field values for ${change.project}.`);
+      seen.add(field.field);
+    }
+    const status = getProposedValue(change, "status", change.fields.find((item) => item.field === "status")?.from ?? "active");
+    const priority = getProposedValue(change, "priority", change.fields.find((item) => item.field === "priority")?.from ?? "P3");
+    const nextAction = getProposedValue(change, "next_action", change.fields.find((item) => item.field === "next_action")?.from ?? "");
+    if (!ALLOWED_STATUSES.has(status)) throw new Error(`Invalid status for ${change.project}.`);
+    if (!ALLOWED_PRIORITIES.has(priority)) throw new Error(`Invalid priority for ${change.project}.`);
+    if (status !== "complete" && nextAction.trim().length < 4) throw new Error(`Next action is required for ${change.project}.`);
   }
   return plan as ChangePlan;
 }
@@ -106,9 +126,8 @@ export async function POST(request: Request) {
       const encodedPath = change.path.split("/").map(encodeURIComponent).join("/");
       const current = await github(`/repos/${OWNER}/${REPO}/contents/${encodedPath}?ref=${encodeURIComponent(branch)}`, token);
       const source = Buffer.from(current.content, "base64").toString("utf8");
-      let updated = replaceFrontmatter(source, "status", change.after.status);
-      updated = replaceFrontmatter(updated, "priority", change.after.priority);
-      updated = replaceFrontmatter(updated, "next_action", change.after.next_action);
+      let updated = source;
+      for (const field of change.fields) updated = replaceFrontmatter(updated, field.field, field.to);
       await github(`/repos/${OWNER}/${REPO}/contents/${encodedPath}`, token, {
         method: "PUT",
         body: JSON.stringify({
@@ -123,7 +142,7 @@ export async function POST(request: Request) {
     const pull = await github(`/repos/${OWNER}/${REPO}/pulls`, token, {
       method: "POST",
       body: JSON.stringify({
-        title: `chore(lifeos): apply approved project change plan`,
+        title: "chore(lifeos): apply approved project change plan",
         head: branch,
         base: BASE,
         draft: true,
@@ -132,7 +151,7 @@ export async function POST(request: Request) {
           "",
           "Created through the authenticated Interactive Operations approval gate.",
           "",
-          ...plan.changes.map((change) => `- **${change.project}**: status ${change.before.status} → ${change.after.status}; priority ${change.before.priority} → ${change.after.priority}`),
+          ...plan.changes.map((change) => `- **${change.project}**: ${change.fields.map((field) => `${field.field} ${field.from || "empty"} → ${field.to || "empty"}`).join("; ")}`),
           "",
           "No direct commit was made to `main`. Review and merge this PR to apply the canonical vault changes.",
         ].join("\n"),
