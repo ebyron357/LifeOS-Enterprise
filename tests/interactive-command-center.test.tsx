@@ -28,20 +28,24 @@ const projects: ProjectBrief[] = [
   },
 ];
 
+function activeProjectCard() {
+  const activeLane = screen.getByRole("region", { name: "active projects" });
+  return within(activeLane).getByText("Active Alpha").closest("article") as HTMLElement;
+}
+
 describe("interactive command center", () => {
   afterEach(cleanup);
 
   it("stages status, priority, and next-action edits before approval", () => {
     render(<InteractiveCommandCenter projects={projects} />);
 
-    const card = screen.getByText("Active Alpha").closest("article");
-    expect(card).not.toBeNull();
-    fireEvent.click(within(card as HTMLElement).getByRole("button", { name: "Edit" }));
+    const card = activeProjectCard();
+    fireEvent.click(within(card).getByRole("button", { name: "Edit" }));
 
-    const selects = within(card as HTMLElement).getAllByRole("combobox");
+    const selects = within(card).getAllByRole("combobox");
     fireEvent.change(selects[0], { target: { value: "blocked" } });
     fireEvent.change(selects[1], { target: { value: "P0" } });
-    fireEvent.change(within(card as HTMLElement).getByRole("textbox"), {
+    fireEvent.change(within(card).getByRole("textbox"), {
       target: { value: "Resolve the deployment credential blocker." },
     });
 
@@ -55,7 +59,7 @@ describe("interactive command center", () => {
   it("generates a proposal-only approval package without writing vault data", () => {
     render(<InteractiveCommandCenter projects={projects} />);
 
-    const card = screen.getByText("Active Alpha").closest("article") as HTMLElement;
+    const card = activeProjectCard();
     fireEvent.change(within(card).getByRole("combobox"), { target: { value: "complete" } });
     fireEvent.click(screen.getByRole("button", { name: /review changes \(1\)/i }));
     fireEvent.click(screen.getByRole("button", { name: /generate approval package/i }));
