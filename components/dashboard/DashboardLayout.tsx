@@ -3,6 +3,7 @@ import { AIStatus } from "@/components/widgets/AIStatus";
 import { MorningBrief } from "@/components/widgets/MorningBrief";
 import { PersonalGrowthWidget } from "@/components/widgets/PersonalGrowthWidget";
 import { InteractiveCommandCenter } from "@/components/dashboard/InteractiveCommandCenter";
+import { ChangePlanPersistence } from "@/components/dashboard/ChangePlanPersistence";
 import { DashboardQuickActions } from "@/components/dashboard/DashboardQuickActions";
 import { PortalSidebar } from "@/components/shell/PortalSidebar";
 import { CognitiveSupportCenter } from "@/components/dashboard/CognitiveSupportCenter";
@@ -70,6 +71,7 @@ export function DashboardLayout({ widgets, data, github, revenue, counts }: Dash
         <section id="projects" className="app-section">
           <div className="section-heading"><span>02</span><div><p>Execution control</p><h2>Projects and decisions</h2></div></div>
           <InteractiveCommandCenter projects={data.projects} />
+          <ChangePlanPersistence />
           <div className="widget-slot widget-slot--wide" data-widget-id="morning-brief">
             <MorningBrief priorities={data.priorities} activeProjects={data.activeProjects} waitingOn={data.waitingOn} reviewsDue={data.reviewsDue} />
           </div>
