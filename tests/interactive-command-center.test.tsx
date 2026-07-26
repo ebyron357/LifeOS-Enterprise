@@ -28,9 +28,9 @@ const projects: ProjectBrief[] = [
   },
 ];
 
-function activeProjectCard() {
-  const activeLane = screen.getByRole("region", { name: "active projects" });
-  return within(activeLane).getByText("Active Alpha").closest("article") as HTMLElement;
+function projectCard(lane: string, project: string) {
+  const laneRegion = screen.getByRole("region", { name: `${lane} projects` });
+  return within(laneRegion).getByText(project).closest("article") as HTMLElement;
 }
 
 describe("interactive command center", () => {
@@ -39,15 +39,18 @@ describe("interactive command center", () => {
   it("stages status, priority, and next-action edits before approval", () => {
     render(<InteractiveCommandCenter projects={projects} />);
 
-    const card = activeProjectCard();
+    let card = projectCard("active", "Active Alpha");
     fireEvent.click(within(card).getByRole("button", { name: "Edit" }));
 
-    const selects = within(card).getAllByRole("combobox");
-    fireEvent.change(selects[0], { target: { value: "blocked" } });
+    let selects = within(card).getAllByRole("combobox");
     fireEvent.change(selects[1], { target: { value: "P0" } });
     fireEvent.change(within(card).getByRole("textbox"), {
       target: { value: "Resolve the deployment credential blocker." },
     });
+    fireEvent.change(selects[0], { target: { value: "blocked" } });
+
+    card = projectCard("blocked", "Active Alpha");
+    expect(card).toHaveAttribute("data-staged", "true");
 
     fireEvent.click(screen.getByRole("button", { name: /review changes \(1\)/i }));
     const review = screen.getByRole("region", { name: /review staged project changes/i });
@@ -59,8 +62,10 @@ describe("interactive command center", () => {
   it("generates a proposal-only approval package without writing vault data", () => {
     render(<InteractiveCommandCenter projects={projects} />);
 
-    const card = activeProjectCard();
+    const card = projectCard("active", "Active Alpha");
     fireEvent.change(within(card).getByRole("combobox"), { target: { value: "complete" } });
+    expect(projectCard("complete", "Active Alpha")).toBeInTheDocument();
+
     fireEvent.click(screen.getByRole("button", { name: /review changes \(1\)/i }));
     fireEvent.click(screen.getByRole("button", { name: /generate approval package/i }));
 
