@@ -40,6 +40,15 @@ The current write mode is `proposal-only`.
 - Refreshing the page restores canonical vault state.
 - No project template records are included in operational data.
 
+## Verified checks
+
+- Dashboard CI: PASS
+- Vault Health: PASS
+- Next.js production build: PASS through Vercel preview
+- TypeScript compilation: PASS
+- Mobile-responsive board styles included
+- Canonical vault write paths remain absent from the client component
+
 ## Future controlled persistence
 
 A later release may convert a validated approval package into a GitHub-backed change request. That layer must include authentication, path allowlisting, frontmatter-only mutation, before-and-after evidence, branch and pull-request creation, and rollback instructions.
