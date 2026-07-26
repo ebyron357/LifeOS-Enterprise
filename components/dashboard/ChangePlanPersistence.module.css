@@ -1,0 +1,12 @@
+.panel { display:grid; gap:16px; margin:14px 0; padding:22px; border:1px solid rgba(55,243,162,.32); border-left:2px solid var(--green); background:linear-gradient(145deg,rgba(10,24,22,.9),rgba(7,11,17,.98)); }
+.panel h3 { margin:0; font-family:Arial,Helvetica,sans-serif; font-size:1.25rem; }
+.panel p { max-width:760px; margin:8px 0 0; color:var(--muted); font-size:.66rem; line-height:1.6; }
+.controls { display:grid; grid-template-columns:minmax(240px,1fr) auto; gap:10px; align-items:end; }
+.controls label { display:grid; gap:7px; color:var(--muted); font-size:.56rem; letter-spacing:.07em; text-transform:uppercase; }
+.controls input { width:100%; min-height:42px; border:1px solid var(--line); color:var(--text); background:#070b11; padding:0 12px; font:650 .66rem ui-monospace,monospace; }
+.controls input:focus { border-color:var(--green); outline:2px solid rgba(55,243,162,.15); }
+.controls button { min-height:42px; border:1px solid var(--green); color:#07100d; background:var(--green); padding:0 16px; font:800 .6rem ui-monospace,monospace; letter-spacing:.06em; text-transform:uppercase; cursor:pointer; }
+.controls button:disabled { opacity:.55; cursor:wait; }
+.message { min-height:1em; color:var(--green)!important; }
+.link { width:max-content; color:var(--cyan); font:700 .62rem ui-monospace,monospace; }
+@media (max-width:680px) { .controls { grid-template-columns:1fr; } .controls button { width:100%; } }
