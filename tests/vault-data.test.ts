@@ -23,6 +23,14 @@ describe("vault dashboard data", () => {
     expect(activeOnly.some((project) => project.status === "blocked" || project.status === "waiting")).toBe(false);
   });
 
+  it("excludes reusable templates and placeholder records from live project metrics", async () => {
+    const data = await getVaultDashboardData(new Date("2026-07-17T12:00:00Z"));
+
+    expect(data.projects.every((project) => !project.path.toLowerCase().includes("templates/"))).toBe(true);
+    expect(data.projects.every((project) => !/\{\{[^}]+\}\}/.test(project.name))).toBe(true);
+    expect(data.priorities.every((project) => !/\{\{[^}]+\}\}/.test(project.name))).toBe(true);
+  });
+
   it("parses vault frontmatter with Windows CRLF line endings", async () => {
     const data = await getVaultDashboardData(new Date("2026-07-17T12:00:00Z"));
     expect(data.projects.some((project) => project.status === "active")).toBe(true);
