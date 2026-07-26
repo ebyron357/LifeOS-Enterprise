@@ -1,22 +1,44 @@
-import { createDefaultWorkspaceLayout } from "./default-layout";
+import { createDefaultWorkspaceLayout, WORKSPACE_LAYOUT_VERSION } from "./default-layout";
 import type { BreakpointLayouts, LayoutItem, WorkspaceId, WorkspaceLayoutState } from "./types";
 
 const BREAKPOINTS = ["lg", "md", "sm", "xs"] as const;
+const SUPPORTED_VERSIONS = new Set([1, 2, WORKSPACE_LAYOUT_VERSION]);
+
+function sanitizeLayoutItem(value: unknown): LayoutItem | null {
+  if (!value || typeof value !== "object") return null;
+  const item = value as LayoutItem;
+  if (
+    typeof item.i !== "string"
+    || typeof item.x !== "number"
+    || typeof item.y !== "number"
+    || typeof item.w !== "number"
+    || typeof item.h !== "number"
+    || !Number.isFinite(item.x)
+    || !Number.isFinite(item.y)
+    || !Number.isFinite(item.w)
+    || !Number.isFinite(item.h)
+  ) {
+    return null;
+  }
+
+  // Persist only stable fields. react-grid-layout may emit transient flags.
+  const next: LayoutItem = {
+    i: item.i,
+    x: item.x,
+    y: item.y,
+    w: item.w,
+    h: item.h,
+  };
+  if (typeof item.minW === "number") next.minW = item.minW;
+  if (typeof item.minH === "number") next.minH = item.minH;
+  if (typeof item.maxW === "number") next.maxW = item.maxW;
+  if (typeof item.maxH === "number") next.maxH = item.maxH;
+  if (typeof item.static === "boolean") next.static = item.static;
+  return next;
+}
 
 function isLayoutItem(value: unknown): value is LayoutItem {
-  if (!value || typeof value !== "object") return false;
-  const item = value as LayoutItem;
-  return (
-    typeof item.i === "string"
-    && typeof item.x === "number"
-    && typeof item.y === "number"
-    && typeof item.w === "number"
-    && typeof item.h === "number"
-    && Number.isFinite(item.x)
-    && Number.isFinite(item.y)
-    && Number.isFinite(item.w)
-    && Number.isFinite(item.h)
-  );
+  return sanitizeLayoutItem(value) !== null;
 }
 
 function isBreakpointLayouts(value: unknown): value is BreakpointLayouts {
@@ -31,17 +53,20 @@ export function parseWorkspaceLayout(raw: string | null): WorkspaceLayoutState {
 
   try {
     const parsed = JSON.parse(raw) as Partial<WorkspaceLayoutState>;
-    if (parsed.version !== 1) return fallback;
+    if (!SUPPORTED_VERSIONS.has(parsed.version as number)) return fallback;
     if (!parsed.layouts || !isBreakpointLayouts(parsed.layouts)) return fallback;
 
+    // v1 defaults stacked the md board; migrate those sessions to the v2 board.
+    if (parsed.version === 1) return fallback;
+
     return {
-      version: 1,
+      version: WORKSPACE_LAYOUT_VERSION,
       workspaceId: (parsed.workspaceId as WorkspaceId) ?? fallback.workspaceId,
       layouts: {
-        lg: parsed.layouts.lg.map((item) => ({ ...item })),
-        md: parsed.layouts.md.map((item) => ({ ...item })),
-        sm: parsed.layouts.sm.map((item) => ({ ...item })),
-        xs: parsed.layouts.xs.map((item) => ({ ...item })),
+        lg: parsed.layouts.lg.map((item) => sanitizeLayoutItem(item)!),
+        md: parsed.layouts.md.map((item) => sanitizeLayoutItem(item)!),
+        sm: parsed.layouts.sm.map((item) => sanitizeLayoutItem(item)!),
+        xs: parsed.layouts.xs.map((item) => sanitizeLayoutItem(item)!),
       },
       widgets: {
         ...fallback.widgets,

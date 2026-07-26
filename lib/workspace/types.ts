@@ -42,7 +42,7 @@ export type WidgetChromeState = {
 };
 
 export type WorkspaceLayoutState = {
-  version: 1;
+  version: 1 | 2;
   workspaceId: WorkspaceId;
   layouts: BreakpointLayouts;
   widgets: Record<string, WidgetChromeState>;

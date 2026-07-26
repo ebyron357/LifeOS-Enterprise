@@ -17,7 +17,9 @@ type WorkspaceGridProps = {
   widgets: Array<{ id: CommandCenterWidgetId; node: ReactNode }>;
 };
 
-const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 0 };
+// lg starts below typical sidebar-adjusted desktop widths so the multi-column
+// board is active around 1100px content width, not only at full 1200px+.
+const BREAKPOINTS = { lg: 1100, md: 901, sm: 600, xs: 0 };
 const COLS = { lg: 12, md: 10, sm: 6, xs: 4 };
 
 export function WorkspaceGrid({ widgets }: WorkspaceGridProps) {
@@ -36,14 +38,25 @@ export function WorkspaceGrid({ widgets }: WorkspaceGridProps) {
 
   const layouts = useMemo(() => state.layouts as ResponsiveLayouts, [state.layouts]);
 
-  function handleLayoutChange(_current: Layout, allLayouts: ResponsiveLayouts) {
+  function handleLayoutChange(current: Layout, allLayouts: ResponsiveLayouts) {
     if (!hydrated || isNarrow) return;
-    setLayouts({
+
+    const next = {
       lg: allLayouts.lg ?? state.layouts.lg,
       md: allLayouts.md ?? state.layouts.md,
       sm: allLayouts.sm ?? state.layouts.sm,
       xs: allLayouts.xs ?? state.layouts.xs,
-    } as BreakpointLayouts);
+    } as BreakpointLayouts;
+
+    // Ensure the active breakpoint always receives the latest committed layout,
+    // even if react-grid-layout omits a sparse key in `allLayouts`.
+    const committed = current.map((item) => ({ ...item }));
+    if (width >= BREAKPOINTS.lg) next.lg = committed;
+    else if (width >= BREAKPOINTS.md) next.md = committed;
+    else if (width >= BREAKPOINTS.sm) next.sm = committed;
+    else next.xs = committed;
+
+    setLayouts(next);
   }
 
   const useStacked = isNarrow || !mounted || width <= 0;

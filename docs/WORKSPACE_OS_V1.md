@@ -69,6 +69,8 @@ Unavailable integrations remain clearly labeled by existing widgets (for example
 
 Storage key: `lifeos-workspace-os-v1-layout`
 
+Current schema version: `2`
+
 Persists:
 
 - breakpoint layouts (`lg`, `md`, `sm`, `xs`)
@@ -77,7 +79,13 @@ Persists:
 - reduced-motion preference
 - last selected workspace id (`lifeos-workspace-os-v1-last-workspace`)
 
-Invalid JSON, wrong version, or malformed layouts fall back to the default layout.
+Invalid JSON, unsupported version, or malformed layouts fall back to the default layout. Legacy `version: 1` sessions are migrated to the v2 defaults because v1 incorrectly stacked the `md` breakpoint used by most sidebar-adjusted desktops.
+
+Desktop grid breakpoints (content width):
+
+- `lg` ≥ 1100px → 12 columns
+- `md` ≥ 901px → 10 columns (multi-column board)
+- `sm` / `xs` used when not in the mobile stacked fallback
 
 **Restore default layout** is always visible in the Command Center toolbar and available from the command palette.
 

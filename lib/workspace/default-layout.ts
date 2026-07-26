@@ -52,11 +52,24 @@ function stackLayout(source: LayoutItem[], cols: number): LayoutItem[] {
   });
 }
 
+/** Scale a 12-col layout into fewer columns while preserving relative placement. */
+function scaleLayout(source: LayoutItem[], cols: number): LayoutItem[] {
+  const scale = cols / 12;
+  return source.map((entry) => {
+    const minW = Math.min(cols, entry.minW ?? 1);
+    const w = Math.min(cols, Math.max(minW, Math.round(entry.w * scale)));
+    const x = Math.min(cols - w, Math.max(0, Math.round(entry.x * scale)));
+    return { ...entry, x, w, minW, minH: entry.minH };
+  });
+}
+
 export function createDefaultLayouts(): BreakpointLayouts {
   return {
     lg: DEFAULT_LG_LAYOUT.map((entry) => ({ ...entry })),
-    md: stackLayout(DEFAULT_LG_LAYOUT, 10),
-    sm: stackLayout(DEFAULT_LG_LAYOUT, 6),
+    // Desktop content width is often <1200px once the sidebar is present, so md
+    // must remain a real multi-column board (not a stacked list).
+    md: scaleLayout(DEFAULT_LG_LAYOUT, 10),
+    sm: scaleLayout(DEFAULT_LG_LAYOUT, 6),
     xs: stackLayout(DEFAULT_LG_LAYOUT, 4),
   };
 }
@@ -65,9 +78,11 @@ export function createDefaultWidgetChrome(): Record<string, { minimized: boolean
   return Object.fromEntries(WIDGET_IDS.map((id) => [id, { minimized: false, hidden: false }]));
 }
 
+export const WORKSPACE_LAYOUT_VERSION = 2 as const;
+
 export function createDefaultWorkspaceLayout(): WorkspaceLayoutState {
   return {
-    version: 1,
+    version: WORKSPACE_LAYOUT_VERSION,
     workspaceId: "command-center",
     layouts: createDefaultLayouts(),
     widgets: createDefaultWidgetChrome(),

@@ -1015,8 +1015,21 @@ html[data-lifeos-reduced-motion="true"] .workspace-rgl * {
     justify-content: center;
   }
   .workspace-switcher {
-    overflow-x: auto;
-    flex-wrap: nowrap;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  .workspace-switcher a {
+    flex: 1 1 auto;
+    min-width: min(100%, 140px);
+    justify-content: space-between;
+  }
+  .workspace-grid,
+  .workspace-grid-item,
+  .workspace-widget {
+    max-width: 100%;
   }
   .workspace-widget-header {
     display: grid;

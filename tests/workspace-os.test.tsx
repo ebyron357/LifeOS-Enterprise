@@ -136,6 +136,19 @@ describe("Workspace OS Command Center", () => {
     expect(stored.reducedMotion).toBe(true);
   });
 
+  it("persists layout changes after restore and local-storage recovery", async () => {
+    render(<CommandCenterWorkspace data={data} github={github} />);
+    fireEvent.click(await screen.findByRole("button", { name: /restore default layout/i }));
+    expect(screen.getByText(/default layout restored/i)).toBeInTheDocument();
+
+    const stored = parseWorkspaceLayout(window.localStorage.getItem(LAYOUT_STORAGE_KEY));
+    expect(stored.layouts.md.some((item) => item.x > 0)).toBe(true);
+
+    window.localStorage.setItem(LAYOUT_STORAGE_KEY, "{bad");
+    const recovered = parseWorkspaceLayout(window.localStorage.getItem(LAYOUT_STORAGE_KEY));
+    expect(recovered.layouts.lg.length).toBe(stored.layouts.lg.length);
+  });
+
   it("keeps mobile stacked mode free of horizontal overflow wrappers", async () => {
     Object.defineProperty(window, "matchMedia", {
       writable: true,
