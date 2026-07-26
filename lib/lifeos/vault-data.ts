@@ -47,7 +47,7 @@ function isDue(date: string, today: string) {
   return Boolean(date) && date <= today;
 }
 
-function isLiveProject(note: { title: string; path: string; type?: string; section?: string }) {
+function isLiveProject(note: { title: string; path: string; type?: string | null; section?: string | null }) {
   const normalizedPath = note.path.toLowerCase();
   const isProject = note.type === "project" || note.section === "projects";
   const isTemplate = note.section === "templates" || normalizedPath.includes("/templates/") || normalizedPath.startsWith("templates/") || normalizedPath.startsWith("99 templates/");
