@@ -1,16 +1,17 @@
 .boardShell { display:grid; gap:14px; }
 .boardHeader { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; padding:22px; border:1px solid var(--line); border-left:2px solid var(--cyan); background:linear-gradient(145deg,rgba(15,23,34,.96),rgba(7,11,17,.98)); }
-.boardHeader h2,.column h3,.reviewPanel h3 { margin:0; font-family:Arial,Helvetica,sans-serif; }
-.boardHeader p { max-width:680px; margin:8px 0 0; color:var(--muted); font-size:.67rem; line-height:1.6; }
+.boardHeader h2,.column h3,.reviewPanel h3,.packagePanel h3 { margin:0; font-family:Arial,Helvetica,sans-serif; }
+.boardHeader p,.packagePanel p { max-width:680px; margin:8px 0 0; color:var(--muted); font-size:.67rem; line-height:1.6; }
 .boardActions,.reviewActions { display:flex; flex-wrap:wrap; gap:8px; }
 .boardActions button,.reviewActions button,.card button { min-height:38px; border:1px solid var(--line); color:var(--text); background:rgba(53,231,255,.04); padding:0 12px; font:700 .58rem ui-monospace,monospace; letter-spacing:.06em; text-transform:uppercase; cursor:pointer; }
 .boardActions button:hover,.reviewActions button:hover,.card button:hover { border-color:var(--line-hot); }
+.boardActions button:disabled,.reviewActions button:disabled { opacity:.45; cursor:not-allowed; }
 .primaryAction { color:#041014!important; border-color:var(--cyan)!important; background:var(--cyan)!important; }
 .board { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
 .column { min-height:280px; padding:14px; border:1px solid var(--line); background:rgba(7,11,17,.76); }
 .column[data-over="true"] { border-color:var(--cyan); background:rgba(53,231,255,.07); }
 .columnHeader { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--line); }
-.columnHeader h3 { font-size:.88rem; }
+.columnHeader h3 { font-size:.88rem; text-transform:capitalize; }
 .columnHeader span { color:var(--cyan); font-size:.61rem; }
 .cardList { display:grid; gap:8px; }
 .card { display:grid; gap:9px; padding:12px; border:1px solid var(--line); background:linear-gradient(145deg,rgba(15,23,34,.98),rgba(8,12,18,.98)); cursor:grab; }
@@ -21,14 +22,22 @@
 .card small { color:var(--muted); font-size:.58rem; line-height:1.5; }
 .badge { flex:0 0 auto; padding:4px 6px; border:1px solid var(--line); color:var(--cyan); font-size:.5rem; text-transform:uppercase; }
 .cardControls { display:grid; grid-template-columns:1fr auto; gap:7px; }
-.cardControls select { min-width:0; min-height:36px; border:1px solid var(--line); color:var(--text); background:#070b11; padding:0 9px; font:650 .58rem ui-monospace,monospace; }
-.reviewPanel { display:grid; gap:14px; padding:20px; border:1px solid rgba(255,182,77,.38); background:rgba(255,182,77,.055); }
-.reviewPanel[hidden] { display:none; }
+.cardControls select,.editor select { min-width:0; min-height:36px; border:1px solid var(--line); color:var(--text); background:#070b11; padding:0 9px; font:650 .58rem ui-monospace,monospace; }
+.editor { display:grid; gap:10px; padding-top:10px; border-top:1px solid var(--line); cursor:default; }
+.editor label { display:grid; gap:6px; color:var(--muted); font-size:.55rem; letter-spacing:.07em; text-transform:uppercase; }
+.editor textarea,.packagePanel textarea { width:100%; resize:vertical; border:1px solid var(--line); color:var(--text); background:#070b11; padding:10px; font:600 .61rem/1.55 ui-monospace,monospace; }
+.editor textarea:focus,.packagePanel textarea:focus { outline:2px solid var(--cyan); outline-offset:1px; }
+.reviewPanel,.packagePanel { display:grid; gap:14px; padding:20px; border:1px solid rgba(255,182,77,.38); background:rgba(255,182,77,.055); }
+.packagePanel { border-color:rgba(53,231,255,.36); background:rgba(53,231,255,.045); }
+.reviewPanel[hidden],.packagePanel[hidden] { display:none; }
 .reviewList { display:grid; gap:7px; }
 .reviewItem { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; padding:11px; border:1px solid var(--line); background:rgba(7,11,17,.72); }
 .reviewItem strong,.reviewItem small { display:block; }
-.reviewItem small { margin-top:4px; color:var(--muted); font-size:.58rem; }
+.reviewItem small { margin-top:4px; color:var(--muted); font-size:.58rem; overflow-wrap:anywhere; }
+.validation { padding:12px; border:1px solid rgba(255,83,104,.42); background:rgba(255,83,104,.07); }
+.validation strong { color:var(--red); font-size:.68rem; text-transform:uppercase; }
+.validation p { margin:7px 0 0; color:#ffc1c8; font-size:.61rem; line-height:1.45; }
 .statusMessage { margin:0; color:var(--green); font-size:.62rem; }
 .empty { color:var(--muted); font-size:.62rem; }
 @media (max-width:1100px) { .board { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-@media (max-width:680px) { .boardHeader { display:grid; } .board { grid-template-columns:1fr; } .column { min-height:180px; } .cardControls { grid-template-columns:1fr; } }
+@media (max-width:680px) { .boardHeader { display:grid; } .board { grid-template-columns:1fr; } .column { min-height:180px; } .cardControls { grid-template-columns:1fr; } .reviewItem { grid-template-columns:1fr; } }
