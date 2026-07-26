@@ -47,6 +47,15 @@ function isDue(date: string, today: string) {
   return Boolean(date) && date <= today;
 }
 
+function isLiveProject(note: { title: string; path: string; type?: string; section?: string }) {
+  const normalizedPath = note.path.toLowerCase();
+  const isProject = note.type === "project" || note.section === "projects";
+  const isTemplate = note.section === "templates" || normalizedPath.includes("/templates/") || normalizedPath.startsWith("templates/") || normalizedPath.startsWith("99 templates/");
+  const hasPlaceholderTitle = /\{\{[^}]+\}\}/.test(note.title);
+
+  return isProject && !isTemplate && !hasPlaceholderTitle;
+}
+
 export async function getVaultDashboardData(now = new Date()): Promise<VaultDashboardData> {
   const today = now.toISOString().slice(0, 10);
   const [index, growthAreaSource, growthGoalSource] = await Promise.all([
@@ -56,7 +65,7 @@ export async function getVaultDashboardData(now = new Date()): Promise<VaultDash
   ]);
 
   const projects: ProjectBrief[] = index.notes
-    .filter((note) => note.type === "project" || note.section === "projects")
+    .filter(isLiveProject)
     .map((note) => ({
       name: note.title,
       path: note.path,
