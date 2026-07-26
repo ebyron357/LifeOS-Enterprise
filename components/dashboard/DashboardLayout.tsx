@@ -3,17 +3,25 @@ import { AIStatus } from "@/components/widgets/AIStatus";
 import { MorningBrief } from "@/components/widgets/MorningBrief";
 import { PersonalGrowthWidget } from "@/components/widgets/PersonalGrowthWidget";
 import { InteractiveCommandCenter } from "@/components/dashboard/InteractiveCommandCenter";
-import { LifeOSNavigation } from "@/components/dashboard/LifeOSNavigation";
+import { DashboardQuickActions } from "@/components/dashboard/DashboardQuickActions";
+import { PortalSidebar } from "@/components/shell/PortalSidebar";
 import { CognitiveSupportCenter } from "@/components/dashboard/CognitiveSupportCenter";
 import type { VaultDashboardData } from "@/lib/lifeos/types";
 import { GitHubHealth } from "@/components/widgets/GitHubHealth";
 import type { GitHubHealthData } from "@/lib/github/health";
 import type { RevenueRadarData } from "@/lib/google/revenue";
 import { RevenueRadar } from "@/components/widgets/RevenueRadar";
+import type { VaultSection } from "@/lib/vault/types";
 
-type DashboardLayoutProps = { widgets: readonly WidgetDefinition[]; data: VaultDashboardData; github: GitHubHealthData; revenue?: RevenueRadarData };
+type DashboardLayoutProps = {
+  widgets: readonly WidgetDefinition[];
+  data: VaultDashboardData;
+  github: GitHubHealthData;
+  revenue?: RevenueRadarData;
+  counts?: Partial<Record<VaultSection, number>>;
+};
 
-export function DashboardLayout({ widgets, data, github, revenue }: DashboardLayoutProps) {
+export function DashboardLayout({ widgets, data, github, revenue, counts }: DashboardLayoutProps) {
   const today = new Intl.DateTimeFormat("en-US", {
     weekday: "long", month: "long", day: "numeric",
   }).format(new Date());
@@ -21,9 +29,19 @@ export function DashboardLayout({ widgets, data, github, revenue }: DashboardLay
 
   return (
     <div className="lifeos-app">
-      <LifeOSNavigation projects={data.projects} activeProjects={data.activeProjects} reviewsDue={data.reviewsDue} />
+      <a className="skip-link" href="#main-content">Skip to main content</a>
+      <PortalSidebar
+        counts={counts}
+        dashboardActions={(
+          <DashboardQuickActions
+            projects={data.projects}
+            activeProjects={data.activeProjects}
+            reviewsDue={data.reviewsDue}
+          />
+        )}
+      />
 
-      <main className="dashboard-shell">
+      <main id="main-content" className="dashboard-shell" tabIndex={-1}>
         <section id="overview" className="app-section">
           <nav className="command-bar" aria-label="LifeOS command status">
             <div className="command-brand"><span className="brand-mark">L</span><strong>LIVE INTELLIGENCE</strong><em>Verified vault signals</em></div>

@@ -5,6 +5,7 @@ import type { ProjectBrief } from "@/lib/lifeos/types";
 const projects: ProjectBrief[] = [
   {
     name: "Ship LifeOS",
+    path: "Projects/Ship LifeOS.md",
     status: "active",
     priority: "P0",
     business: "LifeOS",
@@ -15,6 +16,7 @@ const projects: ProjectBrief[] = [
   },
   {
     name: "Blocked Ops",
+    path: "Projects/Blocked Ops.md",
     status: "blocked",
     priority: "P1",
     business: "LifeOS",
@@ -25,6 +27,7 @@ const projects: ProjectBrief[] = [
   },
   {
     name: "Waiting Partner",
+    path: "Projects/Waiting Partner.md",
     status: "waiting",
     priority: "P2",
     business: "LifeOS",

@@ -127,3 +127,10 @@ Update `docs/VAULT_REPAIR_REPORT.md` with:
 - Any remaining credential-only or local-UI-only actions
 
 Only declare completion when the vault passes validation and the Daily Command Center is operational.
+
+## Web vault portal
+
+- The read-only web portal is documented in `docs/WEB_VAULT_PORTAL.md`.
+- Agent operating rules for Cursor, Claude Code, and Codex live in `docs/WEB_AGENT_OPERATIONS.md`.
+- Privacy exclusions are canonical in `lib/vault/exclusions.ts`.
+- The executive dashboard at `/dashboard` must remain operational when portal routes change.

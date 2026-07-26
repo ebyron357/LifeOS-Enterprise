@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { ProjectBrief } from "@/lib/lifeos/types";
+import { noteHref } from "@/lib/vault/slug";
 
 type WorkMode = "explore" | "decide" | "execute" | "teach";
 type StatusFilter = "all" | "red" | "yellow" | "green";
@@ -84,7 +86,7 @@ export function InteractiveCommandCenter({ projects }: { projects: ProjectBrief[
                 <div className="project-health-card" key={project.name}>
                   <span className={`health-light health-light--${state}`} aria-label={`${state} status`} />
                   <div>
-                    <strong>{project.name}</strong>
+                    <strong><Link href={noteHref(project.path)}>{project.name}</Link></strong>
                     <small>{project.nextAction}</small>
                   </div>
                   <div className="project-meta">
@@ -105,7 +107,7 @@ export function InteractiveCommandCenter({ projects }: { projects: ProjectBrief[
           <div className="needs-list">
             {needsYou.slice(0, 4).map((project) => (
               <div key={project.name}>
-                <strong>{project.name}</strong>
+                <strong><Link href={noteHref(project.path)}>{project.name}</Link></strong>
                 <small>{project.blocker || project.waitingOn || "Review required"}</small>
               </div>
             ))}

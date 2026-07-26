@@ -1,5 +1,6 @@
 export type ProjectBrief = {
   name: string;
+  path: string;
   status: string;
   priority: string;
   business: string;
