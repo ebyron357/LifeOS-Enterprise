@@ -1,78 +1,70 @@
 # LifeOS Interactive Implementation Checklist
 
-**Companion:** `docs/INTERACTIVE_VISUAL_VOICE_ARCHITECTURE.md`  
-**Visual V1 branch:** `feat/lifeos-interactive-visual-v1`  
-**Foundation tip included:** `8e2006b`  
-**Hard rules:** No direct `main` writes · no auto-merge · no Supabase/DB · no client secrets · preserve accessibility · professional AI command-center tone.
+**Companion docs:** `docs/INTERACTIVE_VISUAL_VOICE_ARCHITECTURE.md`, `docs/VOICE_ARCHITECTURE.md`  
+**Verbal V1 branch:** `feat/lifeos-verbal-audio-v1`  
+**Started from Visual V1 tip:** `646e67c` (PR #38 still draft / unmerged)  
+**Hard rules:** No direct `main` writes · no auto-merge · no Supabase/DB · no client secrets · voice optional · professional AI command-center tone.
 
 ---
 
 ## Phase 0 — Repository integrity
 
-- [x] Confirm production `main` tip (`ae23a0b`).
-- [x] Confirm foundation branch exists and was **not** merged.
-- [x] Continue from foundation tip for Visual V1.
-- [ ] Integrate Interactive Operations V2 (`1a00287`) before production write enablement.
-- [x] Update `docs/THIRD_PARTY.md` for new runtime dependencies.
+- [x] Inspected `main` (`ae23a0b`).
+- [x] Confirmed Interactive Visual System V1 PR #38 is **not merged** (still draft).
+- [x] Continued from newest interactive tip `feat/lifeos-interactive-visual-v1` @ `646e67c`.
+- [ ] Integrate Interactive Operations V2 before production write enablement.
+- [x] Update third-party attribution for voice deps.
 
 ---
 
-## Phase 1: Motion and interaction foundation
+## Phase 1–2 — Visual foundation
 
-- [x] Keep / deepen `motion` via reusable primitives (`components/motion/*`, `lib/motion/*`).
-- [x] Respect OS reduced-motion, LifeOS toggle, overload mode.
-- [x] Subtle springs only; no blocking / playful motion.
-- [x] Upgrade board DnD with `@dnd-kit/*` (keyboard + touch + overlay + announcements).
-- [x] Preserve staging / approval / draft-PR governance.
-- [x] Centralized interaction feedback (staged ≠ saved).
-- [x] Lint / typecheck / test / build green on Visual V1 tip.
+- [x] Completed on Visual V1 branch (motion, dnd-kit, command map).
 
 ---
 
-## Phase 2: Interactive command map
+## Phase 3 — Voice and audio console
 
-- [x] Install `@xyflow/react@12.11.2`.
-- [x] Real vault-derived graph (`lib/command-map/build-command-map.ts`).
-- [x] Toolbar: search, entity/status/project filters, focus mode, fit/reset.
-- [x] Details panel + legend + keyboard list + mobile fallback.
-- [x] No editing/connect controls.
-- [x] Board ↔ Map switch in OperationsSurface.
-- [x] Tests for graph integrity / filters / empty warning.
-
----
-
-## Phase 3: Voice and audio console
-
-- [ ] Deferred (no audio in Visual V1).
+- [x] XState voice state machine with required states/transitions.
+- [x] Provider abstraction (`browser` default, LiveKit stub).
+- [x] Voice console UI: controls, transcript, status, confirmation, settings, visualizer, presence.
+- [x] Push-to-talk only (no wake word).
+- [x] Read-only commands against real vault data.
+- [x] Write commands require confirmation + staging governance.
+- [x] Session + tools API routes (no permanent keys to client).
+- [x] Locale fields prepared for en/ht/fr (English verified only).
+- [x] Safe degrade without credentials.
+- [x] Tests for machine, commands, tools, security, transcripts.
 
 ---
 
-## Phase 4: Animated command presence
+## Phase 4 — Animated command presence
 
-- [ ] Deferred (Rive not installed).
-
----
-
-## Phase 5: Accessibility and quality validation
-
-- [x] Keyboard sensors / selects / focus-visible styles.
-- [x] Reduced-motion preference tests.
-- [x] Non-color map signals (shape + label + status text).
-- [x] Overload/motion coupling.
-- [ ] Broader assistive-tech manual pass on preview deployment.
+- [x] CSS abstract presence responsive to voice states.
+- [x] Optional Rive loader installed; no proprietary asset required.
+- [x] Listening indicator never active when mic inactive.
 
 ---
 
-## Phase 6: Production configuration
+## Phase 5 — Accessibility / quality
 
-- [ ] Draft PR opened for Visual V1 (do not merge until reviewed).
-- [ ] V2 persistence integration still required before write activation.
-- [ ] No database introduced.
+- [x] Keyboard shortcuts, transcripts, optional audio.
+- [x] Lint / typecheck / unit tests.
+- [ ] Preview CI + broader assistive-tech pass.
 
 ---
 
-## Exact next implementation step
+## Phase 6 — Production configuration
 
-1. Review/merge Visual V1 draft PR after human approval (or iterate on preview feedback).  
-2. Integrate Interactive Operations V2 into this line.  
-3. Begin Phase 3 voice console only after Visual V1 is accepted.
+- [x] `.env.example` placeholders for voice providers.
+- [ ] Owner supplies LiveKit/OpenAI/ElevenLabs credentials for realtime verification.
+- [ ] Draft PR opened (do not merge until reviewed).
+
+---
+
+## Exact next production step
+
+1. Open/review Verbal Audio V1 draft PR.  
+2. Supply preview env credentials if LiveKit realtime validation is required.  
+3. Integrate Interactive Ops V2 before enabling write staging in production.  
+4. Merge Visual V1 + Verbal V1 only after human approval (no auto-merge).
