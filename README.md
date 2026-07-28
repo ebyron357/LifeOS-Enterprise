@@ -91,6 +91,9 @@ Community plugins are optional. Add Templater, QuickAdd, Tasks, Calendar, or Dat
 - `architecture/METADATA_SCHEMA.md` — property contract
 - `docs/OBSIDIAN_SETUP.md` — exact setup instructions
 - `docs/LifeOS_Specification_v1.md` — operating specification
+- `docs/DEPLOYMENT.md` — production deployment and env matrix
+- `docs/RELEASE_NOTES_v1.md` — v1.0 release notes
+- `CHANGELOG.md` — version history
 - `scripts/setup-obsidian.ps1` — non-destructive local setup
 - `scripts/audit-vault.ps1` — structural and metadata validation
 - `app/dashboard/page.tsx` — executive overview and command center
@@ -115,10 +118,10 @@ Motion respects OS reduced-motion, the Workspace OS reduced-motion toggle, and o
 The same operations surface includes the **Voice console**:
 
 - Push-to-talk (Alt+V), stop audio (Esc), transcript, confirmation for write staging
-- Browser speech fallback by default; LiveKit/OpenAI/ElevenLabs are optional and server-configured
-- Voice is optional — missing credentials must not break the dashboard
+- Browser speech when `LIFEOS_VOICE_ENABLED=true`; LiveKit room minting is deferred and not advertised as ready
+- Voice is optional — disabled by default; missing credentials must not break the dashboard
 
-See `docs/VOICE_ARCHITECTURE.md` and `.env.example`.
+See `docs/VOICE_ARCHITECTURE.md`, `docs/DEPLOYMENT.md`, and `.env.example`.
 
 ## Definition of Done
 

@@ -96,7 +96,6 @@ export function VoiceConsole({
   useEffect(() => {
     let cancelled = false;
     async function boot() {
-      send({ type: "ENABLE" });
       try {
         const response = await fetch("/api/lifeos/voice/session", { cache: "no-store" });
         const payload = await response.json() as {
@@ -105,17 +104,25 @@ export function VoiceConsole({
           configured?: boolean;
         };
         if (cancelled) return;
+        if (!payload.configured || payload.provider === "none") {
+          setProvider("none");
+          setSessionMessage(payload.reason || "Voice is disabled. Written LifeOS interaction remains available.");
+          transportRef.current = createBrowserVoiceTransport();
+          send({ type: "DISABLE" });
+          return;
+        }
+        send({ type: "ENABLE" });
         const nextProvider = payload.provider || "browser";
         setProvider(nextProvider);
         setSessionMessage(payload.reason || sessionMessage);
-        transportRef.current = selectVoiceTransport(nextProvider === "none" ? "browser" : nextProvider) || createBrowserVoiceTransport();
+        transportRef.current = selectVoiceTransport(nextProvider) || createBrowserVoiceTransport();
         send({ type: "CONNECTED" });
       } catch {
         if (cancelled) return;
-        setProvider("browser");
+        setProvider("none");
         transportRef.current = createBrowserVoiceTransport();
-        setSessionMessage("Voice session endpoint unavailable. Browser speech fallback remains usable.");
-        send({ type: "CONNECTED" });
+        setSessionMessage("Voice session endpoint unavailable. Written LifeOS interaction remains available.");
+        send({ type: "DISABLE" });
       }
     }
     void boot();

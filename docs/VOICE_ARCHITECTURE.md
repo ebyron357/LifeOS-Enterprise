@@ -1,52 +1,50 @@
 # LifeOS Voice Architecture (Verbal + Audio V1)
 
-**Status:** Code complete with browser fallback; provider credentials optional  
-**Branch:** `feat/lifeos-verbal-audio-v1`  
-**Started from:** `feat/lifeos-interactive-visual-v1` @ `646e67c`  
-**Note:** Interactive Visual System V1 PR #38 was **not merged** to `main` at implementation time. This branch continues from that newest verified interactive tip. Production `main` remains `ae23a0b`.
+**Status:** Production-ready for browser speech (opt-in)  
+**Release:** LifeOS Enterprise v1.0  
+**Integration branch:** `release/v1.0-visual-voice-integration` (onto `main` after Workspace OS + Ops V2)
 
-## Architecture selected
-
-Provider-abstracted stack:
+## Architecture
 
 ```text
 VoiceConsole (UI)
   ├─ XState voice machine (explicit states/transitions)
-  ├─ Transport adapter (browser | livekit stub)
+  ├─ Browser speech transport (Web Speech API)
   ├─ Command parser (deterministic, locale-ready)
   ├─ Tool registry (read/write classification)
   └─ Temporary in-browser transcript (not vault-persisted)
 
 Server:
-  GET  /api/lifeos/voice/session  → ephemeral session metadata (no permanent keys)
+  GET  /api/lifeos/voice/session  → ephemeral HMAC session metadata (no permanent keys)
   POST /api/lifeos/voice/tools   → validated tool execution
+
+Command Board:
+  listens for `lifeos-voice-staged-change` and applies browser drafts
 ```
 
 ## Providers implemented
 
 | Layer | V1 implementation |
 |-------|-------------------|
-| Realtime transport | Browser default; LiveKit adapter stub when env present |
+| Realtime transport | Browser only |
 | Speech-to-text | Web Speech Recognition API |
 | Language model | Deterministic command parser (no free-form tool calling) |
-| Text-to-speech | Web Speech Synthesis (existing brief path compatible) |
-| Optional TTS vendors | Env placeholders only (`OPENAI_API_KEY`, `ELEVENLABS_API_KEY`) — not client-bundled |
-| Presence | CSS abstract presence; optional Rive loader if asset provided |
-| Waveform library | Not required for V1 replay (re-speak last utterance) |
+| Text-to-speech | Web Speech Synthesis |
+| LiveKit | Credentials may be present; **room tokens are not minted**; provider is **not** advertised as ready |
+| Presence | CSS abstract presence |
 
 ## Security model
 
+- `LIFEOS_VOICE_ENABLED=true` required to enable the console
 - Permanent provider keys never sent to the browser
+- When `LIFEOS_VOICE_SESSION_SECRET` is set, session tokens are HMAC-signed with 1-hour expiry
 - Write tools require `LIFEOS_WRITE_ENABLED` + `LIFEOS_WRITE_SECRET`
 - Write actions require explicit confirmation UI + spoken confirm
 - Staging only (`proposal-only`) — never direct `main`
+- Voice staging events update the Command Board approval package in-browser
 - Rate limits on session + tool routes
 - Transcripts marked temporary; no silent audio storage
 - Wake-word / hands-free listening disabled
-
-## Tool registry
-
-Registered tools live in `lib/voice/tools.ts`. Only those tools may execute. Inputs are validated server-side for write tools and locally for read helpers.
 
 ## Accessibility
 
@@ -54,7 +52,6 @@ Registered tools live in `lib/voice/tools.ts`. Only those tools may execute. Inp
 - Keyboard: Alt+V push-to-talk, Esc stop
 - Transcript always available with role labels
 - Reduced-motion / high-contrast compatible presence + visualizer
-- Overload mode still owned by cognitive support module
 
 ## Language preparation
 
@@ -63,21 +60,9 @@ Registered tools live in `lib/voice/tools.ts`. Only those tools may execute. Inp
 ## Failure / fallback order
 
 1. Written UI (always)
-2. Browser speech synthesis / recognition when available
-3. LiveKit realtime when configured (token mint deferred until hardened)
-4. Clear disabled/error states when unsupported
+2. Browser speech when `LIFEOS_VOICE_ENABLED=true` and Web Speech is available
+3. Clear disabled/error states when unsupported
 
-## Configuration required
+## Configuration
 
-See `.env.example`. Missing config must not break `/dashboard`.
-
-## Status board
-
-| Gate | Status |
-|------|--------|
-| Code complete | Yes |
-| Tests complete | Yes (local) |
-| Configuration required | Yes for LiveKit / write voice staging |
-| Credentials required | Yes for production realtime + write auth |
-| Provider validation required | Yes before claiming live LiveKit |
-| Production verified | No |
+See `.env.example` and `docs/DEPLOYMENT.md`.

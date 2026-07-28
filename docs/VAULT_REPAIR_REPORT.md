@@ -272,3 +272,40 @@ Remaining credential/local-UI-only actions:
 - Authenticate Vercel MCP/CLI in desktop Cursor if project settings need a live API audit beyond homepage/header evidence
 - After merge, confirm production serves `/resources`, `/search`, and `/robots.txt`
 - Obsidian local visual acceptance of Bases/Dataview unchanged from prior closeout
+
+---
+
+## v1.0 integration closeout (2026-07-28)
+
+### Repairs / integrations completed
+
+- Rebased Interactive Visual System V1 and Verbal Audio V1 onto current `main` (Workspace OS V1 + Interactive Operations V2 preserved)
+- Hardened voice session tokens (HMAC + expiry)
+- Gated voice console behind `LIFEOS_VOICE_ENABLED=true`
+- Wired voice staging events into the Command Board
+- Removed unused LiveKit/Rive runtime dependencies from the v1.0 ship set
+- Added `CHANGELOG.md`, `docs/RELEASE_NOTES_v1.md`, `docs/DEPLOYMENT.md`
+- Bumped dashboard package to `1.0.0`
+
+### Validation evidence (integration branch)
+
+| Check | Result |
+|-------|--------|
+| Cherry-pick Visual + Voice onto `main` | PASS (no conflicts) |
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 84+ |
+| `npm run build` | PASS — Next.js 16.1.6 |
+| `pwsh ./scripts/audit-vault.ps1` | PASS |
+| Ops V2 conflict detection retained | Confirmed in change-plan route |
+
+### Final pass/fail
+
+**PASS** for LifeOS Enterprise v1.0 release candidate on integration branch, pending merge to `main` and production deploy confirmation.
+
+Remaining external / credential-only actions:
+
+- Human merge of release PR to `main`
+- Confirm Vercel production promotion
+- Intentionally enable `LIFEOS_WRITE_ENABLED` / `LIFEOS_VOICE_ENABLED` only when desired
+- Optional LiveKit room-token work deferred to a post-1.0 release

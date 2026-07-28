@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -229,6 +229,72 @@ export function InteractiveCommandCenter({ projects }: { projects: ProjectBrief[
     useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }),
     useSensor(KeyboardSensor),
   );
+
+  useEffect(() => {
+    function onVoiceStagedChange(event: Event) {
+      const detail = (event as CustomEvent<{
+        changes?: Array<{
+          project: string;
+          path?: string;
+          fields: Array<{ field: string; from?: string; to: string }>;
+        }>;
+      }>).detail;
+      const staged = detail?.changes;
+      if (!Array.isArray(staged) || staged.length === 0) return;
+
+      const patches: Array<{ name: string; patch: DraftEdit }> = [];
+      for (const change of staged) {
+        const project = projects.find(
+          (item) => item.name === change.project || item.path === change.path,
+        );
+        if (!project || !Array.isArray(change.fields)) continue;
+        const patch: DraftEdit = {};
+        for (const field of change.fields) {
+          if (field.field === "status" && boardStatuses.includes(field.to as BoardStatus)) {
+            patch.status = field.to as BoardStatus;
+          }
+          if (field.field === "priority" && priorities.includes(field.to as Priority)) {
+            patch.priority = field.to as Priority;
+          }
+          if (field.field === "next_action") {
+            patch.nextAction = field.to;
+          }
+        }
+        if (Object.keys(patch).length) patches.push({ name: project.name, patch });
+      }
+      if (!patches.length) return;
+
+      setDrafts((previous) => {
+        const updated = { ...previous };
+        for (const { name, patch } of patches) {
+          const project = projects.find((item) => item.name === name);
+          if (!project) continue;
+          const current = { ...updated[name], ...patch };
+          const unchanged = (current.status === undefined || current.status === normalizedStatus(project))
+            && (current.priority === undefined || current.priority === normalizedPriority(project))
+            && (current.nextAction === undefined || current.nextAction.trim() === (project.nextAction ?? "").trim());
+          if (unchanged) delete updated[name];
+          else updated[name] = current;
+        }
+        return updated;
+      });
+
+      window.dispatchEvent(new CustomEvent("lifeos-operations-view", { detail: { view: "board" } }));
+      setReviewOpen(true);
+      const text = "Voice staging applied to the Command Board. Canonical vault files remain unchanged.";
+      setMessage(text);
+      setAnnouncement(text);
+      feedback.push({
+        kind: "staging",
+        title: "Voice change staged on board",
+        detail: text,
+        persistence: "browser-only",
+      });
+    }
+
+    window.addEventListener("lifeos-voice-staged-change", onVoiceStagedChange);
+    return () => window.removeEventListener("lifeos-voice-staged-change", onVoiceStagedChange);
+  }, [feedback, projects]);
 
   const visible = useMemo(
     () => projects.filter((project) => filter === "all" || health(project) === filter),

@@ -17,7 +17,7 @@ export type VoiceState =
 
 export type VoiceLocale = "en" | "ht" | "fr";
 
-export type VoiceProviderId = "browser" | "livekit" | "none";
+export type VoiceProviderId = "browser" | "none";
 
 export type TranscriptRole = "user" | "lifeos" | "system" | "tool" | "confirmation" | "error";
 

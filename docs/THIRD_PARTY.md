@@ -20,10 +20,15 @@ LifeOS Enterprise includes original application code plus open-source dependenci
 | `@xyflow/react` | MIT | Interactive command map (exploration only) |
 | `xstate` | MIT | Voice interaction state machine |
 | `@xstate/react` | MIT | React bindings for voice machine |
-| `livekit-client` | Apache-2.0 | Optional realtime transport (configured only) |
-| `@rive-app/react-canvas` | MIT | Optional animated presence (CSS fallback default) |
 
 Full license texts are distributed with each package under `node_modules/<package>/LICENSE` (or equivalent) after `npm ci`.
+
+## Reserved / not shipped in v1.0 runtime
+
+| Package | Notes |
+|---------|-------|
+| `livekit-client` | Documented for a future realtime transport; not a v1.0 dependency |
+| `@rive-app/react-canvas` | Optional presence animation deferred; CSS presence ships in v1.0 |
 
 ## Reference projects
 

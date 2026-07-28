@@ -16,7 +16,7 @@ export type SpeechRecognitionEventLike = {
 };
 
 export type VoiceTransport = {
-  id: "browser" | "livekit";
+  id: "browser";
   requestPermission: () => Promise<boolean>;
   startListening: (handlers: {
     onInterim: (text: string) => void;
@@ -116,33 +116,9 @@ export function createBrowserVoiceTransport(): VoiceTransport {
 }
 
 /**
- * LiveKit transport adapter.
- * V1 registers the provider and only connects when server session config is present.
- * Without credentials, callers must stay on the browser transport.
+ * V1 always uses browser speech. LiveKit remains a documented future transport.
  */
-export function createLiveKitVoiceTransportStub(): VoiceTransport {
-  return {
-    id: "livekit",
-    async requestPermission() {
-      return createBrowserVoiceTransport().requestPermission();
-    },
-    async startListening() {
-      throw new Error("LiveKit realtime listening requires server configuration and an active session token.");
-    },
-    stopListening() {},
-    speak(text, opts) {
-      // Fall back to browser TTS for spoken output when LiveKit TTS path is not wired.
-      createBrowserVoiceTransport().speak(text, opts);
-    },
-    stopSpeaking() {
-      createBrowserVoiceTransport().stopSpeaking();
-    },
-    disconnect() {},
-  };
-}
-
 export function selectVoiceTransport(provider: "browser" | "livekit" | "none"): VoiceTransport | null {
   if (provider === "none") return null;
-  if (provider === "livekit") return createLiveKitVoiceTransportStub();
   return createBrowserVoiceTransport();
 }

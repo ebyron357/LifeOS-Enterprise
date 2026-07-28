@@ -1,24 +1,21 @@
 # LifeOS Interactive Visual + Voice Architecture
 
-**Status:** Interactive Visual System V1 implemented; Verbal + Audio V1 implemented on successor branch  
-**Date:** 2026-07-27 (updated 2026-07-28)  
+**Status:** Integrated for LifeOS Enterprise v1.0  
+**Date:** 2026-07-28  
 **Repository:** `ebyron357/LifeOS-Enterprise`  
-**Visual V1 branch:** `feat/lifeos-interactive-visual-v1` (PR #38 draft; **not merged** at Verbal V1 start)  
-**Verbal V1 branch:** `feat/lifeos-verbal-audio-v1`  
-**Foundation branch (unmerged):** `feat/lifeos-interactive-voice-foundation` @ `8e2006b`  
-**Production `main`:** `ae23a0b459b81e9c2405fa75736bd2f22b8240e1` (Interactive Operations V1)
+**Integration branch:** `release/v1.0-visual-voice-integration`  
+**Base:** current `main` (Workspace OS V1 #37 + Interactive Operations V2 #36)
 
 ---
 
 ## 1. Verified source of truth
 
-| Source | Tip | Notes |
-|--------|-----|-------|
-| Production `main` | `ae23a0b` | Unchanged by this phase |
-| Foundation docs branch | `8e2006b` | Architecture + checklist only; **not merged** |
-| Visual V1 implementation | `feat/lifeos-interactive-visual-v1` | Continues from foundation tip |
-| Workspace OS PR #37 | `faa6897` | Included via foundation ancestry |
-| Interactive Ops V2 PR #36 | `1a00287` | Still open / diverged — integrate before write enablement |
+| Source | Status | Notes |
+|--------|--------|-------|
+| Production `main` | Canonical | Includes Workspace OS + Ops V2 persistence |
+| Visual V1 | Integrated | Cherry-picked onto latest `main` |
+| Verbal V1 | Integrated | Cherry-picked onto Visual tip |
+| Interactive Ops V2 | Merged (#36) | Conflict-safe draft-PR persistence; writes remain default-deny |
 
 ---
 
