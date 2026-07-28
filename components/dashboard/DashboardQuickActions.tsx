@@ -24,6 +24,14 @@ export function DashboardQuickActions({ projects, activeProjects, reviewsDue }: 
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
+    function onOpenCapture() {
+      setPanelOpen(true);
+    }
+    window.addEventListener("lifeos-open-quick-capture", onOpenCapture);
+    return () => window.removeEventListener("lifeos-open-quick-capture", onOpenCapture);
+  }, []);
+
+  useEffect(() => {
     if (!panelOpen) return;
 
     closeButtonRef.current?.focus();
