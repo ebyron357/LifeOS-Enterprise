@@ -110,6 +110,16 @@ On `/dashboard`, the project operations widget supports:
 
 Motion respects OS reduced-motion, the Workspace OS reduced-motion toggle, and overload mode. Board edits remain browser-staged proposals; canonical vault writes still require the authenticated draft-PR workflow. See `docs/INTERACTIVE_VISUAL_VOICE_ARCHITECTURE.md` and `docs/INTERACTIVE_IMPLEMENTATION_CHECKLIST.md`.
 
+### Verbal + Audio V1
+
+The same operations surface includes the **Voice console**:
+
+- Push-to-talk (Alt+V), stop audio (Esc), transcript, confirmation for write staging
+- Browser speech fallback by default; LiveKit/OpenAI/ElevenLabs are optional and server-configured
+- Voice is optional — missing credentials must not break the dashboard
+
+See `docs/VOICE_ARCHITECTURE.md` and `.env.example`.
+
 ## Definition of Done
 
 The vault is operational when it can answer these questions in under one minute:

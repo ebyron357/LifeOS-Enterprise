@@ -1,9 +1,10 @@
 # LifeOS Interactive Visual + Voice Architecture
 
-**Status:** Interactive Visual System V1 implemented on feature branch (voice still deferred)  
+**Status:** Interactive Visual System V1 implemented; Verbal + Audio V1 implemented on successor branch  
 **Date:** 2026-07-27 (updated 2026-07-28)  
 **Repository:** `ebyron357/LifeOS-Enterprise`  
-**Visual V1 branch:** `feat/lifeos-interactive-visual-v1`  
+**Visual V1 branch:** `feat/lifeos-interactive-visual-v1` (PR #38 draft; **not merged** at Verbal V1 start)  
+**Verbal V1 branch:** `feat/lifeos-verbal-audio-v1`  
 **Foundation branch (unmerged):** `feat/lifeos-interactive-voice-foundation` @ `8e2006b`  
 **Production `main`:** `ae23a0b459b81e9c2405fa75736bd2f22b8240e1` (Interactive Operations V1)
 

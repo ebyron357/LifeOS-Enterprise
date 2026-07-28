@@ -18,6 +18,10 @@ LifeOS Enterprise includes original application code plus open-source dependenci
 | `@dnd-kit/sortable` | MIT | Sortable helpers for dnd-kit |
 | `@dnd-kit/utilities` | MIT | Transform helpers for dnd-kit |
 | `@xyflow/react` | MIT | Interactive command map (exploration only) |
+| `xstate` | MIT | Voice interaction state machine |
+| `@xstate/react` | MIT | React bindings for voice machine |
+| `livekit-client` | Apache-2.0 | Optional realtime transport (configured only) |
+| `@rive-app/react-canvas` | MIT | Optional animated presence (CSS fallback default) |
 
 Full license texts are distributed with each package under `node_modules/<package>/LICENSE` (or equivalent) after `npm ci`.
 
