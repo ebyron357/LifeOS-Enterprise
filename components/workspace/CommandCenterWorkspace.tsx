@@ -1,9 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ChangePlanPersistence } from "@/components/dashboard/ChangePlanPersistence";
 import { CognitiveSupportCenter } from "@/components/dashboard/CognitiveSupportCenter";
-import { InteractiveCommandCenter } from "@/components/dashboard/InteractiveCommandCenter";
+import { OperationsSurface } from "@/components/dashboard/OperationsSurface";
 import { AIStatus } from "@/components/widgets/AIStatus";
 import { GitHubHealth } from "@/components/widgets/GitHubHealth";
 import { MorningBrief } from "@/components/widgets/MorningBrief";
@@ -67,8 +66,7 @@ export function CommandCenterWorkspace({ data, github, revenue }: CommandCenterW
           detailsLabel="Open projects"
           onOpenDetails={() => router.push("/projects")}
         >
-          <InteractiveCommandCenter projects={data.projects} />
-          <ChangePlanPersistence />
+          <OperationsSurface data={data} />
         </WorkspaceWidget>
       ),
     },
