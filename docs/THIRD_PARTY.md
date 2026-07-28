@@ -13,7 +13,11 @@ LifeOS Enterprise includes original application code plus open-source dependenci
 | `rehype-sanitize` | MIT | HTML sanitization for rendered notes |
 | `react-grid-layout` | MIT | Workspace OS drag/resize grid |
 | `cmdk` | MIT | Workspace OS command palette |
-| `motion` | MIT | Workspace OS panel transitions |
+| `motion` | MIT | Workspace OS + Interactive Visual V1 motion primitives |
+| `@dnd-kit/core` | MIT | Accessible project-board drag and drop |
+| `@dnd-kit/sortable` | MIT | Sortable helpers for dnd-kit |
+| `@dnd-kit/utilities` | MIT | Transform helpers for dnd-kit |
+| `@xyflow/react` | MIT | Interactive command map (exploration only) |
 
 Full license texts are distributed with each package under `node_modules/<package>/LICENSE` (or equivalent) after `npm ci`.
 
