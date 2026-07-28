@@ -1,11 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { InteractiveCommandCenter } from "@/components/dashboard/InteractiveCommandCenter";
 import { ChangePlanPersistence } from "@/components/dashboard/ChangePlanPersistence";
 import { InteractionFeedbackProvider } from "@/components/feedback/InteractionFeedback";
 import { MotionProvider } from "@/components/motion/MotionProvider";
+import { VoiceConsole } from "@/components/voice/VoiceConsole";
 import { useBrowserStorageString } from "@/lib/lifeos/use-browser-storage";
 import type { VaultDashboardData } from "@/lib/lifeos/types";
 import type { CommandMapBuildInput } from "@/lib/command-map/types";
@@ -30,6 +31,18 @@ type OperationsSurfaceProps = {
 export function OperationsSurface({ data }: OperationsSurfaceProps) {
   const [view, setView] = useBrowserStorageString("lifeos-operations-view-v1", "board");
   const [mapReady, setMapReady] = useState(view === "map");
+
+  useEffect(() => {
+    function onView(event: Event) {
+      const detail = (event as CustomEvent<{ view?: string }>).detail;
+      if (detail?.view === "map" || detail?.view === "board") {
+        setView(detail.view);
+        if (detail.view === "map") setMapReady(true);
+      }
+    }
+    window.addEventListener("lifeos-operations-view", onView);
+    return () => window.removeEventListener("lifeos-operations-view", onView);
+  }, [setView]);
 
   const mapInput: CommandMapBuildInput = useMemo(() => ({
     projects: data.projects.map((project) => ({
@@ -100,6 +113,14 @@ export function OperationsSurface({ data }: OperationsSurfaceProps) {
           >
             {mapReady ? <CommandMap input={mapInput} /> : null}
           </div>
+
+          <VoiceConsole
+            projects={data.projects}
+            agents={data.agents}
+            activeProjects={data.activeProjects}
+            waitingOn={data.waitingOn}
+            reviewsDue={data.reviewsDue}
+          />
         </section>
       </InteractionFeedbackProvider>
     </MotionProvider>
