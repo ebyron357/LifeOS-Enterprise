@@ -3,7 +3,7 @@ import "server-only";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { getVaultIndex } from "@/lib/vault/index";
-import type { AgentBrief, GrowthBrief, ProjectBrief, VaultDashboardData } from "./types";
+import type { AgentBrief, BusinessBrief, GrowthBrief, PersonBrief, ProjectBrief, VaultDashboardData } from "./types";
 
 type Frontmatter = Record<string, string>;
 
@@ -76,6 +76,7 @@ export async function getVaultDashboardData(now = new Date()): Promise<VaultDash
       reviewDate: note.reviewDate ?? "",
       waitingOn: note.waitingOn ?? "",
       blocker: note.blocker ?? "",
+      owner: note.owner ?? "",
     }));
 
   const agents: AgentBrief[] = (index.bySection.agents ?? []).map((note) => ({
@@ -84,6 +85,32 @@ export async function getVaultDashboardData(now = new Date()): Promise<VaultDash
     reviewDate: note.reviewDate ?? "",
     purpose: section(note.body, "Purpose"),
   }));
+
+  const businesses: BusinessBrief[] = (index.bySection.businesses ?? [])
+    .filter((note) => {
+      const path = note.path.toLowerCase();
+      const isTemplate = note.section === "templates" || path.includes("/templates/") || path.startsWith("templates/") || path.startsWith("99 templates/");
+      return (note.type === "business" || note.section === "businesses") && !isTemplate && !/\{\{[^}]+\}\}/.test(note.title);
+    })
+    .map((note) => ({
+      name: note.title,
+      path: note.path,
+      status: note.status ?? "unknown",
+    }));
+
+  const people: PersonBrief[] = (index.bySection.people ?? [])
+    .filter((note) => {
+      const path = note.path.toLowerCase();
+      const isTemplate = note.section === "templates" || path.includes("/templates/") || path.startsWith("templates/") || path.startsWith("99 templates/");
+      const isIndex = note.title.trim().toLowerCase() === "people" || path.endsWith("/people.md") || path.endsWith("\\people.md");
+      return (note.type === "person" || note.section === "people") && !isTemplate && !isIndex && !/\{\{[^}]+\}\}/.test(note.title);
+    })
+    .map((note) => ({
+      name: note.title,
+      path: note.path,
+      organization: note.organization ?? "",
+      role: note.role ?? "",
+    }));
 
   const growthArea = parseFrontmatter(growthAreaSource);
   const growthGoal = parseFrontmatter(growthGoalSource);
@@ -106,6 +133,8 @@ export async function getVaultDashboardData(now = new Date()): Promise<VaultDash
     waitingOn: active.filter((project) => project.status === "waiting" || Boolean(project.waitingOn)).length,
     reviewsDue: active.filter((project) => isDue(project.reviewDate, today)).length,
     agents: agents.sort((a, b) => a.name.localeCompare(b.name)),
+    businesses: businesses.sort((a, b) => a.name.localeCompare(b.name)),
+    people: people.sort((a, b) => a.name.localeCompare(b.name)),
     growth,
   };
 }

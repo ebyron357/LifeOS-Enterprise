@@ -35,7 +35,7 @@ export function DashboardLayout({ data, github, revenue, counts }: DashboardLayo
           <div className="command-brand">
             <span className="brand-mark">L</span>
             <strong>LIVE INTELLIGENCE</strong>
-            <em>Workspace OS V1</em>
+            <em>Interactive Visual V1</em>
           </div>
           <div className="command-signals">
             <span className="signal-time">Read-only vault · layout preferences stay in this browser</span>

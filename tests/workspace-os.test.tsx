@@ -45,6 +45,8 @@ const data = {
   waitingOn: 0,
   reviewsDue: 1,
   agents: [{ name: "Chief of Staff", status: "active", reviewDate: "2026-07-17", purpose: "Choose what deserves attention." }],
+  businesses: [{ name: "LifeOS", path: "Businesses/LifeOS.md", status: "active" }],
+  people: [{ name: "Bwa", path: "50 People/Bwa.md", organization: "LifeOS", role: "Operator" }],
   growth: { focus: "One useful habit", currentValue: "3", targetValue: "24", reviewDate: "2026-07-20" },
 };
 

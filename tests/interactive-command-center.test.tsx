@@ -7,7 +7,7 @@ const source = readFileSync(
   "utf8",
 );
 
-describe("Interactive Operations V1 safety contract", () => {
+describe("Interactive Operations Visual V1 safety contract", () => {
   it("provides staged project controls and an approval gate", () => {
     expect(source).toContain('type BoardStatus = "active" | "waiting" | "blocked" | "complete"');
     expect(source).toContain("Review staged changes");
@@ -22,11 +22,21 @@ describe("Interactive Operations V1 safety contract", () => {
     expect(source).toContain("next action must contain at least 8 characters");
   });
 
-  it("keeps persistence proposal-only", () => {
+  it("keeps persistence proposal-only and uses accessible dnd-kit sensors", () => {
     expect(source).toContain('schema: "lifeos.change-plan.v1"');
     expect(source).toContain('write_mode: "proposal-only"');
     expect(source).toContain("Canonical vault files remain unchanged");
+    expect(source).toContain("KeyboardSensor");
+    expect(source).toContain("TouchSensor");
+    expect(source).toContain("PointerSensor");
+    expect(source).toContain("DragOverlay");
+    expect(source).toContain("aria-live");
     expect(source).not.toContain("GITHUB_TOKEN");
     expect(source).not.toContain("fetch(\"https://api.github.com");
+  });
+
+  it("never writes directly to main from the board", () => {
+    expect(source).not.toContain('BASE = "main"');
+    expect(source).toContain("proposal-only");
   });
 });
