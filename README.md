@@ -101,6 +101,15 @@ Community plugins are optional. Add Templater, QuickAdd, Tasks, Calendar, or Dat
 
 Run `npm install` and `npm run dev`, then open `/dashboard` for the executive overview. Browse the full vault from the left navigation: projects, tasks, people, resources, journal, reviews, search, and note reader routes.
 
+### Interactive Visual System V1
+
+On `/dashboard`, the project operations widget supports:
+
+- **Command Board** — accessible drag/drop staging with keyboard and touch (dnd-kit)
+- **Command Map** — React Flow exploration of real vault relationships (projects, businesses, agents, blockers, people)
+
+Motion respects OS reduced-motion, the Workspace OS reduced-motion toggle, and overload mode. Board edits remain browser-staged proposals; canonical vault writes still require the authenticated draft-PR workflow. See `docs/INTERACTIVE_VISUAL_VOICE_ARCHITECTURE.md` and `docs/INTERACTIVE_IMPLEMENTATION_CHECKLIST.md`.
+
 ## Definition of Done
 
 The vault is operational when it can answer these questions in under one minute:
