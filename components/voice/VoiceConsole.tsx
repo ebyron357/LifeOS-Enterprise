@@ -54,13 +54,24 @@ export function VoiceConsole({
   const [settings, setSettings] = useBrowserStorage<VoiceSettings>("lifeos-voice-settings-v1", defaultSettings);
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [expanded, setExpanded] = useState(true);
-  const [provider, setProvider] = useState<VoiceProviderId>("browser");
-  const [sessionMessage, setSessionMessage] = useState("Voice loads in safe browser-fallback mode until provider credentials are configured.");
+  const [provider, setProvider] = useState<VoiceProviderId>("none");
+  const [sessionMessage, setSessionMessage] = useState("Checking voice configuration… Voice stays disabled until the server enables it.");
   const [pending, setPending] = useState<PendingWriteConfirmation | null>(null);
   const [writeSecret, setWriteSecret] = useState("");
   const transportRef = useRef(createBrowserVoiceTransport());
   const lastSpokenRef = useRef("");
   const inFlightRequestRef = useRef<string | null>(null);
+  const listeningRef = useRef(false);
+  const pendingRef = useRef<PendingWriteConfirmation | null>(null);
+  const voiceEnabled = provider !== "none";
+
+  useEffect(() => {
+    listeningRef.current = state === "listening";
+  }, [state]);
+
+  useEffect(() => {
+    pendingRef.current = pending;
+  }, [pending]);
 
   const context = useMemo(() => ({
     projects,
@@ -138,6 +149,7 @@ export function VoiceConsole({
       if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
       if (event.altKey && event.key.toLowerCase() === "v") {
         event.preventDefault();
+        if (!voiceEnabled && state !== "listening") return;
         if (state === "listening") stopListening();
         else void startListening();
       }
@@ -151,6 +163,11 @@ export function VoiceConsole({
   });
 
   async function startListening() {
+    if (!voiceEnabled) {
+      setSessionMessage("Voice is disabled. Set LIFEOS_VOICE_ENABLED=true to enable browser speech.");
+      append(createTranscriptEntry("error", "Voice is disabled by LIFEOS_VOICE_ENABLED.", { temporary: true }));
+      return;
+    }
     if (settings.muted) {
       send({ type: "FAIL", message: "Unmute before listening." });
       return;
@@ -164,6 +181,7 @@ export function VoiceConsole({
     }
     send({ type: "PERMISSION_GRANTED" });
     send({ type: "START_LISTENING" });
+    listeningRef.current = true;
     await transportRef.current.startListening({
       lang: settings.transcriptionLanguage === "fr" ? "fr-FR" : settings.transcriptionLanguage === "ht" ? "ht-HT" : "en-US",
       onInterim: (text) => setTranscript((current) => upsertInterimTranscript(current, text)),
@@ -177,7 +195,9 @@ export function VoiceConsole({
         append(createTranscriptEntry("error", message, { temporary: true }));
       },
       onEnd: () => {
-        if (snapshot.matches("listening")) send({ type: "STOP_LISTENING" });
+        // Use a ref — closing over snapshot can miss the listening transition.
+        if (listeningRef.current) send({ type: "STOP_LISTENING" });
+        listeningRef.current = false;
       },
     });
   }
@@ -200,6 +220,21 @@ export function VoiceConsole({
 
   async function handleUtterance(text: string) {
     send({ type: "THINK" });
+    const normalized = text.trim().toLowerCase();
+
+    // Spoken confirmation path promised by the write-staging prompt.
+    if (pendingRef.current) {
+      if (/^(confirm|yes|approve|proceed)(\s+please)?$/.test(normalized)) {
+        send({ type: "CONFIRM" });
+        await confirmWrite();
+        return;
+      }
+      if (/^(cancel|no|abort|never\s*mind)$/.test(normalized)) {
+        cancelWrite();
+        return;
+      }
+    }
+
     const parsed = parseVoiceCommand(text, context);
 
     if (parsed.kind === "control") {
@@ -359,6 +394,7 @@ export function VoiceConsole({
         state={String(state)}
         muted={settings.muted}
         audioEnabled={settings.audioEnabled}
+        voiceEnabled={voiceEnabled}
         onPushToTalk={() => void startListening()}
         onStopListening={stopListening}
         onStopSpeaking={stopSpeaking}

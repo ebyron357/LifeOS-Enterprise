@@ -62,6 +62,13 @@ describe("command map data transformation", () => {
     const focused = filterCommandMap(graph, { projectName: "LifeOS Enterprise" });
     expect(focused.nodes.some((node) => node.data.label === "LifeOS Enterprise")).toBe(true);
     expect(focused.edges.length).toBeGreaterThan(0);
+
+    const intersected = filterCommandMap(graph, {
+      entityTypes: ["project", "blocker"],
+      projectName: "LifeOS Enterprise",
+    });
+    expect(intersected.nodes.every((node) => ["project", "blocker"].includes(node.data.entityType))).toBe(true);
+    expect(intersected.nodes.some((node) => node.data.label === "LifeOS Enterprise")).toBe(true);
   });
 
   it("reports an empty-project warning when no projects exist", () => {

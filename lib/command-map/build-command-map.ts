@@ -265,7 +265,8 @@ export function filterCommandMap(
         related.add(edge.target);
       }
     }
-    nodes = graph.nodes.filter((node) => related.has(node.id));
+    // Intersect with filters already applied above — do not reset to the full graph.
+    nodes = nodes.filter((node) => related.has(node.id));
   }
 
   const ids = new Set(nodes.map((node) => node.id));
