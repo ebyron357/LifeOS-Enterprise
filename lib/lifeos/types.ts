@@ -8,6 +8,7 @@ export type ProjectBrief = {
   reviewDate: string;
   waitingOn: string;
   blocker: string;
+  owner?: string;
 };
 
 export type AgentBrief = {
@@ -15,6 +16,19 @@ export type AgentBrief = {
   status: string;
   reviewDate: string;
   purpose: string;
+};
+
+export type BusinessBrief = {
+  name: string;
+  path: string;
+  status: string;
+};
+
+export type PersonBrief = {
+  name: string;
+  path: string;
+  organization: string;
+  role: string;
 };
 
 export type GrowthBrief = {
@@ -31,5 +45,7 @@ export type VaultDashboardData = {
   waitingOn: number;
   reviewsDue: number;
   agents: AgentBrief[];
+  businesses: BusinessBrief[];
+  people: PersonBrief[];
   growth: GrowthBrief;
 };

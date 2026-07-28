@@ -19,6 +19,8 @@ const data = {
   waitingOn: 1,
   reviewsDue: 1,
   agents: [{ name: "Chief of Staff", status: "active", reviewDate: "2026-07-17", purpose: "Choose what deserves attention." }],
+  businesses: [{ name: "LifeOS", path: "Businesses/LifeOS.md", status: "active" }],
+  people: [{ name: "Bwa", path: "50 People/Bwa.md", organization: "LifeOS", role: "Operator" }],
   growth: { focus: "One useful habit", currentValue: "3", targetValue: "24", reviewDate: "2026-07-20" },
 };
 const github = { connected: true, openPullRequests: 1, failedWorkflows: 0, defaultBranch: "main", lastWorkflow: "success", updatedAt: "2026-07-17T00:00:00Z" };
@@ -58,5 +60,11 @@ describe("executive dashboard", () => {
     expect(mission).toHaveTextContent(/Reviews due\s*1/);
     expect(screen.getByText("120 indexed notes")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /restore default layout/i })).toBeInTheDocument();
+  });
+
+  it("renders board and map view switches", () => {
+    render(<DashboardLayout widgets={widgetRegistry} data={data} github={github} counts={{ search: 120, projects: 3, tasks: 8 }} />);
+    expect(screen.getByRole("tab", { name: /command board/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /command map/i })).toBeInTheDocument();
   });
 });

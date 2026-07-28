@@ -91,6 +91,9 @@ Community plugins are optional. Add Templater, QuickAdd, Tasks, Calendar, or Dat
 - `architecture/METADATA_SCHEMA.md` — property contract
 - `docs/OBSIDIAN_SETUP.md` — exact setup instructions
 - `docs/LifeOS_Specification_v1.md` — operating specification
+- `docs/DEPLOYMENT.md` — production deployment and env matrix
+- `docs/RELEASE_NOTES_v1.md` — v1.0 release notes
+- `CHANGELOG.md` — version history
 - `scripts/setup-obsidian.ps1` — non-destructive local setup
 - `scripts/audit-vault.ps1` — structural and metadata validation
 - `app/dashboard/page.tsx` — executive overview and command center
@@ -100,6 +103,25 @@ Community plugins are optional. Add Templater, QuickAdd, Tasks, Calendar, or Dat
 ## Executive Web Dashboard
 
 Run `npm install` and `npm run dev`, then open `/dashboard` for the executive overview. Browse the full vault from the left navigation: projects, tasks, people, resources, journal, reviews, search, and note reader routes.
+
+### Interactive Visual System V1
+
+On `/dashboard`, the project operations widget supports:
+
+- **Command Board** — accessible drag/drop staging with keyboard and touch (dnd-kit)
+- **Command Map** — React Flow exploration of real vault relationships (projects, businesses, agents, blockers, people)
+
+Motion respects OS reduced-motion, the Workspace OS reduced-motion toggle, and overload mode. Board edits remain browser-staged proposals; canonical vault writes still require the authenticated draft-PR workflow. See `docs/INTERACTIVE_VISUAL_VOICE_ARCHITECTURE.md` and `docs/INTERACTIVE_IMPLEMENTATION_CHECKLIST.md`.
+
+### Verbal + Audio V1
+
+The same operations surface includes the **Voice console**:
+
+- Push-to-talk (Alt+V), stop audio (Esc), transcript, confirmation for write staging
+- Browser speech when `LIFEOS_VOICE_ENABLED=true`; LiveKit room minting is deferred and not advertised as ready
+- Voice is optional — disabled by default; missing credentials must not break the dashboard
+
+See `docs/VOICE_ARCHITECTURE.md`, `docs/DEPLOYMENT.md`, and `.env.example`.
 
 ## Definition of Done
 

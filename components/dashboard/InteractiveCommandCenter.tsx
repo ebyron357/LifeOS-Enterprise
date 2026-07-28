@@ -1,7 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  useDroppable,
+  useDraggable,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+import { MotionListItem, MotionListPresence } from "@/components/motion/MotionList";
+import { MotionPanel } from "@/components/motion/MotionPanel";
+import { MotionStatus } from "@/components/motion/MotionStatus";
+import { useInteractionFeedback } from "@/components/feedback/InteractionFeedback";
 import type { ProjectBrief } from "@/lib/lifeos/types";
 import { noteHref } from "@/lib/vault/slug";
 import styles from "./InteractiveCommandCenter.module.css";
@@ -56,16 +75,226 @@ function normalizedPriority(project: ProjectBrief): Priority {
   return priorities.includes(project.priority as Priority) ? project.priority as Priority : "P3";
 }
 
+function laneId(status: BoardStatus) {
+  return `lane:${status}`;
+}
+
+function ProjectCard({
+  project,
+  draft,
+  expanded,
+  staged,
+  onExpand,
+  onUpdate,
+  dragHandleProps,
+  style,
+  isDragging,
+}: {
+  project: ProjectBrief;
+  draft: DraftEdit;
+  expanded: boolean;
+  staged: boolean;
+  onExpand: () => void;
+  onUpdate: (patch: DraftEdit) => void;
+  dragHandleProps?: Record<string, unknown>;
+  style?: CSSProperties;
+  isDragging?: boolean;
+}) {
+  return (
+    <article
+      className={styles.card}
+      data-staged={staged}
+      data-dragging={isDragging ? "true" : "false"}
+      style={style}
+      aria-roledescription="Draggable project"
+      aria-label={`${project.name}, ${draft.status ?? normalizedStatus(project)}`}
+    >
+      <div className={styles.cardTop}>
+        <button type="button" className={styles.dragHandle} {...dragHandleProps} aria-label={`Move ${project.name}`}>
+          ⋮⋮
+        </button>
+        <strong><Link href={noteHref(project.path)}>{project.name}</Link></strong>
+        <span className={styles.badge} data-priority={draft.priority ?? project.priority}>
+          {draft.priority ?? project.priority}
+        </span>
+      </div>
+      <small>{draft.nextAction ?? project.nextAction}</small>
+      <div className={styles.cardControls}>
+        <label>
+          <span className="sr-only">Stage status for {project.name}</span>
+          <select
+            value={draft.status ?? normalizedStatus(project)}
+            onChange={(event) => onUpdate({ status: event.target.value as BoardStatus })}
+          >
+            {boardStatuses.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+        </label>
+        <button type="button" onClick={onExpand}>{expanded ? "Close" : "Edit"}</button>
+      </div>
+      {expanded ? (
+        <div className={styles.editor}>
+          <label>Priority
+            <select
+              value={draft.priority ?? normalizedPriority(project)}
+              onChange={(event) => onUpdate({ priority: event.target.value as Priority })}
+            >
+              {priorities.map((item) => <option key={item} value={item}>{item}</option>)}
+            </select>
+          </label>
+          <label>Next action
+            <textarea
+              rows={4}
+              value={draft.nextAction ?? project.nextAction}
+              onChange={(event) => onUpdate({ nextAction: event.target.value })}
+            />
+          </label>
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+function DraggableProjectCard(props: {
+  project: ProjectBrief;
+  draft: DraftEdit;
+  expanded: boolean;
+  staged: boolean;
+  onExpand: () => void;
+  onUpdate: (patch: DraftEdit) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: props.project.name,
+    data: { type: "project", project: props.project },
+  });
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging ? 0.35 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef}>
+      <ProjectCard
+        {...props}
+        style={style}
+        isDragging={isDragging}
+        dragHandleProps={{ ...listeners, ...attributes }}
+      />
+    </div>
+  );
+}
+
+function DroppableLane({
+  status,
+  count,
+  children,
+  isOver,
+}: {
+  status: BoardStatus;
+  count: number;
+  children: ReactNode;
+  isOver: boolean;
+}) {
+  const { setNodeRef } = useDroppable({ id: laneId(status), data: { type: "lane", status } });
+  return (
+    <section
+      ref={setNodeRef}
+      className={styles.column}
+      data-over={isOver}
+      aria-label={`${status} projects`}
+    >
+      <header className={styles.columnHeader}>
+        <h3>{status}</h3>
+        <span aria-label={`${count} projects`}>{count}</span>
+      </header>
+      <div className={styles.cardList}>{children}</div>
+    </section>
+  );
+}
+
 export function InteractiveCommandCenter({ projects }: { projects: ProjectBrief[] }) {
+  const feedback = useInteractionFeedback();
   const [mode, setMode] = useState<WorkMode>("execute");
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [drafts, setDrafts] = useState<Record<string, DraftEdit>>({});
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
-  const [draggedProject, setDraggedProject] = useState<string | null>(null);
-  const [overColumn, setOverColumn] = useState<BoardStatus | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [overLane, setOverLane] = useState<BoardStatus | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [packageOpen, setPackageOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [announcement, setAnnouncement] = useState("");
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }),
+    useSensor(KeyboardSensor),
+  );
+
+  useEffect(() => {
+    function onVoiceStagedChange(event: Event) {
+      const detail = (event as CustomEvent<{
+        changes?: Array<{
+          project: string;
+          path?: string;
+          fields: Array<{ field: string; from?: string; to: string }>;
+        }>;
+      }>).detail;
+      const staged = detail?.changes;
+      if (!Array.isArray(staged) || staged.length === 0) return;
+
+      const patches: Array<{ name: string; patch: DraftEdit }> = [];
+      for (const change of staged) {
+        const project = projects.find(
+          (item) => item.name === change.project || item.path === change.path,
+        );
+        if (!project || !Array.isArray(change.fields)) continue;
+        const patch: DraftEdit = {};
+        for (const field of change.fields) {
+          if (field.field === "status" && boardStatuses.includes(field.to as BoardStatus)) {
+            patch.status = field.to as BoardStatus;
+          }
+          if (field.field === "priority" && priorities.includes(field.to as Priority)) {
+            patch.priority = field.to as Priority;
+          }
+          if (field.field === "next_action") {
+            patch.nextAction = field.to;
+          }
+        }
+        if (Object.keys(patch).length) patches.push({ name: project.name, patch });
+      }
+      if (!patches.length) return;
+
+      setDrafts((previous) => {
+        const updated = { ...previous };
+        for (const { name, patch } of patches) {
+          const project = projects.find((item) => item.name === name);
+          if (!project) continue;
+          const current = { ...updated[name], ...patch };
+          const unchanged = (current.status === undefined || current.status === normalizedStatus(project))
+            && (current.priority === undefined || current.priority === normalizedPriority(project))
+            && (current.nextAction === undefined || current.nextAction.trim() === (project.nextAction ?? "").trim());
+          if (unchanged) delete updated[name];
+          else updated[name] = current;
+        }
+        return updated;
+      });
+
+      window.dispatchEvent(new CustomEvent("lifeos-operations-view", { detail: { view: "board" } }));
+      setReviewOpen(true);
+      const text = "Voice staging applied to the Command Board. Canonical vault files remain unchanged.";
+      setMessage(text);
+      setAnnouncement(text);
+      feedback.push({
+        kind: "staging",
+        title: "Voice change staged on board",
+        detail: text,
+        persistence: "browser-only",
+      });
+    }
+
+    window.addEventListener("lifeos-voice-staged-change", onVoiceStagedChange);
+    return () => window.removeEventListener("lifeos-voice-staged-change", onVoiceStagedChange);
+  }, [feedback, projects]);
 
   const visible = useMemo(
     () => projects.filter((project) => filter === "all" || health(project) === filter),
@@ -115,6 +344,8 @@ export function InteractiveCommandCenter({ projects }: { projects: ProjectBrief[
     changes,
   }, null, 2), [changes]);
 
+  const activeProject = activeId ? projects.find((project) => project.name === activeId) ?? null : null;
+
   function updateDraft(project: ProjectBrief, patch: DraftEdit) {
     setDrafts((previous) => {
       const current = { ...previous[project.name], ...patch };
@@ -126,14 +357,14 @@ export function InteractiveCommandCenter({ projects }: { projects: ProjectBrief[
       else updated[project.name] = current;
       return updated;
     });
-    setMessage(`${project.name} updated in the staged plan. Canonical vault files remain unchanged.`);
-  }
-
-  function dropInto(status: BoardStatus) {
-    const project = projects.find((item) => item.name === draggedProject);
-    if (project) updateDraft(project, { status });
-    setDraggedProject(null);
-    setOverColumn(null);
+    const text = `${project.name} updated in the staged plan. Canonical vault files remain unchanged.`;
+    setMessage(text);
+    feedback.push({
+      kind: "staging",
+      title: `${project.name} staged`,
+      detail: text,
+      persistence: "browser-only",
+    });
   }
 
   function removeProjectChanges(projectName: string) {
@@ -142,6 +373,12 @@ export function InteractiveCommandCenter({ projects }: { projects: ProjectBrief[
       delete updated[projectName];
       return updated;
     });
+    feedback.push({
+      kind: "reverted",
+      title: `${projectName} staging removed`,
+      detail: "Staged edits for this project were discarded in the browser.",
+      persistence: "browser-only",
+    });
   }
 
   function clearChanges() {
@@ -149,15 +386,33 @@ export function InteractiveCommandCenter({ projects }: { projects: ProjectBrief[
     setReviewOpen(false);
     setPackageOpen(false);
     setMessage("Staged changes cleared. Canonical vault data remains unchanged.");
+    feedback.push({
+      kind: "reverted",
+      title: "Staged changes cleared",
+      detail: "Canonical vault data remains unchanged.",
+      persistence: "browser-only",
+    });
   }
 
   function approvePlan() {
     if (validationErrors.length) {
       setMessage("Approval blocked. Correct the validation issues shown in the review panel.");
+      feedback.push({
+        kind: "invalid",
+        title: "Approval blocked",
+        detail: validationErrors.join(" "),
+        persistence: "none",
+      });
       return;
     }
     setPackageOpen(true);
     setMessage("Approval package generated. This is a proposal artifact; no vault files were changed.");
+    feedback.push({
+      kind: "approval-required",
+      title: "Approval package ready",
+      detail: "Create a draft GitHub PR only through authenticated persistence. Main remains unchanged.",
+      persistence: "browser-only",
+    });
   }
 
   function downloadPackage() {
@@ -169,11 +424,62 @@ export function InteractiveCommandCenter({ projects }: { projects: ProjectBrief[
     anchor.click();
     URL.revokeObjectURL(url);
     setMessage("Approval package downloaded. Canonical vault data remains unchanged.");
+    feedback.push({
+      kind: "success",
+      title: "Package downloaded",
+      detail: "Proposal artifact saved locally. Canonical vault unchanged.",
+      persistence: "browser-only",
+    });
+  }
+
+  function onDragStart(event: DragStartEvent) {
+    setActiveId(String(event.active.id));
+    setAnnouncement(`Picked up ${event.active.id}. Use arrow keys to choose a status lane, then drop.`);
+  }
+
+  function onDragCancel() {
+    setAnnouncement(`Cancelled moving ${activeId ?? "project"}. No staging change applied.`);
+    setActiveId(null);
+    setOverLane(null);
+    feedback.push({
+      kind: "reverted",
+      title: "Drag cancelled",
+      detail: "No staged status change was applied.",
+      persistence: "none",
+    });
+  }
+
+  function onDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    setActiveId(null);
+    setOverLane(null);
+    if (!over) {
+      setAnnouncement(`Dropped ${active.id} outside a lane. No change.`);
+      return;
+    }
+    const targetStatus = String(over.id).startsWith("lane:")
+      ? String(over.id).replace("lane:", "") as BoardStatus
+      : null;
+    if (!targetStatus || !boardStatuses.includes(targetStatus)) {
+      setAnnouncement(`Invalid drop target for ${active.id}.`);
+      feedback.push({
+        kind: "invalid",
+        title: "Invalid drop",
+        detail: "Projects can only move into Active, Waiting, Blocked, or Complete.",
+        persistence: "none",
+      });
+      return;
+    }
+    const project = projects.find((item) => item.name === active.id);
+    if (!project) return;
+    updateDraft(project, { status: targetStatus });
+    setAnnouncement(`${project.name} staged as ${targetStatus}. Canonical vault unchanged.`);
   }
 
   return (
     <section className="interactive-command" aria-label="Interactive LifeOS controls">
-      <div className="mode-console">
+      <div className="sr-only" aria-live="assertive">{announcement}</div>
+      <MotionPanel className="mode-console" as="div">
         <div><p className="widget-eyebrow">Communication protocol</p><h2>Choose the way we work</h2></div>
         <div className="mode-buttons" role="group" aria-label="Work mode">
           {(Object.keys(modeCopy) as WorkMode[]).map((item) => (
@@ -181,14 +487,14 @@ export function InteractiveCommandCenter({ projects }: { projects: ProjectBrief[
           ))}
         </div>
         <p className="mode-description"><strong>{mode}</strong> — {modeCopy[mode]}</p>
-      </div>
+      </MotionPanel>
 
       <div className={styles.boardShell}>
         <header className={styles.boardHeader}>
           <div>
-            <p className="widget-eyebrow">Interactive Operations V1</p>
+            <p className="widget-eyebrow">Interactive Operations · Visual V1</p>
             <h2>Project command board</h2>
-            <p>Drag projects, edit priority and next actions, validate the plan, and generate a reviewable approval package before persistence is enabled.</p>
+            <p>Move projects with mouse, touch, or keyboard. Edits only stage a browser proposal. Canonical vault and GitHub stay unchanged until an authenticated draft pull request is approved.</p>
           </div>
           <div className={styles.boardActions}>
             <button type="button" onClick={() => setReviewOpen(true)} disabled={!changes.length}>Review changes ({changes.length})</button>
@@ -202,53 +508,55 @@ export function InteractiveCommandCenter({ projects }: { projects: ProjectBrief[
           ))}
         </div>
 
-        <div className={styles.board} aria-label="Project status board">
-          {boardStatuses.map((status) => (
-            <section className={styles.column} data-over={overColumn === status} key={status}
-              onDragEnter={() => setOverColumn(status)} onDragOver={(event) => event.preventDefault()}
-              onDragLeave={() => setOverColumn((current) => current === status ? null : current)} onDrop={() => dropInto(status)} aria-label={`${status} projects`}>
-              <header className={styles.columnHeader}><h3>{status}</h3><span>{grouped[status].length}</span></header>
-              <div className={styles.cardList}>
-                {grouped[status].map((project) => {
-                  const draft = drafts[project.name] ?? {};
-                  const expanded = expandedProject === project.name;
-                  return (
-                    <article className={styles.card} data-staged={Boolean(drafts[project.name])} draggable key={project.name}
-                      onDragStart={() => setDraggedProject(project.name)} onDragEnd={() => { setDraggedProject(null); setOverColumn(null); }}>
-                      <div className={styles.cardTop}>
-                        <strong><Link href={noteHref(project.path)}>{project.name}</Link></strong>
-                        <span className={styles.badge}>{draft.priority ?? project.priority}</span>
-                      </div>
-                      <small>{draft.nextAction ?? project.nextAction}</small>
-                      <div className={styles.cardControls}>
-                        <label><span className="sr-only">Stage status for {project.name}</span>
-                          <select value={draft.status ?? normalizedStatus(project)} onChange={(event) => updateDraft(project, { status: event.target.value as BoardStatus })}>
-                            {boardStatuses.map((item) => <option key={item} value={item}>{item}</option>)}
-                          </select>
-                        </label>
-                        <button type="button" onClick={() => setExpandedProject(expanded ? null : project.name)}>{expanded ? "Close" : "Edit"}</button>
-                      </div>
-                      {expanded ? (
-                        <div className={styles.editor} onDragStart={(event) => event.stopPropagation()}>
-                          <label>Priority
-                            <select value={draft.priority ?? normalizedPriority(project)} onChange={(event) => updateDraft(project, { priority: event.target.value as Priority })}>
-                              {priorities.map((item) => <option key={item} value={item}>{item}</option>)}
-                            </select>
-                          </label>
-                          <label>Next action
-                            <textarea rows={4} value={draft.nextAction ?? project.nextAction} onChange={(event) => updateDraft(project, { nextAction: event.target.value })} />
-                          </label>
-                          <button type="button" onClick={() => setReviewOpen(true)}>Review this change</button>
-                        </div>
-                      ) : null}
-                    </article>
-                  );
-                })}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={onDragStart}
+          onDragCancel={onDragCancel}
+          onDragEnd={onDragEnd}
+          onDragOver={(event) => {
+            const overId = event.over?.id ? String(event.over.id) : "";
+            setOverLane(overId.startsWith("lane:") ? overId.replace("lane:", "") as BoardStatus : null);
+          }}
+        >
+          <div className={styles.board} aria-label="Project status board">
+            {boardStatuses.map((status) => (
+              <DroppableLane key={status} status={status} count={grouped[status].length} isOver={overLane === status}>
+                <MotionListPresence>
+                  {grouped[status].map((project) => {
+                    const draft = drafts[project.name] ?? {};
+                    return (
+                      <MotionListItem id={`${status}-${project.name}`} key={project.name} className={styles.cardMotion}>
+                        <DraggableProjectCard
+                          project={project}
+                          draft={draft}
+                          expanded={expandedProject === project.name}
+                          staged={Boolean(drafts[project.name])}
+                          onExpand={() => setExpandedProject(expandedProject === project.name ? null : project.name)}
+                          onUpdate={(patch) => updateDraft(project, patch)}
+                        />
+                      </MotionListItem>
+                    );
+                  })}
+                </MotionListPresence>
                 {!grouped[status].length ? <p className={styles.empty}>No projects in this lane.</p> : null}
-              </div>
-            </section>
-          ))}
-        </div>
+              </DroppableLane>
+            ))}
+          </div>
+          <DragOverlay>
+            {activeProject ? (
+              <ProjectCard
+                project={activeProject}
+                draft={drafts[activeProject.name] ?? {}}
+                expanded={false}
+                staged={Boolean(drafts[activeProject.name])}
+                onExpand={() => undefined}
+                onUpdate={() => undefined}
+                isDragging
+              />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
 
         <section className={styles.reviewPanel} hidden={!reviewOpen} aria-label="Review staged project changes">
           <div><p className="widget-eyebrow">Approval gate</p><h3>Review staged changes</h3></div>
@@ -278,7 +586,7 @@ export function InteractiveCommandCenter({ projects }: { projects: ProjectBrief[
           </div>
         </section>
 
-        <p className={styles.statusMessage} aria-live="polite">{message}</p>
+        <MotionStatus className={styles.statusMessage} tone="success">{message}</MotionStatus>
       </div>
 
       <div className="command-columns">

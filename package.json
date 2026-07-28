@@ -1,6 +1,6 @@
 {
   "name": "lifeos-enterprise-dashboard",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,15 +11,21 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "cmdk": "^1.1.1",
-    "motion": "^12.42.2",
+    "@dnd-kit/core": "6.3.1",
+    "@dnd-kit/sortable": "10.0.0",
+    "@dnd-kit/utilities": "3.2.2",
+    "@xstate/react": "6.1.0",
+    "@xyflow/react": "12.11.2",
+    "cmdk": "1.1.1",
+    "motion": "12.42.2",
     "next": "16.1.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "react-grid-layout": "^2.2.3",
-    "react-markdown": "^10.1.0",
-    "rehype-sanitize": "^6.0.0",
-    "remark-gfm": "^4.0.1"
+    "react-grid-layout": "2.2.3",
+    "react-markdown": "10.1.0",
+    "rehype-sanitize": "6.0.0",
+    "remark-gfm": "4.0.1",
+    "xstate": "5.32.5"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "6.9.1",

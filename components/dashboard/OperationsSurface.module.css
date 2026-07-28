@@ -1,0 +1,46 @@
+.surface {
+  display: grid;
+  gap: 14px;
+}
+
+.switcher {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: rgba(7, 11, 17, 0.88);
+}
+
+.switcher button {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  color: var(--text);
+  background: transparent;
+  padding: 0 14px;
+  font: 700 0.58rem ui-monospace, monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.switcher button:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+.switcher button.active,
+.active {
+  border-color: var(--cyan);
+  background: rgba(53, 231, 255, 0.1);
+  color: var(--cyan);
+}
+
+.loading {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.68rem;
+}
