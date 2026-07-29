@@ -47,12 +47,14 @@ Projects → Decisions → SOPs → Agents → Experiments
 
 ## Start Here
 
-1. Open this repository as an Obsidian vault.
-2. Follow `docs/OBSIDIAN_SETUP.md`.
-3. Open `00 Home/Life OS.md`.
-4. Open `00 Home/Personal Growth Dashboard.md` for the growth system.
-5. Create notes from `99 Templates/`.
-6. Run `powershell -ExecutionPolicy Bypass -File scripts/audit-vault.ps1` after changes.
+1. Clone or open the canonical GitHub repository `ebyron357/LifeOS-Enterprise` (not a non-git zip extract).
+2. Open this repository as an Obsidian vault.
+3. Follow `docs/OBSIDIAN_SETUP.md`.
+4. Open `00 Home/Life OS.md`.
+5. Open `00 Home/Personal Growth Dashboard.md` for the growth system.
+6. Create notes from `99 Templates/`.
+7. Run `pwsh -NoProfile -File scripts/audit-vault.ps1` after changes.
+8. See `docs/RELEASE_NOTES_v1.md` and `docs/DEPLOYMENT.md` for LifeOS Enterprise **v1.0.0**.
 
 ## Native Features
 

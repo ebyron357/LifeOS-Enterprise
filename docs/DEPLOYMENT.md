@@ -8,6 +8,13 @@
 - GitHub repo access for draft-PR persistence (optional until writes are enabled)
 - Vercel project linked to `ebyron357/LifeOS-Enterprise` (existing)
 
+## Canonical repository
+
+- GitHub: `https://github.com/ebyron357/LifeOS-Enterprise`
+- Default branch: `main`
+- Canonical local clone for release work: `C:\Users\Admin\Desktop\LifeOS-Enterprise`
+- Do **not** treat `LifeOS-Enterprise-main` Desktop extracts as source of truth (non-git copies)
+
 ## Environment variables
 
 | Variable | Required | Default / notes |
@@ -66,5 +73,15 @@ pwsh -NoProfile -File ./scripts/audit-vault.ps1
 ## Security posture (v1.0)
 
 - Reads: vault markdown via server components / APIs (no permanent provider keys in browser)
-- Writes: default-deny; draft PR only; path allowlists; canonical conflict detection (409)
-- Voice: opt-in; browser speech; HMAC sessions when secret configured; no LiveKit readiness claim
+- Writes: draft PR only; path allowlists; canonical conflict detection (409); never direct `main`
+- Voice: opt-in via `LIFEOS_VOICE_ENABLED`; browser speech; HMAC sessions when secret configured; no LiveKit readiness claim
+- Prefer `LIFEOS_WRITE_ENABLED=false` in Vercel unless draft-PR writes are intentionally active with secret + GitHub token
+- Production smoke (2026-07-28): voice disabled; change-plan POST without valid bearer returns `401`; `directMainWrites:false`
+
+## Known limitations
+
+- LiveKit room-token minting deferred (browser speech only)
+- Haitian Creole / French voice locales not verified
+- In-memory rate limiting (not shared across serverless instances)
+- 13 known transitive `npm audit` vulnerabilities remain accepted technical debt
+- Interactive Visual (#38) and Voice (#39) stacked PRs were superseded by release PR #40
