@@ -305,7 +305,18 @@ Remaining credential/local-UI-only actions:
 
 Remaining external / credential-only actions:
 
-- Human merge of release PR to `main`
-- Confirm Vercel production promotion
-- Intentionally enable `LIFEOS_WRITE_ENABLED` / `LIFEOS_VOICE_ENABLED` only when desired
+- Optionally set Vercel `LIFEOS_WRITE_ENABLED=false` for stricter flag posture (writes already fail without full configuration)
+- Intentionally enable `LIFEOS_VOICE_ENABLED` only when desired
 - Optional LiveKit room-token work deferred to a post-1.0 release
+
+### Production release confirmation (2026-07-28)
+
+| Item | Evidence |
+|------|----------|
+| PR #40 | Merged — `ef21fa16313a9f036b4c4083db9f8d76bddc65ab` |
+| PRs #38 / #39 | Closed as superseded |
+| Dashboard CI / Vault Health | Success on `ef21fa1` |
+| Vercel Production | Success for `ef21fa1` |
+| Voice disabled | Session API `provider:none`; UI “Voice disabled” |
+| Writes not fully configured | `configured:false`; unauthorized POST → `401` |
+| `directMainWrites` | `false` |

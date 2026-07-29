@@ -29,3 +29,9 @@ All notable changes to LifeOS Enterprise are documented in this file.
 
 - Added deployment guide, release notes, and this changelog
 - Updated voice/visual architecture notes for production V1 boundaries
+
+### Release
+
+- Merged via PR #40 onto `main` (`ef21fa1`)
+- Superseded stacked PRs #38 and #39 closed without merge
+- Production domain: `https://lifeos-enterprise.vercel.app`
