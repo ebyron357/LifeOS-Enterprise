@@ -7,8 +7,13 @@ export type VoiceAuthResult =
 const recentHits = new Map<string, number[]>();
 const SESSION_TTL_MS = 60 * 60 * 1000;
 
+/**
+ * Browser speech is a credential-free V1 capability, so it is enabled by
+ * default. Operators can still explicitly disable it with
+ * LIFEOS_VOICE_ENABLED=false.
+ */
 export function voiceFeatureEnabled() {
-  return process.env.LIFEOS_VOICE_ENABLED === "true";
+  return process.env.LIFEOS_VOICE_ENABLED !== "false";
 }
 
 /**
