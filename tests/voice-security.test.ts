@@ -33,13 +33,16 @@ describe("voice security helpers", () => {
     process.env.LIFEOS_VOICE_BROWSER_FALLBACK = previousFallback;
   });
 
-  it("gates the feature flag explicitly", () => {
+  it("enables browser voice by default and supports an explicit kill switch", () => {
     const previous = process.env.LIFEOS_VOICE_ENABLED;
+    delete process.env.LIFEOS_VOICE_ENABLED;
+    expect(voiceFeatureEnabled()).toBe(true);
     process.env.LIFEOS_VOICE_ENABLED = "false";
     expect(voiceFeatureEnabled()).toBe(false);
     process.env.LIFEOS_VOICE_ENABLED = "true";
     expect(voiceFeatureEnabled()).toBe(true);
-    process.env.LIFEOS_VOICE_ENABLED = previous;
+    if (previous === undefined) delete process.env.LIFEOS_VOICE_ENABLED;
+    else process.env.LIFEOS_VOICE_ENABLED = previous;
   });
 
   it("requires write secret for write authorization", () => {
