@@ -141,13 +141,28 @@ function outcomeFromBody(body: string): string {
 
 const TEMPLATE_PATH_MARKERS = ["/templates/", "templates/", "99 templates/"];
 
+/**
+ * Matches a folder-index file by its actual filename on disk, never by its
+ * rendered title. This matters because an index note's H1 heading (which
+ * becomes VaultNote.title) can read as an ordinary-looking project name —
+ * e.g. `10 Projects/README.md` renders with title "Projects" — while the
+ * file itself is still just folder documentation, not a project record.
+ * Deliberately does not special-case any specific title string.
+ */
+const INDEX_FILENAME_PATTERN = /^(readme|index|_index|start[_ ]?here)\.md$/i;
+
+export function isIndexNote(path: string): boolean {
+  const basename = path.split(/[\\/]/).pop() ?? path;
+  return INDEX_FILENAME_PATTERN.test(basename);
+}
+
 export function isTrackableProjectNote(note: Pick<VaultNote, "path" | "title" | "type" | "section">): boolean {
   const lowerPath = note.path.toLowerCase();
   const isProject = note.type === "project" || note.section === "projects";
   const isTemplate = note.section === "templates" || TEMPLATE_PATH_MARKERS.some((marker) => lowerPath.includes(marker));
-  const isReadme = note.title.trim().toLowerCase() === "readme";
+  const isIndex = isIndexNote(note.path);
   const hasPlaceholderTitle = /\{\{[^}]+\}\}/.test(note.title);
-  return isProject && !isTemplate && !isReadme && !hasPlaceholderTitle;
+  return isProject && !isTemplate && !isIndex && !hasPlaceholderTitle;
 }
 
 /**

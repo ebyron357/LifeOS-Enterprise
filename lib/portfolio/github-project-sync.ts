@@ -29,13 +29,28 @@ export interface ProjectsV2Client {
   listItems(projectId: string): Promise<ProjectV2Item[]>;
   createField(projectId: string, name: string, dataType: ProjectV2Field["dataType"], options?: string[]): Promise<ProjectV2Field>;
   createItem(projectId: string, title: string): Promise<ProjectV2Item>;
-  updateItemField(projectId: string, itemId: string, fieldId: string, value: string): Promise<void>;
+  /**
+   * Takes the full field definition (not just its ID) because GitHub's
+   * mutation shape for a field's value depends on the field's dataType:
+   * TEXT wants `{ text }`, DATE wants `{ date }`, and SINGLE_SELECT wants
+   * `{ singleSelectOptionId }` (looked up from `field.options` by name) —
+   * never a raw string, or the mutation is rejected with "Did not receive
+   * a single select option Id to update a field of type single_select."
+   */
+  updateItemField(projectId: string, itemId: string, field: ProjectV2Field, value: string): Promise<void>;
 }
 
-/** Field name -> required shape. Names are matched case-insensitively against the existing board before anything is created. */
+/**
+ * Field name -> required shape. Names are matched case-insensitively against the existing
+ * board before anything is created. Deliberately named "Portfolio Status" rather than
+ * "Status": GitHub's default `Status` field represents generic workflow columns (Todo/In
+ * Progress/Done) and is never reused, read from, or written to by this sync. `Portfolio
+ * Status` is a distinct field with Life OS's own controlled vocabulary, so it can never be
+ * fuzzy-matched onto the default field by `planFieldReuse`'s normalized-name comparison.
+ */
 export const REQUIRED_FIELD_DEFINITIONS: Array<{ name: string; dataType: ProjectV2Field["dataType"]; options?: string[] }> = [
   { name: "Project ID", dataType: "TEXT" },
-  { name: "Status", dataType: "SINGLE_SELECT", options: ["Inbox", "Needs Review", "Needs Audit", "Planned", "Ready", "Active", "Waiting", "Blocked", "Review", "Completed", "Archived"] },
+  { name: "Portfolio Status", dataType: "SINGLE_SELECT", options: ["Inbox", "Needs Review", "Needs Audit", "Planned", "Ready", "Active", "Waiting", "Blocked", "Review", "Completed", "Archived"] },
   { name: "Priority", dataType: "SINGLE_SELECT", options: ["Critical", "High", "Medium", "Low", "Someday"] },
   { name: "Health", dataType: "SINGLE_SELECT", options: ["On Track", "At Risk", "Blocked", "Unknown"] },
   { name: "Current Phase", dataType: "TEXT" },
@@ -118,6 +133,8 @@ export function isRetryableError(error: unknown): boolean {
 
 export type SyncPlanItem = {
   projectId: string;
+  /** Human-readable project name (PortfolioProject.name), used as the board item's title. Never the internal projectId slug. */
+  title: string;
   action: "create" | "update" | "skip-unchanged";
   fieldsToWrite: Record<string, string>;
   conflicts: SyncConflict[];
@@ -131,7 +148,11 @@ export type SyncPlan = {
 
 function projectFieldValues(project: PortfolioProject): Record<string, string> {
   return {
-    Status: project.status,
+    // Written on every sync, including "create": this is the stable identifier planSync
+    // matches existing board items against. Without it, every run would fail to recognize
+    // items it already created and would keep proposing duplicates.
+    "Project ID": project.projectId,
+    "Portfolio Status": project.status,
     Priority: project.priority,
     Health: project.health,
     "Current Phase": project.phase,
@@ -160,6 +181,16 @@ export type LastSyncedSnapshot = Record<string, Record<string, string>>; // proj
  * never consults the network itself. A field is only ever proposed as a
  * conflict — never silently overwritten — when the board's current value
  * differs from both the last-synced snapshot and matches neither.
+ *
+ * Deliberately does NOT drop fields from `fieldsToWrite` just because
+ * `fieldPlan.missing` says they don't exist on the board yet at plan time:
+ * `applySync` may create those exact fields moments later in the same run
+ * (`createMissingFields: true`), and the field-ID lookup guard in `applySync`
+ * is the single source of truth for whether a write can actually happen. A
+ * field is only ever a no-op there — never a silent write failure. Filtering
+ * here too would (and, in the first live run against a brand-new board,
+ * did) strip every field from every newly created item, since all required
+ * fields are "missing" on a fresh board at the moment the plan is built.
  */
 export function planSync(
   projects: PortfolioProject[],
@@ -184,15 +215,11 @@ export function planSync(
     const fieldsToWrite: Record<string, string> = {};
 
     if (!existingItem) {
-      const writable = Object.fromEntries(
-        Object.entries(proposedValues).filter(([fieldName]) => !fieldPlan.missing.includes(fieldName)),
-      );
-      items.push({ projectId: project.projectId, action: "create", fieldsToWrite: writable, conflicts: [] });
+      items.push({ projectId: project.projectId, title: project.name, action: "create", fieldsToWrite: { ...proposedValues }, conflicts: [] });
       continue;
     }
 
     for (const [fieldName, proposedValue] of Object.entries(proposedValues)) {
-      if (fieldPlan.missing.includes(fieldName)) continue; // can't write a field that doesn't exist yet
       const boardValue = itemFieldValue(existingItem, fieldName) ?? "";
       const lastWritten = previouslySynced[fieldName] ?? "";
 
@@ -218,7 +245,7 @@ export function planSync(
     }
 
     const action: SyncPlanItem["action"] = Object.keys(fieldsToWrite).length > 0 ? "update" : "skip-unchanged";
-    items.push({ projectId: project.projectId, action, fieldsToWrite, conflicts });
+    items.push({ projectId: project.projectId, title: project.name, action, fieldsToWrite, conflicts });
   }
 
   return {
@@ -254,8 +281,8 @@ export async function applySync(
   let itemsSkippedUnchanged = 0;
   const allConflicts: SyncConflict[] = [];
 
-  const fieldIdByName = new Map<string, string>();
-  for (const [name, field] of fieldPlan.reused) fieldIdByName.set(name, field.id);
+  const fieldByName = new Map<string, ProjectV2Field>();
+  for (const [name, field] of fieldPlan.reused) fieldByName.set(name, field);
 
   if (options.createMissingFields && !options.dryRun) {
     for (const missingName of plan.fieldsMissing) {
@@ -263,7 +290,7 @@ export async function applySync(
       if (!def) continue;
       try {
         const created = await withRetry(() => client.createField(projectId, def.name, def.dataType, def.options));
-        fieldIdByName.set(def.name, created.id);
+        fieldByName.set(def.name, created);
         log.push({ timestamp: new Date().toISOString(), level: "info", message: `Created missing field "${def.name}".` });
       } catch (error) {
         errors.push(`Failed to create field "${def.name}": ${error instanceof Error ? error.message : String(error)}`);
@@ -301,7 +328,7 @@ export async function applySync(
     try {
       let itemId: string;
       if (planItem.action === "create") {
-        const created = await withRetry(() => client.createItem(projectId, planItem.projectId));
+        const created = await withRetry(() => client.createItem(projectId, planItem.title));
         itemId = created.id;
         itemsCreated += 1;
       } else {
@@ -311,12 +338,19 @@ export async function applySync(
       }
 
       for (const [fieldName, value] of Object.entries(planItem.fieldsToWrite)) {
-        const fieldId = fieldIdByName.get(fieldName);
-        if (!fieldId) {
+        const field = fieldByName.get(fieldName);
+        if (!field) {
           log.push({ timestamp: new Date().toISOString(), level: "warn", message: `Skipped field "${fieldName}" (no field ID available).`, projectId: planItem.projectId });
           continue;
         }
-        await withRetry(() => client.updateItemField(projectId, itemId, fieldId, value));
+        if (field.dataType === "SINGLE_SELECT" && !field.options?.some((o) => o.name === value)) {
+          log.push({ timestamp: new Date().toISOString(), level: "warn", message: `Skipped field "${fieldName}" (value "${value}" is not one of its single-select options).`, projectId: planItem.projectId });
+          continue;
+        }
+        if (field.dataType === "DATE" && value === "") {
+          continue; // nothing to write; an empty string is not a valid ISO date for GitHub's API
+        }
+        await withRetry(() => client.updateItemField(projectId, itemId, field, value));
       }
 
       log.push({ timestamp: new Date().toISOString(), level: "info", message: `Applied ${planItem.action}.`, projectId: planItem.projectId });

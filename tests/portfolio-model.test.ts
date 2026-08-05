@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildPortfolioProject, isStale, isTrackableProjectNote, needsAttention, toPortfolioPriority, toPortfolioStatus } from "@/lib/portfolio/model";
+import { buildPortfolioProject, isIndexNote, isStale, isTrackableProjectNote, needsAttention, toPortfolioPriority, toPortfolioStatus } from "@/lib/portfolio/model";
 import type { VaultNote } from "@/lib/vault/types";
 
 function note(overrides: Partial<VaultNote> & { frontmatter?: Record<string, unknown> } = {}): VaultNote {
@@ -135,10 +135,35 @@ describe("attention and trackability filters", () => {
     expect(needsAttention(fine, "2026-08-01")).toBe(false);
   });
 
-  it("excludes templates, README index notes, and placeholder titles from the trackable set", () => {
+  it("excludes templates and placeholder titles from the trackable set", () => {
     expect(isTrackableProjectNote(note({ path: "99 Templates/Project Template.md", section: "templates" }))).toBe(false);
-    expect(isTrackableProjectNote(note({ title: "README", type: "project" }))).toBe(false);
     expect(isTrackableProjectNote(note({ title: "{{project_name}}", type: "project" }))).toBe(false);
     expect(isTrackableProjectNote(note({ type: "project" }))).toBe(true);
+  });
+
+  it("excludes folder-index files by their actual filename, never by the note's rendered title", () => {
+    // Regression case: 10 Projects/README.md has an H1 heading of "# Projects", so its
+    // VaultNote.title reads as an ordinary-looking project name. It must still be excluded
+    // because the file itself is folder documentation, identified by its real filename.
+    expect(isIndexNote("10 Projects/README.md")).toBe(true);
+    expect(isTrackableProjectNote(note({ path: "10 Projects/README.md", title: "Projects", type: null, section: "projects" }))).toBe(false);
+  });
+
+  it("applies the index-note rule generally (README/index/_index/START_HERE), not as a one-off title exception", () => {
+    expect(isIndexNote("Businesses/README.md")).toBe(true);
+    expect(isIndexNote("index.md")).toBe(true);
+    expect(isIndexNote("_index.md")).toBe(true);
+    expect(isIndexNote("10 Projects/START_HERE.md")).toBe(true);
+    expect(isIndexNote("10 Projects/Start Here.md")).toBe(true);
+  });
+
+  it("never excludes a legitimate project note just because its title happens to contain a common word", () => {
+    // Confirms the rule is path-based, not a hidden title blocklist: a real project
+    // note titled "Projects Overview 2026" (a plausible, legitimate project name)
+    // living at a normal filename must still be trackable.
+    expect(isIndexNote("10 Projects/Projects Overview 2026.md")).toBe(false);
+    expect(
+      isTrackableProjectNote(note({ path: "10 Projects/Projects Overview 2026.md", title: "Projects Overview 2026", type: "project", section: "projects" })),
+    ).toBe(true);
   });
 });

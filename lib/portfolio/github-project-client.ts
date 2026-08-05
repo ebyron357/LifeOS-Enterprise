@@ -39,10 +39,26 @@ type ListFieldsResponse = {
   node: {
     fields: {
       pageInfo: PageInfo;
-      nodes: Array<{ id: string; name: string; dataType?: string; options?: Array<{ id: string; name: string }> }>;
+      nodes: Array<{ id: string; name: string; dataType: string; options?: Array<{ id: string; name: string }> }>;
     };
   };
 };
+
+/**
+ * GitHub's ProjectV2FieldType enum has more members than our four (e.g.
+ * NUMBER, ITERATION, ASSIGNEES, LABELS, REPOSITORY, TITLE, ...). Anything
+ * we don't explicitly model is treated as TEXT so listFields never throws
+ * on GitHub's own built-in fields (Assignees, Labels, Repository, etc.) —
+ * REQUIRED_FIELD_DEFINITIONS only ever asks to reuse a field by exact
+ * name, so an imprecise fallback type for an unrelated default field is
+ * harmless; it is never selected for reuse anyway.
+ */
+function toProjectV2DataType(raw: string, hasOptions: boolean): ProjectV2Field["dataType"] {
+  if (hasOptions || raw === "SINGLE_SELECT") return "SINGLE_SELECT";
+  if (raw === "DATE") return "DATE";
+  if (raw === "NUMBER") return "NUMBER";
+  return "TEXT";
+}
 
 type ListItemsResponse = {
   node: {
@@ -76,8 +92,8 @@ export function createGithubProjectsV2Client(token: string): ProjectsV2Client {
                 fields(first: 50, after: $after) {
                   pageInfo { hasNextPage endCursor }
                   nodes {
-                    ... on ProjectV2FieldCommon { id name }
-                    ... on ProjectV2SingleSelectField { id name options { id name } }
+                    ... on ProjectV2FieldCommon { id name dataType }
+                    ... on ProjectV2SingleSelectField { id name dataType options { id name } }
                   }
                 }
               }
@@ -91,7 +107,7 @@ export function createGithubProjectsV2Client(token: string): ProjectsV2Client {
           fields.push({
             id: node.id,
             name: node.name,
-            dataType: node.options ? "SINGLE_SELECT" : "TEXT",
+            dataType: toProjectV2DataType(node.dataType, Boolean(node.options)),
             options: node.options,
           });
         }
@@ -176,12 +192,25 @@ export function createGithubProjectsV2Client(token: string): ProjectsV2Client {
       return { id: data.addProjectV2DraftIssue.projectItem.id, fieldValues: [] };
     },
 
-    async updateItemField(projectId, itemId, fieldId, value) {
+    async updateItemField(projectId, itemId, field, value) {
+      let fieldValue: Record<string, unknown>;
+      if (field.dataType === "SINGLE_SELECT") {
+        const option = field.options?.find((o) => o.name === value);
+        if (!option) {
+          throw new Error(`No single-select option named "${value}" on field "${field.name}".`);
+        }
+        fieldValue = { singleSelectOptionId: option.id };
+      } else if (field.dataType === "DATE") {
+        fieldValue = { date: value };
+      } else {
+        fieldValue = { text: value };
+      }
+
       await graphql(
         `mutation($input: UpdateProjectV2ItemFieldValueInput!) {
           updateProjectV2ItemFieldValue(input: $input) { projectV2Item { id } }
         }`,
-        { input: { projectId, itemId, fieldId, value: { text: value } } },
+        { input: { projectId, itemId, fieldId: field.id, value: fieldValue } },
         token,
       );
     },

@@ -60,3 +60,34 @@ This entire change is isolated to a single branch and a single draft PR; nothing
 
 - `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` — results recorded in the PR description for this branch.
 - Sync engine dry-run evidence against **mocked** GitHub Project data — see `tests/portfolio-github-project-sync.test.ts` (test cases 9-15) and the CLI demo output in the PR description. Live dry-run against the real board is blocked by the missing `project` scope above.
+
+## Entry: GitHub Project 2 Live Apply — Corrections and Field-Write Bug Fixes
+
+- **Date**: 2026-08-04
+- **Branch**: `feat/canonical-portfolio-control-layer` (same branch/PR as above)
+- **Scope**: Applied the two required corrections to the portfolio model, then ran and applied the live GitHub Project 2 sync for the first time. Three bugs were found and fixed while verifying the live board state — see below. No default GitHub field or workflow was touched; no PR was merged.
+
+### Corrections applied (as requested, before any live write)
+
+1. **Portfolio Status is a new, separate field.** `REQUIRED_FIELD_DEFINITIONS` and `projectFieldValues()` in `lib/portfolio/github-project-sync.ts` now define/write `Portfolio Status` (11 Life OS values), never GitHub's default `Status` (Todo/In Progress/Done). `planFieldReuse`'s normalized-name matching cannot conflate the two names, so this is enforced structurally, not just by convention — see the new test "never fuzzy-matches Portfolio Status onto GitHub's default Status field."
+2. **Index-note exclusion is now path-based, not a title exception.** `lib/portfolio/model.ts` adds `isIndexNote(path)`, matching the file's actual basename (`readme.md`, `index.md`, `_index.md`, `start_here.md`, case-insensitive) — never the note's rendered title. `10 Projects/README.md` has an `# Projects` H1 heading (so `VaultNote.title` reads "Projects"), which is why title-based matching was wrong; the file itself has no frontmatter and is folder documentation. This rule is applied generally, so any folder's `README.md` vault-wide is excluded the same way, and a legitimately-named project note (even one containing the word "Projects" in its title) is untouched — see `tests/portfolio-model.test.ts`.
+
+### Bugs found and fixed while verifying the live apply
+
+The revised dry-run (7 items, Portfolio Status as new field, 0 conflicts) passed cleanly and the apply conditions were met, but the **first live apply against the real, empty GitHub Project 2 board** surfaced three bugs that mocked-client tests hadn't caught, because the mocks didn't model GitHub's real per-field-type mutation contract or a genuinely empty starting board:
+
+1. **`planSync` stripped every field from a newly created item.** It pre-filtered `fieldsToWrite` by `fieldPlan.missing` at plan time — but on a brand-new board every one of the 16 required fields is "missing" at plan time, even though `applySync` was about to create them a moment later in the same run. Result: items were created with zero Life OS field values. Fixed by removing that pre-filter; `applySync`'s existing per-write field-ID lookup is now the single source of truth for whether a field can actually be written, and correctly no-ops (with a warn log) only when a field genuinely will not exist.
+2. **Single-select writes sent raw text.** GitHub's `UpdateProjectV2ItemFieldValueInput` requires `{ singleSelectOptionId }` for single-select fields (e.g. `Portfolio Status`, `Priority`, `Health`, `Sync Status`) and `{ date }` for date fields — never `{ text }` for either. Fixed by changing `ProjectsV2Client.updateItemField` to take the full `ProjectV2Field` (not just its ID) and shape the mutation value by `field.dataType`, with a guard that skips (rather than throws) when a proposed value doesn't match any option, or when a date value is empty.
+3. **`listFields` misclassified DATE fields as TEXT.** The GraphQL query never actually requested the field's `dataType`; it *guessed* SINGLE_SELECT vs TEXT based only on whether `options` was present, so `Review Date`/`Last Verified`/`Due Date` came back looking like TEXT fields once fetched from the real board, defeating fix #2 for exactly the fields it was meant to protect. Fixed by requesting `dataType` directly in the query and mapping GitHub's `ProjectV2FieldType` enum properly (unrecognized types default to TEXT, which is safe since reuse is by exact field name).
+4. **`projectFieldValues()` never wrote `Project ID`.** The field was created on the board but never populated on any item, which would have broken idempotency on every subsequent run (`planSync` matches existing items by their `Project ID` field value; with it never written, every run would look like 7 brand-new projects forever). Fixed by adding `Project ID` to the values written on every sync.
+
+All four fixes are covered by new/updated tests: `tests/portfolio-github-project-sync.test.ts` (field-name collision guard, "writes real field values onto items even when required fields are created for the first time in the same apply run," "always writes the stable Project ID on create") and the new `tests/portfolio-github-project-client.test.ts` (mocks `fetch` to assert the exact mutation payload shape per field type).
+
+### Live-board cleanup performed as part of this fix
+
+Each of the three bugs above was caught by inspecting the live board immediately after an apply, before treating that apply as final. Every apply that produced incomplete items (bug 1, then bug 2/3) was followed by deleting only the specific items that run had just created (via `gh project item-delete`) — never any pre-existing board data, since Project 2 had 0 items before this session — and re-running dry-run → apply from clean field data once the underlying bug was fixed. The final apply (after all four fixes) produced 0 errors, and a subsequent no-op re-run confirmed idempotency (`would create: 0, would update: 0, unchanged: 7`).
+
+### Rollback procedure (this entry)
+
+- **Code**: isolated to the same unmerged branch/PR as above; closing the PR/branch fully reverts it.
+- **Live board data**: to undo, delete the 16 additive fields and 7 items this run created on GitHub Project 2 (all listed in the report returned alongside this entry). GitHub's default `Status` field, its 3 options, and the 6 default workflows were never touched and need no rollback.
