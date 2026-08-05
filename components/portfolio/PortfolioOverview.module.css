@@ -1,0 +1,16 @@
+.stack { display:grid; gap:28px; margin:14px 0; }
+.sectionTitle { margin:0 0 12px; font-family:Arial,Helvetica,sans-serif; font-size:1.05rem; }
+.helpText { max-width:760px; margin:0 0 12px; color:var(--muted); font-size:.66rem; line-height:1.6; }
+.attentionRow { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; }
+.attentionCard { display:grid; gap:8px; padding:16px; border:1px solid var(--line); border-left:2px solid var(--amber); background:linear-gradient(145deg,rgba(10,24,22,.9),rgba(7,11,17,.98)); color:var(--text); text-decoration:none; }
+.attentionCard strong { font-family:Arial,Helvetica,sans-serif; font-size:.85rem; }
+.attentionCard span { color:var(--muted); font-size:.62rem; line-height:1.5; }
+.badge { display:inline-flex; align-items:center; padding:3px 8px; border:1px solid var(--line); font:700 .55rem ui-monospace,monospace; text-transform:uppercase; letter-spacing:.05em; }
+.badge.positive { border-color:var(--green); color:var(--green); }
+.badge.warning { border-color:var(--amber); color:var(--amber); }
+.badge.danger { border-color:var(--red); color:var(--red); }
+.badge.neutral { border-color:var(--line); color:var(--muted); }
+.registryGrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
+.registryGrid h3 { margin:0 0 8px; font-family:Arial,Helvetica,sans-serif; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+.registryGrid ul { display:grid; gap:6px; margin:0; padding:0; list-style:none; }
+.registryGrid li { padding:8px 10px; border:1px solid var(--line); font-size:.62rem; line-height:1.5; }
