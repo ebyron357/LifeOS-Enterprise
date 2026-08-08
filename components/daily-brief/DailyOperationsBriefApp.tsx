@@ -23,7 +23,7 @@ import {
   rejectWorkOrder,
   startEndOfDayReview,
 } from "@/lib/daily-brief/store";
-import { useDailyBriefStore } from "@/lib/daily-brief/use-daily-brief-store";
+import { useDailyBriefStore, readStoredDailyBriefState } from "@/lib/daily-brief/use-daily-brief-store";
 import type { DailyOperationsBrief } from "@/lib/daily-brief/types";
 import styles from "./DailyOperationsBriefApp.module.css";
 
@@ -44,11 +44,18 @@ export function DailyOperationsBriefApp({ projects, generatedAtIso }: Props) {
   const [evidenceOpen, setEvidenceOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    const existing = getLatestRevision(store, today);
-    if (existing) return;
-    const previousBrief = getMostRecentApprovedBrief(store, today);
-    const brief = generateDailyBrief({ projects, now, previousBrief, existingRevisions: store.revisionsByDate[today] });
-    setStore(addBriefRevision(store, brief));
+    // Read the true persisted state directly rather than the React `store`
+    // value, which may still reflect the pre-hydration SSR fallback on the
+    // very first client render.
+    const persisted = readStoredDailyBriefState();
+    const existing = getLatestRevision(persisted, today);
+    if (existing) {
+      if (getLatestRevision(store, today) == null) setStore(persisted);
+      return;
+    }
+    const previousBrief = getMostRecentApprovedBrief(persisted, today);
+    const brief = generateDailyBrief({ projects, now, previousBrief, existingRevisions: persisted.revisionsByDate[today] });
+    setStore(addBriefRevision(persisted, brief));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
