@@ -299,3 +299,92 @@ tags:
 7. Empty optional properties may remain blank; required properties may not.
 8. Archived notes use `status: archived` and live under `90 Archive/` when practical.
 9. Personal growth ratings must be self-reported or evidence-based; automation may summarize them but may not fabricate them.
+
+## Portfolio Extension (canonical portfolio control layer)
+
+These properties are **additive and optional** on existing `type: project` notes. They extend, and never replace, the Required Properties by Type above. A project note with none of these fields is still fully valid; the portfolio layer computes safe defaults (see `lib/portfolio/model.ts`) instead of requiring a rewrite of existing notes.
+
+```yaml
+---
+project_id:            # stable slug, e.g. "build-ai-consultant-portfolio"; derived from filename if absent
+outcome:                # one-sentence intended outcome; falls back to the note's "## Outcome" section if absent
+phase:                  # free-text current phase, e.g. "Pilot", "Discovery", "Build"
+health:                 # On Track | At Risk | Blocked | Unknown
+portfolio_status:       # see Portfolio Status below; if absent, derived from legacy `status`
+last_verified:          # ISO date the project's repo/status/next_action were last human- or evidence-confirmed
+assigned_agent:         # optional link to a `type: agent` note; a record only, never an execution claim
+canonical_repo:         # "owner/name" of the single canonical repository, if any
+reference_repos:        # list of "owner/name" repositories that are references, duplicates, or experiments
+github_project_item_id: # opaque ID of the linked GitHub Project 2 item, once synchronized
+evidence:               # list of short evidence strings/links backing status or health claims
+sync_status:            # Not Synced | Synced | Conflict | Sync Error
+---
+```
+
+### Portfolio Status (computed/optional)
+
+This is a normalized superset of the legacy `status` field above, used by the portfolio layer and GitHub Project 2. It does not replace `status`; existing notes are not required to adopt it. Legacy → Portfolio Status mapping is fixed and documented in `lib/portfolio/model.ts`.
+
+```text
+Inbox
+Needs Review
+Needs Audit
+Planned
+Ready
+Active
+Waiting
+Blocked
+Review
+Completed
+Archived
+```
+
+Legacy → Portfolio Status defaults (used only when `portfolio_status` is absent):
+
+| Legacy `status` | Portfolio Status |
+|---|---|
+| `inbox` | Inbox |
+| `planned`, `draft`, `design` | Planned |
+| `active`, `approved`, `decided` | Active |
+| `waiting` | Waiting |
+| `blocked` | Blocked |
+| `paused` | Waiting |
+| `review` | Review |
+| `complete` | Completed |
+| `archived`, `cancelled` | Archived |
+| anything else / missing | Needs Review |
+
+### Portfolio Priority (computed/optional)
+
+Maps directly from the existing `priority` (`P0`-`P3`) scale; `priority` itself is unchanged.
+
+| `priority` | Portfolio Priority |
+|---|---|
+| `P0` | Critical |
+| `P1` | High |
+| `P2` | Medium |
+| `P3` | Someday |
+| missing | Medium |
+
+### Repository Classification (per repository, not per project)
+
+Used in `canonical_repo`/`reference_repos` mapping evidence (see `docs/PORTFOLIO_REPOSITORY_MAPPING_PROPOSAL.md`), never written into project frontmatter directly:
+
+```text
+Canonical
+Reference
+Duplicate Review
+Template
+Experiment
+Archive Candidate
+Archived
+Unknown
+```
+
+### Portfolio validation rules
+
+1. `portfolio_status`, `health`, and `sync_status`, when present, must use only the controlled values above.
+2. `assigned_agent` must reference an existing `type: agent` note by wikilink; it records an intended human/agent owner and must never be read as proof of autonomous execution.
+3. `canonical_repo` must be a single `owner/name` string; `reference_repos` is always a list, even with one entry.
+4. A project may have zero or one `canonical_repo`, and any number of `reference_repos`.
+5. `last_verified` is set only from direct evidence (a command run, a fetched page, a merged PR) — never backfilled with today's date as a default.
