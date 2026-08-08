@@ -9,6 +9,7 @@
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "portfolio:sync": "tsx scripts/portfolio/sync-github-project.ts",
     "portfolio:mapping-proposal": "tsx scripts/portfolio/generate-repository-mapping-proposal.ts"
   },
@@ -30,6 +31,7 @@
     "xstate": "5.32.5"
   },
   "devDependencies": {
+    "@playwright/test": "1.62.1",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.2",
     "@types/node": "24.10.9",

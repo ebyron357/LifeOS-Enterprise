@@ -26,3 +26,20 @@ export function useDailyBriefStore(): [DailyBriefStoreState, (next: DailyBriefSt
 
   return [state, setValidated];
 }
+
+/**
+ * Reads the persisted store directly from localStorage, bypassing React
+ * state. Used only for the one-time "generate today's brief if missing"
+ * bootstrap effect, so it is never racing a not-yet-hydrated
+ * `useSyncExternalStore` snapshot on the very first client render.
+ */
+export function readStoredDailyBriefState(): DailyBriefStoreState {
+  if (typeof window === "undefined") return emptyStoreState();
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return emptyStoreState();
+    return JSON.parse(raw) as DailyBriefStoreState;
+  } catch {
+    return emptyStoreState();
+  }
+}
