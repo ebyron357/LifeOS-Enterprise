@@ -5,6 +5,7 @@ import Link from "next/link";
 import { noteHref } from "@/lib/vault/slug";
 import type { PortfolioProject } from "@/lib/portfolio/types";
 import { generateDailyBrief } from "@/lib/daily-brief/generate-brief";
+import { dateKeyInTimezone } from "@/lib/daily-brief/date";
 import { buildEndOfDayReview } from "@/lib/daily-brief/build-end-of-day-review";
 import {
   addBriefRevision,
@@ -30,15 +31,16 @@ import styles from "./DailyOperationsBriefApp.module.css";
 type Props = {
   projects: PortfolioProject[];
   generatedAtIso: string;
+  timezone: string;
 };
 
 function useNow(generatedAtIso: string) {
   return useMemo(() => new Date(generatedAtIso), [generatedAtIso]);
 }
 
-export function DailyOperationsBriefApp({ projects, generatedAtIso }: Props) {
+export function DailyOperationsBriefApp({ projects, generatedAtIso, timezone }: Props) {
   const now = useNow(generatedAtIso);
-  const today = now.toISOString().slice(0, 10);
+  const today = dateKeyInTimezone(now, timezone);
   const [store, setStore] = useDailyBriefStore();
   const [selectedDate, setSelectedDate] = useState(today);
   const [evidenceOpen, setEvidenceOpen] = useState<Record<string, boolean>>({});
@@ -54,7 +56,7 @@ export function DailyOperationsBriefApp({ projects, generatedAtIso }: Props) {
       return;
     }
     const previousBrief = getMostRecentApprovedBrief(persisted, today);
-    const brief = generateDailyBrief({ projects, now, previousBrief, existingRevisions: persisted.revisionsByDate[today] });
+    const brief = generateDailyBrief({ projects, now, timezone, previousBrief, existingRevisions: persisted.revisionsByDate[today] });
     setStore(addBriefRevision(persisted, brief));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -66,7 +68,7 @@ export function DailyOperationsBriefApp({ projects, generatedAtIso }: Props) {
   function regenerate() {
     const currentRevisions = store.revisionsByDate[today] ?? [];
     const previousBrief = getMostRecentApprovedBrief(store, today);
-    const nextDraft = generateDailyBrief({ projects, now: new Date(), previousBrief, existingRevisions: currentRevisions });
+    const nextDraft = generateDailyBrief({ projects, now: new Date(), timezone, previousBrief, existingRevisions: currentRevisions });
     const latest = getLatestRevision(store, today);
     if (latest && (latest.state === "Approved" || latest.state === "Active" || latest.state === "Completed")) {
       setStore(regenerateAfterApproval(store, today, nextDraft));
@@ -139,6 +141,7 @@ export function DailyOperationsBriefApp({ projects, generatedAtIso }: Props) {
         <p className="widget-eyebrow">Today&rsquo;s Mission · {brief.state} · revision {brief.revision}</p>
         <h2>{brief.todaysMission}</h2>
         <button type="button" onClick={editTodaysMission}>Edit mission</button>
+        <p className={styles.calendarNote} role="note">Brief and review history is stored only in this browser; it is not backed up or synchronized across devices.</p>
         {!brief.calendar.connected ? (
           <p className={styles.calendarNote} role="note">{brief.calendar.reason}</p>
         ) : null}
@@ -201,9 +204,9 @@ export function DailyOperationsBriefApp({ projects, generatedAtIso }: Props) {
 
       <section aria-label="Proposed schedule">
         <h3 className={styles.sectionTitle}>Proposed schedule · Suggest Only</h3>
-        <p className={styles.helpText}>No calendar event is created or modified. Approve or reject the proposal below; edits stay local until approved.</p>
+        <p className={styles.helpText}>Times use {brief.timezone}. No calendar event is created or modified. This proposal and your response remain only in this browser.</p>
         <div className={styles.scheduleActions}>
-          <button type="button" onClick={() => setStore(approveSchedule(store, selectedDate, nowIso()))}>Approve schedule</button>
+          <button type="button" onClick={() => setStore(approveSchedule(store, selectedDate, nowIso()))}>{brief.calendar.connected ? "Approve schedule" : "Accept assumed schedule"}</button>
           <button type="button" onClick={() => setStore(rejectSchedule(store, selectedDate, nowIso()))}>Reject schedule</button>
           <span className={styles.badge}>{brief.scheduleApprovalState}</span>
         </div>
