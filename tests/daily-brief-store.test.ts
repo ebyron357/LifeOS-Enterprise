@@ -10,6 +10,7 @@ import {
 } from "@/lib/daily-brief/store";
 import { generateDailyBrief } from "@/lib/daily-brief/generate-brief";
 import { portfolioProject } from "./daily-brief-fixtures";
+import { isDailyBriefStoreState } from "@/lib/daily-brief/use-daily-brief-store";
 
 const NOW = new Date("2026-08-10T09:00:00.000Z");
 
@@ -56,5 +57,17 @@ describe("daily brief store — revision history", () => {
 
     const found = getMostRecentApprovedBrief(state, "2026-08-10");
     expect(found?.briefId).toBe(day1.briefId);
+  });
+});
+
+describe("daily brief store — persisted shape validation", () => {
+  it("accepts the current store schema", () => {
+    expect(isDailyBriefStoreState(emptyStoreState())).toBe(true);
+  });
+
+  it("rejects valid JSON with an obsolete or partial shape", () => {
+    expect(isDailyBriefStoreState({ schemaVersion: 0, revisionsByDate: {}, endOfDayReviewsByDate: {} })).toBe(false);
+    expect(isDailyBriefStoreState({ schemaVersion: 1, revisionsByDate: null, endOfDayReviewsByDate: {} })).toBe(false);
+    expect(isDailyBriefStoreState({ schemaVersion: 1, revisionsByDate: { "2026-08-08": {} }, endOfDayReviewsByDate: {} })).toBe(false);
   });
 });
