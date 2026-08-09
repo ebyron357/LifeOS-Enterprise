@@ -3,7 +3,7 @@ import { DailyOperationsBriefApp } from "@/components/daily-brief/DailyOperation
 import { getPortfolioData } from "@/lib/portfolio/build-portfolio-data";
 import { getSectionCounts } from "@/lib/vault/index";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export default async function DailyOperationsBriefPage() {
   const now = new Date();
