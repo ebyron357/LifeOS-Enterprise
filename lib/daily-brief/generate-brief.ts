@@ -13,6 +13,7 @@ import type {
   TopOutcome,
 } from "./types";
 import { resolveCalendarState } from "./calendar";
+import { dateKeyInTimezone } from "./date";
 import { buildProposedSchedule, DEFAULT_SCHEDULER_SETTINGS, type SchedulerSettings } from "./scheduler";
 import { buildProposedWorkOrders } from "./work-orders";
 
@@ -296,8 +297,8 @@ function buildMission(outcomes: TopOutcome[], startHere: StartHereAction | null)
  */
 export function generateDailyBrief(input: GenerateBriefInput): DailyOperationsBrief {
   const now = input.now ?? new Date();
-  const timezone = input.timezone ?? "UTC";
-  const today = now.toISOString().slice(0, 10);
+  const timezone = input.timezone ?? "America/New_York";
+  const today = dateKeyInTimezone(now, timezone);
   const generatedAt = now.toISOString();
 
   const candidates = input.projects
