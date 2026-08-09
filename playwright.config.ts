@@ -3,8 +3,7 @@ import { defineConfig, devices } from "@playwright/test";
 /**
  * Playwright verification for the Daily Operations Brief. Runs against a
  * local `next start` production build so evidence reflects real rendering,
- * not a mocked API. Chromium covers desktop + mobile width; WebKit is
- * included where the sandboxed CI environment provides its system deps.
+ * not a mocked API. Chromium covers both desktop and mobile-width journeys.
  */
 export default defineConfig({
   testDir: "./tests/e2e",
