@@ -21,7 +21,7 @@
     "@xyflow/react": "12.11.2",
     "cmdk": "1.1.1",
     "motion": "12.42.2",
-    "next": "16.1.6",
+    "next": "16.3.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-grid-layout": "2.2.3",
@@ -42,7 +42,7 @@
     "jsdom": "27.4.0",
     "tsx": "^4.23.6",
     "typescript": "5.9.3",
-    "vitest": "4.0.18"
+    "vitest": "4.1.10"
   },
   "allowScripts": {
     "esbuild@0.28.1": true
