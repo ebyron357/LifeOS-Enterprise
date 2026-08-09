@@ -1,10 +1,12 @@
 import { test, expect } from "@playwright/test";
 import { buildSeedStore, SEED_LONG_PROJECT_NAME } from "./seed-brief";
+import { dateKeyInTimezone } from "../../lib/daily-brief/date";
 
 const STORAGE_KEY = "lifeos-daily-brief-store-v1";
+const TEST_TIMEZONE = "America/New_York";
 
 function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
+  return dateKeyInTimezone(new Date(), TEST_TIMEZONE);
 }
 
 async function seedStore(page: import("@playwright/test").Page, dates: string[]) {
@@ -80,7 +82,7 @@ test.describe("Daily Operations Brief", () => {
 
   test("supports previous-brief navigation across multiple stored dates", async ({ page }) => {
     const today = todayIso();
-    const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+    const yesterday = dateKeyInTimezone(new Date(Date.now() - 86_400_000), TEST_TIMEZONE);
     await seedStore(page, [yesterday, today]);
     await page.goto("/daily-brief");
 
