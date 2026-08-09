@@ -42,17 +42,17 @@ LIMIT 5
 ```dataview
 TABLE WITHOUT ID
   file.link AS "Project",
-  deadline AS "Deadline",
+  default(due_date, deadline) AS "Deadline",
   priority AS "Priority",
   next_action AS "Next Action",
   business AS "Business"
 FROM "Projects" OR "10 Projects"
 WHERE type = "project"
-  AND deadline
+  AND (due_date OR deadline)
   AND status != "complete"
   AND status != "archived"
   AND lower(file.name) != "readme"
-SORT deadline ASC
+SORT default(due_date, deadline) ASC
 ```
 
 ## Waiting On / Blocked
@@ -146,6 +146,7 @@ TABLE WITHOUT ID
   file.mtime AS "Last Modified"
 FROM "01 Inbox" OR "Inbox"
 WHERE lower(file.name) != "readme"
+  AND lower(file.name) != "inbox"
 SORT file.mtime DESC
 ```
 
