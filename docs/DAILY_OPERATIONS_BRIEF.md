@@ -141,8 +141,10 @@ no connected calendar integration, because none exists anywhere in this
 codebase today (confirmed by inspection, not assumed). `resolveCalendarState()`
 returns `{ connected: false, mode: "availability-assumed", reason: "No
 authorized calendar integration is configured." }`, and
-`getAvailabilityWindows()` falls back to a default 09:00–17:00 work day. The
-brief still generates fully in this mode; the schedule is labeled "Suggest
+`getAvailabilityWindows()` falls back to a default 09:00–17:00 work day. Dates
+are derived in the configured IANA timezone (`LIFEOS_TIMEZONE`, default
+`America/New_York`) rather than from UTC. The brief still generates fully in
+this mode; the schedule is labeled "Suggest
 Only" and the calendar gap is documented here rather than silently ignored.
 Should a real, authorized, read-only calendar integration be added later, it
 should populate `CalendarState` and availability windows without changing the
@@ -208,7 +210,9 @@ stale or low-confidence brief is never mistaken for a fully-verified one.
 - Consequential actions (Approve brief, Complete end-of-day review) require
   an explicit confirmation dialog.
 - Daily Brief runtime state is browser-local only; it is never sent to a
-  server endpoint by this feature.
+  server endpoint by this feature. The UI states that this history is not
+  backed up or synchronized across devices, and incompatible stored shapes
+  are rejected before hydration.
 
 ## Failure handling
 
@@ -253,14 +257,13 @@ vault or GitHub Project 2 data is ever touched.
    second, separate live call to GitHub Project 2 or GitHub's REST API during
    generation.
 3. Runtime state (revisions, reviews) is browser-local (`localStorage`) only;
-   it is not synced across devices or persisted server-side.
-4. No live Vercel preview URL could be produced or verified from the sandbox
-   this change was authored in (no deployment credentials/network access to
-   Vercel are available there). Screenshots captured against a local
-   production build (`next build && next start`) are provided below as
-   owner-preview evidence in the meantime; opening the dependent draft PR is
-   expected to trigger this repository's existing Vercel GitHub integration
-   (if configured) to produce a real preview URL automatically.
+   it is not synced across devices, backed up, or persisted server-side. This
+   is an explicit beta boundary, not durable enterprise record storage.
+4. The owner timezone comes from `LIFEOS_TIMEZONE` and defaults to
+   `America/New_York`. Deployments for another owner or region must set that
+   environment variable to the correct IANA timezone.
+5. Vercel preview readiness is external deployment evidence only. Each new
+   head commit still requires Vault Health and Dashboard CI to run and pass.
 
 ## Owner-preview evidence
 
