@@ -49,6 +49,19 @@ describe("generateDailyBrief — calendar", () => {
     expect(brief.calendar.mode).toBe("availability-assumed");
     expect(brief.assumptions.some((assumption) => assumption.includes("No calendar integration is connected"))).toBe(true);
   });
+
+  it("uses the configured local date instead of rolling over at UTC midnight", () => {
+    const lateEveningEastern = new Date("2026-08-09T03:30:00.000Z");
+    const brief = generateDailyBrief({
+      projects: [portfolioProject()],
+      now: lateEveningEastern,
+      timezone: "America/New_York",
+    });
+
+    expect(brief.briefDate).toBe("2026-08-08");
+    expect(brief.briefId).toBe("brief-2026-08-08");
+    expect(brief.timezone).toBe("America/New_York");
+  });
 });
 
 describe("generateDailyBrief — competing Critical projects", () => {
