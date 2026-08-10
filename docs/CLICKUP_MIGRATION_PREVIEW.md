@@ -1,9 +1,9 @@
 # LifeOS → ClickUp Migration Plan
 
 **Status:** READ-ONLY CANONICAL PLAN — no ClickUp Space, Folder, List, Task, custom field, or automation has been created from this document.
-**Document date:** 2026-08-10 (revised following owner decisions on packaging systems, Web Vault Portal classification, Copilot/AI agents, ClientVerse Store Builds, legacy folder structure, n8n, and the Technology and Repository Registry follow-up)
+**Document date:** 2026-08-10 (revised following owner decisions on packaging systems, Web Vault Portal classification, Copilot/AI agents, ClientVerse Public Platform repository identity, legacy folder structure, n8n, and the Technology and Repository Registry follow-up)
 
-This document is the canonical migration plan for populating the existing ClickUp Space `LIFE-OS-OPERATIONS`. It preserves the complete migration analysis performed against the `ebyron357/LifeOS-Enterprise` repository, updated to reflect explicit owner decisions. This is a full replacement of the prior version of this document, not an appendix or patch. Nothing in this document authorizes ClickUp changes on its own — it is a plan to be executed only after the one remaining unresolved decision (ClientVerse Store Builds repository identity) is confirmed by the owner.
+This document is the canonical migration plan for populating the existing ClickUp Space `LIFE-OS-OPERATIONS`. It preserves the complete migration analysis performed against the `ebyron357/LifeOS-Enterprise` repository, updated to reflect explicit owner decisions. This is a full replacement of the prior version of this document, not an appendix or patch. Nothing in this document authorizes ClickUp changes on its own — it is a plan ready for execution once ClickUp write access is verified; all seven original owner decisions, including the ClientVerse repository identity, are now resolved.
 
 ---
 
@@ -11,19 +11,19 @@ This document is the canonical migration plan for populating the existing ClickU
 
 LifeOS-Enterprise is a single Obsidian vault repository plus a companion Next.js "read-only web portal," not a portfolio of many active client repositories. It tracks three businesses (LifeOS, ClientVerse, TradeIQ) and references packaging-brand product systems through `PROJECT_REPO_REGISTRY.md`. Three additional active vault projects exist under `10 Projects/` (Build AI Consultant Portfolio, Build YouTube to Knowledge Engine, Operationalize Content-to-Lead Service) that build repeatable automated/semi-automated workflows.
 
-Following owner review, six of the seven original open decisions are now **resolved**:
+Following owner review, all seven original open decisions are now **resolved**:
 
 1. **Packaging/product systems (12oz, ALT Syrup, Bravo Paws)** — approved to migrate into **Product Systems** as three separate Lists/projects, even though no canonical vault Project/Business note yet exists for them. Creating those missing vault notes is tracked as follow-up work, not a migration blocker.
 2. **Web Vault Portal** — approved to classify under **Core Systems** as an internal operating/control surface, not a customer-facing product.
 3. **Copilot/AI agents** — approved to classify the agents themselves under **Automation**, tracked as a single simple List rather than one List per agent. Governance/rules/policy documentation about the agents remains separate, reference-only documentation.
-4. **ClientVerse Store Builds repository identity — REMAINS UNRESOLVED.** No repository should be assumed canonical. This item is marked **REVIEW REQUIRED** throughout this document.
+4. **ClientVerse Public Platform repository identity — RESOLVED.** The owner has confirmed the canonical repository is `ebyron357/clientverse` (private, existing repo). There is no separate "ClientVerse Store Builds" repository; the vault project previously tracked under that name maps to this confirmed repository. CRM / GoHighLevel integration is not yet connected — this is planned follow-up work, not a migration blocker.
 5. **Legacy flat folder structure** — approved with a safety rule: the PARA/numbered structure (`00 Home` … `90 Archive`) is the standard going forward; legacy flat folders must be reviewed for unique content and then moved into an archive/review path — never deleted or silently discarded.
 6. **n8n** — approved as an official part of the LifeOS automation ecosystem, classified under **Automation**. It is a real orchestration platform, not merely experimental — but individual n8n workflows still carry their own maturity phase (Planning/Development/Testing/Production/Maintenance) and must not be assumed production-ready as a set.
 7. **Technology and Repository Registry follow-up** — approved as a required P1 review, scheduled before the overall portfolio migration can be considered fully closed.
 
-The only remaining unresolved item is the canonical repository identity for **ClientVerse Store Builds**. No destructive, consolidation, or structural action should be taken on this project until that identity is confirmed.
+No decisions from the original owner review remain unresolved. See "Newly Discovered Issues" below for items surfaced during this update that are separate from the original seven decisions.
 
-Recommendation: migrate the vault-tracked projects and the now-approved system/automation/product assets as ClickUp Lists/Tasks per the mapping below; treat governance and reference material as documentation only; hold ClientVerse Store Builds in a REVIEW REQUIRED state; and complete the Technology and Repository Registry P1 review before declaring the portfolio migration closed.
+Recommendation: migrate the vault-tracked projects and the now-approved system/automation/product assets as ClickUp Lists/Tasks per the mapping below; treat governance and reference material as documentation only; migrate ClientVerse Public Platform using the confirmed repository; track CRM/GoHighLevel integration as a planned follow-up task, not a blocker; and complete the Technology and Repository Registry P1 review before declaring the portfolio migration closed.
 
 ---
 
@@ -52,7 +52,7 @@ Existing ClickUp folders (do not create new folders beyond these five):
 - **n8n = automation and orchestration layer.** n8n is an approved, official part of the LifeOS automation ecosystem (Decision 6). It is treated as a real platform, not a hypothetical or purely experimental tool. However, this status applies to the *platform*, not to every individual workflow — each n8n workflow must be tracked with its own maturity phase (Planning, Development, Testing, Production, Maintenance) so that unfinished workflows are never implied to be production-ready.
 - **AI / Copilot agents = Automation layer.** The Copilot custom agents (`.github/agents/*.agent.md`) and the AI role personas (`AI/*.md`) are approved to live under Automation (Decision 3). Governance, rules, policies, and standards describing how these agents should behave may remain represented as reference documentation (e.g., under Core Systems or as linked reference material), but the agents themselves — as an operating capability — belong under Automation.
 - **Product repositories = focused product delivery systems.** Each packaging/product brand (12oz, ALT Syrup, Bravo Paws) and each software product (TradeIQ) is tracked as its own Product Systems List, not merged into a single catch-all list.
-- **Client repositories = focused client delivery systems.** Each client-facing delivery project (Charlotte Real Estate System, ClientVerse Store Builds) is tracked under Client Delivery, with any repository-identity uncertainty explicitly flagged rather than assumed.
+- **Client repositories = focused client delivery systems.** Each client-facing delivery project (Charlotte Real Estate System, ClientVerse Public Platform) is tracked under Client Delivery, using its confirmed canonical repository.
 
 ---
 
@@ -68,7 +68,7 @@ Existing ClickUp folders (do not create new folders beyond these five):
 ### Client Delivery
 
 - **Charlotte Real Estate System** — approved client outcome under the ClientVerse business; live site with explicit production-integration blockers recorded in the vault.
-- **ClientVerse Store Builds — REVIEW REQUIRED (Decision 4, unresolved).** This is a real, active, blocked client project per the vault record, but its canonical GitHub repository is not confirmed. It must still be migrated as a ClickUp List/task (the work is real and blocked on credentials), but **no repository should be linked, assumed, or consolidated** until the owner confirms which repository is canonical. Do not assume `project-reconstruction` or any other repository.
+- **ClientVerse Public Platform — RESOLVED (Decision 4).** Canonical GitHub repository is `ebyron357/clientverse` (confirmed by owner, private repo, exists). This is the ClientVerse public website / lead-acquisition platform. This project was previously tracked in the vault under `Projects/ClientVerse Store Builds.md`; that vault note describes the same delivery work now confirmed to map to this repository. There is no separate "ClientVerse Store Builds" repository. CRM / GoHighLevel integration is **not yet fully connected** — this is planned follow-up implementation work, tracked as its own task, and does **not** block migrating this project into ClickUp.
 - **ClientVerse (business umbrella)** — the parent business record grouping the two client projects above; represented as the parent List context, not a duplicate task.
 
 ### Product Systems
@@ -163,17 +163,16 @@ Existing ClickUp folders (do not create new folders beyond these five):
 - Immediate next action: Confirm environment variables and lead routing.
 - Evidence: `Projects/Charlotte Real Estate System.md` (`status: active`, `blocker: Production integrations need final verification`).
 
-**List: ClientVerse Store Builds — REVIEW REQUIRED**
+**List: ClientVerse Public Platform** (RESOLVED — Decision 4)
 - Folder: Client Delivery
-- Purpose: Track the client store-build delivery project. **Canonical repository is not confirmed (Decision 4, UNRESOLVED).**
-- GitHub repository/repositories: **NOT CONFIRMED.** Do not assume `ebyron357/project-reconstruction` or any other repository is canonical for this project. `PROJECT_REPO_REGISTRY.md` tentatively associates "Staxx / Shopify client work" with `project-reconstruction`, but this has not been verified as the same project described in `Projects/ClientVerse Store Builds.md`.
-- Classification: REVIEW REQUIRED
-- Priority: P0 (Urgent) — the underlying work is still active/blocked regardless of the repository-identity question.
-- Current state: Blocked on API credentials and final catalog; repository identity unconfirmed.
-- Immediate next action: (1) Owner confirms the canonical repository for this project. (2) Independently of that, complete credential workflow and connect production settings once repository identity is confirmed.
-- Blocker: "Credentials and final catalog are not fully available" AND canonical repository identity is unconfirmed.
-- Evidence: `Projects/ClientVerse Store Builds.md` (`status: waiting`, `waiting_on: API credentials`); `PROJECT_REPO_REGISTRY.md` "Other Active Project Repos" table (unverified association only).
-- **Migration safety note:** Do not perform any consolidation, renaming, or archival action against `project-reconstruction` or any candidate repository in connection with this List until the owner confirms the mapping.
+- Purpose: Track the ClientVerse public website / lead-acquisition platform delivery project. Previously tracked in the vault as "ClientVerse Store Builds"; the canonical repository has now been confirmed and no separate Store Builds repository exists.
+- GitHub repository/repositories: `ebyron357/clientverse` (private, confirmed canonical by owner 2026-08-10).
+- Classification: ACTIVE
+- Priority: P0 (Urgent) — the underlying delivery work remains active/blocked on credentials regardless of the repository question, which is now resolved.
+- Current state: Client store/website workflow active; demo catalog fallback exists; production credentials still needed; CRM / GoHighLevel integration not yet connected (planned follow-up, not a blocker).
+- Immediate next action: Complete credential workflow and connect production settings. Track CRM/GoHighLevel integration as a separate planned task (see Tasks section) — do not treat it as blocking this List's migration.
+- Blocker: "Credentials and final catalog are not fully available" (repository identity is no longer a blocker).
+- Evidence: `Projects/ClientVerse Store Builds.md` (`status: waiting`, `waiting_on: API credentials`); `PROJECT_REPO_REGISTRY.md` "Other Active Project Repos" table (`ebyron357/clientverse` entry, confirmed 2026-08-10).
 
 ### Product Systems Folder
 
@@ -365,29 +364,29 @@ Existing ClickUp folders (do not create new folders beyond these five):
 - Native ClickUp Priority: Urgent
 - Evidence: `Projects/Charlotte Real Estate System.md` Tasks list.
 
-**Task: Confirm canonical repository for ClientVerse Store Builds — REVIEW REQUIRED**
-- ClickUp List: ClientVerse Store Builds
-- Objective: Owner confirms which GitHub repository is the canonical source for this project.
-- Current State: Unconfirmed; `PROJECT_REPO_REGISTRY.md` offers only a tentative, unverified association with `project-reconstruction`.
-- Next Action: Owner reviews candidate repositories and confirms canonical mapping.
-- Blocker: Repository identity unconfirmed.
-- Waiting On: Owner decision.
-- Success Criteria: One repository is explicitly confirmed as canonical, or the vault Project note is updated to record that no repository yet exists for this work.
-- GitHub Repository: NOT CONFIRMED — do not assign.
-- Native ClickUp Priority: Urgent (blocks safe progress on the credential task below)
-- Evidence: `Projects/ClientVerse Store Builds.md`; `PROJECT_REPO_REGISTRY.md` "Other Active Project Repos" table.
-
-**Task: Complete credential workflow for ClientVerse Store Builds**
-- ClickUp List: ClientVerse Store Builds
+**Task: Complete credential workflow for ClientVerse Public Platform**
+- ClickUp List: ClientVerse Public Platform
 - Objective: Confirm app setup, obtain API token, add environment variables, confirm demo fallback remains safe, run a live smoke test.
-- Current State: Client store workflow active; demo catalog fallback exists; production credentials still needed.
-- Next Action: Complete credential workflow and connect production settings. **Do not begin repository-specific work until the canonical repository is confirmed (see task above).**
-- Blocker: "Credentials and final catalog are not fully available" AND repository identity unconfirmed.
-- Waiting On: API credentials; repository identity confirmation.
+- Current State: Client store/website workflow active; demo catalog fallback exists; production credentials still needed.
+- Next Action: Complete credential workflow and connect production settings.
+- Blocker: "Credentials and final catalog are not fully available."
+- Waiting On: API credentials.
 - Success Criteria: Live smoke test passes after products exist.
-- GitHub Repository: NOT CONFIRMED.
+- GitHub Repository: `ebyron357/clientverse`
 - Native ClickUp Priority: Urgent
-- Evidence: `Projects/ClientVerse Store Builds.md` Tasks list.
+- Evidence: `Projects/ClientVerse Store Builds.md` Tasks list; `PROJECT_REPO_REGISTRY.md` "Other Active Project Repos" table.
+
+**Task: Connect CRM / GoHighLevel integration for ClientVerse Public Platform — PLANNED / INTEGRATION REQUIRED**
+- ClickUp List: ClientVerse Public Platform
+- Objective: Connect the ClientVerse public website to the CRM / GoHighLevel integration for lead capture and routing.
+- Current State: Not yet fully connected. This is expected future implementation work, not a defect.
+- Next Action: Scope and implement the CRM/GHL connection as its own milestone once the credential workflow above is complete.
+- Blocker: None — this task does **not** block the ClickUp migration or the creation of the ClientVerse Public Platform List.
+- Waiting On: Prioritization by owner.
+- Success Criteria: Website lead-capture forms verified to route into CRM / GoHighLevel.
+- GitHub Repository: `ebyron357/clientverse`
+- Native ClickUp Priority: Normal (planned follow-up, not an active blocker)
+- Evidence: Owner clarification (2026-08-10); `Projects/ClientVerse Store Builds.md`.
 
 **Task: Reconcile TradeIQ feature plan against competitor apps**
 - ClickUp List: TradeIQ Product
@@ -535,7 +534,7 @@ Do NOT create sample tasks or placeholder tasks beyond the ones listed above —
 - **README.md index files** (e.g., `Automations/README.md`, `Tools/README.md`, `SOPs/README.md`, `URLs/README.md`, `Knowledge/README.md`, `Learning/README.md`, `People/README.md`, `Resources/README.md`, `90 Archive/README.md`) — Reason: folder-purpose descriptions with no project content of their own; remain documentation.
 - **Agent governance/rules/policy documentation as if it were the agents themselves** — Reason: per Decision 3, documentation describing agent standards is reference material (tracked under Core Systems → Agent Governance & Standards); it should not be duplicated as Automation tasks. Only the agents-as-a-capability belong under Automation.
 - **One ClickUp List per individual Copilot agent** — Reason: per Decision 3, keep the implementation simple; do not create 14+ separate Lists unless a future operational need justifies it.
-- **Any repository consolidation, renaming, or archival action involving ClientVerse Store Builds** — Reason: per Decision 4, the canonical repository is not confirmed; taking any structural action based on an unverified assumption risks acting against the wrong repository.
+- **Any repository consolidation, renaming, or archival action merging ClientVerse Public Platform (`ebyron357/clientverse`) with a separate CRM/GoHighLevel repository** — Reason: no evidence confirms the public website and CRM are the same system; the CRM/GHL integration is planned follow-up work, not a repository merge.
 - **Treating n8n workflows as production-ready by default** — Reason: per Decision 6, n8n the platform is approved, but individual workflows must be tracked at their own maturity phase; none should be marked Production without passing an end-to-end test.
 - **The OpenRouter integration's internal library files individually** (`lib/router.js`, `lib/client.js`, `lib/errors.js`, `lib/env.js`) — Reason: implementation details of one integration, already represented by the single "Integrations" List item.
 - **Deleting any legacy folder, archive-candidate repo, or duplicate system** — Reason: per Decision 5 and the Archive Safety rules below, nothing is deleted; items move only into ARCHIVE CANDIDATE / REVIEW REQUIRED states pending verification.
@@ -548,7 +547,7 @@ Every archive or cleanup recommendation in this document must use one of the fol
 
 - **ACTIVE** — currently in use, tracked as ongoing work.
 - **MAINTAIN** — stable, low-effort tracking only (e.g., Governance & Docs, Integrations, Copilot/AI Agents List).
-- **REVIEW REQUIRED** — needs owner or maintainer review before a final classification or action can be taken (e.g., ClientVerse Store Builds, Legacy Folder Archive & Review, Technology and Repository Registry P1 Review, Capture Processing Workflow).
+- **REVIEW REQUIRED** — needs owner or maintainer review before a final classification or action can be taken (e.g., Legacy Folder Archive & Review, Technology and Repository Registry P1 Review, Capture Processing Workflow).
 - **ARCHIVE CANDIDATE** — proposed for archival, pending verification (e.g., the 7 named duplicate/legacy repos, legacy flat folders once reviewed).
 - **DELETE CANDIDATE** — reserved for items that, after full verification, are confirmed to contain no unique value; none are currently designated DELETE CANDIDATE in this document.
 
@@ -568,24 +567,26 @@ No repository, folder, or note referenced in this document should be deleted as 
 
 ## Human Decisions Required
 
-Decisions 1, 2, 3, 5, 6, and 7 from the owner review are now **RESOLVED** and have been incorporated throughout this document (see Executive Summary and the relevant Folder Mapping / List entries above). They are retained here only as a record of resolution, not as open questions:
+Decisions 1 through 7 from the owner review are now **RESOLVED** and have been incorporated throughout this document (see Executive Summary and the relevant Folder Mapping / List entries above). They are retained here only as a record of resolution, not as open questions:
 
 - ~~Packaging/product systems classification~~ — RESOLVED (Decision 1): Product Systems, three separate Lists, missing vault notes are follow-up work.
 - ~~Web Vault Portal classification~~ — RESOLVED (Decision 2): Core Systems.
 - ~~Copilot/AI agents classification~~ — RESOLVED (Decision 3): Automation, single simple List.
+- ~~ClientVerse repository identity~~ — RESOLVED (Decision 4): canonical repository confirmed by owner as `ebyron357/clientverse` (ClientVerse Public Platform). No separate "ClientVerse Store Builds" repository exists. CRM/GoHighLevel integration is planned follow-up work, not a migration blocker.
 - ~~Legacy folder structure~~ — RESOLVED WITH SAFETY RULE (Decision 5): PARA is standard; legacy content reviewed then archived, never deleted.
 - ~~n8n classification~~ — RESOLVED (Decision 6): Automation, official platform; workflow-level maturity phases still apply.
 - ~~Technology and Repository Registry follow-up~~ — RESOLVED as required (Decision 7): scheduled as Phase 8 P1 review.
 
-### Remaining Unresolved Decision
+### No Remaining Unresolved Decisions
 
-- **ClientVerse Store Builds canonical repository identity (Decision 4) — UNRESOLVED.** The canonical GitHub repository for this project is not confirmed. `PROJECT_REPO_REGISTRY.md` offers only a tentative, unverified association with `ebyron357/project-reconstruction`. Migration of the underlying ClickUp List/task may proceed (the work itself is real and evidenced in the vault), but **no repository should be linked, and no consolidation, renaming, or archival action should occur** until the owner confirms the mapping.
+All seven original owner decisions are resolved. See "Newly Discovered Issues" below for items surfaced during this update that require future attention but do not block the ClickUp migration.
 
 ### Newly Discovered Issues (not part of the original seven — kept separate per instructions)
 
 - **Priority for the three packaging-brand Lists is unrated.** No `priority` field exists anywhere in the vault or registry for 12oz, ALT Syrup, or Bravo Paws; a native ClickUp Priority must be assigned by the owner at List-creation time rather than inferred.
 - **Depth of the Technology and Repository Registry.** The registry contains many more P0/P1 rows (e.g., `vercel/ai`, `vercel/sdk`, Axe/Accessibility Insights) beyond the ones already surfaced in this document; the Phase 8 review (Decision 7) is the correct place to resolve this, but it is called out here explicitly so it is not mistaken for already being fully covered.
 - **Shared Packaging Infrastructure scope is not fully defined.** Decision 1 permits shared packaging infrastructure to remain separate from the three product-specific Lists, but the vault does not clearly enumerate everything that counts as "shared" versus "product-specific" — this may need a short scoping pass when the Phase 8 registry review occurs.
+- **CRM / GoHighLevel integration for ClientVerse Public Platform is not yet connected.** This is confirmed planned follow-up implementation work, not a defect and not a migration blocker. It is tracked as its own task (see "Task: Connect CRM / GoHighLevel integration for ClientVerse Public Platform"). No separate CRM repository has been identified in the vault or registry; if one exists, it should be confirmed by the owner rather than assumed.
 
 ---
 
@@ -601,7 +602,7 @@ Create the `LIFE-OS-OPERATIONS` Space's five Folders' Lists for Core Systems (Li
 Confirm the ClientVerse business-level handoff checklist next action; establish the ClientVerse Program List as the parent context for client delivery work.
 
 **Phase 4: Client delivery systems**
-Confirm production environment variables and lead routing for Charlotte Real Estate System. For ClientVerse Store Builds, resolve the REVIEW REQUIRED repository-identity question before or in parallel with progressing the credential workflow — do not let repository uncertainty block tracking the work, but do not act on an assumed repository either.
+Confirm production environment variables and lead routing for Charlotte Real Estate System. For ClientVerse Public Platform, progress the credential workflow using the confirmed repository (`ebyron357/clientverse`); track the CRM/GoHighLevel integration as its own planned task without letting it block the migration.
 
 **Phase 5: Product / packaging systems**
 Progress the three separate packaging Lists (ALTERNATIVE 12oz, ALT Syrup, Bravo Paws) per their individual next actions; progress TradeIQ's feature reconciliation; create the follow-up vault notes for the packaging brands as time allows (non-blocking).
@@ -613,7 +614,7 @@ Track the OpenRouter integration for maintenance; progress the three Automation 
 Review each legacy flat folder for unique content, links, assets, or dependencies; move confirmed-migrated folders into an archive/review path while preserving history; review the 7 named duplicate/legacy GitHub repos for unique assets before any archival action — do not delete anything.
 
 **Phase 8: Technology and Repository Registry P1 review and final portfolio reconciliation**
-Conduct the dedicated review of `40 Resources/Technology/Technology and Repository Registry.md`; reconcile any additional systems/repositories/dependencies discovered against the existing ClickUp structure; confirm the ClientVerse Store Builds repository identity has been resolved (or explicitly re-flag it if still unresolved); only after this phase should the overall portfolio migration be considered fully closed.
+Conduct the dedicated review of `40 Resources/Technology/Technology and Repository Registry.md`; reconcile any additional systems/repositories/dependencies discovered against the existing ClickUp structure; only after this phase should the overall portfolio migration be considered fully closed.
 
 ---
 
@@ -629,7 +630,7 @@ Define the following custom fields on the Space (or on each relevant Folder/List
 
 **GitHub Repository**
 - Type: URL
-- Note: Leave blank rather than guessing for any item marked REVIEW REQUIRED (e.g., ClientVerse Store Builds) until confirmed.
+- Note: Populate with the confirmed canonical repository for each List (e.g., `ebyron357/clientverse` for ClientVerse Public Platform). Leave blank rather than guessing for any future item whose repository identity has not been explicitly confirmed.
 
 **Current Phase**
 - Type: Dropdown
@@ -676,9 +677,10 @@ Use exactly the following ClickUp statuses (no additions or substitutions):
 
 ## Final Migration Checklist
 
-- [ ] Confirm this document (`docs/CLICKUP_MIGRATION_PREVIEW.md`) reflects the owner's approved decisions (1, 2, 3, 5, 6, 7 resolved; 4 unresolved).
+- [ ] Confirm this document (`docs/CLICKUP_MIGRATION_PREVIEW.md`) reflects the owner's approved decisions (1 through 7, all resolved).
 - [ ] Confirm the existing `LIFE-OS-OPERATIONS` Space and its 5 existing folders (Core Systems, Client Delivery, Product Systems, Automation, Portfolio Cleanup) are the correct, final target — do not create a new Space.
-- [ ] **Do not resolve Decision 4 (ClientVerse Store Builds repository identity) by assumption.** Obtain explicit owner confirmation before linking any repository or taking any consolidation/archival action related to this project.
+- [ ] Create the ClientVerse Public Platform List using the confirmed canonical repository `ebyron357/clientverse`; do not create a separate "ClientVerse Store Builds" repository record.
+- [ ] Track the CRM/GoHighLevel integration for ClientVerse Public Platform as its own planned task; do not treat it as a blocker to migration.
 - [ ] Create the Lists specified in "Exact Lists to Create," one Folder at a time, following the Recommended Execution Order (Phase 1 → Phase 8).
 - [ ] Create ALTERNATIVE 12oz, ALT Syrup, and Bravo Paws as three separate Lists under Product Systems — do not combine them.
 - [ ] Create the Copilot/AI Agents List as a single List under Automation — do not create one List per agent.
