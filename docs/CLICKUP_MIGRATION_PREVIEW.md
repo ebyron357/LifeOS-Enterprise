@@ -1,19 +1,29 @@
 # LifeOS → ClickUp Migration Plan
 
-**Status:** READ-ONLY PREVIEW — no ClickUp Space, Folder, List, Task, custom field, or automation has been created from this document.
-**Document date:** 2026-08-10
+**Status:** READ-ONLY CANONICAL PLAN — no ClickUp Space, Folder, List, Task, custom field, or automation has been created from this document.
+**Document date:** 2026-08-10 (revised following owner decisions on packaging systems, Web Vault Portal classification, Copilot/AI agents, ClientVerse Store Builds, legacy folder structure, n8n, and the Technology and Repository Registry follow-up)
 
-This document is the canonical migration plan for populating the existing ClickUp Space `LIFE-OS-OPERATIONS`. It preserves the complete migration analysis performed against the `ebyron357/LifeOS-Enterprise` repository. Nothing in this document authorizes ClickUp changes on its own — it is a plan to be executed only after explicit owner approval.
+This document is the canonical migration plan for populating the existing ClickUp Space `LIFE-OS-OPERATIONS`. It preserves the complete migration analysis performed against the `ebyron357/LifeOS-Enterprise` repository, updated to reflect explicit owner decisions. This is a full replacement of the prior version of this document, not an appendix or patch. Nothing in this document authorizes ClickUp changes on its own — it is a plan to be executed only after the one remaining unresolved decision (ClientVerse Store Builds repository identity) is confirmed by the owner.
 
 ---
 
 ## Executive Summary
 
-LifeOS-Enterprise is a single Obsidian vault repository plus a companion Next.js "read-only web portal," not a portfolio of many active client repositories. It tracks three businesses (LifeOS, ClientVerse, TradeIQ) and references packaging-brand projects only through `PROJECT_REPO_REGISTRY.md` — those brands have no corresponding vault Project or Business note. Three additional active vault projects exist under `10 Projects/` (Build AI Consultant Portfolio, Build YouTube to Knowledge Engine, Operationalize Content-to-Lead Service) that were not fully classified in the original preview pass; they are now incorporated below with full evidence.
+LifeOS-Enterprise is a single Obsidian vault repository plus a companion Next.js "read-only web portal," not a portfolio of many active client repositories. It tracks three businesses (LifeOS, ClientVerse, TradeIQ) and references packaging-brand product systems through `PROJECT_REPO_REGISTRY.md`. Three additional active vault projects exist under `10 Projects/` (Build AI Consultant Portfolio, Build YouTube to Knowledge Engine, Operationalize Content-to-Lead Service) that build repeatable automated/semi-automated workflows.
 
-Most repository content is documentation/governance (architecture specs, docs, agent standards, templates) rather than discrete deliverables, and should remain documentation rather than become ClickUp work items. Genuine client/product work for packaging brands lives in *other* GitHub repositories referenced from the registry, not inside this repository.
+Following owner review, six of the seven original open decisions are now **resolved**:
 
-Recommendation: migrate the vault-tracked projects and a small set of system/automation assets as ClickUp Lists/Tasks; treat governance and reference material as documentation only; flag packaging-brand repos, duplicate/archive repos, and several folder/classification ambiguities for owner decision before any ClickUp task creation.
+1. **Packaging/product systems (12oz, ALT Syrup, Bravo Paws)** — approved to migrate into **Product Systems** as three separate Lists/projects, even though no canonical vault Project/Business note yet exists for them. Creating those missing vault notes is tracked as follow-up work, not a migration blocker.
+2. **Web Vault Portal** — approved to classify under **Core Systems** as an internal operating/control surface, not a customer-facing product.
+3. **Copilot/AI agents** — approved to classify the agents themselves under **Automation**, tracked as a single simple List rather than one List per agent. Governance/rules/policy documentation about the agents remains separate, reference-only documentation.
+4. **ClientVerse Store Builds repository identity — REMAINS UNRESOLVED.** No repository should be assumed canonical. This item is marked **REVIEW REQUIRED** throughout this document.
+5. **Legacy flat folder structure** — approved with a safety rule: the PARA/numbered structure (`00 Home` … `90 Archive`) is the standard going forward; legacy flat folders must be reviewed for unique content and then moved into an archive/review path — never deleted or silently discarded.
+6. **n8n** — approved as an official part of the LifeOS automation ecosystem, classified under **Automation**. It is a real orchestration platform, not merely experimental — but individual n8n workflows still carry their own maturity phase (Planning/Development/Testing/Production/Maintenance) and must not be assumed production-ready as a set.
+7. **Technology and Repository Registry follow-up** — approved as a required P1 review, scheduled before the overall portfolio migration can be considered fully closed.
+
+The only remaining unresolved item is the canonical repository identity for **ClientVerse Store Builds**. No destructive, consolidation, or structural action should be taken on this project until that identity is confirmed.
+
+Recommendation: migrate the vault-tracked projects and the now-approved system/automation/product assets as ClickUp Lists/Tasks per the mapping below; treat governance and reference material as documentation only; hold ClientVerse Store Builds in a REVIEW REQUIRED state; and complete the Technology and Repository Registry P1 review before declaring the portfolio migration closed.
 
 ---
 
@@ -36,10 +46,13 @@ Existing ClickUp folders (do not create new folders beyond these five):
 
 ## Canonical Operating Model
 
-- **LifeOS Enterprise (this repository) = operating/control plane.** It is the single source of vault structure, metadata standards, dashboards, agent definitions, and the read-only web portal that renders the vault. It defines *what* work exists and *how* it should be tracked, but it is not itself a task tracker.
-- **GitHub = code and technical source of truth.** All executable code (the Next.js portal, the OpenRouter integration, packaging-brand production repos, client delivery repos such as `charlotte-real-estate-system`, `tradeiq-command-center`, `project-reconstruction`) lives in Git repositories. Commits, PRs, and CI checks are the record of technical truth.
-- **ClickUp = execution and work-management layer.** ClickUp is where day-to-day task assignment, status tracking, priority, blockers, and human work coordination happen. ClickUp does not replace the vault's Markdown notes as the description of a project's *intent* — it operationalizes the *doing* of that intent.
-- **n8n = automation/orchestration layer.** n8n is currently a **proposed/pilot** automation tool referenced in `40 Resources/Technology/Technology and Repository Registry.md` (`AmplifyAutomation/n8n-templates`, status "Controlled Pilot") and `40 Resources/Content Services/Content Services Tool Stack.md` (listed alongside Make/Zapier/Activepieces/Huginn as automation options). No n8n workflows currently exist as implemented, running automation in this repository — it is evaluated but not adopted. It should be tracked in ClickUp's Automation folder as a pilot/evaluation item, not as a live automation system.
+- **LifeOS Enterprise (this repository) = control plane / operating system.** It is the single source of vault structure, metadata standards, dashboards, agent definitions, and the read-only web portal that renders the vault. It defines *what* work exists and *how* it should be tracked, but it is not itself a task tracker.
+- **GitHub = code, technical evidence, and repository source of truth.** All executable code (the Web Vault Portal, the OpenRouter integration, packaging-brand production repos, client delivery repos) lives in Git repositories. Commits, PRs, and CI checks are the record of technical truth.
+- **ClickUp = work execution, visibility, priorities, blockers, and outcomes.** ClickUp is where day-to-day task assignment, status tracking, priority, blockers, and human work coordination happen. ClickUp does not replace the vault's Markdown notes as the description of a project's *intent* — it operationalizes the *doing* of that intent.
+- **n8n = automation and orchestration layer.** n8n is an approved, official part of the LifeOS automation ecosystem (Decision 6). It is treated as a real platform, not a hypothetical or purely experimental tool. However, this status applies to the *platform*, not to every individual workflow — each n8n workflow must be tracked with its own maturity phase (Planning, Development, Testing, Production, Maintenance) so that unfinished workflows are never implied to be production-ready.
+- **AI / Copilot agents = Automation layer.** The Copilot custom agents (`.github/agents/*.agent.md`) and the AI role personas (`AI/*.md`) are approved to live under Automation (Decision 3). Governance, rules, policies, and standards describing how these agents should behave may remain represented as reference documentation (e.g., under Core Systems or as linked reference material), but the agents themselves — as an operating capability — belong under Automation.
+- **Product repositories = focused product delivery systems.** Each packaging/product brand (12oz, ALT Syrup, Bravo Paws) and each software product (TradeIQ) is tracked as its own Product Systems List, not merged into a single catch-all list.
+- **Client repositories = focused client delivery systems.** Each client-facing delivery project (Charlotte Real Estate System, ClientVerse Store Builds) is tracked under Client Delivery, with any repository-identity uncertainty explicitly flagged rather than assumed.
 
 ---
 
@@ -48,34 +61,37 @@ Existing ClickUp folders (do not create new folders beyond these five):
 ### Core Systems
 
 - **LifeOS Enterprise (the vault/system itself)** — belongs here because it is the meta-system: command center, dashboards, metadata schema, templates, and validation scripts that everything else depends on. It is not a client or product deliverable.
-- **Governance & Metadata Standards** (`architecture/METADATA_SCHEMA.md`, `docs/LifeOS_Specification_v1.md`, `docs/CANONICAL_LIVE_STATUS.md`, `docs/CURRENT_STATE_AUDIT.md`) — belongs here because these are the standards that govern how every other system records status; they are referenced by, not separate from, the LifeOS control plane.
-- **AI Agent Standards** (`.github/agents/*.agent.md`, `AI/*.md`) — belongs here because these define reusable operating standards (14 Copilot agents + 4 AI role personas) used across all work, not a single deliverable.
-- **Web Vault Portal (Next.js app)** — belongs here (with an owner-decision flag) because it is shared infrastructure that renders the vault; it is deployed (v1.0.0, `https://lifeos-enterprise.vercel.app`) but scoped to internal/operational use rather than being sold as a product.
+- **Governance & Metadata Standards** (`architecture/METADATA_SCHEMA.md`, `docs/LifeOS_Specification_v1.md`, `docs/CANONICAL_LIVE_STATUS.md`, `docs/CURRENT_STATE_AUDIT.md`) — belongs here because these are the standards that govern how every other system records status.
+- **Agent Governance & Standards (documentation only)** — belongs here as reference documentation describing rules/policies for how Copilot/AI agents should operate. This is distinct from the agents themselves, which are tracked under Automation per Decision 3.
+- **Web Vault Portal (Next.js app)** — **RESOLVED (Decision 2):** classified under Core Systems. It is an internal LifeOS operating/control surface (renders the vault, hosts the Command Center, dashboards, and interactive operations) and is explicitly not a customer-facing product, even though it is shipped and versioned (v1.0.0, deployed to Vercel).
 
 ### Client Delivery
 
 - **Charlotte Real Estate System** — approved client outcome under the ClientVerse business; live site with explicit production-integration blockers recorded in the vault.
-- **ClientVerse Store Builds** — approved client outcome under ClientVerse; explicitly blocked/waiting on API credentials per vault record.
+- **ClientVerse Store Builds — REVIEW REQUIRED (Decision 4, unresolved).** This is a real, active, blocked client project per the vault record, but its canonical GitHub repository is not confirmed. It must still be migrated as a ClickUp List/task (the work is real and blocked on credentials), but **no repository should be linked, assumed, or consolidated** until the owner confirms which repository is canonical. Do not assume `project-reconstruction` or any other repository.
 - **ClientVerse (business umbrella)** — the parent business record grouping the two client projects above; represented as the parent List context, not a duplicate task.
 
 ### Product Systems
 
 - **TradeIQ** — approved product outcome; a standalone software product (trading intelligence) with its own business and project record, distinct from client delivery work.
-- **Packaging Brand Projects (12 oz, ALT syrup, Bravo Paws)** — flagged as pending owner confirmation. They are described as active/active-recovery in `PROJECT_REPO_REGISTRY.md`, and referenced again in `40 Resources/Technology/Technology and Repository Registry.md` (barcode/commercialization work for "THE ALTERNATIVE, ALT syrups, Bravo Paws, STAXX"), but have no vault Project or Business note, so they cannot yet be treated as canonical Product Systems entries without owner confirmation.
+- **ALTERNATIVE 12oz — RESOLVED (Decision 1).** Tracked as its own separate List/project under Product Systems. Canonical active repo per `PROJECT_REPO_REGISTRY.md`: `ebyron357/12oz`. No vault Project/Business note currently exists — creating one is tracked as follow-up work, not a migration blocker.
+- **ALT Syrup — RESOLVED (Decision 1).** Tracked as its own separate List/project under Product Systems. Canonical active repo per `PROJECT_REPO_REGISTRY.md`: `ebyron357/alt-syrup-labels` (status: ACTIVE / RECOVERY — final release files not confirmed in hand). No vault Project/Business note currently exists — creating one is tracked as follow-up work.
+- **Bravo Paws — RESOLVED (Decision 1).** Tracked as its own separate List/project under Product Systems. Canonical active repo per `PROJECT_REPO_REGISTRY.md`: `ebyron357/ebyron357-BravoPaws-Official`. No vault Project/Business note currently exists — creating one is tracked as follow-up work.
+- **Shared Packaging Infrastructure** — per Decision 1, shared packaging infrastructure (e.g., barcode generation, shared brand asset tooling referenced in `40 Resources/Technology/Technology and Repository Registry.md`) may remain tracked separately from the three product-specific Lists above; it is not merged into any single product's List.
 
 ### Automation
 
-- **OpenRouter Integration / LifeOS CLI** (`integrations/openrouter/`) — an implemented, working automation/integration component (has its own `package.json`, README, and library code), so it qualifies as an approved automation system.
-- **Vault-tracked Automation Backlog Ideas** (`10 Projects/Build AI Consultant Portfolio.md`, `10 Projects/Build YouTube to Knowledge Engine.md`, `10 Projects/Operationalize Content-to-Lead Service.md`) — these are active projects with full frontmatter (status, priority, owner, next_action, due dates) and detailed execution plans; they involve building repeatable automated/semi-automated workflows (portfolio evidence pipeline, YouTube-to-knowledge pipeline, content-to-lead pipeline) and are approved for Automation tracking based on this evidence.
-- **Capture Processing Workflow** (`workflows/CAPTURE_PROCESSING_WORKFLOW.md`) — documented process, not yet exercised end to end per `Businesses/LifeOS.md`; belongs here as a workflow reference, not a separate product.
-- **n8n (pilot/evaluation)** — proposed automation orchestration layer, currently at "Controlled Pilot" / research status per `40 Resources/Technology/Technology and Repository Registry.md`; no implemented workflow exists yet.
-- **Copilot Custom Agents (14) as tooling** — alternate classification to Core Systems, flagged as ambiguous; included here only as a cross-reference, not a duplicate entry (see Human Decisions Required).
+- **OpenRouter Integration / LifeOS CLI** (`integrations/openrouter/`) — an implemented, working automation/integration component, so it qualifies as an approved automation system.
+- **Vault-tracked Automation Backlog Ideas** (`10 Projects/Build AI Consultant Portfolio.md`, `10 Projects/Build YouTube to Knowledge Engine.md`, `10 Projects/Operationalize Content-to-Lead Service.md`) — active projects that build repeatable automated/semi-automated pipelines.
+- **Capture Processing Workflow** (`workflows/CAPTURE_PROCESSING_WORKFLOW.md`) — documented process, not yet exercised end to end.
+- **Copilot / AI Agents — RESOLVED (Decision 3).** The actual Copilot custom agents (14 `.agent.md` files) and AI role personas (`AI/*.md`) are tracked under Automation as a single simple List, not one List per agent. Additional per-agent Lists should only be created if a genuine future operational need justifies it.
+- **n8n — RESOLVED (Decision 6).** Classified under Automation as an official, real automation/orchestration platform — not experimental or hypothetical. Individual workflows are tracked with their own maturity phase (Planning, Development, Testing, Production, Maintenance); the platform-level approval does not imply any specific workflow is production-ready.
 
 ### Portfolio Cleanup
 
-- **Legacy vault folder duplication** — the numbered PARA structure (`00 Home` … `90 Archive`) duplicates legacy flat folders (`Businesses/`, `Projects/`, `AI/`, `Automations/`, `Command Center/`, `Dashboards/`, `Knowledge/`, `Learning/`, `People/`, `Resources/`, `SOPs/`, `Tools/`, `URLs/`). `Projects/LifeOS Enterprise.md` itself lists "migrate remaining legacy Projects into 10 Projects" as a pending next action — this is unresolved internal cleanup, not new work.
-- **Duplicate/archive GitHub repos** per `PROJECT_REPO_REGISTRY.md`: `ALT-Label-System`, `alternative-packaging-system`, `alternative-passionFruit-production`, `alternative-lychee-sweet-tea`, `ALT-Syrup-Label-System`, `Bravo-Labels-`, `Bravofinal` — explicitly marked "archive/reference" and "do not use as active" by the registry's own governance rule ("One project = one active GitHub repo").
-- **Consolidation work** — reconciling the `Projects/` (flat) vs. `10 Projects/` (PARA) note sets so the same project is not represented twice.
+- **Legacy Folder Archive & Review — RESOLVED WITH SAFETY RULE (Decision 5).** The PARA/numbered structure (`00 Home` … `90 Archive`) is the approved standard going forward. Legacy flat folders (`Businesses/`, `Projects/`, `AI/`, `Automations/`, `Command Center/`, `Dashboards/`, `Knowledge/`, `Learning/`, `People/`, `Resources/`, `SOPs/`, `Tools/`, `URLs/`) must not remain mixed indefinitely into active operational views, but must **not be deleted**. Each legacy folder must be reviewed for unique information, links, assets, or operational dependencies before being moved into an archive/review path. History must be preserved.
+- **Duplicate/archive GitHub repos** per `PROJECT_REPO_REGISTRY.md`: `ALT-Label-System`, `alternative-packaging-system`, `alternative-passionFruit-production`, `alternative-lychee-sweet-tea`, `ALT-Syrup-Label-System`, `Bravo-Labels-`, `Bravofinal` — explicitly marked "archive/reference" and "do not use as active" by the registry's own governance rule.
+- **Technology and Repository Registry P1 Review — RESOLVED as required follow-up (Decision 7).** A dedicated review of `40 Resources/Technology/Technology and Repository Registry.md` is required before the overall portfolio migration can be considered fully closed (see "Recommended Execution Order," Phase 8).
 
 ---
 
@@ -89,41 +105,41 @@ Existing ClickUp folders (do not create new folders beyond these five):
 - Folder: Core Systems
 - Purpose: Track validation and stabilization of the vault/control-plane itself.
 - GitHub repository/repositories: `ebyron357/LifeOS-Enterprise` (root, `architecture/`, `docs/`, `templates/`, `99 Templates/`, `AGENTS.md`, `workflows/CAPTURE_PROCESSING_WORKFLOW.md`)
-- Classification: Active
+- Classification: ACTIVE
 - Priority: P0 (Urgent)
-- Current state: Foundation complete per `docs/CANONICAL_LIVE_STATUS.md` ("V1.0 is built, merged, deployed, and operational"); visual Obsidian validation still open per `Projects/LifeOS Enterprise.md` checklist.
-- Immediate next action: Open the vault in Obsidian and verify all core dashboards render visually; resolve any P0/P1 defects found (per `Projects/LifeOS Enterprise.md` open checklist items).
-- Evidence: `Businesses/LifeOS.md` KPI table ("Core dashboards validated in Obsidian — Not yet verified"); `Projects/LifeOS Enterprise.md` Validation Checklist (3 of 8 items unchecked); `docs/CANONICAL_LIVE_STATUS.md`.
+- Current state: Foundation complete per `docs/CANONICAL_LIVE_STATUS.md`; visual Obsidian validation still open per `Projects/LifeOS Enterprise.md` checklist.
+- Immediate next action: Open the vault in Obsidian and verify all core dashboards render visually; resolve any P0/P1 defects found.
+- Evidence: `Businesses/LifeOS.md` KPI table; `Projects/LifeOS Enterprise.md` Validation Checklist; `docs/CANONICAL_LIVE_STATUS.md`.
 
 **List: Governance & Docs**
 - Folder: Core Systems
 - Purpose: Reference-only tracking of standards documents; not actionable work.
 - GitHub repository/repositories: `ebyron357/LifeOS-Enterprise` (`architecture/METADATA_SCHEMA.md`, `docs/LifeOS_Specification_v1.md`, `docs/CANONICAL_LIVE_STATUS.md`, `docs/CURRENT_STATE_AUDIT.md`)
-- Classification: Maintenance
+- Classification: MAINTAIN
 - Priority: Normal
 - Current state: Complete/stable documentation; no open task lists inside the files themselves.
 - Immediate next action: None — link as reference only.
 - Evidence: File contents are specifications/status records with no unchecked action items.
 
-**List: Agent Standards**
+**List: Agent Governance & Standards**
 - Folder: Core Systems
-- Purpose: Track maintenance of the 14 Copilot custom agents and 4 AI role personas as shared standards.
-- GitHub repository/repositories: `ebyron357/LifeOS-Enterprise` (`.github/agents/*.agent.md`, `AI/*.md`)
-- Classification: Maintenance
+- Purpose: Track maintenance of the governance rules, policies, and standards that describe how Copilot/AI agents should operate. This is distinct from the agents themselves (see Automation → Copilot / AI Agents).
+- GitHub repository/repositories: `ebyron357/LifeOS-Enterprise` (`.github/agents/*.agent.md` as reference documentation, `AI/*.md`)
+- Classification: MAINTAIN
 - Priority: Low
-- Current state: Active and current (14 agent files present, 4 role files present).
-- Immediate next action: None identified at this time; create tasks only if an agent definition needs an update.
+- Current state: Active and current (14 agent definition files present, 4 AI role files present).
+- Immediate next action: None identified at this time; update only if governance standards change.
 - Evidence: Directory listing of `.github/agents/` (14 files) and `AI/` (4 files: Automation Advisor, Chief of Staff, Librarian, Project Manager).
 
 **List: Web Portal**
-- Folder: Core Systems (pending owner confirmation — see Human Decisions Required)
-- Purpose: Track ongoing evolution of the read-only Next.js web portal over the vault.
+- Folder: Core Systems (RESOLVED — Decision 2)
+- Purpose: Track ongoing evolution of the read-only Next.js web portal over the vault as an internal operating/control surface.
 - GitHub repository/repositories: `ebyron357/LifeOS-Enterprise` (`app/`, `components/`, `lib/`, `tests/`, `package.json`)
-- Classification: Active
+- Classification: ACTIVE
 - Priority: High
 - Current state: Shipped v1.0.0, deployed to Vercel; CHANGELOG documents active recent work (Workspace OS V1, Interactive Operations V2, Voice V1).
 - Immediate next action: Per `docs/CANONICAL_LIVE_STATUS.md` activation table — supply `LIFEOS_WRITE_ENABLED`/`LIFEOS_WRITE_SECRET`/`LIFEOS_GITHUB_TOKEN` to activate draft-PR persistence, and `LIFEOS_VOICE_ENABLED` to activate the Voice Console, if those capabilities are wanted.
-- Evidence: `package.json` version `1.0.0`; `CHANGELOG.md` `[1.0.0]` entry; `docs/CANONICAL_LIVE_STATUS.md` "Activation state" table listing Draft-PR persistence and Voice Console as implemented-but-inactive.
+- Evidence: `package.json` version `1.0.0`; `CHANGELOG.md` `[1.0.0]` entry; `docs/CANONICAL_LIVE_STATUS.md` "Activation state" table.
 
 ### Client Delivery Folder
 
@@ -131,21 +147,33 @@ Existing ClickUp folders (do not create new folders beyond these five):
 - Folder: Client Delivery
 - Purpose: Parent tracking context for the ClientVerse business; not a task itself.
 - GitHub repository/repositories: n/a (business-level record: `Businesses/ClientVerse.md`)
-- Classification: Active
+- Classification: ACTIVE
 - Priority: P0 (Urgent)
 - Current state: Active business with two active projects and one open next action (reusable handoff checklist).
-- Immediate next action: Create reusable handoff checklist (per `Businesses/ClientVerse.md` Next Action).
-- Evidence: `Businesses/ClientVerse.md` frontmatter `status: active`, `priority: P0`; "Next Action: Create reusable handoff checklist."
+- Immediate next action: Create reusable handoff checklist.
+- Evidence: `Businesses/ClientVerse.md` frontmatter `status: active`, `priority: P0`.
 
-**List: ClientVerse Client Sites**
+**List: Charlotte Real Estate System**
 - Folder: Client Delivery
-- Purpose: Track the two concrete client delivery projects (Charlotte Real Estate System, ClientVerse Store Builds).
-- GitHub repository/repositories: `ebyron357/charlotte-real-estate-system`; ClientVerse Store Builds repo not explicitly named in the vault (referenced in `PROJECT_REPO_REGISTRY.md` as possibly `ebyron357/project-reconstruction` for "Staxx / Shopify client work" — unconfirmed, see Human Decisions Required)
-- Classification: Active (Charlotte Real Estate System) / Waiting (ClientVerse Store Builds)
-- Priority: P0 (Urgent) for both
-- Current state: Charlotte Real Estate System — live site, production integrations unverified. ClientVerse Store Builds — blocked on API credentials and final catalog.
-- Immediate next action: Charlotte — confirm environment variables and lead routing. Store Builds — complete credential workflow and connect production settings.
-- Evidence: `Projects/Charlotte Real Estate System.md` (`status: active`, `blocker: Production integrations need final verification`); `Projects/ClientVerse Store Builds.md` (`status: waiting`, `waiting_on: API credentials`).
+- Purpose: Track the client real estate delivery project.
+- GitHub repository/repositories: `ebyron357/charlotte-real-estate-system`
+- Classification: ACTIVE
+- Priority: P0 (Urgent)
+- Current state: Live site; production integrations unverified.
+- Immediate next action: Confirm environment variables and lead routing.
+- Evidence: `Projects/Charlotte Real Estate System.md` (`status: active`, `blocker: Production integrations need final verification`).
+
+**List: ClientVerse Store Builds — REVIEW REQUIRED**
+- Folder: Client Delivery
+- Purpose: Track the client store-build delivery project. **Canonical repository is not confirmed (Decision 4, UNRESOLVED).**
+- GitHub repository/repositories: **NOT CONFIRMED.** Do not assume `ebyron357/project-reconstruction` or any other repository is canonical for this project. `PROJECT_REPO_REGISTRY.md` tentatively associates "Staxx / Shopify client work" with `project-reconstruction`, but this has not been verified as the same project described in `Projects/ClientVerse Store Builds.md`.
+- Classification: REVIEW REQUIRED
+- Priority: P0 (Urgent) — the underlying work is still active/blocked regardless of the repository-identity question.
+- Current state: Blocked on API credentials and final catalog; repository identity unconfirmed.
+- Immediate next action: (1) Owner confirms the canonical repository for this project. (2) Independently of that, complete credential workflow and connect production settings once repository identity is confirmed.
+- Blocker: "Credentials and final catalog are not fully available" AND canonical repository identity is unconfirmed.
+- Evidence: `Projects/ClientVerse Store Builds.md` (`status: waiting`, `waiting_on: API credentials`); `PROJECT_REPO_REGISTRY.md` "Other Active Project Repos" table (unverified association only).
+- **Migration safety note:** Do not perform any consolidation, renaming, or archival action against `project-reconstruction` or any candidate repository in connection with this List until the owner confirms the mapping.
 
 ### Product Systems Folder
 
@@ -153,21 +181,51 @@ Existing ClickUp folders (do not create new folders beyond these five):
 - Folder: Product Systems
 - Purpose: Track TradeIQ feature roadmap and MVP definition.
 - GitHub repository/repositories: `ebyron357/tradeiq-command-center`
-- Classification: Active
+- Classification: ACTIVE
 - Priority: P1 (High)
 - Current state: Feature prioritization started; consolidated roadmap needed.
-- Immediate next action: Reconcile current feature plan against competitor app feature sets (per `Projects/TradeIQ.md` Next Action).
-- Evidence: `Projects/TradeIQ.md` frontmatter `status: active`, `priority: P1`; task list (must-have features, differentiators, MVP vs v2, data sources, build phases).
+- Immediate next action: Reconcile current feature plan against competitor app feature sets.
+- Evidence: `Projects/TradeIQ.md` frontmatter `status: active`, `priority: P1`; task list.
 
-**List: Packaging Brands** (proposed — does not yet exist as a vault Project/Business note)
+**List: ALTERNATIVE 12oz** (RESOLVED — Decision 1)
 - Folder: Product Systems
-- Purpose: Track physical product label/packaging production systems.
-- GitHub repository/repositories: `ebyron357/12oz` (ALTERNATIVE 12 oz beverage labels), `ebyron357/alt-syrup-labels` (ALT syrup labels), `ebyron357/ebyron357-BravoPaws-Official` (Bravo Paws labels)
-- Classification: **Requires owner decision** — evidence exists only at the repo-registry level, not modeled in the vault.
-- Priority: Unrated (no priority set anywhere in the vault for these)
-- Current state: Per `PROJECT_REPO_REGISTRY.md` — 12oz: ACTIVE; ALT syrup labels: ACTIVE / RECOVERY ("final release files are not confirmed in hand"); Bravo Paws: ACTIVE.
-- Immediate next action: Owner must confirm these are still active before any ClickUp project/task is created; if confirmed, add corresponding vault Project notes first for consistency with the rest of the operating model.
-- Evidence: `PROJECT_REPO_REGISTRY.md` "Packaging Projects" table; `40 Resources/Technology/Technology and Repository Registry.md` line referencing barcode/commercialization work for "THE ALTERNATIVE, ALT syrups, Bravo Paws, STAXX."
+- Purpose: Track the ALTERNATIVE 12 oz beverage labels production system as its own separate product List.
+- GitHub repository/repositories: `ebyron357/12oz`
+- Classification: ACTIVE
+- Priority: Not yet rated in the vault — recommend owner assigns a native ClickUp priority at List creation.
+- Current state: ACTIVE per `PROJECT_REPO_REGISTRY.md`; contains production system, SKU files, brand assets, codes, exports, release scripts, and release dashboard.
+- Immediate next action: Finish ALTERNATIVE 12 oz beverage print readiness (per `PROJECT_REPO_REGISTRY.md` "Current Focus Order," item 3). **Follow-up (not a blocker):** create a canonical `Projects/ALTERNATIVE 12oz.md` vault note.
+- Evidence: `PROJECT_REPO_REGISTRY.md` "Packaging Projects" table.
+
+**List: ALT Syrup** (RESOLVED — Decision 1)
+- Folder: Product Systems
+- Purpose: Track the ALT syrup labels production system as its own separate product List.
+- GitHub repository/repositories: `ebyron357/alt-syrup-labels`
+- Classification: ACTIVE / RECOVERY
+- Priority: Not yet rated in the vault — recommend owner assigns a native ClickUp priority at List creation.
+- Current state: "Final release files are not confirmed in hand" per `PROJECT_REPO_REGISTRY.md`.
+- Immediate next action: Recover or rebuild ALT syrup final files (per `PROJECT_REPO_REGISTRY.md` "Current Focus Order," item 2). **Follow-up (not a blocker):** create a canonical `Projects/ALT Syrup.md` vault note.
+- Evidence: `PROJECT_REPO_REGISTRY.md` "Packaging Projects" table.
+
+**List: Bravo Paws** (RESOLVED — Decision 1)
+- Folder: Product Systems
+- Purpose: Track the Bravo Paws labels production system as its own separate product List.
+- GitHub repository/repositories: `ebyron357/ebyron357-BravoPaws-Official`
+- Classification: ACTIVE
+- Priority: Not yet rated in the vault — recommend owner assigns a native ClickUp priority at List creation.
+- Current state: ACTIVE per `PROJECT_REPO_REGISTRY.md`; contains current Bravo requirements, project status, asset inventory, and Illustrator automation scripts.
+- Immediate next action: Wrap Bravo Paws labels (per `PROJECT_REPO_REGISTRY.md` "Current Focus Order," item 1). **Follow-up (not a blocker):** create a canonical `Projects/Bravo Paws.md` vault note.
+- Evidence: `PROJECT_REPO_REGISTRY.md` "Packaging Projects" table.
+
+**List: Shared Packaging Infrastructure** (RESOLVED — Decision 1, may remain separate)
+- Folder: Product Systems
+- Purpose: Track shared tooling/infrastructure used across packaging brands (e.g., barcode generation) that is not specific to any single product.
+- GitHub repository/repositories: Not a dedicated repo — referenced via `40 Resources/Technology/Technology and Repository Registry.md` (e.g., `metafloor/bwip-js` for barcode generation across "THE ALTERNATIVE, ALT syrups, Bravo Paws, STAXX").
+- Classification: MAINTAIN
+- Priority: Not yet rated.
+- Current state: Approved — Next per the registry.
+- Immediate next action: Build one verified SVG barcode generation test (per registry entry).
+- Evidence: `40 Resources/Technology/Technology and Repository Registry.md` `metafloor/bwip-js` row.
 
 ### Automation Folder
 
@@ -175,9 +233,9 @@ Existing ClickUp folders (do not create new folders beyond these five):
 - Folder: Automation
 - Purpose: Maintain the OpenRouter multi-model LLM router integration used by LifeOS tooling.
 - GitHub repository/repositories: `ebyron357/LifeOS-Enterprise` (`integrations/openrouter/`)
-- Classification: Maintenance
+- Classification: MAINTAIN
 - Priority: Low
-- Current state: Present and appears functional (own `package.json`, `README.md`, `lib/router.js`, `lib/client.js`, `lifeos-cli.js`, `.env.example`).
+- Current state: Present and appears functional (own `package.json`, README, `lib/router.js`, `lib/client.js`, `lifeos-cli.js`, `.env.example`).
 - Immediate next action: None identified from repository evidence; track for ongoing maintenance only.
 - Evidence: Directory listing of `integrations/openrouter/`.
 
@@ -185,63 +243,73 @@ Existing ClickUp folders (do not create new folders beyond these five):
 - Folder: Automation
 - Purpose: Track the three active vault projects that build repeatable automated/semi-automated pipelines.
 - GitHub repository/repositories: `ebyron357/LifeOS-Enterprise` (`10 Projects/Build AI Consultant Portfolio.md`, `10 Projects/Build YouTube to Knowledge Engine.md`, `10 Projects/Operationalize Content-to-Lead Service.md`)
-- Classification: Active (all three)
+- Classification: ACTIVE (all three)
 - Priority: P0 (Build AI Consultant Portfolio; Operationalize Content-to-Lead Service) / P1 (Build YouTube to Knowledge Engine)
-- Current state: See individual tasks below — each has a due date, next action, and detailed execution plan.
+- Current state: See individual tasks below.
 - Immediate next action: See per-project next actions below.
-- Evidence: Frontmatter of each of the three files (all `type: project`, `status: active`, with `priority`, `owner: Bwa`, `due_date`, `next_action` fields populated).
+- Evidence: Frontmatter of each of the three files.
 
 **List: Workflows**
 - Folder: Automation
 - Purpose: Track the documented capture-processing workflow.
 - GitHub repository/repositories: `ebyron357/LifeOS-Enterprise` (`workflows/CAPTURE_PROCESSING_WORKFLOW.md`)
-- Classification: Cleanup/Validation
+- Classification: REVIEW REQUIRED (not yet exercised end to end)
 - Priority: Normal
 - Current state: Documented but "not yet verified" as exercised end to end.
-- Immediate next action: Exercise the capture-processing workflow end to end and record the result (per `Businesses/LifeOS.md` KPI table).
-- Evidence: `Businesses/LifeOS.md` KPI row "Capture workflow exercised end to end — Not yet verified — Pending."
+- Immediate next action: Exercise the capture-processing workflow end to end and record the result.
+- Evidence: `Businesses/LifeOS.md` KPI table.
 
-**List: n8n Automation Pilot**
+**List: Copilot / AI Agents** (RESOLVED — Decision 3)
 - Folder: Automation
-- Purpose: Track evaluation of n8n as the automation/orchestration layer.
-- GitHub repository/repositories: n/a — no n8n workflow files exist in this repository; referenced only in resource/tool-stack documents.
-- Classification: Research/Cleanup (pilot evaluation, not implemented)
-- Priority: P1 (per registry entry for the ClientVerse/lead-response use case)
-- Current state: "Controlled Pilot" status per registry; no sandbox workflow has been built yet.
-- Immediate next action: Review speed-to-lead and appointment workflows using `AmplifyAutomation/n8n-templates`; one sandbox workflow must pass end-to-end test without exposing production data (per registry's own completion evidence criterion).
-- Evidence: `40 Resources/Technology/Technology and Repository Registry.md` row for `AmplifyAutomation/n8n-templates`.
-
-**List: AI Agent Tooling** (owner-decision alternate to "Agent Standards" under Core Systems)
-- Folder: Automation (ambiguous — see Human Decisions Required)
-- Purpose: Same content as "Agent Standards" above; listed here only to flag the classification conflict, not as a separate migration target.
-- GitHub repository/repositories: `.github/agents/`
-- Classification: Maintenance
+- Purpose: Track the actual Copilot custom agents and AI role personas as a single, simple operational List. Do not create one List per agent unless a future operational need justifies it.
+- GitHub repository/repositories: `ebyron357/LifeOS-Enterprise` (`.github/agents/*.agent.md`, `AI/*.md`)
+- Classification: ACTIVE
 - Priority: Low
-- Current state: Active/current.
-- Immediate next action: Owner must choose one folder (Core Systems or Automation) to avoid duplicate tracking.
-- Evidence: Same 14 `.agent.md` files cited above.
+- Current state: 14 Copilot agents and 4 AI role personas active and current.
+- Immediate next action: None identified from repository evidence; track for ongoing maintenance only. Split into per-agent Lists only if operational complexity requires it later.
+- Evidence: Directory listing of `.github/agents/` (14 files) and `AI/` (4 files).
+
+**List: n8n Automation Platform** (RESOLVED — Decision 6)
+- Folder: Automation
+- Purpose: Track n8n as an official, approved automation/orchestration platform within the LifeOS ecosystem. This List tracks the platform-level adoption; individual workflows are tracked as separate tasks with their own maturity phase.
+- GitHub repository/repositories: n/a within this repository — n8n itself is external tooling referenced in `40 Resources/Technology/Technology and Repository Registry.md` and `40 Resources/Content Services/Content Services Tool Stack.md`. No n8n workflow files currently exist in this repository.
+- Classification: ACTIVE (platform-level) — individual workflows remain at Planning/Development/Testing/Production/Maintenance phase as applicable; do not assume any specific workflow is production-ready.
+- Priority: P1 (per registry entry for the ClientVerse/lead-response use case)
+- Current state: Registry lists `AmplifyAutomation/n8n-templates` at "Controlled Pilot" status for a bounded ClientVerse/D'Affordable Homes/Jasmine Parker lead-response use case; no workflow has yet passed an end-to-end sandbox test.
+- Immediate next action: Review speed-to-lead and appointment workflows from `AmplifyAutomation/n8n-templates`; build and validate one sandbox workflow through to a passing end-to-end test without exposing production data, then advance that workflow's individual phase from Testing toward Production.
+- Evidence: `40 Resources/Technology/Technology and Repository Registry.md` row for `AmplifyAutomation/n8n-templates`; `40 Resources/Content Services/Content Services Tool Stack.md` automation tool references.
 
 ### Portfolio Cleanup Folder
 
-**List: Legacy Folder Migration**
+**List: Legacy Folder Archive & Review** (RESOLVED WITH SAFETY RULE — Decision 5)
 - Folder: Portfolio Cleanup
-- Purpose: Reconcile the flat legacy folders against the numbered PARA structure so the same project/business is not tracked twice.
+- Purpose: Review each legacy flat folder for unique information, links, assets, or operational dependencies, then move reviewed content into an archive/review path. Nothing is deleted.
 - GitHub repository/repositories: `ebyron357/LifeOS-Enterprise` (`Projects/`, `Businesses/`, `AI/`, `Automations/`, `Command Center/`, `Dashboards/`, `Knowledge/`, `Learning/`, `People/`, `Resources/`, `SOPs/`, `Tools/`, `URLs/` vs. `00 Home/`…`90 Archive/`)
-- Classification: Cleanup
+- Classification: REVIEW REQUIRED
 - Priority: Normal
-- Current state: Both folder sets exist in parallel; `Projects/LifeOS Enterprise.md` explicitly lists migrating legacy Projects into `10 Projects` as a pending (unchecked) next action.
-- Immediate next action: Migrate remaining legacy Projects into `10 Projects` (per `Projects/LifeOS Enterprise.md` Next Action list).
-- Evidence: `Projects/LifeOS Enterprise.md` next_action frontmatter: "...then migrate remaining legacy Projects into 10 Projects when convenient."
+- Current state: Both folder sets exist in parallel; `Projects/LifeOS Enterprise.md` explicitly lists migrating legacy Projects into `10 Projects` as a pending next action.
+- Immediate next action: Per-folder review: confirm no unique content, links, assets, or dependencies remain only in the legacy location; then move into an archive/review path (e.g., `90 Archive/`) while preserving history. Do not delete.
+- Evidence: `Projects/LifeOS Enterprise.md` next_action frontmatter.
 
 **List: Archive Candidate Repos**
 - Folder: Portfolio Cleanup
 - Purpose: Track review/archival of the 7 named duplicate GitHub repos.
 - GitHub repository/repositories: `ebyron357/ALT-Label-System`, `ebyron357/alternative-packaging-system`, `ebyron357/alternative-passionFruit-production`, `ebyron357/alternative-lychee-sweet-tea`, `ebyron357/ALT-Syrup-Label-System`, `ebyron357/Bravo-Labels-`, `ebyron357/Bravofinal`
-- Classification: Cleanup/Archive
+- Classification: ARCHIVE CANDIDATE (see "Archive Safety" section — none should be deleted without verification)
 - Priority: Low
 - Current state: Explicitly marked "archive/reference" and "Do Not Use As Active Unless Specifically Needed" in the registry.
-- Immediate next action: "Archive or rename duplicate repos only after confirming no unique assets are missing" (per `PROJECT_REPO_REGISTRY.md` Current Focus Order, item 4).
+- Immediate next action: Verify no unique assets are missing before archiving or renaming (per `PROJECT_REPO_REGISTRY.md` Current Focus Order, item 4).
 - Evidence: `PROJECT_REPO_REGISTRY.md` "Do Not Use As Active Unless Specifically Needed" section and "Current Focus Order" section.
+
+**List: Technology and Repository Registry P1 Review** (RESOLVED as required follow-up — Decision 7)
+- Folder: Portfolio Cleanup
+- Purpose: Perform a dedicated review of `40 Resources/Technology/Technology and Repository Registry.md` to identify any systems, repositories, or dependencies not yet represented in this ClickUp migration.
+- GitHub repository/repositories: `ebyron357/LifeOS-Enterprise` (`40 Resources/Technology/Technology and Repository Registry.md`)
+- Classification: REVIEW REQUIRED
+- Priority: P1 (High)
+- Current state: Registry contains numerous additional P0/P1 rows (e.g., `vercel/ai`, `vercel/sdk`, Axe/Accessibility Insights, `metafloor/bwip-js`) not yet individually evaluated for ClickUp migration beyond what has already been extracted into this document.
+- Immediate next action: Conduct the P1 review before declaring the overall portfolio migration fully closed (see "Recommended Execution Order," Phase 8).
+- Evidence: `40 Resources/Technology/Technology and Repository Registry.md` full priority queue table.
 
 ---
 
@@ -251,63 +319,75 @@ Existing ClickUp folders (do not create new folders beyond these five):
 
 **Task: Validate LifeOS core dashboards in Obsidian**
 - ClickUp List: LifeOS Foundation
-- Objective: Confirm all core dashboards (Daily Command Center, Weekly Review, Monthly Review, Executive Dashboard) render correctly when the vault is opened in Obsidian.
+- Objective: Confirm all core dashboards render correctly when the vault is opened in Obsidian.
 - Current State: Not yet verified.
-- Next Action: Open the repository as an Obsidian vault, enable required plugins, verify dashboard queries render without errors.
+- Next Action: Open the vault, enable required plugins, verify dashboard queries render without errors.
 - Blocker: None recorded.
 - Waiting On: N/A
-- Success Criteria: All core dashboards render; Dataview/Bases queries resolve without errors (per `Projects/LifeOS Enterprise.md` Validation Checklist).
+- Success Criteria: All core dashboards render; Dataview/Bases queries resolve without errors.
 - GitHub Repository: `ebyron357/LifeOS-Enterprise`
 - Native ClickUp Priority: Urgent
-- Evidence: `Projects/LifeOS Enterprise.md` unchecked items: "Open the vault in Obsidian and verify all core dashboards render visually."; `Businesses/LifeOS.md` KPI "Core dashboards validated in Obsidian — Not yet verified."
+- Evidence: `Projects/LifeOS Enterprise.md` Validation Checklist; `Businesses/LifeOS.md` KPI table.
 
 **Task: Resolve P0/P1 runtime defects found during visual validation**
 - ClickUp List: LifeOS Foundation
 - Objective: Fix any defects discovered while validating dashboards in Obsidian.
-- Current State: Not yet assessed — defects not yet known because visual validation has not occurred.
-- Next Action: Complete the dashboard validation task above first, then triage and fix any defects found.
+- Current State: Not yet assessed.
+- Next Action: Complete dashboard validation task first, then triage and fix defects found.
 - Blocker: Depends on completion of dashboard validation.
 - Waiting On: Dashboard validation task.
-- Success Criteria: Zero P0/P1 foundation defects remain (per `Projects/LifeOS Enterprise.md` Definition of Done).
+- Success Criteria: Zero P0/P1 foundation defects remain.
 - GitHub Repository: `ebyron357/LifeOS-Enterprise`
 - Native ClickUp Priority: Urgent
-- Evidence: `Businesses/LifeOS.md` KPI "P0/P1 foundation defects — Not yet assessed in Obsidian — Pending."
+- Evidence: `Businesses/LifeOS.md` KPI table.
 
 **Task: Exercise capture-processing workflow end to end**
 - ClickUp List: Workflows
-- Objective: Process one Inbox item through the documented capture-processing workflow to confirm it works in practice.
-- Current State: Workflow is documented but not yet exercised.
+- Objective: Process one Inbox item through the documented capture-processing workflow.
+- Current State: Documented but not yet exercised.
 - Next Action: Process one Inbox item end to end and record the result.
 - Blocker: None recorded.
 - Waiting On: N/A
-- Success Criteria: One successful capture-to-processing cycle recorded (per `Businesses/LifeOS.md` KPI target: "1 successful cycle").
+- Success Criteria: One successful capture-to-processing cycle recorded.
 - GitHub Repository: `ebyron357/LifeOS-Enterprise`
 - Native ClickUp Priority: Normal
 - Evidence: `workflows/CAPTURE_PROCESSING_WORKFLOW.md`; `Businesses/LifeOS.md` KPI table.
 
 **Task: Confirm production environment variables and lead routing (Charlotte Real Estate System)**
-- ClickUp List: ClientVerse Client Sites
+- ClickUp List: Charlotte Real Estate System
 - Objective: Verify production database URL, CRM webhook, retry cron, form submissions, and local market list.
-- Current State: Website is live; SEO/privacy work and build validation exist from prior work; production integrations unverified.
+- Current State: Live; production integrations unverified.
 - Next Action: Confirm database URL; confirm CRM webhook; confirm retry cron; verify form submissions; verify local market list.
 - Blocker: "Production integrations need final verification."
 - Waiting On: None recorded beyond internal verification.
-- Success Criteria: All 5 sub-checks (database URL, CRM webhook, retry cron, form submissions, market list) confirmed.
+- Success Criteria: All 5 sub-checks confirmed.
 - GitHub Repository: `ebyron357/charlotte-real-estate-system`
 - Native ClickUp Priority: Urgent
-- Evidence: `Projects/Charlotte Real Estate System.md` Tasks list and Blocker field.
+- Evidence: `Projects/Charlotte Real Estate System.md` Tasks list.
+
+**Task: Confirm canonical repository for ClientVerse Store Builds — REVIEW REQUIRED**
+- ClickUp List: ClientVerse Store Builds
+- Objective: Owner confirms which GitHub repository is the canonical source for this project.
+- Current State: Unconfirmed; `PROJECT_REPO_REGISTRY.md` offers only a tentative, unverified association with `project-reconstruction`.
+- Next Action: Owner reviews candidate repositories and confirms canonical mapping.
+- Blocker: Repository identity unconfirmed.
+- Waiting On: Owner decision.
+- Success Criteria: One repository is explicitly confirmed as canonical, or the vault Project note is updated to record that no repository yet exists for this work.
+- GitHub Repository: NOT CONFIRMED — do not assign.
+- Native ClickUp Priority: Urgent (blocks safe progress on the credential task below)
+- Evidence: `Projects/ClientVerse Store Builds.md`; `PROJECT_REPO_REGISTRY.md` "Other Active Project Repos" table.
 
 **Task: Complete credential workflow for ClientVerse Store Builds**
-- ClickUp List: ClientVerse Client Sites
-- Objective: Confirm app setup, obtain API token, add environment variables, confirm demo fallback remains safe, and run a live smoke test.
+- ClickUp List: ClientVerse Store Builds
+- Objective: Confirm app setup, obtain API token, add environment variables, confirm demo fallback remains safe, run a live smoke test.
 - Current State: Client store workflow active; demo catalog fallback exists; production credentials still needed.
-- Next Action: Complete credential workflow and connect production settings.
-- Blocker: "Credentials and final catalog are not fully available."
-- Waiting On: API credentials.
-- Success Criteria: Live smoke test passes after products exist, per the 5-item task list in the source note.
-- GitHub Repository: Not explicitly named in the vault (see Human Decisions Required — possibly `ebyron357/project-reconstruction`)
+- Next Action: Complete credential workflow and connect production settings. **Do not begin repository-specific work until the canonical repository is confirmed (see task above).**
+- Blocker: "Credentials and final catalog are not fully available" AND repository identity unconfirmed.
+- Waiting On: API credentials; repository identity confirmation.
+- Success Criteria: Live smoke test passes after products exist.
+- GitHub Repository: NOT CONFIRMED.
 - Native ClickUp Priority: Urgent
-- Evidence: `Projects/ClientVerse Store Builds.md` Tasks list, `waiting_on: API credentials`.
+- Evidence: `Projects/ClientVerse Store Builds.md` Tasks list.
 
 **Task: Reconcile TradeIQ feature plan against competitor apps**
 - ClickUp List: TradeIQ Product
@@ -321,47 +401,95 @@ Existing ClickUp folders (do not create new folders beyond these five):
 - Native ClickUp Priority: High
 - Evidence: `Projects/TradeIQ.md` Tasks list.
 
+**Task: Finish ALTERNATIVE 12 oz print readiness**
+- ClickUp List: ALTERNATIVE 12oz
+- Objective: Complete print-readiness work for the ALTERNATIVE 12 oz beverage labels.
+- Current State: ACTIVE production system with SKU files, brand assets, codes, exports, release scripts, and release dashboard.
+- Next Action: Finish ALTERNATIVE 12 oz beverage print readiness (registry Current Focus Order item 3).
+- Blocker: None recorded.
+- Waiting On: N/A
+- Success Criteria: Print-ready state confirmed.
+- GitHub Repository: `ebyron357/12oz`
+- Native ClickUp Priority: High
+- Evidence: `PROJECT_REPO_REGISTRY.md` "Packaging Projects" table and "Current Focus Order."
+
+**Task: Recover or rebuild ALT syrup final release files**
+- ClickUp List: ALT Syrup
+- Objective: Recover or rebuild the final release files for ALT syrup labels.
+- Current State: ACTIVE / RECOVERY — final release files not confirmed in hand.
+- Next Action: Recover or rebuild ALT syrup final files (registry Current Focus Order item 2).
+- Blocker: Final release files not confirmed in hand.
+- Waiting On: N/A
+- Success Criteria: Final release files confirmed and in hand.
+- GitHub Repository: `ebyron357/alt-syrup-labels`
+- Native ClickUp Priority: Urgent
+- Evidence: `PROJECT_REPO_REGISTRY.md` "Packaging Projects" table.
+
+**Task: Wrap Bravo Paws labels**
+- ClickUp List: Bravo Paws
+- Objective: Complete the Bravo Paws labels production wrap.
+- Current State: ACTIVE; current requirements, project status, asset inventory, and Illustrator automation scripts present.
+- Next Action: Wrap Bravo Paws labels (registry Current Focus Order item 1).
+- Blocker: None recorded.
+- Waiting On: N/A
+- Success Criteria: Labels wrapped/complete per registry definition.
+- GitHub Repository: `ebyron357/ebyron357-BravoPaws-Official`
+- Native ClickUp Priority: Urgent
+- Evidence: `PROJECT_REPO_REGISTRY.md` "Packaging Projects" table and "Current Focus Order."
+
+**Task: Create canonical LifeOS vault notes for packaging brands** (follow-up, not a blocker)
+- ClickUp List: ALTERNATIVE 12oz / ALT Syrup / Bravo Paws (one sub-task per product)
+- Objective: Create `Projects/*.md` and/or `Businesses/*.md` vault notes for the three packaging brands so they are represented in the vault consistent with other tracked projects.
+- Current State: No vault notes currently exist; only `PROJECT_REPO_REGISTRY.md` entries.
+- Next Action: Draft one Project note per brand using the existing template and registry evidence.
+- Blocker: None — explicitly does not block the ClickUp migration (Decision 1).
+- Waiting On: N/A
+- Success Criteria: One vault Project note exists per packaging brand.
+- GitHub Repository: `ebyron357/LifeOS-Enterprise` (vault notes only)
+- Native ClickUp Priority: Low
+- Evidence: `PROJECT_REPO_REGISTRY.md`.
+
 **Task: Complete LifeOS Enterprise Evidence Package (AI Consultant Portfolio)**
 - ClickUp List: Automation Backlog
-- Objective: Structural audit, dashboard screenshots, architecture diagram, one before-and-after workflow, one measurable operational result, privacy-safe export review, and walkthrough outline.
-- Current State: Active; candidate classification and flagship case-study selection already complete (checked items in source note).
-- Next Action: Complete the LifeOS Enterprise Evidence Package as described above.
+- Objective: Structural audit, dashboard screenshots, architecture diagram, one before-and-after workflow, one measurable operational result, privacy-safe export review, walkthrough outline.
+- Current State: Active; candidate classification and flagship case-study selection already complete.
+- Next Action: Complete the LifeOS Enterprise Evidence Package.
 - Blocker: None recorded.
 - Waiting On: N/A
 - Success Criteria: Evidence package complete and usable as a flagship case study input.
 - GitHub Repository: `ebyron357/LifeOS-Enterprise`
 - Native ClickUp Priority: Urgent
-- Evidence: `10 Projects/Build AI Consultant Portfolio.md` frontmatter `next_action` field; due date 2026-10-31.
+- Evidence: `10 Projects/Build AI Consultant Portfolio.md`; due date 2026-10-31.
 
 **Task: Process one pilot YouTube video through the manual capture workflow**
 - ClickUp List: Automation Backlog
 - Objective: Process one public captioned YouTube video through the manual pilot workflow and record every failure, correction, and useful output.
-- Current State: Active; core flow and success criteria documented; no pilot yet run.
+- Current State: Active; no pilot yet run.
 - Next Action: Run Pilot 1 (public captioned tutorial) using NotebookLM.
 - Blocker: None recorded.
 - Waiting On: N/A
 - Success Criteria: Transcript import, extracted resources, course outline, SOP, checklist, flashcards, quiz, and action items all verified for one pilot video.
 - GitHub Repository: `ebyron357/LifeOS-Enterprise`
 - Native ClickUp Priority: High
-- Evidence: `10 Projects/Build YouTube to Knowledge Engine.md` frontmatter `next_action` field; due date 2026-08-15.
+- Evidence: `10 Projects/Build YouTube to Knowledge Engine.md`; due date 2026-08-15.
 
 **Task: Select pilot offer, niche, and campaign for Content-to-Lead Service**
 - ClickUp List: Automation Backlog
 - Objective: Select one pilot offer, one target niche, and one controlled campaign to run through the complete content-to-lead workflow.
-- Current State: Active; 14-day implementation plan documented; pilot not yet selected.
+- Current State: Active; pilot not yet selected.
 - Next Action: Select one pilot offer, one target niche, and one controlled campaign.
-- Blocker: Field present in frontmatter but left blank (no blocker text recorded).
+- Blocker: None recorded.
 - Waiting On: Not recorded.
-- Success Criteria: Pilot niche/offer selected and Days 1–2 (Offer and Pipeline) plan items completed.
+- Success Criteria: Pilot niche/offer selected and Days 1–2 plan items completed.
 - GitHub Repository: `ebyron357/LifeOS-Enterprise`
 - Native ClickUp Priority: Urgent
-- Evidence: `10 Projects/Operationalize Content-to-Lead Service.md` frontmatter `next_action` field; due date 2026-08-15.
+- Evidence: `10 Projects/Operationalize Content-to-Lead Service.md`; due date 2026-08-15.
 
-**Task: Review n8n templates for a bounded ClientVerse lead-response pilot**
-- ClickUp List: n8n Automation Pilot
-- Objective: Review speed-to-lead and appointment workflows from `AmplifyAutomation/n8n-templates` for D'Affordable Homes, ClientVerse, and Jasmine Parker use cases.
-- Current State: Controlled Pilot status; not yet implemented.
-- Next Action: Review speed-to-lead and appointment workflows.
+**Task: Build and validate one n8n sandbox workflow for ClientVerse lead response**
+- ClickUp List: n8n Automation Platform
+- Objective: Review speed-to-lead and appointment workflows from `AmplifyAutomation/n8n-templates`; build and validate one sandbox workflow end to end.
+- Current State: Controlled Pilot status; individual workflow phase = Planning.
+- Next Action: Move the workflow from Planning to Development to Testing; do not mark Production until it passes an end-to-end test without exposing production data.
 - Blocker: None recorded.
 - Waiting On: N/A
 - Success Criteria: One sandbox workflow passes an end-to-end test without exposing production data.
@@ -369,35 +497,123 @@ Existing ClickUp folders (do not create new folders beyond these five):
 - Native ClickUp Priority: High
 - Evidence: `40 Resources/Technology/Technology and Repository Registry.md` row for `AmplifyAutomation/n8n-templates`.
 
-Do NOT create sample tasks or placeholder tasks beyond the ones listed above — every task above is backed by an explicit, currently-open next_action or unchecked checklist item found in the repository.
+**Task: Review legacy flat folders for unique content before archiving**
+- ClickUp List: Legacy Folder Archive & Review
+- Objective: For each legacy flat folder (`Businesses/`, `Projects/`, `AI/`, `Automations/`, `Command Center/`, `Dashboards/`, `Knowledge/`, `Learning/`, `People/`, `Resources/`, `SOPs/`, `Tools/`, `URLs/`), verify no unique content, links, assets, or dependencies exist that are missing from the corresponding PARA/numbered location.
+- Current State: Not yet reviewed folder-by-folder.
+- Next Action: Complete a per-folder review checklist before any move to archive.
+- Blocker: None recorded.
+- Waiting On: N/A
+- Success Criteria: Each legacy folder is either confirmed fully migrated (safe to move to archive/review path) or its unique content is identified and migrated first.
+- GitHub Repository: `ebyron357/LifeOS-Enterprise`
+- Native ClickUp Priority: Normal
+- Evidence: `Projects/LifeOS Enterprise.md` next_action frontmatter.
+
+**Task: Conduct Technology and Repository Registry P1 review**
+- ClickUp List: Technology and Repository Registry P1 Review
+- Objective: Review all P0/P1 rows in `40 Resources/Technology/Technology and Repository Registry.md` and determine whether any additional systems/repositories/dependencies require their own ClickUp List or task beyond what is already captured in this document.
+- Current State: Not yet reviewed as a dedicated pass.
+- Next Action: Conduct the review before the overall portfolio migration is considered fully closed.
+- Blocker: None recorded.
+- Waiting On: N/A
+- Success Criteria: Every P0/P1 registry row is either mapped to an existing ClickUp List/task or explicitly logged as a new follow-up item.
+- GitHub Repository: `ebyron357/LifeOS-Enterprise`
+- Native ClickUp Priority: High
+- Evidence: `40 Resources/Technology/Technology and Repository Registry.md` full table.
+
+Do NOT create sample tasks or placeholder tasks beyond the ones listed above — every task above is backed by an explicit, currently-open next_action or unchecked checklist item found in the repository (or is an owner-approved follow-up per the decisions above).
 
 ---
 
 ## Do Not Migrate
 
-- **Legacy flat folders as separate content from the PARA structure** (`Businesses/`, `Projects/`, `AI/`, `Automations/`, `Command Center/`, `Dashboards/`, `Knowledge/`, `Learning/`, `People/`, `Resources/`, `SOPs/`, `Tools/`, `URLs/`) — Reason: these are being actively migrated into the numbered structure (`10 Projects/`, `20 Areas/`, etc.) per the repository's own recorded next action; migrating both sets into ClickUp would create duplicate work items describing the same project.
-- **`ALT-Label-System`, `alternative-packaging-system`, `alternative-passionFruit-production`, `alternative-lychee-sweet-tea`** — Reason: explicitly marked as archive/reference and "focus noise" in `PROJECT_REPO_REGISTRY.md`; the canonical active repo for this work is `ebyron357/12oz`.
+- **Legacy flat folders as separate content from the PARA structure** — Reason: per Decision 5, these are being consolidated into the numbered structure; they are handled through the "Legacy Folder Archive & Review" List/task, not migrated as independent, ongoing active content.
+- **`ALT-Label-System`, `alternative-packaging-system`, `alternative-passionFruit-production`, `alternative-lychee-sweet-tea`** — Reason: explicitly marked archive/reference and "focus noise" in `PROJECT_REPO_REGISTRY.md`; the canonical active repo for this work is `ebyron357/12oz`. Tracked only as ARCHIVE CANDIDATE, not migrated as active work.
 - **`ALT-Syrup-Label-System`** — Reason: explicitly superseded by `ebyron357/alt-syrup-labels` per the registry.
 - **`Bravo-Labels-`, `Bravofinal`** — Reason: explicitly superseded by `ebyron357/ebyron357-BravoPaws-Official` per the registry.
-- **`architecture/`, `docs/`, `templates/`, `99 Templates/` content in general** — Reason: these are reference/governance documentation, not actionable deliverables; only the two specific validation tasks listed above (dashboard validation, defect resolution) are actionable and have been included as tasks.
-- **README.md index files** (e.g., `Automations/README.md`, `Tools/README.md`, `SOPs/README.md`, `URLs/README.md`, `Knowledge/README.md`, `Learning/README.md`, `People/README.md`, `Resources/README.md`, `90 Archive/README.md`) — Reason: these are folder-purpose descriptions ("Store automation records here...") with no project content of their own; they should remain documentation.
-- **`.github/agents/*.agent.md` and `AI/*.md` as active "experiments"** — Reason: these are stable, in-use standards, not experiments; they may warrant a Maintenance-classified reference list (see above) but should not be treated as active project work requiring task tracking.
-- **n8n as an implemented automation system** — Reason: no n8n workflow exists in this repository; it is a tool under evaluation ("Controlled Pilot" / research status). It should be tracked as a pilot-evaluation item only, not migrated as if it were live automation infrastructure.
-- **The OpenRouter integration's internal library files individually** (`lib/router.js`, `lib/client.js`, `lib/errors.js`, `lib/env.js`) — Reason: these are implementation details of one integration, already represented by the single "Integrations" List item; they should not be split into separate ClickUp tasks without a specific defect or feature request.
+- **`architecture/`, `docs/`, `templates/`, `99 Templates/` content in general** — Reason: reference/governance documentation, not actionable deliverables; only the two specific validation tasks already listed (dashboard validation, defect resolution) are actionable.
+- **README.md index files** (e.g., `Automations/README.md`, `Tools/README.md`, `SOPs/README.md`, `URLs/README.md`, `Knowledge/README.md`, `Learning/README.md`, `People/README.md`, `Resources/README.md`, `90 Archive/README.md`) — Reason: folder-purpose descriptions with no project content of their own; remain documentation.
+- **Agent governance/rules/policy documentation as if it were the agents themselves** — Reason: per Decision 3, documentation describing agent standards is reference material (tracked under Core Systems → Agent Governance & Standards); it should not be duplicated as Automation tasks. Only the agents-as-a-capability belong under Automation.
+- **One ClickUp List per individual Copilot agent** — Reason: per Decision 3, keep the implementation simple; do not create 14+ separate Lists unless a future operational need justifies it.
+- **Any repository consolidation, renaming, or archival action involving ClientVerse Store Builds** — Reason: per Decision 4, the canonical repository is not confirmed; taking any structural action based on an unverified assumption risks acting against the wrong repository.
+- **Treating n8n workflows as production-ready by default** — Reason: per Decision 6, n8n the platform is approved, but individual workflows must be tracked at their own maturity phase; none should be marked Production without passing an end-to-end test.
+- **The OpenRouter integration's internal library files individually** (`lib/router.js`, `lib/client.js`, `lib/errors.js`, `lib/env.js`) — Reason: implementation details of one integration, already represented by the single "Integrations" List item.
+- **Deleting any legacy folder, archive-candidate repo, or duplicate system** — Reason: per Decision 5 and the Archive Safety rules below, nothing is deleted; items move only into ARCHIVE CANDIDATE / REVIEW REQUIRED states pending verification.
+
+---
+
+## Archive Safety
+
+Every archive or cleanup recommendation in this document must use one of the following states — nothing is ever automatically deleted:
+
+- **ACTIVE** — currently in use, tracked as ongoing work.
+- **MAINTAIN** — stable, low-effort tracking only (e.g., Governance & Docs, Integrations, Copilot/AI Agents List).
+- **REVIEW REQUIRED** — needs owner or maintainer review before a final classification or action can be taken (e.g., ClientVerse Store Builds, Legacy Folder Archive & Review, Technology and Repository Registry P1 Review, Capture Processing Workflow).
+- **ARCHIVE CANDIDATE** — proposed for archival, pending verification (e.g., the 7 named duplicate/legacy repos, legacy flat folders once reviewed).
+- **DELETE CANDIDATE** — reserved for items that, after full verification, are confirmed to contain no unique value; none are currently designated DELETE CANDIDATE in this document.
+
+Before any item advances from ARCHIVE CANDIDATE toward removal, the following must be verified and documented:
+
+- Unique assets (files, designs, code not present elsewhere)
+- Source files (original, non-duplicated production files)
+- Client deliverables (anything delivered to or referenced by a client)
+- Deployment information (live URLs, hosting configuration, environment variables)
+- Credentials documentation (even if the credentials themselves are not stored in the repo)
+- Repository history (commit history, issues, PRs of historical value)
+- Links/dependencies (anything else in the vault or other repos that references this item)
+
+No repository, folder, or note referenced in this document should be deleted as a result of this migration plan.
 
 ---
 
 ## Human Decisions Required
 
-- Should the packaging brand projects (12oz, ALT syrup, Bravo Paws) be onboarded into ClickUp now, given they have no vault Project/Business note — only `PROJECT_REPO_REGISTRY.md` entries?
-- Does the Web Vault Portal (Next.js app) belong in **Core Systems** or **Product Systems**? (It is shared infrastructure but is also a shipped, versioned product.)
-- Do the 14 Copilot custom agents belong in **Core Systems** (as a standard) or **Automation** (as tooling)? Choose one to avoid duplicate tracking between the "Agent Standards" and "AI Agent Tooling" Lists proposed above.
-- What is the actual GitHub repository for **ClientVerse Store Builds**? `PROJECT_REPO_REGISTRY.md` tentatively maps "Staxx / Shopify client work" to `ebyron357/project-reconstruction`, but this is not confirmed as the same project referenced in `Projects/ClientVerse Store Builds.md`.
-- Are the legacy flat folders (`Businesses/`, `Projects/`, `AI/`, `Automations/`, etc.) fully superseded by the numbered PARA structure, or still authoritative for some content? This affects whether any additional items are hiding in the legacy folders that were not surfaced by this review.
-- Should n8n be tracked as a formal Automation-folder pilot now, or deferred until a specific project (e.g., ClientVerse lead response) is ready to test it?
-- Is `40 Resources/Technology/Technology and Repository Registry.md` itself a live, currently-maintained priority queue that should generate additional ClickUp tasks beyond the ones already extracted here (e.g., `vercel/ai`, `vercel/sdk`, accessibility tooling, barcode generation)? This document contains many more P0/P1 rows not yet individually evaluated for ClickUp migration and may warrant a dedicated follow-up review.
+Decisions 1, 2, 3, 5, 6, and 7 from the owner review are now **RESOLVED** and have been incorporated throughout this document (see Executive Summary and the relevant Folder Mapping / List entries above). They are retained here only as a record of resolution, not as open questions:
 
-Do not silently resolve any of the above; each requires explicit owner confirmation before proceeding.
+- ~~Packaging/product systems classification~~ — RESOLVED (Decision 1): Product Systems, three separate Lists, missing vault notes are follow-up work.
+- ~~Web Vault Portal classification~~ — RESOLVED (Decision 2): Core Systems.
+- ~~Copilot/AI agents classification~~ — RESOLVED (Decision 3): Automation, single simple List.
+- ~~Legacy folder structure~~ — RESOLVED WITH SAFETY RULE (Decision 5): PARA is standard; legacy content reviewed then archived, never deleted.
+- ~~n8n classification~~ — RESOLVED (Decision 6): Automation, official platform; workflow-level maturity phases still apply.
+- ~~Technology and Repository Registry follow-up~~ — RESOLVED as required (Decision 7): scheduled as Phase 8 P1 review.
+
+### Remaining Unresolved Decision
+
+- **ClientVerse Store Builds canonical repository identity (Decision 4) — UNRESOLVED.** The canonical GitHub repository for this project is not confirmed. `PROJECT_REPO_REGISTRY.md` offers only a tentative, unverified association with `ebyron357/project-reconstruction`. Migration of the underlying ClickUp List/task may proceed (the work itself is real and evidenced in the vault), but **no repository should be linked, and no consolidation, renaming, or archival action should occur** until the owner confirms the mapping.
+
+### Newly Discovered Issues (not part of the original seven — kept separate per instructions)
+
+- **Priority for the three packaging-brand Lists is unrated.** No `priority` field exists anywhere in the vault or registry for 12oz, ALT Syrup, or Bravo Paws; a native ClickUp Priority must be assigned by the owner at List-creation time rather than inferred.
+- **Depth of the Technology and Repository Registry.** The registry contains many more P0/P1 rows (e.g., `vercel/ai`, `vercel/sdk`, Axe/Accessibility Insights) beyond the ones already surfaced in this document; the Phase 8 review (Decision 7) is the correct place to resolve this, but it is called out here explicitly so it is not mistaken for already being fully covered.
+- **Shared Packaging Infrastructure scope is not fully defined.** Decision 1 permits shared packaging infrastructure to remain separate from the three product-specific Lists, but the vault does not clearly enumerate everything that counts as "shared" versus "product-specific" — this may need a short scoping pass when the Phase 8 registry review occurs.
+
+---
+
+## Recommended Execution Order
+
+**Phase 1: LifeOS and canonical portfolio stabilization**
+Validate LifeOS core dashboards in Obsidian; resolve P0/P1 defects; exercise the capture-processing workflow end to end. This phase stabilizes the control plane before other work is layered on top of it.
+
+**Phase 2: ClickUp hierarchy and core operating structure**
+Create the `LIFE-OS-OPERATIONS` Space's five Folders' Lists for Core Systems (LifeOS Foundation, Governance & Docs, Agent Governance & Standards, Web Portal) and apply the custom fields and status model defined below, establishing the operating structure before populating client/product/automation work.
+
+**Phase 3: ClientVerse and core business systems**
+Confirm the ClientVerse business-level handoff checklist next action; establish the ClientVerse Program List as the parent context for client delivery work.
+
+**Phase 4: Client delivery systems**
+Confirm production environment variables and lead routing for Charlotte Real Estate System. For ClientVerse Store Builds, resolve the REVIEW REQUIRED repository-identity question before or in parallel with progressing the credential workflow — do not let repository uncertainty block tracking the work, but do not act on an assumed repository either.
+
+**Phase 5: Product / packaging systems**
+Progress the three separate packaging Lists (ALTERNATIVE 12oz, ALT Syrup, Bravo Paws) per their individual next actions; progress TradeIQ's feature reconciliation; create the follow-up vault notes for the packaging brands as time allows (non-blocking).
+
+**Phase 6: Automation and n8n integration**
+Track the OpenRouter integration for maintenance; progress the three Automation Backlog projects; track the Copilot/AI Agents List as maintenance; build and validate the first n8n sandbox workflow, advancing it through Planning → Development → Testing before any Production designation.
+
+**Phase 7: Legacy cleanup and archive review**
+Review each legacy flat folder for unique content, links, assets, or dependencies; move confirmed-migrated folders into an archive/review path while preserving history; review the 7 named duplicate/legacy GitHub repos for unique assets before any archival action — do not delete anything.
+
+**Phase 8: Technology and Repository Registry P1 review and final portfolio reconciliation**
+Conduct the dedicated review of `40 Resources/Technology/Technology and Repository Registry.md`; reconcile any additional systems/repositories/dependencies discovered against the existing ClickUp structure; confirm the ClientVerse Store Builds repository identity has been resolved (or explicitly re-flag it if still unresolved); only after this phase should the overall portfolio migration be considered fully closed.
 
 ---
 
@@ -413,10 +629,12 @@ Define the following custom fields on the Space (or on each relevant Folder/List
 
 **GitHub Repository**
 - Type: URL
+- Note: Leave blank rather than guessing for any item marked REVIEW REQUIRED (e.g., ClientVerse Store Builds) until confirmed.
 
 **Current Phase**
 - Type: Dropdown
 - Options: Discovery, Planning, Development, Testing, Production, Maintenance
+- Note: For n8n workflows specifically, use this field at the individual-workflow level, not at the platform/List level, so that platform-level approval (Decision 6) is never confused with any single workflow's readiness.
 
 **Blocker**
 - Type: Text
@@ -456,39 +674,21 @@ Use exactly the following ClickUp statuses (no additions or substitutions):
 
 ---
 
-## Recommended Execution Order
-
-**Phase 1: LifeOS and portfolio stabilization**
-Validate LifeOS core dashboards in Obsidian; resolve P0/P1 defects; exercise the capture-processing workflow end to end; resolve the legacy-folder-vs-PARA-structure migration. This phase stabilizes the control plane before other work is layered on top of it.
-
-**Phase 2: ClientVerse and core platform releases**
-Track the Web Vault Portal's ongoing evolution (pending the Core Systems vs. Product Systems decision) and confirm the ClientVerse business-level handoff checklist next action.
-
-**Phase 3: Client delivery**
-Confirm production environment variables and lead routing for Charlotte Real Estate System; complete the credential workflow and production smoke test for ClientVerse Store Builds.
-
-**Phase 4: Product/packaging delivery**
-Reconcile the TradeIQ feature plan against competitor apps; resolve the packaging-brand owner decision and, if approved, onboard 12oz / ALT syrup / Bravo Paws.
-
-**Phase 5: Automation**
-Track the OpenRouter integration for maintenance; progress the three Automation Backlog projects (AI Consultant Portfolio, YouTube to Knowledge Engine, Content-to-Lead Service) against their documented next actions; evaluate the n8n pilot for a bounded ClientVerse lead-response use case.
-
-**Phase 6: Portfolio cleanup**
-Archive or rename the 7 named duplicate/legacy GitHub repos only after confirming no unique assets are missing, per the registry's own "Current Focus Order."
-
----
-
 ## Final Migration Checklist
 
-- [ ] Confirm this document (`docs/CLICKUP_MIGRATION_PREVIEW.md`) reflects the owner's understanding of the current portfolio.
-- [ ] Resolve all items under "Human Decisions Required" before creating any ClickUp Folders/Lists.
+- [ ] Confirm this document (`docs/CLICKUP_MIGRATION_PREVIEW.md`) reflects the owner's approved decisions (1, 2, 3, 5, 6, 7 resolved; 4 unresolved).
 - [ ] Confirm the existing `LIFE-OS-OPERATIONS` Space and its 5 existing folders (Core Systems, Client Delivery, Product Systems, Automation, Portfolio Cleanup) are the correct, final target — do not create a new Space.
-- [ ] Create the Lists specified in "Exact Lists to Create," one Folder at a time, starting with Core Systems (Phase 1).
+- [ ] **Do not resolve Decision 4 (ClientVerse Store Builds repository identity) by assumption.** Obtain explicit owner confirmation before linking any repository or taking any consolidation/archival action related to this project.
+- [ ] Create the Lists specified in "Exact Lists to Create," one Folder at a time, following the Recommended Execution Order (Phase 1 → Phase 8).
+- [ ] Create ALTERNATIVE 12oz, ALT Syrup, and Bravo Paws as three separate Lists under Product Systems — do not combine them.
+- [ ] Create the Copilot/AI Agents List as a single List under Automation — do not create one List per agent.
+- [ ] Classify the Web Portal List under Core Systems.
 - [ ] Apply the custom fields specified in "ClickUp Field Mapping" at the Space level so they are available to every List.
 - [ ] Apply the exact Status Model specified above — no additional statuses.
 - [ ] Create only the tasks specified in "Tasks to Create Later" — do not add placeholder or sample tasks.
-- [ ] Set native ClickUp Priority and the custom fields (Project Health, GitHub Repository, Current Phase, Blocker, Waiting On, Next Action, Next Milestone, Production Ready, Evidence/Verification, Owner) on each task as it is created, using the evidence recorded above.
-- [ ] Follow the Recommended Execution Order (Phase 1 → Phase 6); do not start Phase 2+ work in ClickUp before Phase 1 stabilization tasks are at least in progress.
-- [ ] Do not migrate any item listed under "Do Not Migrate."
-- [ ] Re-review `40 Resources/Technology/Technology and Repository Registry.md` in a follow-up pass before treating it as fully covered by this document (see final bullet under Human Decisions Required).
+- [ ] Set native ClickUp Priority and the custom fields on each task as it is created, using the evidence recorded above.
+- [ ] Track n8n workflows individually by Current Phase (Planning/Development/Testing/Production/Maintenance); do not mark the n8n platform-level List itself as "Production" in a way that implies every workflow is production-ready.
+- [ ] Complete the legacy-folder review (Phase 7) before moving any legacy content into an archive path; preserve history; do not delete anything.
+- [ ] Complete the Technology and Repository Registry P1 review (Phase 8) before declaring the portfolio migration fully closed.
 - [ ] After ClickUp structure is created, cross-link each ClickUp task back to its GitHub evidence file/path for traceability.
+- [ ] Do not migrate any item listed under "Do Not Migrate."
