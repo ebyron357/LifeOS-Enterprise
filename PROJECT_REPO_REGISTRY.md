@@ -1,6 +1,6 @@
 # Project Repository Registry
 
-Last updated: 2026-07-08
+Last updated: 2026-08-10
 
 Purpose: reduce duplicate GitHub confusion by defining **one active repo per project** and moving everything else into archive/reference status.
 
@@ -28,7 +28,8 @@ Do not open archive/reference repos unless the active repo is missing a specific
 |---|---|---|
 | Jasmine Parker / Allure Realty website | `ebyron357/charlotte-real-estate-system` | Active real estate platform repo. |
 | TradeIQ | `ebyron357/tradeiq-command-center` | Active TradeIQ command center repo. |
-| Staxx / Shopify client work | `ebyron357/project-reconstruction` | Active client store reconstruction repo unless replaced by confirmed Shopify-native repo. |
+| **ClientVerse Public Platform** | **`ebyron357/clientverse`** | **CONFIRMED by owner (2026-08-10).** Canonical repository for the ClientVerse public website / lead-acquisition platform. Private repo, exists. Role: public-facing website and lead acquisition, not internal CRM. CRM / GoHighLevel integration is **not yet fully connected** — treat as planned follow-up work, not a migration blocker. This repository is distinct from `project-reconstruction` (Staxx / Shopify client work, below); no evidence links the two, so they are not merged. |
+| Staxx / Shopify client work | `ebyron357/project-reconstruction` | Active client store reconstruction repo unless replaced by confirmed Shopify-native repo. Unrelated to ClientVerse Public Platform — no confirmed association exists between this repo and any ClientVerse project. |
 | Life OS | `ebyron357/LifeOS-Enterprise` | System-level registry and operations repo. |
 
 ---
