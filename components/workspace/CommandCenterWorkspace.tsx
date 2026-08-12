@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CognitiveSupportCenter } from "@/components/dashboard/CognitiveSupportCenter";
 import { OperationsSurface } from "@/components/dashboard/OperationsSurface";
@@ -29,11 +30,18 @@ type CommandCenterWorkspaceProps = {
 export function CommandCenterWorkspace({ data, github, revenue }: CommandCenterWorkspaceProps) {
   const router = useRouter();
   const blocked = data.projects.filter((project) => project.status === "blocked" || project.blocker).length;
-  const today = new Intl.DateTimeFormat("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  }).format(new Date());
+  // Compute the local date only after mount to avoid a server/client timezone
+  // mismatch (the server may still be on the previous day in its own timezone).
+  const [today, setToday] = useState<string | null>(null);
+  useEffect(() => {
+    setToday(
+      new Intl.DateTimeFormat("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+      }).format(new Date()),
+    );
+  }, []);
 
   const widgets = [
     {
@@ -157,7 +165,7 @@ export function CommandCenterWorkspace({ data, github, revenue }: CommandCenterW
       <WorkspaceShell
         title="Command Center"
         eyebrow="Workspace OS · Command Center"
-        description={`Live vault-backed mission control for ${today}. Drag, resize, focus, and restore widgets without changing Markdown.`}
+        description={`Live vault-backed mission control${today ? ` for ${today}` : ""}. Drag, resize, focus, and restore widgets without changing Markdown.`}
       >
         <div className="workspace-hero">
           <div>
