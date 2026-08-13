@@ -17,6 +17,159 @@
     },
     {
       "parameters": {
+        "jsCode": "// ---------------------------------------------------------------------------\n// Node: Derive Idempotency Key (fail-closed)\n//\n// The X-GitHub-Delivery header is the ONLY accepted key source.\n// GitHub reuses the same delivery ID on every retry of the same logical\n// event, making it the ideal idempotency key.\n//\n// If the header is absent the event is quarantined: no ClickUp mutation\n// occurs, and a structured log entry is emitted for manual review.\n// ---------------------------------------------------------------------------\nconst headers = $input.first().json.headers ?? {};\nconst deliveryId =\n  headers['x-github-delivery'] ??\n  headers['X-GitHub-Delivery'] ??\n  null;\n\nif (!deliveryId) {\n  console.warn(\n    '[idempotency] QUARANTINE X-GitHub-Delivery header absent; event quarantined for manual review'\n  );\n  return [\n    {\n      json: {\n        ...$input.first().json,\n        _idempotencyKey: null,\n        _idempotencyDecision: 'quarantine',\n      },\n    },\n  ];\n}\n\nconsole.log(`[idempotency] derived key=${deliveryId}`);\nreturn [{ json: { ...$input.first().json, _idempotencyKey: deliveryId } }];"
+      },
+      "id": "derive-key",
+      "name": "Derive Idempotency Key",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ---------------------------------------------------------------------------\n// Node: Idempotency Gate — durable file-based atomic store\n//\n// Uses O_EXCL (exclusive create) via Node fs.openSync with flag 'wx'.\n// The kernel guarantees that exactly one concurrent caller succeeds on\n// POSIX and NTFS filesystems.  Records are persisted to disk so they\n// survive process restarts.\n//\n// Store directory: $vars.IDEMPOTENCY_STORE_DIR (configure in n8n Variables).\n// Default: /data/n8n/idempotency\n//\n// TTL: records older than 30 days are swept (GitHub redelivery window is\n// 72 h, so 30 days is a safe upper bound).\n//\n// For multi-instance n8n deployments share the same persistent volume\n// across all workers so every instance sees the same store directory.\n// ---------------------------------------------------------------------------\nconst key = $input.first().json._idempotencyKey;\n\nif (!key || $input.first().json._idempotencyDecision === 'quarantine') {\n  return [{ json: { ...$input.first().json, _idempotencyDecision: 'quarantine' } }];\n}\n\nconst fs   = require('node:fs');\nconst path = require('node:path');\n\nconst storeDir = ($vars.IDEMPOTENCY_STORE_DIR ?? '/data/n8n/idempotency').trim();\nconst TTL_MS   = 30 * 24 * 60 * 60 * 1000;\n\nfs.mkdirSync(storeDir, { recursive: true });\n\n// --- TTL sweep (best-effort, never throws) ---\ntry {\n  const cutoff = Date.now() - TTL_MS;\n  for (const entry of fs.readdirSync(storeDir)) {\n    if (!entry.endsWith('.json')) continue;\n    try {\n      const fp = path.join(storeDir, entry);\n      if (fs.statSync(fp).mtimeMs < cutoff) {\n        fs.unlinkSync(fp);\n        console.log(`[idempotency] TTL_EXPIRED removed file=${entry}`);\n      }\n    } catch { /* ignore per-file errors */ }\n  }\n} catch { /* ignore directory errors */ }\n\n// --- Atomic claim via O_EXCL exclusive create ---\nconst safeKey  = encodeURIComponent(key).replace(/%/g, '_');\nconst filePath = path.join(storeDir, `${safeKey}.json`);\nconst record   = { key, processedAt: new Date().toISOString(), label: 'first' };\n\ntry {\n  const fd = fs.openSync(filePath, 'wx');  // O_CREAT | O_EXCL\n  fs.writeSync(fd, JSON.stringify(record, null, 2));\n  fs.closeSync(fd);\n  console.log(`[idempotency] FIRST processing key=${key}`);\n  return [{ json: { ...$input.first().json, _idempotencyDecision: 'first' } }];\n} catch (err) {\n  if (err.code !== 'EEXIST') throw err;\n  // Another caller already claimed this key\n  let priorProcessedAt = 'unknown';\n  try {\n    const prior = JSON.parse(fs.readFileSync(filePath, 'utf8'));\n    priorProcessedAt = prior.processedAt ?? 'unknown';\n  } catch { /* best-effort */ }\n  console.log(\n    `[idempotency] DUPLICATE suppressed key=${key} first_seen=${priorProcessedAt}`\n  );\n  return [{\n    json: {\n      ...$input.first().json,\n      _idempotencyDecision: 'duplicate',\n      _priorProcessedAt: priorProcessedAt,\n    },\n  }];\n}"
+      },
+      "id": "idempotency-gate",
+      "name": "Idempotency Gate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json._idempotencyDecision }}",
+              "operation": "equals",
+              "value2": "first"
+            }
+          ]
+        }
+      },
+      "id": "route-decision",
+      "name": "Route: First or Duplicate/Quarantine?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ---------------------------------------------------------------------------\n// Node: Log Duplicate / Quarantine Suppression\n// Emits a structured log entry so suppressed events are fully observable.\n// ---------------------------------------------------------------------------\nconst decision = $input.first().json._idempotencyDecision;\nconst key      = $input.first().json._idempotencyKey ?? '(none)';\nconst when     = $input.first().json._priorProcessedAt ?? 'n/a';\nconsole.log(\n  `[idempotency] SUPPRESSED decision=${decision} key=${key} original_processing=${when}`\n);\nreturn [{ json: { suppressed: true, decision, key, priorProcessedAt: when } }];"
+      },
+      "id": "log-suppressed",
+      "name": "Log Suppressed Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 460]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ---------------------------------------------------------------------------\n// Node: Build ClickUp Comment\n// Constructs the comment body from the GitHub issue/PR event payload.\n// ---------------------------------------------------------------------------\nconst payload = $input.first().json.body ?? $input.first().json;\nconst issue   = payload.issue ?? payload.pull_request ?? {};\nconst repo    = payload.repository?.full_name ?? 'unknown';\nconst action  = payload.action ?? 'unknown';\nconst actor   = payload.sender?.login ?? 'unknown';\nconst key     = $input.first().json._idempotencyKey;\n\nconst commentText =\n  `**GitHub event** \\`${action}\\` on \\`${repo}\\` #${issue.number ?? '?'}` +\n  `\\nActor: ${actor}` +\n  `\\nURL: ${issue.html_url ?? ''}` +\n  `\\n\\n_idempotency-key: ${key}_`;\n\nreturn [{ json: { commentText, idempotencyKey: key, issueNumber: issue.number } }];"
+      },
+      "id": "build-comment",
+      "name": "Build ClickUp Comment",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 140]
+    },
+    {
+      "parameters": {
+        "resource": "comment",
+        "operation": "create",
+        "task": "={{ $vars.CLICKUP_TASK_ID }}",
+        "comment": "={{ $json.commentText }}"
+      },
+      "id": "clickup-comment",
+      "name": "ClickUp: Post Comment",
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [1340, 140],
+      "credentials": {
+        "clickUpApi": {
+          "id": "clickup-api-creds",
+          "name": "ClickUp API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ---------------------------------------------------------------------------\n// Node: Log First Processing\n// Emits a structured log entry for the successful, non-duplicate path.\n// ---------------------------------------------------------------------------\nconst key    = $input.first().json.idempotencyKey;\nconst taskId = $vars.CLICKUP_TASK_ID;\nconsole.log(\n  `[idempotency] FIRST_PROCESSED key=${key} clickup_task=${taskId} ts=${new Date().toISOString()}`\n);\nreturn [{ json: { processed: true, key } }];"
+      },
+      "id": "log-first",
+      "name": "Log First Processing",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 140]
+    }
+  ],
+  "connections": {
+    "GitHub Webhook": {
+      "main": [
+        [{ "node": "Derive Idempotency Key", "type": "main", "index": 0 }]
+      ]
+    },
+    "Derive Idempotency Key": {
+      "main": [
+        [{ "node": "Idempotency Gate", "type": "main", "index": 0 }]
+      ]
+    },
+    "Idempotency Gate": {
+      "main": [
+        [{ "node": "Route: First or Duplicate/Quarantine?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Route: First or Duplicate/Quarantine?": {
+      "main": [
+        [{ "node": "Build ClickUp Comment", "type": "main", "index": 0 }],
+        [{ "node": "Log Suppressed Event", "type": "main", "index": 0 }]
+      ]
+    },
+    "Build ClickUp Comment": {
+      "main": [
+        [{ "node": "ClickUp: Post Comment", "type": "main", "index": 0 }]
+      ]
+    },
+    "ClickUp: Post Comment": {
+      "main": [
+        [{ "node": "Log First Processing", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["github", "clickup", "idempotent", "lifeos"],
+  "pinData": {},
+  "_readme": {
+    "storeDir": "Configure the IDEMPOTENCY_STORE_DIR n8n variable to a persistent directory shared across all n8n worker instances (e.g. a mounted volume). Default: /data/n8n/idempotency",
+    "ttl": "Records older than 30 days are automatically swept. GitHub redelivery window is 72 h.",
+    "atomicity": "The gate uses O_EXCL (exclusive-create) so exactly one concurrent execution claims each key.",
+    "e2e_proof": "To verify: generate a new GitHub delivery, note the X-GitHub-Delivery ID, deliberately redeliver via GitHub webhook settings, and confirm exactly one ClickUp comment appears."
+  }
+}
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "github-webhook",
+        "responseMode": "onReceived",
+        "responseData": "noData"
+      },
+      "id": "webhook-trigger",
+      "name": "GitHub Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "github-clickup-idempotent"
+    },
+    {
+      "parameters": {
         "jsCode": "// ---------------------------------------------------------------------------\n// Node: Derive Idempotency Key\n//\n// Priority order:\n//   1. X-GitHub-Delivery header — reused by GitHub on retries of the same\n//      logical event, making it the ideal idempotency key.\n//   2. Composite fallback from stable payload fields.\n// ---------------------------------------------------------------------------\nconst headers = $input.first().json.headers ?? {};\nconst payload = $input.first().json.body ?? {};\n\nconst deliveryId = headers['x-github-delivery'] ?? headers['X-GitHub-Delivery'];\nconst action      = payload.action ?? 'unknown';\nconst repo        = payload.repository?.full_name ?? 'unknown';\nconst itemNumber  = payload.issue?.number ?? payload.pull_request?.number ?? 0;\n\nconst key = deliveryId\n  ? deliveryId\n  : `fallback:${repo}:${itemNumber}:${action}`;\n\nconsole.log(`[idempotency] derived key=${key}`);\n\nreturn [{ json: { ...payload, _idempotencyKey: key, _headers: headers } }];"
       },
       "id": "derive-key",
