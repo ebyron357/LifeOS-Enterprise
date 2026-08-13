@@ -1,0 +1,149 @@
+{
+  "name": "GitHub → ClickUp (Idempotent)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "github-webhook",
+        "responseMode": "onReceived",
+        "responseData": "noData"
+      },
+      "id": "webhook-trigger",
+      "name": "GitHub Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "github-clickup-idempotent"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ---------------------------------------------------------------------------\n// Node: Derive Idempotency Key\n//\n// Priority order:\n//   1. X-GitHub-Delivery header — reused by GitHub on retries of the same\n//      logical event, making it the ideal idempotency key.\n//   2. Composite fallback from stable payload fields.\n// ---------------------------------------------------------------------------\nconst headers = $input.first().json.headers ?? {};\nconst payload = $input.first().json.body ?? {};\n\nconst deliveryId = headers['x-github-delivery'] ?? headers['X-GitHub-Delivery'];\nconst action      = payload.action ?? 'unknown';\nconst repo        = payload.repository?.full_name ?? 'unknown';\nconst itemNumber  = payload.issue?.number ?? payload.pull_request?.number ?? 0;\n\nconst key = deliveryId\n  ? deliveryId\n  : `fallback:${repo}:${itemNumber}:${action}`;\n\nconsole.log(`[idempotency] derived key=${key}`);\n\nreturn [{ json: { ...payload, _idempotencyKey: key, _headers: headers } }];"
+      },
+      "id": "derive-key",
+      "name": "Derive Idempotency Key",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ---------------------------------------------------------------------------\n// Node: Idempotency Gate (check-and-set against n8n Static Data)\n//\n// n8n Static Data persists across executions within the same workflow\n// instance. For multi-instance deployments, replace this node with an\n// HTTP Request to a shared Redis or key-value endpoint.\n// ---------------------------------------------------------------------------\nconst staticData = $getWorkflowStaticData('global');\nconst processedKeys = staticData.processedKeys ?? {};\n\nconst key = $input.first().json._idempotencyKey;\n\nif (processedKeys[key]) {\n  const prior = processedKeys[key];\n  console.log(\n    `[idempotency] DUPLICATE suppressed key=${key} first_seen=${prior.processedAt}`\n  );\n  return [\n    {\n      json: {\n        ...$input.first().json,\n        _idempotencyDecision: 'duplicate',\n        _priorProcessedAt: prior.processedAt,\n      },\n    },\n  ];\n}\n\n// Persist BEFORE downstream mutation (check-and-set semantics).\nprocessedKeys[key] = { processedAt: new Date().toISOString() };\nstaticData.processedKeys = processedKeys;\n\nconsole.log(`[idempotency] FIRST processing key=${key}`);\n\nreturn [\n  {\n    json: {\n      ...$input.first().json,\n      _idempotencyDecision: 'first',\n    },\n  },\n];"
+      },
+      "id": "idempotency-gate",
+      "name": "Idempotency Gate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json._idempotencyDecision }}",
+              "operation": "equals",
+              "value2": "first"
+            }
+          ]
+        }
+      },
+      "id": "route-decision",
+      "name": "Route: First or Duplicate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ---------------------------------------------------------------------------\n// Node: Log Duplicate Suppression\n// Emits a structured log entry so duplicate events are fully observable.\n// ---------------------------------------------------------------------------\nconst key  = $input.first().json._idempotencyKey;\nconst when = $input.first().json._priorProcessedAt;\nconsole.log(\n  `[idempotency] DUPLICATE_SUPPRESSED key=${key} original_processing=${when}`\n);\nreturn [{ json: { suppressed: true, key, priorProcessedAt: when } }];"
+      },
+      "id": "log-duplicate",
+      "name": "Log Duplicate Suppression",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 460]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ---------------------------------------------------------------------------\n// Node: Build ClickUp Comment\n// Constructs the comment body from the GitHub issue/PR event payload.\n// Adjust `listId` / `taskId` mapping to match your ClickUp space.\n// ---------------------------------------------------------------------------\nconst payload = $input.first().json;\nconst issue   = payload.issue ?? payload.pull_request ?? {};\nconst repo    = payload.repository?.full_name ?? 'unknown';\nconst action  = payload.action ?? 'unknown';\nconst actor   = payload.sender?.login ?? 'unknown';\nconst key     = payload._idempotencyKey;\n\nconst commentText =\n  `**GitHub event** \\`${action}\\` on \\`${repo}\\` #${issue.number ?? '?'}` +\n  `\\nActor: ${actor}` +\n  `\\nURL: ${issue.html_url ?? ''}` +\n  `\\n\\n_idempotency-key: ${key}_`;\n\nreturn [{ json: { commentText, idempotencyKey: key, issueNumber: issue.number } }];"
+      },
+      "id": "build-comment",
+      "name": "Build ClickUp Comment",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 140]
+    },
+    {
+      "parameters": {
+        "resource": "comment",
+        "operation": "create",
+        "task": "={{ $vars.CLICKUP_TASK_ID }}",
+        "comment": "={{ $json.commentText }}"
+      },
+      "id": "clickup-comment",
+      "name": "ClickUp: Post Comment",
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [1340, 140],
+      "credentials": {
+        "clickUpApi": {
+          "id": "clickup-api-creds",
+          "name": "ClickUp API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ---------------------------------------------------------------------------\n// Node: Log First Processing\n// Emits a structured log entry for the successful, non-duplicate path.\n// ---------------------------------------------------------------------------\nconst key    = $input.first().json.idempotencyKey;\nconst taskId = $vars.CLICKUP_TASK_ID;\nconsole.log(\n  `[idempotency] FIRST_PROCESSED key=${key} clickup_task=${taskId} ts=${new Date().toISOString()}`\n);\nreturn [{ json: { processed: true, key } }];"
+      },
+      "id": "log-first",
+      "name": "Log First Processing",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 140]
+    }
+  ],
+  "connections": {
+    "GitHub Webhook": {
+      "main": [
+        [{ "node": "Derive Idempotency Key", "type": "main", "index": 0 }]
+      ]
+    },
+    "Derive Idempotency Key": {
+      "main": [
+        [{ "node": "Idempotency Gate", "type": "main", "index": 0 }]
+      ]
+    },
+    "Idempotency Gate": {
+      "main": [
+        [{ "node": "Route: First or Duplicate?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Route: First or Duplicate?": {
+      "main": [
+        [{ "node": "Build ClickUp Comment", "type": "main", "index": 0 }],
+        [{ "node": "Log Duplicate Suppression", "type": "main", "index": 0 }]
+      ]
+    },
+    "Build ClickUp Comment": {
+      "main": [
+        [{ "node": "ClickUp: Post Comment", "type": "main", "index": 0 }]
+      ]
+    },
+    "ClickUp: Post Comment": {
+      "main": [
+        [{ "node": "Log First Processing", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["github", "clickup", "idempotent", "lifeos"],
+  "pinData": {}
+}
