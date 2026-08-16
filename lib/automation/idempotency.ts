@@ -322,7 +322,6 @@ export async function checkAndSet(
 export async function guardEvent(
   store: IdempotencyStore,
   headers: GitHubEventHeaders,
-  _payload?: GitHubEventPayload,
 ): Promise<ProcessingDecision> {
   const key = deriveIdempotencyKey(headers);
   return checkAndSet(store, key);

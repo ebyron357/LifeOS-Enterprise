@@ -100,14 +100,7 @@ function runCheckAndSetSuite(label: string, makeStore: () => InMemoryIdempotency
       const key = "del-LIFEOS-AUTO-PROOF-20260811-A";
       // Six timestamps matching the original incident (issue #52)
       const results: ProcessingDecision[] = [];
-      for (const _ of [
-        "2026-08-11T06:04:48.179Z",
-        "2026-08-11T06:10:30.631Z",
-        "2026-08-11T06:15:01.370Z",
-        "2026-08-11T06:15:01.372Z",
-        "2026-08-11T06:19:35.415Z",
-        "2026-08-11T07:33:05.691Z",
-      ]) {
+      for (let attempt = 0; attempt < 6; attempt += 1) {
         results.push(await checkAndSet(store, key));
       }
       const firstCount = results.filter((r) => r.proceed).length;
