@@ -12,22 +12,6 @@ import {
 } from "@/lib/automation/idempotency";
 
 // ---------------------------------------------------------------------------
-// Fixtures
-// ---------------------------------------------------------------------------
-
-const REPO = "ebyron357/LifeOS-Enterprise";
-
-function makePayload(overrides: Record<string, unknown> = {}) {
-  return {
-    action: "opened",
-    repository: { full_name: REPO },
-    issue: { number: 52, html_url: "https://github.com/ebyron357/LifeOS-Enterprise/issues/52" },
-    sender: { login: "test-actor" },
-    ...overrides,
-  };
-}
-
-// ---------------------------------------------------------------------------
 // deriveIdempotencyKey
 // ---------------------------------------------------------------------------
 
@@ -224,34 +208,32 @@ describe("guardEvent", () => {
   });
 
   it("first delivery proceeds", async () => {
-    const result = await guardEvent(store, { deliveryId: "gh-del-xyz" }, makePayload());
+    const result = await guardEvent(store, { deliveryId: "gh-del-xyz" });
     expect(result.proceed).toBe(true);
     expect(result.key).toBe("gh-del-xyz");
   });
 
   it("retry of same delivery is suppressed", async () => {
     const headers = { deliveryId: "gh-del-xyz" };
-    await guardEvent(store, headers, makePayload());
-    const retry = await guardEvent(store, headers, makePayload());
+    await guardEvent(store, headers);
+    const retry = await guardEvent(store, headers);
     expect(retry.proceed).toBe(false);
     expect(retry.label).toBe("duplicate");
   });
 
   it("same issue, different delivery IDs are not suppressed", async () => {
-    const payload = makePayload();
-    const r1 = await guardEvent(store, { deliveryId: "del-1" }, payload);
-    const r2 = await guardEvent(store, { deliveryId: "del-2" }, payload);
+    const r1 = await guardEvent(store, { deliveryId: "del-1" });
+    const r2 = await guardEvent(store, { deliveryId: "del-2" });
     expect(r1.proceed).toBe(true);
     expect(r2.proceed).toBe(true);
   });
 
   it("quarantines event when delivery header is absent (fail-closed)", async () => {
-    const result = await guardEvent(store, {}, makePayload());
+    const result = await guardEvent(store, {});
     expect(result.proceed).toBe(false);
     expect(result.label).toBe("quarantine");
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Importable n8n workflow artifact
