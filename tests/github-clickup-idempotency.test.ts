@@ -251,3 +251,27 @@ describe("guardEvent", () => {
     expect(result.label).toBe("quarantine");
   });
 });
+
+
+// ---------------------------------------------------------------------------
+// Importable n8n workflow artifact
+// ---------------------------------------------------------------------------
+
+describe("GitHub → ClickUp n8n workflow artifact", () => {
+  it("is valid JSON and retains the durable fail-closed idempotency gate", () => {
+    const workflowPath = path.join(
+      process.cwd(),
+      "integrations/n8n/github-clickup-idempotent.workflow.json",
+    );
+    const workflowText = fs.readFileSync(workflowPath, "utf8");
+    const workflow = JSON.parse(workflowText) as {
+      nodes?: Array<{ name?: string; parameters?: { jsCode?: string } }>;
+    };
+
+    expect(Array.isArray(workflow.nodes)).toBe(true);
+    expect(workflow.nodes?.some((node) => node.name === "Idempotency Gate")).toBe(true);
+    expect(workflowText).toContain("fs.openSync(filePath, 'wx')");
+    expect(workflowText).toContain("_idempotencyDecision: 'quarantine'");
+    expect(workflowText).not.toContain("fallback:");
+  });
+});
