@@ -39,11 +39,28 @@ function configured() {
   );
 }
 
+/**
+ * Names of the required write-path variables that are not set.
+ *
+ * Returns variable NAMES only — never values, lengths, or prefixes — so an
+ * operator can see exactly which entry is still missing in the hosting
+ * platform without the endpoint ever disclosing a credential. The names are
+ * already public in `.env.example`.
+ */
+function missingWriteConfig() {
+  const missing: string[] = [];
+  if (process.env.LIFEOS_WRITE_ENABLED !== "true") missing.push("LIFEOS_WRITE_ENABLED");
+  if (!process.env.LIFEOS_WRITE_SECRET) missing.push("LIFEOS_WRITE_SECRET");
+  if (!process.env.LIFEOS_GITHUB_TOKEN) missing.push("LIFEOS_GITHUB_TOKEN");
+  return missing;
+}
+
 export async function GET() {
   return NextResponse.json({
     ok: true,
     enabled: process.env.LIFEOS_WRITE_ENABLED === "true",
     configured: configured(),
+    missing: missingWriteConfig(),
     mode: "draft-pr-only",
     directMainWrites: false,
   });

@@ -42,6 +42,25 @@ describe("LifeOS change-plan persistence V2", () => {
     expect(clientSource).not.toContain("LIFEOS_GITHUB_TOKEN");
   });
 
+  it("names the missing write-path variables without disclosing any value", async () => {
+    vi.stubEnv("LIFEOS_WRITE_ENABLED", "true");
+    vi.stubEnv("LIFEOS_WRITE_SECRET", "");
+    vi.stubEnv("LIFEOS_GITHUB_TOKEN", "");
+    const result = await (await GET()).json();
+    expect(result).toMatchObject({ enabled: true, configured: false, directMainWrites: false });
+    expect(result.missing).toEqual(["LIFEOS_WRITE_SECRET", "LIFEOS_GITHUB_TOKEN"]);
+  });
+
+  it("reports no missing variables once the write path is fully configured", async () => {
+    vi.stubEnv("LIFEOS_WRITE_ENABLED", "true");
+    vi.stubEnv("LIFEOS_WRITE_SECRET", "super-secret-value");
+    vi.stubEnv("LIFEOS_GITHUB_TOKEN", "super-secret-token");
+    const serialized = JSON.stringify(await (await GET()).json());
+    expect(JSON.parse(serialized)).toMatchObject({ configured: true, missing: [] });
+    expect(serialized).not.toContain("super-secret-value");
+    expect(serialized).not.toContain("super-secret-token");
+  });
+
   it("rejects writes while the service is disabled", async () => {
     vi.stubEnv("LIFEOS_WRITE_ENABLED", "false");
     const response = await POST(request(validPlan));
