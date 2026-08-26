@@ -154,3 +154,20 @@ Playwright verification covers: opening view (mission/outcomes/Start Here/schedu
 1. **Do nothing** — this branch is a dependent draft PR against `feat/canonical-portfolio-control-layer`, itself unmerged into `main`. Closing this draft PR and deleting `feat/daily-operations-brief` fully reverts the repository to the portfolio-layer-only state.
 2. If any part of this change were merged in the future and needed to be undone: revert the merge commit via a new PR (`git revert -m 1 <merge-commit-sha>`). No canonical vault data, schema, or GitHub Project 2 field is touched by this change, so no data migration or board cleanup is required — only the new `lib/daily-brief/*`, `components/daily-brief/*`, `app/daily-brief/*`, and test/tooling files need to be removed.
 3. Browser-local Daily Brief state can be cleared per-browser at any time via `localStorage.removeItem("lifeos-daily-brief-store-v1")`; it holds no canonical data and clearing it has no effect on the vault or GitHub Project 2.
+
+## Entry: Interactive Agent Runtime
+
+- **Date**: 2026-08-26
+- **Branch**: `feat/lifeos-interactive-agent-runtime`
+- **Base**: `main` @ `9895c4a805032f677a9acb90e4747669ed92bfc4`
+- **Scope**: Persistent conversational voice, owner-controlled screen share, unified agent runtime, tool registry, approval policy, teaching mode, and activity visibility. Existing VoiceConsole, Daily Brief, Portfolio, Workspace OS, Revenue Radar, and ChangePlanPersistence are preserved.
+
+### Branch decision
+
+Work from current canonical `main` (`9895c4a`), not from the unfinished local Daily Brief worktree. A dedicated branch keeps this layer reviewable and rollback-safe.
+
+### Rollback
+
+1. Close the PR and delete `feat/lifeos-interactive-agent-runtime` if unmerged.
+2. If merged later, revert the merge commit. No vault schema or GitHub Project data is rewritten.
+3. Clear browser session keys if needed: `lifeos-agent-session-id`.

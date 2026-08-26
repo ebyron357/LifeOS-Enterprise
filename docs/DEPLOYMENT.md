@@ -27,7 +27,9 @@
 | `LIFEOS_VOICE_BROWSER_FALLBACK` | No | `true` |
 | `LIFEOS_VOICE_SESSION_SECRET` | Optional | Enables HMAC voice session tokens |
 | `REVENUE_SHEET_ID` / Google SA | Optional | Revenue Radar |
-| `LIVEKIT_*` | Optional | Reserved; V1 does not mint room tokens |
+| `LIVEKIT_*` | Optional | Reserved; room tokens are not minted |
+| `LIFEOS_AGENT_LLM_API_KEY` / `OPENAI_API_KEY` / `OPENROUTER_API_KEY` | Optional | Server-side reply rewrite only; tools still go through the policy engine |
+| `CLICKUP_API_TOKEN` / `SLACK_BOT_TOKEN` / `N8N_WEBHOOK_URL` / `VERCEL_TOKEN` / `SUPABASE_SERVICE_ROLE_KEY` | Optional | Adapter discovery only; unconfigured tools stay unavailable |
 
 Never commit `.env.local` or real secrets.
 

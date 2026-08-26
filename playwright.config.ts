@@ -19,6 +19,8 @@ export default defineConfig({
   projects: [
     { name: "chromium-desktop", use: { ...devices["Desktop Chrome"] } },
     { name: "chromium-mobile", use: { ...devices["Pixel 7"] } },
+    { name: "webkit-desktop", testMatch: /conversation\.spec\.ts/, use: { ...devices["Desktop Safari"] } },
+    { name: "webkit-mobile", testMatch: /conversation\.spec\.ts/, use: { ...devices["iPhone 13"], viewport: { width: 390, height: 844 } } },
   ],
   webServer: {
     command: "npm run build && npm run start -- -p 4173",

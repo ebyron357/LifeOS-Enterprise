@@ -143,8 +143,8 @@ export function CommandCenterWorkspace({ data, github, revenue }: CommandCenterW
         <WorkspaceWidget
           id="ai-workforce"
           status={data.agents.some((agent) => agent.status === "active") ? "active" : "idle"}
-          detailsLabel="Open agents"
-          onOpenDetails={() => router.push("/agents")}
+          detailsLabel="Open conversation"
+          onOpenDetails={() => router.push("/conversation")}
         >
           <AIStatus agents={data.agents} />
         </WorkspaceWidget>

@@ -4,6 +4,8 @@
 **Release:** LifeOS Enterprise v1.0  
 **Integration branch:** `release/v1.0-visual-voice-integration` (onto `main` after Workspace OS + Ops V2)
 
+Persistent conversational voice now also lives in `/conversation`. That layer reuses this transport and state machine. See `docs/INTERACTIVE_AGENT_RUNTIME.md`. The Command Center `VoiceConsole` remains the V1 command console.
+
 ## Architecture
 
 ```text
