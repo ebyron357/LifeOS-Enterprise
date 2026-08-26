@@ -24,6 +24,7 @@ export type VoiceTransport = {
     onError: (message: string) => void;
     onEnd: () => void;
     lang: string;
+    continuous?: boolean;
   }) => Promise<void>;
   stopListening: () => void;
   speak: (text: string, opts: {
@@ -61,7 +62,7 @@ export function createBrowserVoiceTransport(): VoiceTransport {
         return false;
       }
     },
-    async startListening({ onInterim, onFinal, onError, onEnd, lang }) {
+    async startListening({ onInterim, onFinal, onError, onEnd, lang, continuous = false }) {
       const Ctor = getRecognitionCtor();
       if (!Ctor) {
         onError("Speech recognition is not supported in this browser.");
@@ -70,7 +71,7 @@ export function createBrowserVoiceTransport(): VoiceTransport {
       recognition?.abort();
       recognition = new Ctor();
       recognition.lang = lang;
-      recognition.continuous = false;
+      recognition.continuous = continuous;
       recognition.interimResults = true;
       recognition.onresult = (event) => {
         let interim = "";

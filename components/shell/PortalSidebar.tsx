@@ -16,6 +16,7 @@ export type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Overview", code: "01", section: "overview" },
   { href: "/daily-brief", label: "Daily Brief", code: "02b" },
+  { href: "/conversation", label: "Conversation", code: "02c" },
   { href: "/projects", label: "Projects", code: "02", section: "projects" },
   { href: "/portfolio", label: "Portfolio", code: "03" },
   { href: "/tasks", label: "Tasks", code: "04", section: "tasks" },
