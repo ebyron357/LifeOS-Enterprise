@@ -1,0 +1,153 @@
+{
+  "_backup": {
+    "purpose": "Restorable snapshot of the live n8n workflow BEFORE the 2026-09-01 idempotency closeout update. Captured verbatim from the n8n API prior to any modification.",
+    "capturedAt": "2026-09-01",
+    "n8nHost": "bwa357.app.n8n.cloud",
+    "workflowId": "wMv71FmDq4aN5ZsE",
+    "versionId": "81b58657-92fb-4b3a-a563-5ff0dcbe2d9f",
+    "activeVersionId": "81b58657-92fb-4b3a-a563-5ff0dcbe2d9f",
+    "versionCreatedAt": "2026-08-11T06:14:31.090Z",
+    "restore": "This version also remains restorable in-place via n8n workflow version history (restore_workflow_version with the versionId above)."
+  },
+  "id": "wMv71FmDq4aN5ZsE",
+  "name": "LifeOS Proof: GitHub -> n8n -> ClickUp",
+  "active": true,
+  "settings": { "executionOrder": "v1", "availableInMCP": true },
+  "nodes": [
+    {
+      "id": "abb05907-0506-4888-8453-a9fd9a3f624f",
+      "name": "Run Proof",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 96],
+      "parameters": {}
+    },
+    {
+      "id": "7800676b-870a-456c-aee3-5cd8773ca9e7",
+      "name": "Get GitHub Issue 50",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [224, 96],
+      "parameters": {
+        "resource": "issue",
+        "operation": "get",
+        "authentication": "accessToken",
+        "owner": { "__rl": true, "mode": "name", "value": "ebyron357" },
+        "repository": { "__rl": true, "mode": "name", "value": "LifeOS-Enterprise" },
+        "issueNumber": 50
+      },
+      "webhookId": "6362673a-a820-43d2-b7fb-4162a329755e",
+      "credentials": { "githubApi": { "id": "59vUDjb0gZQNIXzI", "name": "GitHub account" } }
+    },
+    {
+      "id": "06474f3a-6760-42c6-a6de-30c667696696",
+      "name": "Validate Proof",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [448, 96],
+      "parameters": {
+        "jsCode": "const issue = $input.first().json;\nconst token = 'LIFEOS-AUTO-PROOF-20260811-A';\nconst expectedRepo = 'ebyron357/LifeOS-Enterprise';\nconst htmlUrl = issue.html_url || '';\nconst repoUrl = issue.repository_url || '';\nconst title = issue.title || '';\nconst body = issue.body || '';\nconst repoMatch = htmlUrl.includes(expectedRepo) || repoUrl.includes(expectedRepo);\nconst tokenMatch = title.includes(token) || body.includes(token);\nreturn [{\n  json: {\n    valid: repoMatch && tokenMatch,\n    repoMatch,\n    tokenMatch,\n    issueNumber: issue.number,\n    issueUrl: issue.html_url,\n    token,\n    runTimestamp: new Date().toISOString(),\n  },\n}];"
+      }
+    },
+    {
+      "id": "32b3b629-5722-4e4c-b7b2-df216fe58715",
+      "name": "Validation Passed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [672, 96],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2 },
+          "conditions": [
+            {
+              "id": "valid",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "4ad68f17-0e38-4822-be26-58dff86b3999",
+      "name": "Set Status Review",
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [896, 0],
+      "parameters": {
+        "resource": "task",
+        "operation": "update",
+        "authentication": "accessToken",
+        "id": "86e2re8eg",
+        "updateFields": { "status": "Review" }
+      },
+      "credentials": { "clickUpApi": { "id": "TVIiuaopiEX9aZKX", "name": "ClickUp account" } }
+    },
+    {
+      "id": "96c1b923-930b-4b73-b2a2-700a53a5a834",
+      "name": "Add Proof Comment",
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [1120, 0],
+      "parameters": {
+        "resource": "comment",
+        "operation": "create",
+        "authentication": "accessToken",
+        "commentOn": "task",
+        "id": "86e2re8eg",
+        "commentText": "=GitHub → n8n → ClickUp automation proof received successfully.\nProof token: {{ $('Validate Proof').item.json.token }}\nGitHub issue number: #{{ $('Validate Proof').item.json.issueNumber }}\nGitHub issue URL: {{ $('Validate Proof').item.json.issueUrl }}\nAutomation run timestamp: {{ $('Validate Proof').item.json.runTimestamp }}",
+        "additionalFields": {}
+      },
+      "credentials": { "clickUpApi": { "id": "TVIiuaopiEX9aZKX", "name": "ClickUp account" } }
+    },
+    {
+      "id": "3853227e-f99e-445d-a5f4-8c01fb6703ad",
+      "name": "Stop - Validation Failed",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [896, 192],
+      "parameters": {}
+    },
+    {
+      "id": "c2a9427b-eb1a-4950-a735-49514b506b96",
+      "name": "GitHub Issue Event",
+      "type": "n8n-nodes-base.githubTrigger",
+      "typeVersion": 1,
+      "position": [0, 288],
+      "parameters": {
+        "authentication": "accessToken",
+        "owner": { "__rl": true, "mode": "name", "value": "ebyron357" },
+        "repository": { "__rl": true, "mode": "name", "value": "LifeOS-Enterprise" },
+        "events": ["issues"]
+      },
+      "webhookId": "4c138af1-be0a-4fef-8985-ead494014a23",
+      "credentials": { "githubApi": { "id": "59vUDjb0gZQNIXzI", "name": "GitHub account" } }
+    },
+    {
+      "id": "0edf7246-2fb7-4849-a5b4-20d09d798998",
+      "name": "Normalize Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [224, 288],
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nconst payload = raw.body || raw;\nconst issue = payload.issue || {};\nconst repo = payload.repository || {};\nreturn [{\n  json: {\n    number: issue.number,\n    title: issue.title || '',\n    body: issue.body || '',\n    html_url: issue.html_url || '',\n    repository_url: repo.html_url || ('https://github.com/' + (repo.full_name || '')),\n  },\n}];"
+      }
+    }
+  ],
+  "connections": {
+    "Run Proof": { "main": [[{ "node": "Get GitHub Issue 50", "type": "main", "index": 0 }]] },
+    "Get GitHub Issue 50": { "main": [[{ "node": "Validate Proof", "type": "main", "index": 0 }]] },
+    "Validate Proof": { "main": [[{ "node": "Validation Passed?", "type": "main", "index": 0 }]] },
+    "Validation Passed?": {
+      "main": [
+        [{ "node": "Set Status Review", "type": "main", "index": 0 }],
+        [{ "node": "Stop - Validation Failed", "type": "main", "index": 0 }]
+      ]
+    },
+    "Set Status Review": { "main": [[{ "node": "Add Proof Comment", "type": "main", "index": 0 }]] },
+    "GitHub Issue Event": { "main": [[{ "node": "Normalize Event", "type": "main", "index": 0 }]] },
+    "Normalize Event": { "main": [[{ "node": "Validate Proof", "type": "main", "index": 0 }]] }
+  }
+}
