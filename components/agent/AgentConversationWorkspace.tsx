@@ -133,13 +133,15 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/lifeos/agent/session", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((payload) => {
+    Promise.all([
+      fetch("/api/lifeos/agent/session", { cache: "no-store" }).then((response) => response.json()),
+      fetch("/api/lifeos/voice/session", { cache: "no-store" }).then((response) => response.json()),
+    ])
+      .then(([payload, voicePayload]) => {
         if (cancelled) return;
         setTools(Array.isArray(payload.tools) ? payload.tools : []);
         setToken(typeof payload.sessionToken === "string" ? payload.sessionToken : null);
-        const tts = payload.tts && typeof payload.tts === "object" ? payload.tts : null;
+        const tts = voicePayload?.tts && typeof voicePayload.tts === "object" ? voicePayload.tts : null;
         const providers: Array<{ id: TtsProviderId; configured: boolean; reason: string | null }> = Array.isArray(tts?.providers)
           ? tts.providers
               .map((provider: { id?: string; configured?: boolean; reason?: string | null }) => ({
@@ -160,10 +162,10 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
             ...current,
             ...stored,
             provider,
-            locale: storedRaw ? stored.locale : payload?.localeDefaults?.locale || current.locale,
+            locale: storedRaw ? stored.locale : voicePayload?.localeDefaults?.locale || current.locale,
             transcriptionLanguage: storedRaw
               ? stored.transcriptionLanguage
-              : payload?.localeDefaults?.transcriptionLanguage || current.transcriptionLanguage,
+              : voicePayload?.localeDefaults?.transcriptionLanguage || current.transcriptionLanguage,
           };
           return next;
         });

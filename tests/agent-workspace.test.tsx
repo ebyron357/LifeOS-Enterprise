@@ -18,6 +18,15 @@ describe("conversation workspace", () => {
       if (url.includes("/api/lifeos/agent/session")) {
         return new Response(JSON.stringify({ ok: true, tools: [], sessionToken: null }), { status: 200 });
       }
+      if (url.includes("/api/lifeos/voice/session")) {
+        return new Response(JSON.stringify({
+          ok: true,
+          configured: true,
+          provider: "browser",
+          tts: { activeProvider: "browser", fallbackProvider: "browser", providers: [] },
+          localeDefaults: { locale: "en", transcriptionLanguage: "en", responseLanguage: "en" },
+        }), { status: 200 });
+      }
       if (url.includes("/api/lifeos/agent/turn")) {
         return new Response(JSON.stringify({
           ok: true,
@@ -63,5 +72,36 @@ describe("conversation workspace", () => {
     fireEvent.click(screen.getByRole("button", { name: /^send$/i }));
     expect(await screen.findByText(/Answer from LifeOS context/i)).toBeInTheDocument();
     expect(fetch).toHaveBeenCalledWith("/api/lifeos/agent/turn", expect.objectContaining({ method: "POST" }));
+  });
+
+  it("wires server-side TTS metadata from the voice session endpoint, not the agent session endpoint", async () => {
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/api/lifeos/agent/session")) {
+        // Deliberately mirrors production: the agent session payload never carries `tts`.
+        return new Response(JSON.stringify({ ok: true, tools: [], sessionToken: null }), { status: 200 });
+      }
+      if (url.includes("/api/lifeos/voice/session")) {
+        return new Response(JSON.stringify({
+          ok: true,
+          configured: true,
+          provider: "browser",
+          tts: {
+            activeProvider: "openai",
+            fallbackProvider: "browser",
+            providers: [
+              { id: "openai", configured: true, reason: null },
+              { id: "browser", configured: true, reason: null },
+            ],
+          },
+          localeDefaults: { locale: "en", transcriptionLanguage: "en", responseLanguage: "en" },
+        }), { status: 200 });
+      }
+      return new Response(JSON.stringify({ ok: false }), { status: 404 });
+    }));
+
+    render(<AgentConversationWorkspace vault={vault} />);
+
+    expect(await screen.findByText(/Active provider: openai\. Fallback: browser\./i)).toBeInTheDocument();
   });
 });
