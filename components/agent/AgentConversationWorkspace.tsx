@@ -33,6 +33,7 @@ import {
   toAwarenessSnapshot,
 } from "@/lib/screen/browser";
 import { describeScreenShare, INITIAL_SCREEN_SHARE, type ScreenShareSnapshot } from "@/lib/screen/state";
+import type { TtsProviderId } from "@/lib/voice/tts-providers";
 import styles from "./AgentConversationWorkspace.module.css";
 
 type AgentConversationWorkspaceProps = {
@@ -40,6 +41,49 @@ type AgentConversationWorkspaceProps = {
 };
 
 const SESSION_KEY = "lifeos-agent-session-id";
+const VOICE_SETTINGS_KEY = "lifeos-conversation-voice-settings-v1";
+
+type ResponseStyle = "balanced" | "concise" | "coach";
+type VoiceSettings = {
+  provider: TtsProviderId;
+  locale: string;
+  transcriptionLanguage: string;
+  speechRate: number;
+  pitch: number;
+  responseStyle: ResponseStyle;
+};
+
+const DEFAULT_VOICE_SETTINGS: VoiceSettings = {
+  provider: "browser",
+  locale: "en-US",
+  transcriptionLanguage: "en-US",
+  speechRate: 1,
+  pitch: 1,
+  responseStyle: "balanced",
+};
+
+function parseVoiceSettings(raw: string | null): VoiceSettings {
+  if (!raw) return DEFAULT_VOICE_SETTINGS;
+  try {
+    const parsed = JSON.parse(raw) as Partial<VoiceSettings>;
+    return {
+      provider: parsed.provider === "openai" ? "openai" : "browser",
+      locale: typeof parsed.locale === "string" && parsed.locale.trim() ? parsed.locale : "en-US",
+      transcriptionLanguage: typeof parsed.transcriptionLanguage === "string" && parsed.transcriptionLanguage.trim()
+        ? parsed.transcriptionLanguage
+        : "en-US",
+      speechRate: typeof parsed.speechRate === "number" && Number.isFinite(parsed.speechRate)
+        ? Math.max(0.5, Math.min(2, parsed.speechRate))
+        : 1,
+      pitch: typeof parsed.pitch === "number" && Number.isFinite(parsed.pitch)
+        ? Math.max(0.5, Math.min(2, parsed.pitch))
+        : 1,
+      responseStyle: parsed.responseStyle === "concise" || parsed.responseStyle === "coach" ? parsed.responseStyle : "balanced",
+    };
+  } catch {
+    return DEFAULT_VOICE_SETTINGS;
+  }
+}
 
 function sessionId(): string {
   if (typeof window === "undefined") return "ssr";
@@ -63,12 +107,19 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   const [paused, setPaused] = useState(false);
   const [teaching, setTeaching] = useState<TeachingPlan | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [voiceSettings, setVoiceSettings] = useState<VoiceSettings>(DEFAULT_VOICE_SETTINGS);
+  const [availableProviders, setAvailableProviders] = useState<Array<{ id: TtsProviderId; configured: boolean; reason: string | null }>>([]);
+  const [activeProvider, setActiveProvider] = useState<TtsProviderId>("browser");
+  const [fallbackProvider, setFallbackProvider] = useState<TtsProviderId>("browser");
   const [nowMs, setNowMs] = useState(() => Date.now());
   const streamRef = useRef<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const transportRef = useRef(createBrowserVoiceTransport());
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const keepListeningRef = useRef(false);
   const restartListeningRef = useRef<((continuous: boolean) => Promise<void>) | null>(null);
+  const lastSubmissionRef = useRef<string>("");
+  const skipFirstVoicePersistRef = useRef(true);
 
   const awareness: ScreenAwarenessSnapshot = useMemo(() => toAwarenessSnapshot(screen, nowMs), [screen, nowMs]);
 
@@ -88,6 +139,34 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         if (cancelled) return;
         setTools(Array.isArray(payload.tools) ? payload.tools : []);
         setToken(typeof payload.sessionToken === "string" ? payload.sessionToken : null);
+        const tts = payload.tts && typeof payload.tts === "object" ? payload.tts : null;
+        const providers: Array<{ id: TtsProviderId; configured: boolean; reason: string | null }> = Array.isArray(tts?.providers)
+          ? tts.providers
+              .map((provider: { id?: string; configured?: boolean; reason?: string | null }) => ({
+                id: provider?.id === "openai" ? "openai" : "browser",
+                configured: Boolean(provider?.configured),
+                reason: typeof provider?.reason === "string" ? provider.reason : null,
+              }))
+          : [];
+        setAvailableProviders(providers);
+        setActiveProvider(tts?.activeProvider === "openai" ? "openai" : "browser");
+        setFallbackProvider(tts?.fallbackProvider === "openai" ? "openai" : "browser");
+        setVoiceSettings((current) => {
+          const storedRaw = typeof window === "undefined" ? null : window.localStorage.getItem(VOICE_SETTINGS_KEY);
+          const stored = parseVoiceSettings(storedRaw);
+          const supported = providers.filter((provider) => provider.configured).map((provider) => provider.id);
+          const provider = supported.includes(stored.provider) ? stored.provider : (tts?.activeProvider === "openai" ? "openai" : "browser");
+          const next = {
+            ...current,
+            ...stored,
+            provider,
+            locale: storedRaw ? stored.locale : payload?.localeDefaults?.locale || current.locale,
+            transcriptionLanguage: storedRaw
+              ? stored.transcriptionLanguage
+              : payload?.localeDefaults?.transcriptionLanguage || current.transcriptionLanguage,
+          };
+          return next;
+        });
       })
       .catch(() => {
         if (!cancelled) setError("Unable to load agent session metadata.");
@@ -101,6 +180,14 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
     if (videoRef.current) videoRef.current.srcObject = streamRef.current;
   }, [screen.state]);
 
+  useEffect(() => {
+    if (skipFirstVoicePersistRef.current) {
+      skipFirstVoicePersistRef.current = false;
+      return;
+    }
+    window.localStorage.setItem(VOICE_SETTINGS_KEY, JSON.stringify(voiceSettings));
+  }, [voiceSettings]);
+
   const appendLine = useCallback((role: TranscriptEntry["role"], text: string) => {
     setTranscript((entries) => [...entries, createTranscriptEntry(role, text, { temporary: true })].slice(-80));
   }, []);
@@ -111,7 +198,62 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
     return next;
   }, [token]);
 
+  const speakReply = useCallback(async (text: string) => {
+    if (!text.trim()) return;
+    const selected = voiceSettings.provider;
+    if (selected === "openai") {
+      try {
+        const response = await fetch("/api/lifeos/voice/speak", {
+          method: "POST",
+          headers: headers(),
+          body: JSON.stringify({
+            text,
+            locale: voiceSettings.locale,
+            speed: voiceSettings.speechRate,
+            style: voiceSettings.responseStyle,
+            provider: "openai",
+          }),
+        });
+        if (response.ok) {
+          const blob = await response.blob();
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.src = "";
+          }
+          const url = URL.createObjectURL(blob);
+          const audio = new Audio(url);
+          audioRef.current = audio;
+          audio.onended = () => {
+            URL.revokeObjectURL(url);
+            setVoice((current) => (current.muted ? muteConversation(current) : { ...current, speaking: false, processing: false, state: keepListeningRef.current ? "listening" : current.state }));
+          };
+          audio.onerror = () => {
+            URL.revokeObjectURL(url);
+            setVoice((current) => failConversation(current, "Server-side TTS playback failed."));
+          };
+          await audio.play();
+          return;
+        }
+      } catch {
+        // Fall through to browser synthesis.
+      }
+    }
+
+    transportRef.current.speak(text, {
+      rate: voiceSettings.speechRate,
+      pitch: voiceSettings.pitch,
+      lang: voiceSettings.locale,
+      onEnd: () => {
+        setVoice((current) => (current.muted ? muteConversation(current) : { ...current, speaking: false, processing: false, state: keepListeningRef.current ? "listening" : current.state }));
+      },
+    });
+  }, [headers, voiceSettings]);
+
   const sendTurn = useCallback(async (text: string, channel: "text" | "voice") => {
+    const normalized = text.trim().toLowerCase();
+    const dedupeKey = `${channel}:${normalized}`;
+    if (!normalized || lastSubmissionRef.current === dedupeKey) return;
+    lastSubmissionRef.current = dedupeKey;
     if (voice.transcriptPrivacy !== "hidden") appendLine("user", text);
     setVoice((current) => markThinking(current));
     setActivity((events) => appendActivity(events, createActivityEvent("mission-started", "Sending owner request.")));
@@ -142,20 +284,18 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         return;
       }
       setVoice((current) => markSpeaking(current));
-      transportRef.current.speak(next.spokenReply, {
-        rate: 1,
-        lang: "en-US",
-        onEnd: () => {
-          setVoice((current) => (current.muted ? muteConversation(current) : { ...current, speaking: false, processing: false, state: keepListeningRef.current ? "listening" : current.state }));
-        },
-      });
+      await speakReply(next.spokenReply);
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "Agent turn failed.";
       setError(message);
       setVoice((current) => failConversation(current, message));
       appendLine("error", message);
+    } finally {
+      window.setTimeout(() => {
+        if (lastSubmissionRef.current === dedupeKey) lastSubmissionRef.current = "";
+      }, 1200);
     }
-  }, [appendLine, approvals, awareness, headers, paused, voice.muted, voice.startedAt, voice.transcriptPrivacy]);
+  }, [appendLine, approvals, awareness, headers, paused, speakReply, voice.muted, voice.startedAt, voice.transcriptPrivacy]);
 
   const beginListening = useCallback(async (continuous: boolean) => {
     keepListeningRef.current = continuous;
@@ -167,7 +307,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
     setVoice((current) => startConversation(current, new Date().toISOString()));
     setActivity((events) => appendActivity(events, createActivityEvent("session-started", "Voice conversation started.")));
     await transportRef.current.startListening({
-      lang: "en-US",
+      lang: voiceSettings.transcriptionLanguage,
       continuous,
       onInterim: (text) => {
         if (voice.transcriptPrivacy === "hidden") return;
@@ -186,7 +326,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         }
       },
     });
-  }, [sendTurn, voice.muted, voice.transcriptPrivacy]);
+  }, [sendTurn, voice.muted, voice.transcriptPrivacy, voiceSettings.transcriptionLanguage]);
 
   useEffect(() => {
     restartListeningRef.current = beginListening;
@@ -195,6 +335,11 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   function endVoice() {
     keepListeningRef.current = false;
     transportRef.current.disconnect();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      audioRef.current = null;
+    }
     setVoice((current) => stopConversation(current));
     setActivity((events) => appendActivity(events, createActivityEvent("session-stopped", "Voice conversation stopped.")));
   }
@@ -263,7 +408,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
           <button type="button" onClick={endVoice}>Stop conversation</button>
           <button type="button" onClick={() => setVoice((current) => muteConversation(current))} disabled={voice.muted}>Mute microphone</button>
           <button type="button" onClick={() => setVoice((current) => unmuteConversation(current))} disabled={!voice.muted}>Unmute microphone</button>
-          <button type="button" onClick={() => { transportRef.current.stopSpeaking(); setVoice((current) => interruptSpeech(current)); }}>Interrupt assistant</button>
+          <button type="button" onClick={() => { transportRef.current.stopSpeaking(); if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; } setVoice((current) => interruptSpeech(current)); }}>Interrupt assistant</button>
           <button type="button" onClick={() => { setVoice((current) => resumeConversation(current)); void beginListening(true); }}>Resume conversation</button>
           <button type="button" onClick={() => { setVoice((current) => enablePushToTalk(current)); void beginListening(false); }}>Push to talk</button>
           <button type="button" onClick={() => setTranscript([])}>Clear transcript</button>
@@ -294,6 +439,87 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
           <button type="submit">Send</button>
         </form>
         {error ? <p role="alert">{error}</p> : null}
+      </section>
+
+      <section className={styles.panel} aria-label="Voice settings">
+        <h2>Voice settings</h2>
+        <div className={styles.toolbar}>
+          <label>
+            Provider
+            <select
+              value={voiceSettings.provider}
+              onChange={(event) => setVoiceSettings((current) => ({ ...current, provider: event.target.value === "openai" ? "openai" : "browser" }))}
+            >
+              {availableProviders.filter((provider) => provider.configured).map((provider) => (
+                <option key={provider.id} value={provider.id}>{provider.id}</option>
+              ))}
+              {!availableProviders.some((provider) => provider.configured) ? <option value="browser">browser</option> : null}
+            </select>
+          </label>
+          <label>
+            Locale
+            <select
+              value={voiceSettings.locale}
+              onChange={(event) => setVoiceSettings((current) => ({ ...current, locale: event.target.value }))}
+            >
+              <option value="en-US">English (US)</option>
+              <option value="en-GB">English (UK)</option>
+              <option value="zh-TW">中文（台灣）</option>
+              <option value="fr-FR">Français</option>
+            </select>
+          </label>
+          <label>
+            Input language
+            <select
+              value={voiceSettings.transcriptionLanguage}
+              onChange={(event) => setVoiceSettings((current) => ({ ...current, transcriptionLanguage: event.target.value }))}
+            >
+              <option value="en-US">English (US)</option>
+              <option value="en-GB">English (UK)</option>
+              <option value="zh-TW">中文（台灣）</option>
+              <option value="fr-FR">Français</option>
+            </select>
+          </label>
+          <label>
+            Response style
+            <select
+              value={voiceSettings.responseStyle}
+              onChange={(event) => setVoiceSettings((current) => ({ ...current, responseStyle: event.target.value as ResponseStyle }))}
+            >
+              <option value="balanced">Balanced</option>
+              <option value="concise">Concise</option>
+              <option value="coach">Teaching coach</option>
+            </select>
+          </label>
+          <label>
+            Speed
+            <input
+              type="range"
+              min={0.5}
+              max={2}
+              step={0.1}
+              value={voiceSettings.speechRate}
+              onChange={(event) => setVoiceSettings((current) => ({ ...current, speechRate: Number(event.target.value) }))}
+            />
+          </label>
+          <label>
+            Pitch
+            <input
+              type="range"
+              min={0.5}
+              max={2}
+              step={0.1}
+              value={voiceSettings.pitch}
+              onChange={(event) => setVoiceSettings((current) => ({ ...current, pitch: Number(event.target.value) }))}
+            />
+          </label>
+          <button type="button" onClick={() => void speakReply("This is your current LifeOS voice preview.")}>Preview voice</button>
+          <button type="button" onClick={() => setVoiceSettings(DEFAULT_VOICE_SETTINGS)}>Reset to default</button>
+        </div>
+        <p>Active provider: {activeProvider}. Fallback: {fallbackProvider}.</p>
+        {availableProviders.filter((provider) => !provider.configured).map((provider) => (
+          <p key={provider.id}>{provider.id} unavailable: {provider.reason}</p>
+        ))}
       </section>
 
       <div className={styles.grid}>

@@ -29,6 +29,7 @@ export type VoiceTransport = {
   stopListening: () => void;
   speak: (text: string, opts: {
     rate: number;
+    pitch?: number;
     lang: string;
     onStart?: () => void;
     onEnd?: () => void;
@@ -100,6 +101,7 @@ export function createBrowserVoiceTransport(): VoiceTransport {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = opts.rate;
+      if (typeof opts.pitch === "number" && Number.isFinite(opts.pitch)) utterance.pitch = opts.pitch;
       utterance.lang = opts.lang.startsWith("fr") ? "fr-FR" : opts.lang.startsWith("ht") ? "ht-HT" : "en-US";
       utterance.onstart = () => opts.onStart?.();
       utterance.onend = () => opts.onEnd?.();
@@ -119,7 +121,7 @@ export function createBrowserVoiceTransport(): VoiceTransport {
 /**
  * V1 always uses browser speech. LiveKit remains a documented future transport.
  */
-export function selectVoiceTransport(provider: "browser" | "livekit" | "none"): VoiceTransport | null {
+export function selectVoiceTransport(provider: "browser" | "openai" | "livekit" | "none"): VoiceTransport | null {
   if (provider === "none") return null;
   return createBrowserVoiceTransport();
 }

@@ -25,4 +25,22 @@ test.describe("interactive conversation workspace", () => {
     await expect(page.getByRole("button", { name: /share screen/i })).toBeEnabled();
     await expect(page.getByText(/never starts capture by itself/i)).toBeVisible();
   });
+
+  test("persists voice settings after refresh", async ({ page }) => {
+    await page.goto("/conversation");
+    const settings = page.locator("section[aria-label='Voice settings']");
+    const selects = settings.getByRole("combobox");
+    await selects.first().selectOption("browser");
+    await selects.nth(1).selectOption("zh-TW");
+    await selects.nth(3).selectOption("coach");
+    await expect(selects.nth(1)).toHaveValue("zh-TW");
+    await expect.poll(async () => {
+      const value = await page.evaluate(() => window.localStorage.getItem("lifeos-conversation-voice-settings-v1"));
+      return value || "";
+    }).toContain("\"locale\":\"zh-TW\"");
+    await page.reload();
+    const stored = await page.evaluate(() => window.localStorage.getItem("lifeos-conversation-voice-settings-v1"));
+    expect(stored).toContain("\"locale\":\"zh-TW\"");
+    expect(stored).toContain("\"responseStyle\":\"coach\"");
+  });
 });
