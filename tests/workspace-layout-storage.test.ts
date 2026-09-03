@@ -8,6 +8,7 @@ describe("workspace layout storage", () => {
     expect(parsed.version).toBe(WORKSPACE_LAYOUT_VERSION);
     expect(parsed.layouts.lg.length).toBeGreaterThan(0);
     expect(parsed.focusedWidgetId).toBeNull();
+    expect(parsed.widgetOrder).toContain("mission-status");
   });
 
   it("returns default layout when version or layouts are missing", () => {
@@ -43,6 +44,7 @@ describe("workspace layout storage", () => {
     expect(restored.focusedWidgetId).toBe("decision-queue");
     expect(restored.reducedMotion).toBe(true);
     expect(restored.layouts.lg.find((item) => item.i === "ai-workforce")?.w).toBe(12);
+    expect(restored.widgetOrder[0]).toBe("mission-status");
   });
 
   it("strips transient react-grid-layout flags when restoring", () => {

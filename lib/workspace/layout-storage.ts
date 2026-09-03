@@ -1,5 +1,5 @@
 import { createDefaultWorkspaceLayout, WORKSPACE_LAYOUT_VERSION } from "./default-layout";
-import type { BreakpointLayouts, LayoutItem, WorkspaceId, WorkspaceLayoutState } from "./types";
+import type { BreakpointLayouts, CommandCenterWidgetId, LayoutItem, WorkspaceId, WorkspaceLayoutState } from "./types";
 
 const BREAKPOINTS = ["lg", "md", "sm", "xs"] as const;
 const SUPPORTED_VERSIONS = new Set([1, 2, WORKSPACE_LAYOUT_VERSION]);
@@ -48,18 +48,45 @@ function isBreakpointLayouts(value: unknown): value is BreakpointLayouts {
 }
 
 export function parseWorkspaceLayout(raw: string | null): WorkspaceLayoutState {
+  return parseWorkspaceLayoutWithDiagnostics(raw).state;
+}
+
+export function parseWorkspaceLayoutWithDiagnostics(raw: string | null): {
+  state: WorkspaceLayoutState;
+  repaired: boolean;
+  messages: string[];
+} {
   const fallback = createDefaultWorkspaceLayout();
-  if (!raw) return fallback;
+  if (!raw) return { state: fallback, repaired: false, messages: [] };
 
   try {
     const parsed = JSON.parse(raw) as Partial<WorkspaceLayoutState>;
-    if (!SUPPORTED_VERSIONS.has(parsed.version as number)) return fallback;
-    if (!parsed.layouts || !isBreakpointLayouts(parsed.layouts)) return fallback;
+    if (!SUPPORTED_VERSIONS.has(parsed.version as number)) {
+      return {
+        state: fallback,
+        repaired: true,
+        messages: ["Unsupported layout version detected. Default layout restored."],
+      };
+    }
+    if (!parsed.layouts || !isBreakpointLayouts(parsed.layouts)) {
+      return {
+        state: fallback,
+        repaired: true,
+        messages: ["Corrupted layout geometry detected. Default layout restored."],
+      };
+    }
 
     // v1 defaults stacked the md board; migrate those sessions to the v2 board.
-    if (parsed.version === 1) return fallback;
+    if (parsed.version === 1) {
+      return {
+        state: fallback,
+        repaired: true,
+        messages: ["Legacy v1 layout migrated to v2 multi-column defaults."],
+      };
+    }
 
     return {
+      state: {
       version: WORKSPACE_LAYOUT_VERSION,
       workspaceId: (parsed.workspaceId as WorkspaceId) ?? fallback.workspaceId,
       layouts: {
@@ -72,13 +99,29 @@ export function parseWorkspaceLayout(raw: string | null): WorkspaceLayoutState {
         ...fallback.widgets,
         ...(parsed.widgets ?? {}),
       },
+      widgetOrder: sanitizeWidgetOrder(parsed.widgetOrder, fallback),
       focusedWidgetId: typeof parsed.focusedWidgetId === "string" || parsed.focusedWidgetId === null
         ? parsed.focusedWidgetId
         : null,
       reducedMotion: Boolean(parsed.reducedMotion),
+      },
+      repaired: false,
+      messages: [],
     };
   } catch {
-    return fallback;
+    return {
+      state: fallback,
+      repaired: true,
+      messages: ["Corrupted layout state JSON detected. Default layout restored."],
+    };
+  }
+
+  function sanitizeWidgetOrder(value: unknown, fallback: WorkspaceLayoutState): CommandCenterWidgetId[] {
+    if (!Array.isArray(value)) return fallback.widgetOrder;
+    const known = new Set(fallback.widgetOrder);
+    const fromState = value.filter((item): item is CommandCenterWidgetId => typeof item === "string" && known.has(item as CommandCenterWidgetId));
+    const missing = fallback.widgetOrder.filter((item) => !fromState.includes(item));
+    return [...fromState, ...missing];
   }
 }
 

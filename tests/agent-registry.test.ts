@@ -11,8 +11,8 @@ describe("tool registry", () => {
     expect(getRegisteredTool("slack.send_message", {})?.unavailableReason).toMatch(/SLACK_BOT_TOKEN/);
   });
 
-  it("marks ClickUp available only when a token exists", () => {
-    expect(getRegisteredTool("clickup.create_task", { CLICKUP_API_TOKEN: "x" })?.configured).toBe(true);
+  it("marks ClickUp available only with required execution config", () => {
+    expect(getRegisteredTool("clickup.create_task", { CLICKUP_API_TOKEN: "x", CLICKUP_LIST_ID: "list" })?.configured).toBe(true);
     expect(getRegisteredTool("clickup.create_task", {})?.configured).toBe(false);
   });
 

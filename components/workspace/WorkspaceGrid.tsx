@@ -61,10 +61,24 @@ export function WorkspaceGrid({ widgets }: WorkspaceGridProps) {
 
   const useStacked = isNarrow || !mounted || width <= 0;
 
+  const orderedWidgets = state.widgetOrder
+    .map((id) => widgets.find((widget) => widget.id === id))
+    .filter((widget): widget is { id: CommandCenterWidgetId; node: ReactNode } => Boolean(widget));
+  const visibleWidgets = orderedWidgets.filter((widget) => !state.widgets[widget.id]?.hidden);
+  const hiddenAll = visibleWidgets.length === 0;
+
+  if (hiddenAll) {
+    return (
+      <div className="workspace-grid-skeleton" role="status">
+        All widgets are hidden. Open Widget Library / Customize to add one back.
+      </div>
+    );
+  }
+
   if (useStacked) {
     return (
       <div className="workspace-grid workspace-grid--stacked" ref={containerRef} data-workspace-layout={isNarrow ? "stacked" : "pending"}>
-        {widgets.map(({ id, node }) => (
+        {visibleWidgets.map(({ id, node }) => (
           <div key={id} className="workspace-grid-item" data-grid-id={id}>
             {node}
           </div>
@@ -97,7 +111,7 @@ export function WorkspaceGrid({ widgets }: WorkspaceGridProps) {
         }}
         onLayoutChange={handleLayoutChange}
       >
-        {widgets.map(({ id, node }) => (
+        {visibleWidgets.map(({ id, node }) => (
           <div key={id} className="workspace-grid-item" data-grid-id={id}>
             {node}
           </div>

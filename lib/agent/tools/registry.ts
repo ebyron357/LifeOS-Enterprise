@@ -20,12 +20,16 @@ export function discoverToolAvailability(env: EnvMap = process.env): Record<stri
     "github.inspect_health": available(),
     "github.merge_pull_request": unavailable("Merge is a high-risk action and is not enabled in this runtime."),
     "clickup.create_task": env.CLICKUP_API_TOKEN
+      && env.CLICKUP_LIST_ID
       ? available()
-      : unavailable("ClickUp is not configured. No CLICKUP_API_TOKEN is present."),
+      : unavailable("ClickUp is not configured. CLICKUP_API_TOKEN or CLICKUP_LIST_ID is missing."),
     "slack.send_message": env.SLACK_BOT_TOKEN
+      && env.SLACK_DEFAULT_CHANNEL
       ? available()
-      : unavailable("Slack is not configured. No SLACK_BOT_TOKEN is present."),
-    "vercel.deploy_production": unavailable("Production deploys are never auto-executed from the agent runtime."),
+      : unavailable("Slack is not configured. SLACK_BOT_TOKEN or SLACK_DEFAULT_CHANNEL is missing."),
+    "vercel.deploy_production": env.VERCEL_TOKEN && env.VERCEL_PROJECT_ID
+      ? available()
+      : unavailable("Vercel deploy is not configured. VERCEL_TOKEN or VERCEL_PROJECT_ID is missing."),
     "supabase.destructive_change": unavailable("Supabase destructive changes are not enabled."),
     "n8n.trigger_workflow": env.N8N_WEBHOOK_URL
       ? available()

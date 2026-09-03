@@ -7,6 +7,7 @@ import { canAutoExecute, decideApproval, DEFAULT_OWNER_EXECUTION_POLICY, require
 import { describeScreenShare, type ScreenShareSnapshot } from "@/lib/screen/state";
 import { buildTeachingPlan, describeCurrentTeachingStep, detectTeachingMode } from "./teaching";
 import { getRegisteredTool, listRegisteredTools } from "./tools/registry";
+import { executeExternalApprovedTool } from "./tools/executor";
 import type {
   AgentState,
   AgentTurnInput,
@@ -332,7 +333,7 @@ export function applyApprovalDecision(
   return approvals.map((item) => (item.id === approvalId ? decideApproval(item, decision, nowIso) : item));
 }
 
-export function executeApprovedTool(input: AgentTurnInput, approval: ApprovalRequest): ToolResult {
+export async function executeApprovedTool(input: AgentTurnInput, approval: ApprovalRequest): Promise<ToolResult> {
   if (approval.decision !== "approved") {
     return {
       invocationId: approval.id,
@@ -342,6 +343,9 @@ export function executeApprovedTool(input: AgentTurnInput, approval: ApprovalReq
       summary: "Owner rejected this action. Nothing was executed.",
       evidence: [approval.id],
     };
+  }
+  if (["clickup.create_task", "slack.send_message", "n8n.trigger_workflow", "vercel.deploy_production"].includes(approval.toolId)) {
+    return executeExternalApprovedTool(input, approval.toolId, approval.id);
   }
   return executeConfiguredTool(input, {
     id: approval.id,

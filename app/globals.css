@@ -765,6 +765,11 @@ html[data-lifeos-density="calm"] .app-section:not(#overview) { margin-top:100px;
   color: var(--muted);
   font-size: .62rem;
 }
+.workspace-diagnostics {
+  margin: 0;
+  color: var(--amber);
+  font-size: .65rem;
+}
 .workspace-hero {
   display: flex;
   align-items: flex-end;
@@ -974,6 +979,120 @@ html[data-lifeos-density="calm"] .app-section:not(#overview) { margin-top:100px;
   font-size: .62rem;
   border-top: 1px solid var(--line);
 }
+.widget-library-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 81;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, .72);
+}
+.widget-library {
+  width: min(980px, 100%);
+  max-height: min(88vh, 920px);
+  overflow: auto;
+  border: 1px solid var(--line-hot);
+  background: #070b11;
+  padding: 16px;
+}
+.widget-library header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.widget-library ul {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.widget-library li {
+  border: 1px solid var(--line);
+  padding: 10px;
+  display: grid;
+  gap: 10px;
+}
+.widget-library-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.widget-library button {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font: 700 .58rem ui-monospace, monospace;
+  text-transform: uppercase;
+}
+.game-loop-head strong {
+  display: block;
+  font: 800 1.1rem Arial, sans-serif;
+}
+.game-loop-head span {
+  color: var(--muted);
+  font-size: .7rem;
+}
+.game-loop-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.game-loop-grid > div {
+  border: 1px solid var(--line);
+  padding: 10px;
+}
+.game-loop-grid span {
+  color: var(--muted);
+  font-size: .58rem;
+  text-transform: uppercase;
+}
+.game-loop-grid strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--cyan);
+}
+.game-loop-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.game-loop-actions button,
+.game-loop-quests button {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font: 700 .58rem ui-monospace, monospace;
+  text-transform: uppercase;
+}
+.game-loop-quests ul {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.game-loop-quests li {
+  border: 1px solid var(--line);
+  padding: 10px;
+  display: grid;
+  gap: 10px;
+}
+.game-loop-quests small {
+  color: var(--muted);
+  display: block;
+  margin-top: 4px;
+}
+.game-loop-diagnostic {
+  color: var(--amber);
+  font-size: .68rem;
+}
 .workspace-placeholder {
   display: grid;
   gap: 14px;
@@ -1033,5 +1152,8 @@ html[data-lifeos-reduced-motion="true"] .workspace-rgl * {
   }
   .workspace-widget-header {
     display: grid;
+  }
+  .game-loop-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

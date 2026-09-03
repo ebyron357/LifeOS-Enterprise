@@ -72,7 +72,7 @@ export async function POST(request: Request) {
   }
 
   const vault = await getVaultDashboardData();
-  const result = executeApprovedTool({
+  const result = await executeApprovedTool({
     sessionId: body.sessionId || "anonymous",
     channel: "text",
     text: decided.summary,

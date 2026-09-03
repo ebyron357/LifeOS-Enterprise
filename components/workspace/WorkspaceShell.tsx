@@ -6,6 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { WORKSPACES, workspaceFromPath } from "@/lib/workspace/workspaces";
 import { CommandPalette } from "./CommandPalette";
 import { useWorkspace } from "./WorkspaceProvider";
+import { WidgetLibrary } from "./WidgetLibrary";
 
 type WorkspaceShellProps = {
   title: string;
@@ -24,8 +25,9 @@ export function WorkspaceShell({
 }: WorkspaceShellProps) {
   const pathname = usePathname() ?? "/dashboard";
   const activeWorkspace = workspaceFromPath(pathname);
-  const { resetLayout, focusNextWidget, toggleReducedMotion, state } = useWorkspace();
+  const { resetLayout, repairLayout, focusNextWidget, toggleReducedMotion, diagnostics, state } = useWorkspace();
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState("Workspace ready.");
 
   useEffect(() => {
@@ -87,6 +89,23 @@ export function WorkspaceShell({
             type="button"
             className="workspace-action"
             onClick={() => {
+              repairLayout();
+              setStatusMessage("Layout state repaired.");
+            }}
+          >
+            Repair layout
+          </button>
+          <button
+            type="button"
+            className="workspace-action"
+            onClick={() => setLibraryOpen(true)}
+          >
+            Widget library / Customize
+          </button>
+          <button
+            type="button"
+            className="workspace-action"
+            onClick={() => {
               focusNextWidget();
               setStatusMessage("Focused next widget.");
             }}
@@ -124,10 +143,14 @@ export function WorkspaceShell({
       </nav>
 
       <p className="workspace-live-region" aria-live="polite">{statusMessage}</p>
+      {diagnostics.length ? (
+        <p className="workspace-diagnostics" role="status">{diagnostics.join(" ")}</p>
+      ) : null}
 
       {children}
 
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+      <WidgetLibrary open={libraryOpen} onClose={() => setLibraryOpen(false)} />
     </div>
   );
 }

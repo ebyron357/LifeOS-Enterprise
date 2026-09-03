@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { applyApprovalDecision, executeApprovedTool, processAgentTurn } from "@/lib/agent/runtime";
 import type { AgentTurnInput } from "@/lib/agent/types";
 
@@ -30,6 +30,9 @@ function input(overrides: Partial<AgentTurnInput> = {}): AgentTurnInput {
 }
 
 describe("agent runtime", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
   it("routes text into a LifeOS read tool", () => {
     const result = processAgentTurn(input());
     expect(result.results.some((item) => item.toolId === "lifeos.read_attention" && item.status === "completed")).toBe(true);
@@ -68,7 +71,9 @@ describe("agent runtime", () => {
 
   it("blocks a configured high-risk tool until approval", () => {
     const previous = process.env.SLACK_BOT_TOKEN;
+    const previousChannel = process.env.SLACK_DEFAULT_CHANNEL;
     process.env.SLACK_BOT_TOKEN = "test-token";
+    process.env.SLACK_DEFAULT_CHANNEL = "C123";
     try {
       const result = processAgentTurn(input({ text: "Send a Slack update." }));
       expect(result.waitingForOwner).toBe(true);
@@ -77,27 +82,59 @@ describe("agent runtime", () => {
     } finally {
       if (previous === undefined) delete process.env.SLACK_BOT_TOKEN;
       else process.env.SLACK_BOT_TOKEN = previous;
+      if (previousChannel === undefined) delete process.env.SLACK_DEFAULT_CHANNEL;
+      else process.env.SLACK_DEFAULT_CHANNEL = previousChannel;
     }
   });
 
-  it("does not execute a rejected approval", () => {
+  it("does not execute a rejected approval", async () => {
     const pending = processAgentTurn(input({ text: "Stage a project status change." }));
     const approval = pending.approvals.find((item) => item.toolId === "lifeos.stage_project_change");
     expect(approval).toBeTruthy();
     const rejected = applyApprovalDecision(pending.approvals, approval!.id, "rejected", "2026-08-26T12:01:00.000Z")[0];
-    const result = executeApprovedTool(input({ text: "Stage a project status change." }), rejected);
+    const result = await executeApprovedTool(input({ text: "Stage a project status change." }), rejected);
     expect(result.status).toBe("rejected");
     expect(result.ok).toBe(false);
   });
 
-  it("executes an approved reversible tool without writing main", () => {
+  it("executes an approved reversible tool without writing main", async () => {
     const pending = processAgentTurn(input({ text: "Stage a project status change." }));
     const approval = pending.approvals.find((item) => item.toolId === "lifeos.stage_project_change");
     expect(approval).toBeTruthy();
     const approved = applyApprovalDecision(pending.approvals, approval!.id, "approved", "2026-08-26T12:01:00.000Z").find((item) => item.id === approval!.id)!;
-    const result = executeApprovedTool(input({ text: "Stage a project status change." }), approved);
+    const result = await executeApprovedTool(input({ text: "Stage a project status change." }), approved);
     expect(result.status).toBe("completed");
     expect(result.stagedChange?.write_mode).toBe("proposal-only");
+  });
+
+  it("executes an approved external ClickUp action when configured", async () => {
+    const oldToken = process.env.CLICKUP_API_TOKEN;
+    const oldList = process.env.CLICKUP_LIST_ID;
+    process.env.CLICKUP_API_TOKEN = "token";
+    process.env.CLICKUP_LIST_ID = "list";
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ id: "task-1", url: "https://app.clickup.com/t/task-1" }), { status: 200 })));
+    try {
+      const result = await executeApprovedTool(
+        input({ text: "Create ClickUp task", pendingApprovals: [] }),
+        {
+          id: "apr-clickup",
+          toolId: "clickup.create_task",
+          riskLevel: "reversible",
+          summary: "Create ClickUp task",
+          args: {},
+          createdAt: "2026-08-26T12:00:00.000Z",
+          decision: "approved",
+          decidedAt: "2026-08-26T12:00:01.000Z",
+        },
+      );
+      expect(result.status).toBe("completed");
+      expect(result.summary).toMatch(/Created ClickUp task/);
+    } finally {
+      if (oldToken === undefined) delete process.env.CLICKUP_API_TOKEN;
+      else process.env.CLICKUP_API_TOKEN = oldToken;
+      if (oldList === undefined) delete process.env.CLICKUP_LIST_ID;
+      else process.env.CLICKUP_LIST_ID = oldList;
+    }
   });
 
   it("ignores turns while paused", () => {

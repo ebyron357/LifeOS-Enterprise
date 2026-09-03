@@ -5,6 +5,7 @@ import { CognitiveSupportCenter } from "@/components/dashboard/CognitiveSupportC
 import { OperationsSurface } from "@/components/dashboard/OperationsSurface";
 import { AIStatus } from "@/components/widgets/AIStatus";
 import { GitHubHealth } from "@/components/widgets/GitHubHealth";
+import { GameLoopWidget } from "@/components/widgets/GameLoopWidget";
 import { MorningBrief } from "@/components/widgets/MorningBrief";
 import { PersonalGrowthWidget } from "@/components/widgets/PersonalGrowthWidget";
 import { PrayerWidget } from "@/components/widgets/PrayerWidget";
@@ -104,6 +105,14 @@ export function CommandCenterWorkspace({ data, github, revenue }: CommandCenterW
       node: (
         <WorkspaceWidget id="personal-growth" status="active">
           <PersonalGrowthWidget growth={data.growth} />
+        </WorkspaceWidget>
+      ),
+    },
+    {
+      id: "game-loop" as const,
+      node: (
+        <WorkspaceWidget id="game-loop" status="active">
+          <GameLoopWidget projects={data.projects} />
         </WorkspaceWidget>
       ),
     },

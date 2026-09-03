@@ -10,6 +10,7 @@ const WIDGET_IDS: CommandCenterWidgetId[] = [
   "decision-queue",
   "morning-brief",
   "personal-growth",
+  "game-loop",
   "github-health",
   "revenue-radar",
   "prayer",
@@ -36,10 +37,11 @@ export const DEFAULT_LG_LAYOUT: LayoutItem[] = [
   item("decision-queue", 8, 11, 4, 10, 3, 5),
   item("morning-brief", 0, 21, 6, 7, 4, 5),
   item("personal-growth", 6, 21, 6, 7, 4, 5),
-  item("github-health", 0, 28, 4, 6, 3, 4),
-  item("revenue-radar", 4, 28, 4, 6, 3, 4),
-  item("prayer", 8, 28, 4, 6, 3, 4),
-  item("ai-workforce", 0, 34, 12, 7, 6, 5),
+  item("game-loop", 0, 28, 12, 8, 6, 6),
+  item("github-health", 0, 36, 4, 6, 3, 4),
+  item("revenue-radar", 4, 36, 4, 6, 3, 4),
+  item("prayer", 8, 36, 4, 6, 3, 4),
+  item("ai-workforce", 0, 42, 12, 7, 6, 5),
 ];
 
 function stackLayout(source: LayoutItem[], cols: number): LayoutItem[] {
@@ -86,6 +88,7 @@ export function createDefaultWorkspaceLayout(): WorkspaceLayoutState {
     workspaceId: "command-center",
     layouts: createDefaultLayouts(),
     widgets: createDefaultWidgetChrome(),
+    widgetOrder: [...WIDGET_IDS],
     focusedWidgetId: null,
     reducedMotion: false,
   };
@@ -124,6 +127,11 @@ export const COMMAND_CENTER_WIDGET_META: Record<
     title: "Personal growth",
     eyebrow: "Steady progress",
     primaryAction: "Review growth focus",
+  },
+  "game-loop": {
+    title: "Game loop",
+    eyebrow: "Deterministic progress",
+    primaryAction: "Complete one quest",
   },
   "github-health": {
     title: "GitHub health",

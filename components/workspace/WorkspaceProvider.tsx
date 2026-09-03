@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { COMMAND_CENTER_WIDGET_IDS, createDefaultWorkspaceLayout, LAYOUT_STORAGE_KEY } from "@/lib/workspace/default-layout";
-import { parseWorkspaceLayout, serializeWorkspaceLayout } from "@/lib/workspace/layout-storage";
+import { parseWorkspaceLayout, parseWorkspaceLayoutWithDiagnostics, serializeWorkspaceLayout } from "@/lib/workspace/layout-storage";
 import type { BreakpointLayouts, WorkspaceLayoutState } from "@/lib/workspace/types";
 
 type WorkspaceContextValue = {
@@ -18,9 +18,13 @@ type WorkspaceContextValue = {
   hydrated: boolean;
   setLayouts: (layouts: BreakpointLayouts) => void;
   resetLayout: () => void;
+  repairLayout: () => void;
   setFocusedWidget: (id: string | null) => void;
   focusNextWidget: () => void;
   toggleMinimized: (id: string) => void;
+  setWidgetHidden: (id: string, hidden: boolean) => void;
+  moveWidget: (id: string, direction: "up" | "down") => void;
+  diagnostics: string[];
   setReducedMotion: (value: boolean) => void;
   toggleReducedMotion: () => void;
 };
@@ -67,7 +71,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const raw = useSyncExternalStore(subscribe, readRaw, () => defaultRaw);
-  const state = useMemo(() => parseWorkspaceLayout(raw), [raw]);
+  const parsed = useMemo(() => parseWorkspaceLayoutWithDiagnostics(raw), [raw]);
+  const state = parsed.state;
 
   useEffect(() => {
     document.documentElement.dataset.lifeosReducedMotion = state.reducedMotion ? "true" : "false";
@@ -81,13 +86,18 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     writeRaw(defaultRaw);
   }, []);
 
+  const repairLayout = useCallback(() => {
+    const parsed = parseWorkspaceLayout(readRaw());
+    writeRaw(serializeWorkspaceLayout(parsed));
+  }, []);
+
   const setFocusedWidget = useCallback((id: string | null) => {
     updateState((current) => ({ ...current, focusedWidgetId: id }));
   }, []);
 
   const focusNextWidget = useCallback(() => {
     updateState((current) => {
-      const visible = COMMAND_CENTER_WIDGET_IDS.filter((id) => !current.widgets[id]?.hidden);
+      const visible = current.widgetOrder.filter((id) => !current.widgets[id]?.hidden);
       if (!visible.length) return current;
       const index = current.focusedWidgetId ? visible.indexOf(current.focusedWidgetId as typeof visible[number]) : -1;
       const next = visible[(index + 1) % visible.length];
@@ -116,15 +126,56 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     updateState((current) => ({ ...current, reducedMotion: !current.reducedMotion }));
   }, []);
 
+  const setWidgetHidden = useCallback((id: string, hidden: boolean) => {
+    updateState((current) => {
+      const existing = current.widgets[id] ?? { minimized: false, hidden: false };
+      return {
+        ...current,
+        widgets: {
+          ...current.widgets,
+          [id]: { ...existing, hidden, minimized: hidden ? false : existing.minimized },
+        },
+      };
+    });
+  }, []);
+
+  const moveWidget = useCallback((id: string, direction: "up" | "down") => {
+    updateState((current) => {
+      const order = [...current.widgetOrder];
+      const index = order.indexOf(id as (typeof COMMAND_CENTER_WIDGET_IDS)[number]);
+      if (index === -1) return current;
+      const nextIndex = direction === "up" ? Math.max(0, index - 1) : Math.min(order.length - 1, index + 1);
+      if (nextIndex === index) return current;
+      const [entry] = order.splice(index, 1);
+      order.splice(nextIndex, 0, entry);
+      return {
+        ...current,
+        widgetOrder: order,
+      };
+    });
+  }, []);
+
+  const diagnostics = useMemo(() => {
+    const messages: string[] = [...parsed.messages];
+    if (!state.widgetOrder.length) messages.push("Widget order was empty and repaired.");
+    const hiddenAll = COMMAND_CENTER_WIDGET_IDS.every((id) => state.widgets[id]?.hidden);
+    if (hiddenAll) messages.push("All widgets are hidden. Use Widget Library to re-add one.");
+    return messages;
+  }, [parsed.messages, state.widgetOrder, state.widgets]);
+
   const value = useMemo(
     () => ({
       state,
       hydrated: true,
       setLayouts,
       resetLayout,
+      repairLayout,
       setFocusedWidget,
       focusNextWidget,
       toggleMinimized,
+      setWidgetHidden,
+      moveWidget,
+      diagnostics,
       setReducedMotion,
       toggleReducedMotion,
     }),
@@ -132,9 +183,13 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       state,
       setLayouts,
       resetLayout,
+      repairLayout,
       setFocusedWidget,
       focusNextWidget,
       toggleMinimized,
+      setWidgetHidden,
+      moveWidget,
+      diagnostics,
       setReducedMotion,
       toggleReducedMotion,
     ],
