@@ -320,3 +320,32 @@ Remaining external / credential-only actions:
 | Voice disabled | Session API `provider:none`; UI “Voice disabled” |
 | Writes not fully configured | `configured:false`; unauthorized POST → `401` |
 | `directMainWrites` | `false` |
+
+## Final production closeout run — 2026-09-03
+
+### Repairs completed
+
+- Reconciled canonical closeout branch with PR #55 conversation/runtime implementation.
+- Added server-side TTS provider abstraction (`openai` preferred, browser fallback) with no credential exposure to browser clients.
+- Added `POST /api/lifeos/voice/speak` for server-side synthesis with session-token validation, rate limits, and graceful fallback signaling.
+- Extended `/api/lifeos/voice/session` to report active/fallback voice providers and provider availability.
+- Added persistent `/conversation` Voice Settings controls: provider, locale, input language, response style, speed, pitch, preview, and reset.
+- Added transcript duplicate-submission guard and explicit interruption handling that stops active speech immediately.
+- Extended automated verification with voice-provider unit tests and conversation E2E persistence checks across Chromium/WebKit desktop/mobile.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| `npm ci` | PASS |
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 43 files, 241 tests |
+| `npm run build` | PASS |
+| `npm run test:e2e` | PASS — 44 tests (Chromium + WebKit, desktop + mobile) |
+| `npm audit --audit-level=high` | PASS (0 vulnerabilities) |
+| `pwsh -File ./scripts/audit-vault.ps1` | PASS |
+
+### Final pass/fail state
+
+Current repository validation state: **PASS** for agent-capable closeout implementation on branch `copilot/final-production-closeout`, with remaining external provider credential and browser permission steps left to owner acceptance flow.
