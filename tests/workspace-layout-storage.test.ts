@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createDefaultWorkspaceLayout, WORKSPACE_LAYOUT_VERSION } from "@/lib/workspace/default-layout";
-import { parseWorkspaceLayout, serializeWorkspaceLayout } from "@/lib/workspace/layout-storage";
+import { parseWorkspaceLayout, serializeWorkspaceLayout, swapLayoutItemPositions } from "@/lib/workspace/layout-storage";
 
 describe("workspace layout storage", () => {
   it("returns default layout for invalid stored JSON", () => {
@@ -59,5 +59,19 @@ describe("workspace layout storage", () => {
 
     const restored = parseWorkspaceLayout(JSON.stringify(dirty));
     expect(restored.layouts.lg[0]).not.toHaveProperty("moved");
+  });
+
+  it("swaps widget x/y across breakpoints for accessible reorder", () => {
+    const original = createDefaultWorkspaceLayout();
+    const first = original.layouts.lg[0];
+    const second = original.layouts.lg[1];
+    const swapped = swapLayoutItemPositions(original.layouts, first.i, second.i);
+    const nextFirst = swapped.lg.find((item) => item.i === first.i);
+    const nextSecond = swapped.lg.find((item) => item.i === second.i);
+    expect(nextFirst?.x).toBe(second.x);
+    expect(nextFirst?.y).toBe(second.y);
+    expect(nextSecond?.x).toBe(first.x);
+    expect(nextSecond?.y).toBe(first.y);
+    expect(swapped.md.find((item) => item.i === first.i)?.y).toBe(original.layouts.md.find((item) => item.i === second.i)?.y);
   });
 });

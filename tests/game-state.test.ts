@@ -143,4 +143,13 @@ describe("game state engine", () => {
     );
     expect(again.stats.xp).toBe(expected);
   });
+
+  it("binds the daily check-in quest to the top priority next action", () => {
+    const initial = createInitialGameState(context);
+    const today = context.nowIso.slice(0, 10);
+    const checkin = initial.questsByDate[today].find((quest) => quest.id === `daily-checkin-${today}`);
+    expect(checkin?.detail).toContain("Validate voice fallback.");
+    expect(checkin?.detail).toContain("Ship Voice");
+    expect(checkin?.sourceProjectPath).toBe("Projects/Ship Voice.md");
+  });
 });

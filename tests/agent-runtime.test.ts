@@ -154,4 +154,12 @@ describe("agent runtime", () => {
     const result = processAgentTurn(input({ text: "Create a ClickUp task for this." }));
     expect(result.results.some((item) => item.toolId === "clickup.create_task" && item.status !== "completed")).toBe(true);
   });
+
+  it("inspects GitHub health without inventing workflow or pull-request counts", () => {
+    const result = processAgentTurn(input({ text: "What is GitHub health?" }));
+    const health = result.results.find((item) => item.toolId === "github.inspect_health");
+    expect(health?.status).toBe("completed");
+    expect(health?.summary).toMatch(/does not invent/i);
+    expect(health?.summary).not.toMatch(/\b\d+\s+(open pull requests|failed workflows)\b/i);
+  });
 });

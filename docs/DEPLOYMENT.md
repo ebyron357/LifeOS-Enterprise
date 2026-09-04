@@ -4,6 +4,7 @@
 
 - Node.js 20+ (CI uses current LTS)
 - npm (lockfile committed — use `npm ci` in CI/CD)
+- Dashboard CI runs lint, typecheck, unit tests, build, and Playwright
 - Obsidian for vault editing (optional for web-only ops)
 - GitHub repo access for draft-PR persistence (optional until writes are enabled)
 - Vercel project linked to `ebyron357/LifeOS-Enterprise` (existing)
@@ -111,7 +112,7 @@ Playwright viewports: 1440 (desktop), 1024 (laptop), 390 (mobile). Vault audit c
 - Reads: vault markdown via server components / APIs (no permanent provider keys in browser)
 - Writes: draft PR only; path allowlists; canonical conflict detection (409); never direct `main`
 - Agent approvals: authoritative server records with expiry, nonce/replay protection, session + project + repository binding
-- Voice: server TTS when configured; browser fallback; mute stops recognition; HMAC sessions when secret configured; no LiveKit readiness claim
+- Voice: server TTS when configured; browser fallback; mute aborts recognition; new speech interrupts TTS; hold-to-talk flushes on release; HMAC sessions when secret configured; no LiveKit readiness claim
 - Prefer `LIFEOS_WRITE_ENABLED=false` in Vercel unless draft-PR writes are intentionally active with secret + GitHub token
 - Production smoke (2026-07-28): voice disabled; change-plan POST without valid bearer returns `401`; `directMainWrites:false`
 

@@ -113,7 +113,7 @@ See `80 SOPs/LifeOS Owner's Operating Manual.md` → **How to Use Interactive Li
 
 ## Known limitations
 
-- Continuous browser speech quality varies by browser. Push-to-talk is the fallback.
+- Continuous browser speech quality varies by browser. Hold-to-talk is the fallback; release flushes the last utterance.
 - LiveKit room tokens are still deferred.
 - Optional LLM rewrite is not used unless a server-side key exists, and even then tools stay policy-gated.
 - ClickUp, Slack, n8n, Vercel, and Supabase adapters stay unavailable until their env placeholders are set.

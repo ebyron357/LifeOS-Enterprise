@@ -85,15 +85,18 @@ function buildDailyQuests(date: string, projects: ProjectBrief[]): Quest[] {
   const waiting = ranked.filter((project) => project.status === "waiting" || Boolean(project.waitingOn)).slice(0, 1);
   const blocked = ranked.filter((project) => project.status === "blocked" || Boolean(project.blocker)).slice(0, 2);
 
+  const topAttention = ranked[0] ?? null;
   const quests: Quest[] = [
     {
       id: `daily-checkin-${date}`,
       kind: "daily",
       title: "Daily check-in",
-      detail: "Start the day by confirming your top attention target.",
+      detail: topAttention?.nextAction
+        ? `Confirm today's attention target: ${topAttention.name} — ${topAttention.nextAction}`
+        : "Start the day by confirming your top attention target.",
       xp: 20,
       status: "todo",
-      sourceProjectPath: null,
+      sourceProjectPath: topAttention?.path ?? null,
     },
     ...active.map((project, index) => ({
       id: `main-${index + 1}-${normalizeQuestId(project.path)}`,

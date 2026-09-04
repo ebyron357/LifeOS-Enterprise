@@ -125,6 +125,27 @@ export function parseWorkspaceLayoutWithDiagnostics(raw: string | null): {
   }
 }
 
+export function swapLayoutItemPositions(
+  layouts: BreakpointLayouts,
+  firstId: string,
+  secondId: string,
+): BreakpointLayouts {
+  const next = { ...layouts };
+  for (const key of BREAKPOINTS) {
+    next[key] = layouts[key].map((item) => ({ ...item }));
+    const first = next[key].find((item) => item.i === firstId);
+    const second = next[key].find((item) => item.i === secondId);
+    if (!first || !second) continue;
+    const x = first.x;
+    const y = first.y;
+    first.x = second.x;
+    first.y = second.y;
+    second.x = x;
+    second.y = y;
+  }
+  return next;
+}
+
 export function serializeWorkspaceLayout(state: WorkspaceLayoutState): string {
   return JSON.stringify(state);
 }

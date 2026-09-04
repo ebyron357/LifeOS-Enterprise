@@ -112,6 +112,13 @@ describe("Workspace OS Command Center", () => {
     expect(screen.getByText(/default layout restored/i)).toBeInTheDocument();
   });
 
+  it("opens the command palette and repairs layout", async () => {
+    render(<CommandCenterWorkspace data={data} github={github} />);
+    fireEvent.click(await screen.findByRole("button", { name: /command palette/i }));
+    fireEvent.click(screen.getByText("Repair dashboard layout"));
+    expect(screen.getByText(/layout state repaired/i)).toBeInTheDocument();
+  });
+
   it("minimizes and restores a widget", async () => {
     render(<CommandCenterWorkspace data={data} github={github} />);
     const widget = await screen.findByLabelText("Decision queue");
@@ -189,8 +196,17 @@ describe("Workspace OS Command Center", () => {
     expect(await screen.findByLabelText("Game loop")).toBeInTheDocument();
 
     const firstBefore = window.localStorage.getItem(LAYOUT_STORAGE_KEY) || "";
+    const beforeLayout = parseWorkspaceLayout(firstBefore);
+    const gameId = "game-loop";
+    const index = beforeLayout.widgetOrder.indexOf(gameId);
+    const neighbor = beforeLayout.widgetOrder[index - 1];
+    const beforeGame = beforeLayout.layouts.lg.find((item) => item.i === gameId);
+    const beforeNeighbor = beforeLayout.layouts.lg.find((item) => item.i === neighbor);
     fireEvent.click(within(gameItem as HTMLElement).getByRole("button", { name: "Move up" }));
     const firstAfter = window.localStorage.getItem(LAYOUT_STORAGE_KEY) || "";
     expect(firstAfter).not.toEqual(firstBefore);
+    const afterLayout = parseWorkspaceLayout(firstAfter);
+    expect(afterLayout.layouts.lg.find((item) => item.i === gameId)?.y).toBe(beforeNeighbor?.y);
+    expect(afterLayout.layouts.lg.find((item) => item.i === neighbor)?.y).toBe(beforeGame?.y);
   });
 });

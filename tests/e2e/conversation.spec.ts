@@ -87,4 +87,39 @@ test.describe("interactive conversation workspace", () => {
     expect(stored).toContain("\"locale\":\"zh-TW\"");
     expect(stored).toContain("\"responseStyle\":\"coach\"");
   });
+
+  test("push-to-talk holds to listen and releases to stop", async ({ page }) => {
+    await page.addInitScript(() => {
+      const calls = { abort: 0, stop: 0, start: 0 };
+      (window as Window & { __lifeosRecognition?: typeof calls }).__lifeosRecognition = calls;
+      class FakeRecognition {
+        lang = "";
+        continuous = false;
+        interimResults = false;
+        onresult = null;
+        onerror = null;
+        onend = null;
+        start() { calls.start += 1; }
+        stop() { calls.stop += 1; }
+        abort() { calls.abort += 1; }
+      }
+      Object.defineProperty(window, "SpeechRecognition", { configurable: true, value: FakeRecognition });
+      Object.defineProperty(window, "webkitSpeechRecognition", { configurable: true, value: FakeRecognition });
+      Object.defineProperty(window.navigator, "mediaDevices", {
+        configurable: true,
+        value: {
+          getUserMedia: async () => ({ getTracks: () => [{ stop() {} }] }),
+        },
+      });
+    });
+
+    await page.goto("/conversation");
+    const ptt = page.getByRole("button", { name: "Push to talk", exact: true });
+    await ptt.scrollIntoViewIfNeeded();
+    await ptt.focus();
+    await page.keyboard.down(" ");
+    await expect.poll(async () => page.evaluate(() => (window as Window & { __lifeosRecognition?: { start: number } }).__lifeosRecognition?.start ?? 0)).toBeGreaterThan(0);
+    await page.keyboard.up(" ");
+    await expect.poll(async () => page.evaluate(() => (window as Window & { __lifeosRecognition?: { stop: number } }).__lifeosRecognition?.stop ?? 0)).toBeGreaterThan(0);
+  });
 });

@@ -37,7 +37,7 @@ Command Board:
 
 ### Conversation mute contract
 
-Mute must stop microphone capture (`stopListening` → `recognition.abort()` with handlers cleared) and prevent voice transcript submission. Changing a button label alone is insufficient. Permission denial is a distinct `permission-denied` state. See `components/agent/AgentConversationWorkspace.tsx`.
+Mute must stop microphone capture (`stopListening` → `recognition.abort()` with handlers cleared) and prevent voice transcript submission. Changing a button label alone is insufficient. Permission denial is a distinct `permission-denied` state. Sending a new turn or using Interrupt must stop browser TTS and server audio so speech does not overlap. Push-to-talk is hold-to-speak: pointer/key down starts listening, release calls `releaseListening()` (`recognition.stop()`) so the last utterance can flush. See `components/agent/AgentConversationWorkspace.tsx`.
 
 ## Security model
 

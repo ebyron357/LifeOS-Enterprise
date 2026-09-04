@@ -123,6 +123,10 @@ function executeConfiguredTool(input: AgentTurnInput, invocation: ToolInvocation
     const names = input.vault.projects.slice(0, 8).map((project) => `${project.name} (${project.status})`);
     return { invocationId: invocation.id, toolId: tool.id, ok: true, status: "completed", summary: names.join("; ") || "No projects found.", evidence: names };
   }
+  if (tool.id === "github.inspect_health") {
+    const summary = "GitHub health is reported by the Command Center widget from public repository reads. This tool does not invent workflow or pull-request counts.";
+    return { invocationId: invocation.id, toolId: tool.id, ok: true, status: "completed", summary, evidence: [summary] };
+  }
   if (tool.id === "lifeos.read_attention") {
     const blocked = input.vault.projects.filter((project) => project.status === "blocked" || project.blocker);
     const waiting = input.vault.projects.filter((project) => project.status === "waiting" || project.waitingOn);
@@ -234,6 +238,9 @@ export function processAgentTurn(input: AgentTurnInput): AgentTurnResult {
   if (/\bproject|blocked|waiting|attention|portfolio\b/i.test(text)) requestedToolIds.push("lifeos.read_attention", "lifeos.read_projects");
   if (/\btool|mcp|integration|configured\b/i.test(text)) requestedToolIds.push("mcp.discover");
   if (/\bchange (status|priority)|stage|draft pr|update the project\b/i.test(text)) requestedToolIds.push("lifeos.stage_project_change");
+  if (/\bgithub\b/i.test(text) && /\b(health|workflow|ci|pull requests?|prs?)\b/i.test(text) && !/\bmerge\b/i.test(text)) {
+    requestedToolIds.push("github.inspect_health");
+  }
   if (/\bmerge\b/i.test(text)) requestedToolIds.push("github.merge_pull_request");
   if (/\bslack\b/i.test(text)) requestedToolIds.push("slack.send_message");
   if (/\bdeploy\b/i.test(text)) requestedToolIds.push("vercel.deploy_production");

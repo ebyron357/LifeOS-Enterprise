@@ -16,6 +16,11 @@ All notable changes to LifeOS Enterprise are documented in this file.
 - Mobile widget chrome (reorder / minimize / hide) at 390px
 - Integration availability states (`available` / `configured` / `unavailable`) with missing requirements
 - Playwright projects for 1440 / 1024 / 390 viewports plus drag/resize/mute journeys
+- Hold-to-talk conversation control; new speech stops overlapping TTS
+- Command-palette Repair layout; accessible Move up/down swaps grid geometry
+- Daily check-in quest bound to the top-priority project next action
+- `github.inspect_health` read executor that does not invent CI counts
+- Dashboard CI typecheck step
 
 ### Security
 

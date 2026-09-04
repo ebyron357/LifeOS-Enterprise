@@ -391,3 +391,21 @@ Agent-executable closeout: **PASS** (pending re-validation of this continuation)
 - Voice `stopListening` aborts recognition and clears handlers; permission-denied is a distinct UI state.
 - Playwright coverage added for dashboard hydration errors, minimize/restore/repair, drag/resize, and mute abort.
 - Canonical live status, deployment rollback, and architecture docs updated without marking owner acceptance complete.
+- Conversation barge-in: new turns and Interrupt stop overlapping TTS; mute also stops playback.
+- Push-to-talk is hold-to-speak; release flushes the last utterance instead of aborting it.
+- Accessible Move up/down swaps widget x/y across breakpoints, not order-only.
+- Daily check-in quest detail binds to the top-priority project next action.
+- Command palette includes Repair dashboard layout.
+- Dashboard CI now runs `npm run typecheck`.
+- `github.inspect_health` has a truthful read executor and is routed from GitHub health questions.
+
+### Validation evidence (this continuation)
+
+| Check | Result |
+|---|---|
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 48 files, 268 tests |
+| `npm run build` | PASS (Playwright webServer rebuild) |
+| Playwright hold-to-talk (Chromium 1440/1024/390 + WebKit desktop/mobile) | PASS — 5 tests |
+| Prior full Playwright suite on `93b51bb` | PASS — 91 tests |

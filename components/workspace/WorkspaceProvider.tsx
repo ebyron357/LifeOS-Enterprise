@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { COMMAND_CENTER_WIDGET_IDS, createDefaultWorkspaceLayout, LAYOUT_STORAGE_KEY } from "@/lib/workspace/default-layout";
-import { parseWorkspaceLayout, parseWorkspaceLayoutWithDiagnostics, serializeWorkspaceLayout } from "@/lib/workspace/layout-storage";
+import { parseWorkspaceLayout, parseWorkspaceLayoutWithDiagnostics, serializeWorkspaceLayout, swapLayoutItemPositions } from "@/lib/workspace/layout-storage";
 import type { BreakpointLayouts, WorkspaceLayoutState } from "@/lib/workspace/types";
 
 type WorkspaceContextValue = {
@@ -151,6 +151,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       return {
         ...current,
         widgetOrder: order,
+        layouts: swapLayoutItemPositions(current.layouts, id, current.widgetOrder[nextIndex]),
       };
     });
   }, []);

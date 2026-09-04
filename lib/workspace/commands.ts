@@ -5,6 +5,7 @@ export type WorkspaceCommandId =
   | `open-${WorkspaceId}`
   | "open-quick-capture"
   | "reset-layout"
+  | "repair-layout"
   | "focus-next-widget"
   | "toggle-reduced-motion";
 
@@ -31,6 +32,11 @@ export const WORKSPACE_COMMANDS: WorkspaceCommand[] = [
     id: "reset-layout",
     label: "Reset dashboard layout",
     keywords: ["reset", "layout", "default", "restore"],
+  },
+  {
+    id: "repair-layout",
+    label: "Repair dashboard layout",
+    keywords: ["repair", "layout", "recover", "corrupt"],
   },
   {
     id: "focus-next-widget",

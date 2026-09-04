@@ -269,11 +269,23 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
       onEnd: () => {
         setVoice((current) => (current.muted ? muteConversation(current) : { ...current, speaking: false, processing: false, state: keepListeningRef.current ? "listening" : current.state }));
       },
+      onError: (message) => setVoice((current) => failConversation(current, message)),
     });
   }, [headers, voiceSettings]);
 
+  const stopPlayback = useCallback(() => {
+    transportRef.current.stopSpeaking();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current.src = "";
+      audioRef.current = null;
+    }
+  }, []);
+
   const sendTurn = useCallback(async (text: string, channel: "text" | "voice") => {
     if (mutedRef.current && channel === "voice") return;
+    stopPlayback();
     const normalized = text.trim().toLowerCase();
     const dedupeKey = `${channel}:${normalized}`;
     if (!normalized || lastSubmissionRef.current === dedupeKey) return;
@@ -319,7 +331,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         if (lastSubmissionRef.current === dedupeKey) lastSubmissionRef.current = "";
       }, 1200);
     }
-  }, [appendLine, approvals, awareness, headers, paused, speakReply, voice.muted, voice.startedAt, voice.transcriptPrivacy]);
+  }, [appendLine, approvals, awareness, headers, paused, speakReply, stopPlayback, voice.muted, voice.startedAt, voice.transcriptPrivacy]);
 
   const beginListening = useCallback(async (continuous: boolean) => {
     if (mutedRef.current) return;
@@ -343,7 +355,10 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
       },
       onFinal: (text) => {
         if (mutedRef.current) return;
-        if (text) void sendTurn(text, "voice");
+        if (text) {
+          stopPlayback();
+          void sendTurn(text, "voice");
+        }
       },
       onError: (message) => setVoice((current) => failConversation(current, message)),
       onEnd: () => {
@@ -352,7 +367,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         }
       },
     });
-  }, [sendTurn, voice.transcriptPrivacy, voiceSettings.transcriptionLanguage]);
+  }, [sendTurn, stopPlayback, voice.transcriptPrivacy, voiceSettings.transcriptionLanguage]);
 
   useEffect(() => {
     restartListeningRef.current = beginListening;
@@ -361,19 +376,26 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   function endVoice() {
     keepListeningRef.current = false;
     transportRef.current.disconnect();
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = "";
-      audioRef.current = null;
-    }
+    stopPlayback();
     setVoice((current) => stopConversation(current));
     setActivity((events) => appendActivity(events, createActivityEvent("session-stopped", "Voice conversation stopped.")));
+  }
+
+  function startPushToTalk() {
+    setVoice((current) => enablePushToTalk(current));
+    void beginListening(false);
+  }
+
+  function endPushToTalk() {
+    keepListeningRef.current = false;
+    transportRef.current.releaseListening();
   }
 
   function muteMic() {
     keepListeningRef.current = false;
     mutedRef.current = true;
     transportRef.current.stopListening();
+    stopPlayback();
     setVoice((current) => muteConversation(current));
   }
 
@@ -466,9 +488,39 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
           <button type="button" onClick={endVoice}>Stop conversation</button>
           <button type="button" onClick={muteMic} disabled={voice.muted}>Mute microphone</button>
           <button type="button" onClick={unmuteMic} disabled={!voice.muted}>Unmute microphone</button>
-          <button type="button" onClick={() => { transportRef.current.stopSpeaking(); if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; } setVoice((current) => interruptSpeech(current)); }}>Interrupt assistant</button>
+          <button type="button" onClick={() => { stopPlayback(); setVoice((current) => interruptSpeech(current)); }}>Interrupt assistant</button>
           <button type="button" onClick={() => { setVoice((current) => resumeConversation(current)); void beginListening(true); }}>Resume conversation</button>
-          <button type="button" onClick={() => { setVoice((current) => enablePushToTalk(current)); void beginListening(false); }}>Push to talk</button>
+          <button
+            type="button"
+            aria-label="Push to talk"
+            title="Hold to speak, release to send"
+            onPointerDown={(event) => {
+              if (event.button > 0) return;
+              try {
+                event.currentTarget.setPointerCapture(event.pointerId);
+              } catch {
+                // Capture is optional; listening still starts on hold.
+              }
+              startPushToTalk();
+            }}
+            onPointerUp={endPushToTalk}
+            onPointerCancel={endPushToTalk}
+            onKeyDown={(event) => {
+              if (event.repeat) return;
+              if (event.key === " " || event.key === "Enter") {
+                event.preventDefault();
+                startPushToTalk();
+              }
+            }}
+            onKeyUp={(event) => {
+              if (event.key === " " || event.key === "Enter") {
+                event.preventDefault();
+                endPushToTalk();
+              }
+            }}
+          >
+            Push to talk
+          </button>
           <button type="button" onClick={() => setTranscript([])}>Clear transcript</button>
           <button type="button" onClick={() => setVoice((current) => setTranscriptPrivacy(current, current.transcriptPrivacy === "hidden" ? "ephemeral" : "hidden"))}>
             Transcript {voice.transcriptPrivacy === "hidden" ? "hidden" : "visible"}

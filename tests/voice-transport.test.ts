@@ -63,4 +63,35 @@ describe("browser voice transport mute contract", () => {
     });
     expect(onFinal).not.toHaveBeenCalled();
   });
+
+  it("releaseListening stops recognition without clearing handlers so the last utterance can flush", async () => {
+    const recognition = new FakeRecognition();
+    class RecognitionCtor {
+      constructor() {
+        return recognition;
+      }
+    }
+    Object.defineProperty(window, "SpeechRecognition", { configurable: true, value: RecognitionCtor });
+    Object.defineProperty(window, "webkitSpeechRecognition", { configurable: true, value: RecognitionCtor });
+
+    const transport = createBrowserVoiceTransport();
+    const onFinal = vi.fn();
+    await transport.startListening({
+      lang: "en-US",
+      continuous: false,
+      onInterim: vi.fn(),
+      onFinal,
+      onError: vi.fn(),
+      onEnd: vi.fn(),
+    });
+
+    transport.releaseListening();
+    expect(recognition.stopped).toBe(true);
+    expect(recognition.onresult).not.toBeNull();
+    recognition.onresult?.({
+      resultIndex: 0,
+      results: [{ isFinal: true, 0: { transcript: "hold to talk" } }],
+    });
+    expect(onFinal).toHaveBeenCalledWith("hold to talk");
+  });
 });

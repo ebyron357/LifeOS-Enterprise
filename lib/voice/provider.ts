@@ -27,6 +27,7 @@ export type VoiceTransport = {
     continuous?: boolean;
   }) => Promise<void>;
   stopListening: () => void;
+  releaseListening: () => void;
   speak: (text: string, opts: {
     rate: number;
     pitch?: number;
@@ -100,6 +101,14 @@ export function createBrowserVoiceTransport(): VoiceTransport {
         recognition.stop();
       }
       recognition = null;
+    },
+    releaseListening() {
+      if (!recognition) return;
+      try {
+        recognition.stop();
+      } catch {
+        this.stopListening();
+      }
     },
     speak(text, opts) {
       if (!("speechSynthesis" in window)) {

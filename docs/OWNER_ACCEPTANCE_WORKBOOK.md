@@ -76,7 +76,7 @@ Use one row per test. Record evidence (screenshot, short note, or commit SHA). S
 | D6 | Mute stops mic | Start conversation; Mute | Mic capture stops; transcripts stop submitting | ☐ | | |
 | D7 | Unmute | Unmute | Listening resumes only after unmute | ☐ | | |
 | D8 | Interrupt | Speak while assistant talking; Interrupt | Speech stops immediately; no overlap | ☐ | | |
-| D9 | Push-to-talk | Use Push to talk | Works as fallback | ☐ | | |
+| D9 | Push-to-talk | Hold Push to talk, then release | Listening starts on hold and stops on release; last phrase can flush | ☐ | | |
 | D10 | States visible | Observe UI during flow | listening / thinking / speaking / muted / stopped / error clear | ☐ | | |
 | D11 | Mobile voice | Repeat D5–D8 at 390px | Controls usable on mobile | ☐ | | |
 
