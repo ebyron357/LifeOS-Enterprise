@@ -24,10 +24,13 @@ export type VoiceTransport = {
     onError: (message: string) => void;
     onEnd: () => void;
     lang: string;
+    continuous?: boolean;
   }) => Promise<void>;
   stopListening: () => void;
+  releaseListening: () => void;
   speak: (text: string, opts: {
     rate: number;
+    pitch?: number;
     lang: string;
     onStart?: () => void;
     onEnd?: () => void;
@@ -61,7 +64,7 @@ export function createBrowserVoiceTransport(): VoiceTransport {
         return false;
       }
     },
-    async startListening({ onInterim, onFinal, onError, onEnd, lang }) {
+    async startListening({ onInterim, onFinal, onError, onEnd, lang, continuous = false }) {
       const Ctor = getRecognitionCtor();
       if (!Ctor) {
         onError("Speech recognition is not supported in this browser.");
@@ -70,7 +73,7 @@ export function createBrowserVoiceTransport(): VoiceTransport {
       recognition?.abort();
       recognition = new Ctor();
       recognition.lang = lang;
-      recognition.continuous = false;
+      recognition.continuous = continuous;
       recognition.interimResults = true;
       recognition.onresult = (event) => {
         let interim = "";
@@ -88,8 +91,24 @@ export function createBrowserVoiceTransport(): VoiceTransport {
       recognition.start();
     },
     stopListening() {
-      recognition?.stop();
+      if (!recognition) return;
+      recognition.onresult = null;
+      recognition.onerror = null;
+      recognition.onend = null;
+      try {
+        recognition.abort();
+      } catch {
+        recognition.stop();
+      }
       recognition = null;
+    },
+    releaseListening() {
+      if (!recognition) return;
+      try {
+        recognition.stop();
+      } catch {
+        this.stopListening();
+      }
     },
     speak(text, opts) {
       if (!("speechSynthesis" in window)) {
@@ -99,6 +118,7 @@ export function createBrowserVoiceTransport(): VoiceTransport {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = opts.rate;
+      if (typeof opts.pitch === "number" && Number.isFinite(opts.pitch)) utterance.pitch = opts.pitch;
       utterance.lang = opts.lang.startsWith("fr") ? "fr-FR" : opts.lang.startsWith("ht") ? "ht-HT" : "en-US";
       utterance.onstart = () => opts.onStart?.();
       utterance.onend = () => opts.onEnd?.();
@@ -118,7 +138,7 @@ export function createBrowserVoiceTransport(): VoiceTransport {
 /**
  * V1 always uses browser speech. LiveKit remains a documented future transport.
  */
-export function selectVoiceTransport(provider: "browser" | "livekit" | "none"): VoiceTransport | null {
+export function selectVoiceTransport(provider: "browser" | "openai" | "livekit" | "none"): VoiceTransport | null {
   if (provider === "none") return null;
   return createBrowserVoiceTransport();
 }

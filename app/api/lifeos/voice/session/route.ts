@@ -5,6 +5,7 @@ import {
   rateLimit,
   voiceFeatureEnabled,
 } from "@/lib/voice/security";
+import { listTtsProviders, selectPreferredTtsProvider } from "@/lib/voice/tts-providers";
 
 export const runtime = "nodejs";
 
@@ -31,6 +32,12 @@ export async function GET(request: Request) {
   }
 
   const provider = getConfiguredVoiceProvider();
+  const preferredTts = selectPreferredTtsProvider();
+  const ttsProviders = listTtsProviders().map((item) => ({
+    id: item.id,
+    configured: item.configured,
+    reason: item.reason ?? null,
+  }));
   if (provider === "none") {
     return NextResponse.json({
       ok: true,
@@ -39,6 +46,11 @@ export async function GET(request: Request) {
       reason: "Voice browser fallback is disabled. Written LifeOS interaction remains available.",
       sessionToken: null,
       livekit: null,
+      tts: {
+        activeProvider: "browser",
+        fallbackProvider: "browser",
+        providers: ttsProviders,
+      },
     });
   }
 
@@ -62,6 +74,11 @@ export async function GET(request: Request) {
           status: "credentials-present-token-mint-deferred",
         }
       : null,
+    tts: {
+      activeProvider: preferredTts.id,
+      fallbackProvider: "browser",
+      providers: ttsProviders,
+    },
     localeDefaults: {
       locale: process.env.LIFEOS_VOICE_LOCALE || "en",
       transcriptionLanguage: process.env.LIFEOS_VOICE_TRANSCRIPTION_LANGUAGE || "en",

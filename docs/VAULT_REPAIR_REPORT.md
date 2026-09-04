@@ -320,3 +320,96 @@ Remaining external / credential-only actions:
 | Voice disabled | Session API `provider:none`; UI “Voice disabled” |
 | Writes not fully configured | `configured:false`; unauthorized POST → `401` |
 | `directMainWrites` | `false` |
+
+## Final production closeout run — 2026-09-03
+
+### Repairs completed
+
+- Reconciled canonical closeout branch with PR #55 conversation/runtime implementation.
+- Added server-side TTS provider abstraction (`openai` preferred, browser fallback) with no credential exposure to browser clients.
+- Added `POST /api/lifeos/voice/speak` for server-side synthesis with session-token validation, rate limits, and graceful fallback signaling.
+- Extended `/api/lifeos/voice/session` to report active/fallback voice providers and provider availability.
+- Added persistent `/conversation` Voice Settings controls: provider, locale, input language, response style, speed, pitch, preview, and reset.
+- Added transcript duplicate-submission guard and explicit interruption handling that stops active speech immediately.
+- Extended automated verification with voice-provider unit tests and conversation E2E persistence checks across Chromium/WebKit desktop/mobile.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| `npm ci` | PASS |
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 43 files, 241 tests |
+| `npm run build` | PASS |
+| `npm run test:e2e` | PASS — 44 tests (Chromium + WebKit, desktop + mobile) |
+| `npm audit --audit-level=high` | PASS (0 vulnerabilities) |
+| `pwsh -File ./scripts/audit-vault.ps1` | PASS |
+
+### Final pass/fail state
+
+Current repository validation state: **PASS** for agent-capable closeout implementation on branch `copilot/final-production-closeout`, with remaining external provider credential and browser permission steps left to owner acceptance flow.
+
+## Operational closeout hardening — 2026-09-04
+
+### Repairs completed
+
+- Continued from PR #59 tip (`copilot/final-production-closeout`) on branch `cursor/lifeos-operational-closeout-a3b6`.
+- Conversation **Mute** now stops recognition capture and blocks voice transcript submission (not label-only).
+- Screen share uses generation tokens; Stop Sharing and unmount/navigation cleanup stop all MediaStreamTracks.
+- Agent approvals are server-authoritative (expiry, nonce/replay, session/project/repository binding); browser Approve alone cannot authorize.
+- Game quest completion requires explicit owner attestation; XP awarded once; progress bar + profile controls.
+- Mobile widget chrome at 390px: reorder, minimize, hide (not a dead stacked feed).
+- Integration availability states: `available` / `configured` / `unavailable` with missing requirements.
+- Owner acceptance workbook: `docs/OWNER_ACCEPTANCE_WORKBOOK.md`.
+- Playwright projects for 1440 / 1024 / 390.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| `npm ci` | PASS |
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 48 files, 263 tests |
+| `npm run build` | PASS |
+| Playwright Chromium 1440/1024/390 + WebKit conversation | PASS — 91 tests |
+| `npm audit --audit-level=high` | PASS (0 vulnerabilities) |
+| `pwsh -File ./scripts/audit-vault.ps1` | PASS |
+
+### Final pass/fail state
+
+Agent-executable closeout: **PASS** (pending re-validation of this continuation). Owner acceptance and production credential verification remain **owner-only** (see workbook). LifeOS is **not** marked owner-accepted or production-operational for this closeout until the owner completes the workbook.
+
+## Operational closeout continuation — 2026-09-04 (same branch)
+
+### Additional repairs
+
+- Boss battles now break blockers into three smaller actions; step marks never award XP.
+- Daily check-in quest and Daily check-in button share one XP event.
+- Approval consume validates revision binding and incoming path allowlists; omitted project path cannot skip a bound project.
+- Voice `stopListening` aborts recognition and clears handlers; permission-denied is a distinct UI state.
+- Playwright coverage added for dashboard hydration errors, minimize/restore/repair, drag/resize, and mute abort.
+- Canonical live status, deployment rollback, and architecture docs updated without marking owner acceptance complete.
+- Conversation barge-in: new turns and Interrupt stop overlapping TTS; mute also stops playback.
+- Push-to-talk is hold-to-speak; release flushes the last utterance instead of aborting it.
+- Accessible Move up/down swaps widget x/y across breakpoints, not order-only.
+- Daily check-in quest detail binds to the top-priority project next action.
+- Command palette includes Repair dashboard layout.
+- Dashboard CI now runs `npm run typecheck`.
+- `github.inspect_health` has a truthful read executor and is routed from GitHub health questions.
+
+### Validation evidence (this continuation)
+
+| Check | Result |
+|---|---|
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 48 files, 268 tests |
+| `npm run build` | PASS (Playwright webServer rebuild) |
+| Playwright hold-to-talk (Chromium 1440/1024/390 + WebKit desktop/mobile) | PASS — 5 tests |
+| Prior full Playwright suite on `93b51bb` | PASS — 91 tests |
+
+### Hold-to-talk acceptance follow-up
+
+- Releasing Push to talk now returns visible voice state to `idle` and preserves push-to-talk mode. Capture already stopped on release; the leftover listening label was the verified gap.

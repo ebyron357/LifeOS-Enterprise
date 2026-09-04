@@ -23,7 +23,7 @@ const BREAKPOINTS = { lg: 1100, md: 901, sm: 600, xs: 0 };
 const COLS = { lg: 12, md: 10, sm: 6, xs: 4 };
 
 export function WorkspaceGrid({ widgets }: WorkspaceGridProps) {
-  const { state, hydrated, setLayouts } = useWorkspace();
+  const { state, hydrated, setLayouts, moveWidget, setWidgetHidden, toggleMinimized } = useWorkspace();
   const { width, containerRef, mounted } = useContainerWidth({ measureBeforeMount: true });
   const [isNarrow, setIsNarrow] = useState(false);
 
@@ -61,11 +61,51 @@ export function WorkspaceGrid({ widgets }: WorkspaceGridProps) {
 
   const useStacked = isNarrow || !mounted || width <= 0;
 
+  const orderedWidgets = state.widgetOrder
+    .map((id) => widgets.find((widget) => widget.id === id))
+    .filter((widget): widget is { id: CommandCenterWidgetId; node: ReactNode } => Boolean(widget));
+  const visibleWidgets = orderedWidgets.filter((widget) => !state.widgets[widget.id]?.hidden);
+  const hiddenAll = visibleWidgets.length === 0;
+
+  if (hiddenAll) {
+    return (
+      <div className="workspace-grid-skeleton" role="status">
+        All widgets are hidden. Open Widget Library / Customize to add one back.
+      </div>
+    );
+  }
+
   if (useStacked) {
     return (
-      <div className="workspace-grid workspace-grid--stacked" ref={containerRef} data-workspace-layout={isNarrow ? "stacked" : "pending"}>
-        {widgets.map(({ id, node }) => (
-          <div key={id} className="workspace-grid-item" data-grid-id={id}>
+      <div
+        className="workspace-grid workspace-grid--stacked"
+        ref={containerRef}
+        data-workspace-layout={isNarrow ? "stacked" : "pending"}
+        data-mobile-interactive="true"
+      >
+        <p className="workspace-mobile-hint">
+          Mobile customization: reorder, minimize, or hide widgets below. Open Widget Library for full show/hide control.
+        </p>
+        {visibleWidgets.map(({ id, node }, index) => (
+          <div key={id} className="workspace-grid-item workspace-grid-item--mobile" data-grid-id={id}>
+            <div className="workspace-mobile-chrome" role="toolbar" aria-label={`${id} mobile controls`}>
+              <button type="button" onClick={() => moveWidget(id, "up")} disabled={index === 0}>
+                Move up
+              </button>
+              <button
+                type="button"
+                onClick={() => moveWidget(id, "down")}
+                disabled={index === visibleWidgets.length - 1}
+              >
+                Move down
+              </button>
+              <button type="button" onClick={() => toggleMinimized(id)}>
+                {state.widgets[id]?.minimized ? "Restore" : "Minimize"}
+              </button>
+              <button type="button" onClick={() => setWidgetHidden(id, true)}>
+                Hide
+              </button>
+            </div>
             {node}
           </div>
         ))}
@@ -97,7 +137,7 @@ export function WorkspaceGrid({ widgets }: WorkspaceGridProps) {
         }}
         onLayoutChange={handleLayoutChange}
       >
-        {widgets.map(({ id, node }) => (
+        {visibleWidgets.map(({ id, node }) => (
           <div key={id} className="workspace-grid-item" data-grid-id={id}>
             {node}
           </div>

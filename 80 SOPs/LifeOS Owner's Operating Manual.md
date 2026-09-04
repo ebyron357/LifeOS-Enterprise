@@ -3,7 +3,7 @@ type: sop
 status: active
 area: LifeOS
 created: 2026-08-11
-updated: 2026-08-11
+updated: 2026-08-26
 tags:
   - life-os
   - operating-manual
@@ -491,6 +491,23 @@ Give me one next action.
 
 > [!info] FINAL RULE
 > No guessing. No duplicate work. No building a new system because the current screen is confusing. Verify first, then act.
+
+# How to Use Interactive LifeOS
+
+Use the Conversation workspace when you want to talk to LifeOS, share a screen, or watch the agent work. This does not replace Obsidian, ClickUp, or the Command Board.
+
+1. Start LifeOS — open the dashboard, then open **Conversation**.
+2. Start voice — click **Start conversation**. LifeOS should say it can hear you. Use **Push to talk** if continuous listening is unreliable.
+3. Share screen — click **Share Screen** and pick a window. LifeOS will not start capture by itself.
+4. Ask LifeOS for help — type or speak. Example: “What needs attention?” or “Walk me through this screen.”
+5. Let the agent inspect — watch Agent Activity for the current task and tool. Read-only work can run immediately.
+6. Approve an action — if LifeOS asks, click **Approve** or **Reject**. High-risk work never runs silently.
+7. Stop the agent — click **Pause Agent** or **Stop Task**.
+8. Stop screen sharing — click **Stop Sharing**, or use the browser’s stop-share control.
+9. End the session — click **Stop conversation**. Transcripts stay temporary unless you hide them. Nothing is written to `main` from this screen.
+
+> [!warning] Screen capture in automated tests
+> Browsers block Playwright from granting screen-share permission. Verify Share Screen once yourself in the preview.
 
 # 15. Source Notes and Canonical References
 

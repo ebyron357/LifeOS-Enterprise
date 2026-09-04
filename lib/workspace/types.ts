@@ -14,6 +14,7 @@ export type CommandCenterWidgetId =
   | "decision-queue"
   | "morning-brief"
   | "personal-growth"
+  | "game-loop"
   | "github-health"
   | "revenue-radar"
   | "prayer"
@@ -46,6 +47,7 @@ export type WorkspaceLayoutState = {
   workspaceId: WorkspaceId;
   layouts: BreakpointLayouts;
   widgets: Record<string, WidgetChromeState>;
+  widgetOrder: CommandCenterWidgetId[];
   focusedWidgetId: string | null;
   reducedMotion: boolean;
 };

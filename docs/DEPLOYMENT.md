@@ -4,6 +4,7 @@
 
 - Node.js 20+ (CI uses current LTS)
 - npm (lockfile committed — use `npm ci` in CI/CD)
+- Dashboard CI runs lint, typecheck, unit tests, build, and Playwright
 - Obsidian for vault editing (optional for web-only ops)
 - GitHub repo access for draft-PR persistence (optional until writes are enabled)
 - Vercel project linked to `ebyron357/LifeOS-Enterprise` (existing)
@@ -27,7 +28,11 @@
 | `LIFEOS_VOICE_BROWSER_FALLBACK` | No | `true` |
 | `LIFEOS_VOICE_SESSION_SECRET` | Optional | Enables HMAC voice session tokens |
 | `REVENUE_SHEET_ID` / Google SA | Optional | Revenue Radar |
-| `LIVEKIT_*` | Optional | Reserved; V1 does not mint room tokens |
+| `LIVEKIT_*` | Optional | Reserved; room tokens are not minted |
+| `LIFEOS_AGENT_LLM_API_KEY` / `OPENAI_API_KEY` / `OPENROUTER_API_KEY` | Optional | Server-side LLM rewrite and OpenAI TTS when configured; tools still go through the policy engine |
+| `CLICKUP_API_TOKEN` / `CLICKUP_LIST_ID` / `SLACK_BOT_TOKEN` / `SLACK_DEFAULT_CHANNEL` / `N8N_WEBHOOK_URL` / `VERCEL_TOKEN` / `VERCEL_PROJECT_ID` / `SUPABASE_SERVICE_ROLE_KEY` | Optional | Adapter execution only when complete; unconfigured tools stay **unavailable** (never shown as connected) |
+
+Owner acceptance workbook: `docs/OWNER_ACCEPTANCE_WORKBOOK.md`.
 
 Never commit `.env.local` or real secrets.
 
@@ -60,21 +65,54 @@ npm run build
 pwsh -NoProfile -File ./scripts/audit-vault.ps1
 ```
 
+## Rollback procedure
+
+1. Do **not** merge draft PR #60 if acceptance fails.
+2. Production remains the last promoted `main` deployment. No closeout commit is on `main` until the owner merges.
+3. If a preview or mistaken promote must be undone: in Vercel, roll back to the previous Ready production deployment (last known `main` SHA).
+4. If a draft PR was merged in error: revert the merge with a new PR; delete the isolated change-plan branches if any were created.
+5. Close unused draft PRs (#55 / #59) only after the owner confirms PR #60 is the surviving closeout vehicle.
+
+Exact production SHA is recorded only after a verified production deploy of that SHA.
+
 ## Production checklist
 
 - [ ] `LIFEOS_WRITE_ENABLED=false` unless intentionally enabling
 - [ ] No client-side GitHub tokens
 - [ ] Dashboard CI green on release commit
 - [ ] Vault Health green on release commit
-- [ ] `/dashboard` responsive at desktop and ~390px width
+- [ ] `/dashboard` responsive at 1440 / 1024 / 390
+- [ ] Widget Library, Repair Layout, and mobile reorder verified
+- [ ] Game loop XP awards only on attested completions
+- [ ] Conversation mute stops microphone capture
+- [ ] Screen share cleanup on Stop / navigate away
+- [ ] Approvals enforced server-side (not browser indicator alone)
 - [ ] Reduced-motion / overload modes still usable
+- [ ] Owner acceptance workbook completed by owner
 - [ ] Rollback path known (previous Vercel deployment)
 
-## Security posture (v1.0)
+## Test instructions
+
+```powershell
+npm ci
+npm run lint
+npm run typecheck
+npm test
+npm run build
+pwsh -NoProfile -File ./scripts/audit-vault.ps1
+npm audit --audit-level=high
+npx playwright install --with-deps chromium webkit
+npm run test:e2e
+```
+
+Playwright viewports: 1440 (desktop), 1024 (laptop), 390 (mobile). Vault audit covers required folders, metadata, and internal link checks.
+
+## Security posture (operational closeout)
 
 - Reads: vault markdown via server components / APIs (no permanent provider keys in browser)
 - Writes: draft PR only; path allowlists; canonical conflict detection (409); never direct `main`
-- Voice: opt-in via `LIFEOS_VOICE_ENABLED`; browser speech; HMAC sessions when secret configured; no LiveKit readiness claim
+- Agent approvals: authoritative server records with expiry, nonce/replay protection, session + project + repository binding
+- Voice: server TTS when configured; browser fallback; mute aborts recognition; new speech interrupts TTS; hold-to-talk flushes on release; HMAC sessions when secret configured; no LiveKit readiness claim
 - Prefer `LIFEOS_WRITE_ENABLED=false` in Vercel unless draft-PR writes are intentionally active with secret + GitHub token
 - Production smoke (2026-07-28): voice disabled; change-plan POST without valid bearer returns `401`; `directMainWrites:false`
 

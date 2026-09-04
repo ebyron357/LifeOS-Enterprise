@@ -6,6 +6,8 @@
 **Release PR:** [#40](https://github.com/ebyron357/LifeOS-Enterprise/pull/40) (merged)  
 **Superseded PRs:** [#38](https://github.com/ebyron357/LifeOS-Enterprise/pull/38), [#39](https://github.com/ebyron357/LifeOS-Enterprise/pull/39) (closed without merge)
 
+Operational closeout after v1.0 is tracked on draft PR #60 and `docs/OWNER_ACCEPTANCE_WORKBOOK.md`. It is not part of the merged v1.0 production SHA.
+
 ## What’s in v1.0
 
 | Capability | Status |

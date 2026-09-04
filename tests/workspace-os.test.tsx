@@ -96,6 +96,7 @@ describe("Workspace OS Command Center", () => {
     expect(screen.getByLabelText("Project command board")).toBeInTheDocument();
     expect(screen.getByLabelText("Decision queue")).toBeInTheDocument();
     expect(screen.getByLabelText("Morning brief")).toBeInTheDocument();
+    expect(screen.getByLabelText("Game loop")).toBeInTheDocument();
     expect(screen.getByText("Restore default layout")).toBeInTheDocument();
   });
 
@@ -109,6 +110,13 @@ describe("Workspace OS Command Center", () => {
     expect(screen.getByLabelText("Search commands")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Reset dashboard layout"));
     expect(screen.getByText(/default layout restored/i)).toBeInTheDocument();
+  });
+
+  it("opens the command palette and repairs layout", async () => {
+    render(<CommandCenterWorkspace data={data} github={github} />);
+    fireEvent.click(await screen.findByRole("button", { name: /command palette/i }));
+    fireEvent.click(screen.getByText("Repair dashboard layout"));
+    expect(screen.getByText(/layout state repaired/i)).toBeInTheDocument();
   });
 
   it("minimizes and restores a widget", async () => {
@@ -171,5 +179,34 @@ describe("Workspace OS Command Center", () => {
     const { container } = render(<CommandCenterWorkspace data={data} github={github} />);
     expect(await screen.findByLabelText("Mission status")).toBeInTheDocument();
     expect(container.querySelector('[data-workspace-layout="stacked"]')).not.toBeNull();
+  });
+
+  it("supports widget library add/remove and ordering controls", async () => {
+    render(<CommandCenterWorkspace data={data} github={github} />);
+    fireEvent.click(await screen.findByRole("button", { name: /widget library \/ customize/i }));
+    const library = screen.getByLabelText("Widget Library");
+    expect(within(library).getByRole("heading", { name: /widget library \/ customize/i })).toBeInTheDocument();
+
+    const gameItem = within(library).getByText("Game loop").closest("li");
+    expect(gameItem).not.toBeNull();
+    fireEvent.click(within(gameItem as HTMLElement).getByRole("button", { name: "Remove widget" }));
+    expect(screen.queryByLabelText("Game loop")).not.toBeInTheDocument();
+
+    fireEvent.click(within(gameItem as HTMLElement).getByRole("button", { name: "Add widget" }));
+    expect(await screen.findByLabelText("Game loop")).toBeInTheDocument();
+
+    const firstBefore = window.localStorage.getItem(LAYOUT_STORAGE_KEY) || "";
+    const beforeLayout = parseWorkspaceLayout(firstBefore);
+    const gameId = "game-loop";
+    const index = beforeLayout.widgetOrder.indexOf(gameId);
+    const neighbor = beforeLayout.widgetOrder[index - 1];
+    const beforeGame = beforeLayout.layouts.lg.find((item) => item.i === gameId);
+    const beforeNeighbor = beforeLayout.layouts.lg.find((item) => item.i === neighbor);
+    fireEvent.click(within(gameItem as HTMLElement).getByRole("button", { name: "Move up" }));
+    const firstAfter = window.localStorage.getItem(LAYOUT_STORAGE_KEY) || "";
+    expect(firstAfter).not.toEqual(firstBefore);
+    const afterLayout = parseWorkspaceLayout(firstAfter);
+    expect(afterLayout.layouts.lg.find((item) => item.i === gameId)?.y).toBe(beforeNeighbor?.y);
+    expect(afterLayout.layouts.lg.find((item) => item.i === neighbor)?.y).toBe(beforeGame?.y);
   });
 });

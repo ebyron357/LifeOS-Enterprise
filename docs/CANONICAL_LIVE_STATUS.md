@@ -1,14 +1,16 @@
 # LifeOS Enterprise — Canonical Live Status
 
-**Status date:** 2026-07-30  
+**Status date:** 2026-09-04  
 **Canonical repository:** `ebyron357/LifeOS-Enterprise`  
 **Canonical branch:** `main`  
 **Production URL:** `https://lifeos-enterprise.vercel.app/dashboard`  
-**Released version:** `1.0.0`
+**Released version:** `1.0.0`  
+**Operational closeout branch:** `cursor/lifeos-operational-closeout-a3b6` (draft PR #60)  
+**Owner acceptance:** not complete
 
 ## Governing status
 
-**LifeOS Enterprise V1.0 is built, merged, deployed, and operational.**
+**LifeOS Enterprise V1.0 is built, merged, and deployed on `main`.** The 2026-09-04 operational closeout (widgets, verified game loop, conversation voice, screen-share safety, server-authoritative approvals) is **agent-complete on draft PR #60** and is **not** merged, **not** owner-accepted, and **not** production-promoted.
 
 This document is the single status source of truth. Earlier reports, draft-PR descriptions, percentages, and phase summaries are superseded whenever they conflict with this document or the current production evidence.
 
@@ -79,15 +81,32 @@ The v1.0 release package records:
 - PR #41: merged production release closeout
 - PR #25: historical standards package; remains governed by its recorded separate disposition restriction
 
+## Operational closeout (2026-09-04)
+
+Draft PR: https://github.com/ebyron357/LifeOS-Enterprise/pull/60
+
+Agent-executable work for owner acceptance is on `cursor/lifeos-operational-closeout-a3b6`. Use `docs/OWNER_ACCEPTANCE_WORKBOOK.md` for owner verification. Do not mark owner acceptance complete from CI or this document.
+
+Related open work that this closeout supersedes for merge review:
+
+- PR #55 `feat/lifeos-interactive-agent-runtime` — included upstream of the closeout branch
+- PR #59 `copilot/final-production-closeout` — prior draft tip; closeout continues from that commit
+
 ## Remaining closeout work
 
-Remaining work is limited to maintenance or optional activation:
+Owner-only remaining work:
 
-1. Reconcile stale pre-v1 draft PRs against current `main` and close obsolete branches while preserving unique approved material.
-2. Keep production write-back disabled unless all required secrets and controls are configured together.
-3. Activate and verify browser voice only when production voice is desired.
-4. Connect Revenue Radar only to a verified source; never display invented values.
-5. Complete local Windows/Obsidian visual checks when access to the actual workstation is available.
+1. Complete `docs/OWNER_ACCEPTANCE_WORKBOOK.md` on the PR #60 preview.
+2. Supply production credentials (`LIFEOS_GITHUB_TOKEN`, `LIFEOS_WRITE_SECRET`, optional `OPENAI_API_KEY`).
+3. Live microphone, screen-share, and TTS quality verification.
+4. Approve merge and production promote. Do not auto-merge.
+
+Maintenance / optional activation on current production `main`:
+
+1. Keep production write-back disabled unless all required secrets and controls are configured together.
+2. Activate and verify browser voice only when production voice is desired.
+3. Connect Revenue Radar only to a verified source; never display invented values.
+4. Complete local Windows/Obsidian visual checks when access to the actual workstation is available.
 
 ## Status-reporting rule
 

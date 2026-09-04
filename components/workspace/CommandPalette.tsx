@@ -14,7 +14,7 @@ type CommandPaletteProps = {
 
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const router = useRouter();
-  const { resetLayout, focusNextWidget, toggleReducedMotion } = useWorkspace();
+  const { resetLayout, repairLayout, focusNextWidget, toggleReducedMotion } = useWorkspace();
   const [query, setQuery] = useState("");
 
   function closePalette() {
@@ -38,6 +38,10 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       case "reset-layout":
         resetLayout();
         window.dispatchEvent(new CustomEvent("lifeos-workspace-status", { detail: "Default layout restored." }));
+        break;
+      case "repair-layout":
+        repairLayout();
+        window.dispatchEvent(new CustomEvent("lifeos-workspace-status", { detail: "Layout state repaired." }));
         break;
       case "focus-next-widget":
         focusNextWidget();

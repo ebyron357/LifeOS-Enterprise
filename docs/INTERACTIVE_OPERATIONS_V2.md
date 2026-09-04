@@ -31,6 +31,8 @@ The browser generates a proposal-only change package. The server route then:
 
 Direct commits to `main` are not implemented.
 
+Conversation-originated tool approvals (2026-09-04 closeout) add server-authoritative records with path allowlists and revision binding. Those approvals cannot write `main`; canonical metadata still uses this change-plan route.
+
 ## Idempotency
 
 The plan ID is derived from a canonical representation of the requested changes. The branch is named:

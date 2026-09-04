@@ -4,6 +4,8 @@
 **Release:** LifeOS Enterprise v1.0  
 **Integration branch:** `release/v1.0-visual-voice-integration` (onto `main` after Workspace OS + Ops V2)
 
+Persistent conversational voice now also lives in `/conversation`. That layer reuses this transport and state machine. See `docs/INTERACTIVE_AGENT_RUNTIME.md`. The Command Center `VoiceConsole` remains the V1 command console.
+
 ## Architecture
 
 ```text
@@ -24,14 +26,18 @@ Command Board:
 
 ## Providers implemented
 
-| Layer | V1 implementation |
-|-------|-------------------|
-| Realtime transport | Browser only |
+| Layer | Implementation |
+|-------|----------------|
+| Realtime transport | Browser recognition + optional server TTS |
 | Speech-to-text | Web Speech Recognition API |
-| Language model | Deterministic command parser (no free-form tool calling) |
-| Text-to-speech | Web Speech Synthesis |
+| Language model | Deterministic command parser / agent runtime (policy-gated) |
+| Text-to-speech | Server OpenAI TTS when `OPENAI_API_KEY` is set; otherwise browser Speech Synthesis |
 | LiveKit | Credentials may be present; **room tokens are not minted**; provider is **not** advertised as ready |
 | Presence | CSS abstract presence |
+
+### Conversation mute contract
+
+Mute must stop microphone capture (`stopListening` → `recognition.abort()` with handlers cleared) and prevent voice transcript submission. Changing a button label alone is insufficient. Permission denial is a distinct `permission-denied` state. Sending a new turn or using Interrupt must stop browser TTS and server audio so speech does not overlap. Push-to-talk is hold-to-speak: pointer/key down starts listening, release calls `releaseListening()` (`recognition.stop()`) so the last utterance can flush. See `components/agent/AgentConversationWorkspace.tsx`.
 
 ## Security model
 
