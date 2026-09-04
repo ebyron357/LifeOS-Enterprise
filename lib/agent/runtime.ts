@@ -3,6 +3,11 @@ import { executeReadTool } from "@/lib/voice/tools";
 import type { VoiceCommandContext } from "@/lib/voice/commands";
 import { parseVoiceCommand } from "@/lib/voice/commands";
 import { createActivityEvent } from "./activity";
+import {
+  createAuthoritativeApproval,
+  publicApprovalView,
+  registerAuthoritativeApproval,
+} from "./approvals";
 import { canAutoExecute, decideApproval, DEFAULT_OWNER_EXECUTION_POLICY, requiresApproval } from "./policy";
 import { describeScreenShare, type ScreenShareSnapshot } from "@/lib/screen/state";
 import { buildTeachingPlan, describeCurrentTeachingStep, detectTeachingMode } from "./teaching";
@@ -72,17 +77,26 @@ function makeInvocation(toolId: string, args: Record<string, unknown>, nowIso: s
   return { id: `inv-${toolId}-${nowIso}`, toolId, args, requestedAt: nowIso };
 }
 
-function approvalFromInvocation(invocation: ToolInvocation, summary: string): ApprovalRequest {
-  return {
-    id: `apr-${invocation.id}`,
-    toolId: invocation.toolId,
-    riskLevel: getRegisteredTool(invocation.toolId)?.riskLevel ?? "high",
-    summary,
-    args: invocation.args,
-    createdAt: invocation.requestedAt,
-    decision: "pending",
-    decidedAt: null,
-  };
+function approvalFromInvocation(
+  invocation: ToolInvocation,
+  summary: string,
+  sessionId: string,
+  projectPath: string | null,
+): ApprovalRequest {
+  const authoritative = registerAuthoritativeApproval(
+    createAuthoritativeApproval({
+      sessionId,
+      toolId: invocation.toolId,
+      riskLevel: getRegisteredTool(invocation.toolId)?.riskLevel ?? "high",
+      summary,
+      args: invocation.args,
+      createdAt: invocation.requestedAt,
+      projectPath,
+      pathAllowlist: projectPath ? [projectPath] : [],
+      scope: `tool:${invocation.toolId}`,
+    }),
+  );
+  return publicApprovalView(authoritative);
 }
 
 function executeConfiguredTool(input: AgentTurnInput, invocation: ToolInvocation): ToolResult {
@@ -257,7 +271,13 @@ export function processAgentTurn(input: AgentTurnInput): AgentTurnResult {
         });
         continue;
       }
-      const request = approvalFromInvocation(invocation, `${tool.name} requires explicit approval.`);
+      const projectPath = input.vault.priorities[0]?.path ?? input.vault.projects[0]?.path ?? null;
+      const request = approvalFromInvocation(
+        invocation,
+        `${tool.name} requires explicit approval.`,
+        input.sessionId,
+        projectPath,
+      );
       approvals.push(request);
       results.push({
         invocationId: invocation.id,

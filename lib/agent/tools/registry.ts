@@ -1,16 +1,36 @@
-import type { ToolDefinition } from "../types";
+import type { IntegrationAvailability, ToolDefinition } from "../types";
 
-function unavailable(reason: string): Pick<ToolDefinition, "configured" | "unavailableReason"> {
-  return { configured: false, unavailableReason: reason };
+type AvailabilityPatch = Pick<
+  ToolDefinition,
+  "configured" | "availability" | "unavailableReason" | "missingRequirements"
+>;
+
+function unavailable(reason: string, missingRequirements: string[] = []): AvailabilityPatch {
+  return {
+    configured: false,
+    availability: "unavailable",
+    unavailableReason: reason,
+    missingRequirements,
+  };
 }
 
-function available(): Pick<ToolDefinition, "configured"> {
-  return { configured: true };
+function available(): AvailabilityPatch {
+  // Built-in LifeOS read tools are available without external credentials.
+  return { configured: true, availability: "available" };
+}
+
+function configuredOnly(missingRequirements: string[] = []): AvailabilityPatch {
+  // Credentials present does not prove a live healthy connection without a probe.
+  return {
+    configured: true,
+    availability: "configured",
+    missingRequirements,
+  };
 }
 
 export type EnvMap = Record<string, string | undefined>;
 
-export function discoverToolAvailability(env: EnvMap = process.env): Record<string, Pick<ToolDefinition, "configured" | "unavailableReason">> {
+export function discoverToolAvailability(env: EnvMap = process.env): Record<string, AvailabilityPatch> {
   return {
     "lifeos.read_projects": available(),
     "lifeos.read_attention": available(),
@@ -18,31 +38,57 @@ export function discoverToolAvailability(env: EnvMap = process.env): Record<stri
     "lifeos.read_screen_context": available(),
     "lifeos.stage_project_change": available(),
     "github.inspect_health": available(),
-    "github.merge_pull_request": unavailable("Merge is a high-risk action and is not enabled in this runtime."),
-    "clickup.create_task": env.CLICKUP_API_TOKEN
-      && env.CLICKUP_LIST_ID
-      ? available()
-      : unavailable("ClickUp is not configured. CLICKUP_API_TOKEN or CLICKUP_LIST_ID is missing."),
-    "slack.send_message": env.SLACK_BOT_TOKEN
-      && env.SLACK_DEFAULT_CHANNEL
-      ? available()
-      : unavailable("Slack is not configured. SLACK_BOT_TOKEN or SLACK_DEFAULT_CHANNEL is missing."),
+    "github.merge_pull_request": unavailable(
+      "Merge is a high-risk action and is not enabled in this runtime.",
+      ["owner enablement"],
+    ),
+    "clickup.create_task": env.CLICKUP_API_TOKEN && env.CLICKUP_LIST_ID
+      ? configuredOnly()
+      : unavailable("ClickUp is not configured. CLICKUP_API_TOKEN or CLICKUP_LIST_ID is missing.", [
+        "CLICKUP_API_TOKEN",
+        "CLICKUP_LIST_ID",
+      ]),
+    "slack.send_message": env.SLACK_BOT_TOKEN && env.SLACK_DEFAULT_CHANNEL
+      ? configuredOnly()
+      : unavailable("Slack is not configured. SLACK_BOT_TOKEN or SLACK_DEFAULT_CHANNEL is missing.", [
+        "SLACK_BOT_TOKEN",
+        "SLACK_DEFAULT_CHANNEL",
+      ]),
     "vercel.deploy_production": env.VERCEL_TOKEN && env.VERCEL_PROJECT_ID
-      ? available()
-      : unavailable("Vercel deploy is not configured. VERCEL_TOKEN or VERCEL_PROJECT_ID is missing."),
-    "supabase.destructive_change": unavailable("Supabase destructive changes are not enabled."),
+      ? configuredOnly()
+      : unavailable("Vercel deploy is not configured. VERCEL_TOKEN or VERCEL_PROJECT_ID is missing.", [
+        "VERCEL_TOKEN",
+        "VERCEL_PROJECT_ID",
+      ]),
+    "supabase.destructive_change": unavailable("Supabase destructive changes are not enabled.", [
+      "SUPABASE_SERVICE_ROLE_KEY",
+      "owner enablement",
+    ]),
     "n8n.trigger_workflow": env.N8N_WEBHOOK_URL
-      ? available()
-      : unavailable("n8n is not configured. No N8N_WEBHOOK_URL is present."),
-    "calendar.read_availability": unavailable("No authorized calendar integration exists in this workspace."),
-    "email.send": unavailable("Email send is not configured and is a high-risk action."),
+      ? configuredOnly()
+      : unavailable("n8n is not configured. No N8N_WEBHOOK_URL is present.", ["N8N_WEBHOOK_URL"]),
+    "calendar.read_availability": unavailable(
+      "No authorized calendar integration exists in this workspace.",
+      ["calendar OAuth"],
+    ),
+    "email.send": unavailable("Email send is not configured and is a high-risk action.", [
+      "email provider",
+    ]),
     "docs.retrieve": available(),
     "learning.teach_step": available(),
     "mcp.discover": available(),
   };
 }
 
-const BASE_TOOLS: Array<Omit<ToolDefinition, "configured" | "unavailableReason">> = [
+export function describeAvailability(status: IntegrationAvailability): string {
+  if (status === "available") return "Built-in and ready without external credentials.";
+  if (status === "configured") return "Credentials present; live connectivity is not probed as connected.";
+  if (status === "connected") return "Live connectivity verified.";
+  if (status === "degraded") return "Configured but currently degraded.";
+  return "Unavailable until requirements are met.";
+}
+
+const BASE_TOOLS: Array<Omit<ToolDefinition, "configured" | "unavailableReason" | "availability" | "missingRequirements">> = [
   { id: "lifeos.read_projects", name: "Read LifeOS projects", description: "Read current project status, blockers, and next actions from the vault.", category: "lifeos-read", riskLevel: "read", requiresApproval: false, capabilities: ["list-projects", "read-status"] },
   { id: "lifeos.read_attention", name: "Read attention items", description: "Summarize blocked, waiting, and review-due work.", category: "lifeos-read", riskLevel: "read", requiresApproval: false, capabilities: ["attention"] },
   { id: "lifeos.search_knowledge", name: "Search LifeOS knowledge", description: "Retrieve LifeOS documentation and operating guidance.", category: "knowledge", riskLevel: "read", requiresApproval: false, capabilities: ["docs", "knowledge"] },
@@ -66,7 +112,13 @@ export function listRegisteredTools(env: EnvMap = process.env): ToolDefinition[]
   const availability = discoverToolAvailability(env);
   return BASE_TOOLS.map((tool) => {
     const status = availability[tool.id] ?? unavailable("Unknown tool availability.");
-    return { ...tool, ...status };
+    return {
+      ...tool,
+      configured: status.configured,
+      availability: status.availability,
+      unavailableReason: status.unavailableReason,
+      missingRequirements: status.missingRequirements,
+    };
   });
 }
 

@@ -45,8 +45,11 @@ export type ToolDefinition = {
   riskLevel: RiskLevel;
   requiresApproval: boolean;
   configured: boolean;
+  /** Truthful lifecycle status — never claim connected without a live probe. */
+  availability: IntegrationAvailability;
   capabilities: string[];
   unavailableReason?: string;
+  missingRequirements?: string[];
 };
 
 export type ToolInvocation = {
@@ -78,7 +81,22 @@ export type ApprovalRequest = {
   createdAt: string;
   decision: ApprovalDecision;
   decidedAt: string | null;
+  /** Server-authoritative fields — present on approvals issued by the turn route. */
+  expiresAt?: string;
+  nonce?: string;
+  projectPath?: string | null;
+  repository?: string;
+  pathAllowlist?: string[];
+  revisionBinding?: string | null;
+  scope?: string;
 };
+
+export type IntegrationAvailability =
+  | "available"
+  | "configured"
+  | "connected"
+  | "degraded"
+  | "unavailable";
 
 export type ActivityEventKind =
   | "session-started"
