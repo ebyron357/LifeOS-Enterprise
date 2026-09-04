@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { resetAuthoritativeApprovalsForTests } from "@/lib/agent/approvals";
 import { applyApprovalDecision, executeApprovedTool, processAgentTurn } from "@/lib/agent/runtime";
 import type { AgentTurnInput } from "@/lib/agent/types";
 
@@ -32,6 +33,7 @@ function input(overrides: Partial<AgentTurnInput> = {}): AgentTurnInput {
 describe("agent runtime", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    resetAuthoritativeApprovalsForTests();
   });
   it("routes text into a LifeOS read tool", () => {
     const result = processAgentTurn(input());

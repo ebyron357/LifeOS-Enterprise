@@ -5,6 +5,7 @@ import type { ActivityEvent, AgentTurnResult, ApprovalRequest, ScreenAwarenessSn
 import type { VaultDashboardData } from "@/lib/lifeos/types";
 import { appendActivity, createActivityEvent } from "@/lib/agent/activity";
 import {
+  denyMicrophone,
   describeConversationVoice,
   enablePushToTalk,
   failConversation,
@@ -325,7 +326,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
     keepListeningRef.current = continuous;
     const allowed = await transportRef.current.requestPermission();
     if (!allowed) {
-      setVoice((current) => failConversation(current, "Microphone permission was denied."));
+      setVoice((current) => denyMicrophone(current));
       return;
     }
     setVoice((current) => startConversation(current, new Date().toISOString()));
@@ -455,6 +456,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         <h2>Conversation</h2>
         <div className={styles.statusRow} aria-live="polite">
           <span className={styles.badge} data-tone={voice.microphoneOpen ? "ok" : "warn"}>{voiceLabel}</span>
+          <span className={styles.badge} data-voice-state={voice.state}>State: {voice.state}</span>
           <span className={styles.badge}>{voice.connection}</span>
           <span className={styles.badge}>Duration {formatDuration(voice.durationMs)}</span>
           <span className={styles.badge}>Audio recording off</span>

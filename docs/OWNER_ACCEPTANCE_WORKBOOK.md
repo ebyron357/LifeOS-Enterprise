@@ -57,7 +57,8 @@ Use one row per test. Record evidence (screenshot, short note, or commit SHA). S
 | C4 | Duplicate protection | Confirm complete again / refresh | No duplicate XP | ☐ | | |
 | C5 | Cancel attestation | Click Complete then cancel dialog | No XP awarded | ☐ | | |
 | C6 | Daily check-in | Click Daily check-in | +20 XP once per day; streak updates | ☐ | | |
-| C7 | Boss / side / main quests | Inspect today's quests | Quests derive from active/blocked/waiting projects | ☐ | | |
+| C7 | Boss / side / main quests | Inspect today's quests | Quests derive from active/blocked/waiting projects; boss battles show smaller actions | ☐ | | |
+| C10 | Boss steps | Mark a boss step, then attest the battle | Step mark awards 0 XP; attested boss awards XP once | ☐ | | |
 | C8 | End of day | Click End day results | Summary of completed quests appears | ☐ | | |
 | C9 | Repair / reset | Repair then optionally Reset | Corrupted state recovers; reset clears progress intentionally | ☐ | | |
 

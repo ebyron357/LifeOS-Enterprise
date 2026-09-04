@@ -138,6 +138,22 @@ export function GameLoopWidget({ projects }: GameLoopWidgetProps) {
                 <strong>{quest.title}</strong>
                 <small>{quest.kind.toUpperCase()} · {quest.xp} XP · {quest.detail}</small>
               </div>
+              {quest.steps?.length ? (
+                <ol className="game-loop-steps">
+                  {quest.steps.map((step) => (
+                    <li key={step.id}>
+                      <span>{step.title}: {step.detail}</span>
+                      <button
+                        type="button"
+                        disabled={step.status === "done" || quest.status === "done"}
+                        onClick={() => dispatch({ type: "complete-step", questId: quest.id, stepId: step.id })}
+                      >
+                        {step.status === "done" ? "Step done" : "Mark step"}
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+              ) : null}
               <button
                 type="button"
                 disabled={quest.status === "done"}

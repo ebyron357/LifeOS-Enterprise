@@ -99,6 +99,14 @@ export function publicApprovalView(approval: AuthoritativeApproval): ApprovalReq
   };
 }
 
+export function projectRevisionBinding(project: {
+  path: string;
+  status: string;
+  nextAction: string;
+}): string {
+  return shaShort(`${project.path}|${project.status}|${project.nextAction}`);
+}
+
 export function consumeAuthoritativeApproval(input: {
   approvalId: string;
   decision: "approved" | "rejected";
@@ -106,6 +114,8 @@ export function consumeAuthoritativeApproval(input: {
   nowIso: string;
   projectPath?: string | null;
   repository?: string | null;
+  requestedPath?: string | null;
+  revisionBinding?: string | null;
 }): ApprovalConsumeResult {
   const existing = store.get(input.approvalId);
   if (!existing) {
@@ -126,19 +136,17 @@ export function consumeAuthoritativeApproval(input: {
   if (Date.parse(input.nowIso) > Date.parse(existing.expiresAt)) {
     return { ok: false, error: "Approval has expired.", status: 410 };
   }
-  if (
-    existing.projectPath
-    && input.projectPath
-    && existing.projectPath !== input.projectPath
-  ) {
+  if (existing.projectPath && existing.projectPath !== (input.projectPath || "")) {
     return { ok: false, error: "Approval project binding mismatch.", status: 403 };
   }
-  if (
-    existing.pathAllowlist.length
-    && existing.projectPath
-    && !existing.pathAllowlist.includes(existing.projectPath)
-  ) {
+  const requestedPath = input.requestedPath ?? input.projectPath ?? existing.projectPath;
+  if (existing.pathAllowlist.length && requestedPath && !existing.pathAllowlist.includes(requestedPath)) {
     return { ok: false, error: "Approval path is outside the allowlist.", status: 403 };
+  }
+  if (existing.revisionBinding) {
+    if (!input.revisionBinding || input.revisionBinding !== existing.revisionBinding) {
+      return { ok: false, error: "Approval revision binding mismatch.", status: 409 };
+    }
   }
 
   const next: AuthoritativeApproval = {

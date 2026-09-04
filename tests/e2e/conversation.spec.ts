@@ -26,6 +26,50 @@ test.describe("interactive conversation workspace", () => {
     await expect(page.getByText(/never starts capture by itself/i)).toBeVisible();
   });
 
+  test("mutes by aborting capture and interrupting speech in the UI", async ({ page }) => {
+    await page.addInitScript(() => {
+      const calls = { abort: 0, stop: 0, start: 0, cancel: 0 };
+      (window as Window & { __lifeosRecognition?: typeof calls }).__lifeosRecognition = calls;
+      class FakeRecognition {
+        lang = "";
+        continuous = false;
+        interimResults = false;
+        onresult = null;
+        onerror = null;
+        onend = null;
+        start() { calls.start += 1; }
+        stop() { calls.stop += 1; }
+        abort() { calls.abort += 1; }
+      }
+      Object.defineProperty(window, "SpeechRecognition", { configurable: true, value: FakeRecognition });
+      Object.defineProperty(window, "webkitSpeechRecognition", { configurable: true, value: FakeRecognition });
+      Object.defineProperty(window.navigator, "mediaDevices", {
+        configurable: true,
+        value: {
+          getUserMedia: async () => ({ getTracks: () => [{ stop() {} }] }),
+        },
+      });
+      const speech = window.speechSynthesis;
+      if (speech) {
+        const originalCancel = speech.cancel.bind(speech);
+        speech.cancel = () => {
+          calls.cancel += 1;
+          originalCancel();
+        };
+      }
+    });
+
+    await page.goto("/conversation");
+    await page.getByRole("button", { name: /start conversation/i }).click();
+    await expect(page.getByText(/state:\s*listening/i)).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("button", { name: "Mute microphone", exact: true }).click();
+    await expect(page.getByText(/state:\s*muted/i)).toBeVisible();
+    const afterMute = await page.evaluate(() => (window as Window & { __lifeosRecognition?: { abort: number } }).__lifeosRecognition?.abort ?? 0);
+    expect(afterMute).toBeGreaterThan(0);
+    await page.getByRole("button", { name: /interrupt assistant/i }).click();
+    await expect(page.getByText(/state:\s*muted/i)).toBeVisible();
+  });
+
   test("persists voice settings after refresh", async ({ page }) => {
     await page.goto("/conversation");
     const settings = page.locator("section[aria-label='Voice settings']");

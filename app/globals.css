@@ -1161,6 +1161,20 @@ html[data-lifeos-density="calm"] .app-section:not(#overview) { margin-top:100px;
   display: block;
   margin-top: 4px;
 }
+.game-loop-steps {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+.game-loop-steps li {
+  border: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: start;
+}
 .game-loop-diagnostic {
   color: var(--amber);
   font-size: .68rem;

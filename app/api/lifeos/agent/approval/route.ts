@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
-import { consumeAuthoritativeApproval, LIFEOS_REPOSITORY, publicApprovalView } from "@/lib/agent/approvals";
+import {
+  consumeAuthoritativeApproval,
+  getAuthoritativeApproval,
+  LIFEOS_REPOSITORY,
+  projectRevisionBinding,
+  publicApprovalView,
+} from "@/lib/agent/approvals";
 import { executeApprovedTool } from "@/lib/agent/runtime";
 import { logAgentEvent } from "@/lib/agent/observability";
 import { validOrigin, withinAgentRateLimit } from "@/lib/agent/http";
@@ -51,6 +57,20 @@ export async function POST(request: Request) {
   }
 
   const nowIso = new Date().toISOString();
+  const existing = getAuthoritativeApproval(body.approvalId);
+  const vault = await getVaultDashboardData();
+  const boundProject = existing?.projectPath
+    ? vault.projects.find((project) => project.path === existing.projectPath) ?? null
+    : null;
+  const revisionBinding = boundProject
+    ? projectRevisionBinding({
+        path: boundProject.path,
+        status: boundProject.status,
+        nextAction: boundProject.nextAction,
+      })
+    : null;
+  const requestedPath = typeof existing?.args.path === "string" ? existing.args.path : existing?.projectPath ?? null;
+
   const consumed = consumeAuthoritativeApproval({
     approvalId: body.approvalId,
     decision: body.decision,
@@ -58,6 +78,8 @@ export async function POST(request: Request) {
     nowIso,
     projectPath: typeof body.projectPath === "string" ? body.projectPath : null,
     repository: typeof body.repository === "string" ? body.repository : LIFEOS_REPOSITORY,
+    requestedPath,
+    revisionBinding,
   });
 
   if (!consumed.ok) {
@@ -89,11 +111,10 @@ export async function POST(request: Request) {
     });
   }
 
-  const vault = await getVaultDashboardData();
-  const boundProject = decided.projectPath
+  const approvedProject = decided.projectPath
     ? vault.projects.find((project) => project.path === decided.projectPath) ?? null
     : null;
-  if (decided.projectPath && !boundProject) {
+  if (decided.projectPath && !approvedProject) {
     return NextResponse.json({
       ok: false,
       error: "Approved project path is not present in the canonical vault.",

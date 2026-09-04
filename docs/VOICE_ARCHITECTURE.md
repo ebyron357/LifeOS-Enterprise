@@ -37,7 +37,7 @@ Command Board:
 
 ### Conversation mute contract
 
-Mute must stop microphone capture (`stopListening`) and prevent voice transcript submission. Changing a button label alone is insufficient. See `components/agent/AgentConversationWorkspace.tsx`.
+Mute must stop microphone capture (`stopListening` → `recognition.abort()` with handlers cleared) and prevent voice transcript submission. Changing a button label alone is insufficient. Permission denial is a distinct `permission-denied` state. See `components/agent/AgentConversationWorkspace.tsx`.
 
 ## Security model
 

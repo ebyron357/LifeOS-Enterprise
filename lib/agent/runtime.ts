@@ -5,6 +5,7 @@ import { parseVoiceCommand } from "@/lib/voice/commands";
 import { createActivityEvent } from "./activity";
 import {
   createAuthoritativeApproval,
+  projectRevisionBinding,
   publicApprovalView,
   registerAuthoritativeApproval,
 } from "./approvals";
@@ -82,6 +83,7 @@ function approvalFromInvocation(
   summary: string,
   sessionId: string,
   projectPath: string | null,
+  revisionBinding: string | null,
 ): ApprovalRequest {
   const authoritative = registerAuthoritativeApproval(
     createAuthoritativeApproval({
@@ -93,6 +95,7 @@ function approvalFromInvocation(
       createdAt: invocation.requestedAt,
       projectPath,
       pathAllowlist: projectPath ? [projectPath] : [],
+      revisionBinding,
       scope: `tool:${invocation.toolId}`,
     }),
   );
@@ -271,12 +274,20 @@ export function processAgentTurn(input: AgentTurnInput): AgentTurnResult {
         });
         continue;
       }
-      const projectPath = input.vault.priorities[0]?.path ?? input.vault.projects[0]?.path ?? null;
+      const boundProject = input.vault.priorities[0] ?? input.vault.projects[0] ?? null;
+      const projectPath = boundProject?.path ?? null;
       const request = approvalFromInvocation(
         invocation,
         `${tool.name} requires explicit approval.`,
         input.sessionId,
         projectPath,
+        boundProject
+          ? projectRevisionBinding({
+              path: boundProject.path,
+              status: boundProject.status,
+              nextAction: boundProject.nextAction,
+            })
+          : null,
       );
       approvals.push(request);
       results.push({
@@ -354,6 +365,18 @@ export function applyApprovalDecision(
 }
 
 export async function executeApprovedTool(input: AgentTurnInput, approval: ApprovalRequest): Promise<ToolResult> {
+  const requestedPath = typeof approval.args.path === "string" ? approval.args.path : approval.projectPath;
+  if (approval.pathAllowlist?.length && requestedPath && !approval.pathAllowlist.includes(requestedPath)) {
+    return {
+      invocationId: approval.id,
+      toolId: approval.toolId,
+      ok: false,
+      status: "failed",
+      summary: "Approved path is outside the allowlist. Nothing was executed.",
+      evidence: [approval.id],
+      error: "path_allowlist",
+    };
+  }
   if (approval.decision !== "approved") {
     return {
       invocationId: approval.id,

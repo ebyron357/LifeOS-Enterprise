@@ -371,12 +371,23 @@ Current repository validation state: **PASS** for agent-capable closeout impleme
 | `npm ci` | PASS |
 | `npm run lint` | PASS |
 | `npm run typecheck` | PASS |
-| `npm test` | PASS — 47 files, 257 tests |
+| `npm test` | PASS — 48 files, 263 tests |
 | `npm run build` | PASS |
-| Chromium Playwright 1440/1024/390 | PASS — 69 tests |
+| Playwright Chromium 1440/1024/390 + WebKit conversation | PASS — 91 tests |
 | `npm audit --audit-level=high` | PASS (0 vulnerabilities) |
 | `pwsh -File ./scripts/audit-vault.ps1` | PASS |
 
 ### Final pass/fail state
 
-Agent-executable closeout: **PASS**. Owner acceptance and production credential verification remain **owner-only** (see workbook). LifeOS is **not** marked owner-accepted or production-operational for this closeout until the owner completes the workbook.
+Agent-executable closeout: **PASS** (pending re-validation of this continuation). Owner acceptance and production credential verification remain **owner-only** (see workbook). LifeOS is **not** marked owner-accepted or production-operational for this closeout until the owner completes the workbook.
+
+## Operational closeout continuation — 2026-09-04 (same branch)
+
+### Additional repairs
+
+- Boss battles now break blockers into three smaller actions; step marks never award XP.
+- Daily check-in quest and Daily check-in button share one XP event.
+- Approval consume validates revision binding and incoming path allowlists; omitted project path cannot skip a bound project.
+- Voice `stopListening` aborts recognition and clears handlers; permission-denied is a distinct UI state.
+- Playwright coverage added for dashboard hydration errors, minimize/restore/repair, drag/resize, and mute abort.
+- Canonical live status, deployment rollback, and architecture docs updated without marking owner acceptance complete.

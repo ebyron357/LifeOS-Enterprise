@@ -4,6 +4,13 @@ export type QuestKind = "daily" | "main" | "side" | "boss";
 
 export type QuestStatus = "todo" | "done";
 
+export type QuestStep = {
+  id: string;
+  title: string;
+  detail: string;
+  status: QuestStatus;
+};
+
 export type Quest = {
   id: string;
   kind: QuestKind;
@@ -12,6 +19,8 @@ export type Quest = {
   xp: number;
   status: QuestStatus;
   sourceProjectPath: string | null;
+  /** Boss battles only: smaller real actions. Completing steps does not award XP. */
+  steps?: QuestStep[];
 };
 
 export type AchievementId =
@@ -89,6 +98,7 @@ export type QuestVerification = {
 export type GameAction =
   | { type: "daily-check-in" }
   | { type: "complete-quest"; questId: string; verification: QuestVerification }
+  | { type: "complete-step"; questId: string; stepId: string }
   | { type: "recover-streak" }
   | { type: "end-day" }
   | { type: "repair-state" }

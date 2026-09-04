@@ -40,13 +40,14 @@ describe("game state engine", () => {
     const today = context.nowIso.slice(0, 10);
     expect(initial.questsByDate[today].length).toBeGreaterThan(0);
 
-    const daily = initial.questsByDate[today][0];
+    const main = initial.questsByDate[today].find((quest) => quest.kind === "main");
+    expect(main).toBeTruthy();
     const afterQuest = reduceGameState(
       initial,
-      { type: "complete-quest", questId: daily.id, verification: attest(daily.id) },
+      { type: "complete-quest", questId: main!.id, verification: attest(main!.id) },
       context,
     );
-    expect(afterQuest.stats.xp).toBe(daily.xp);
+    expect(afterQuest.stats.xp).toBe(main!.xp);
     expect(afterQuest.stats.level).toBe(1);
   });
 
@@ -117,5 +118,29 @@ describe("game state engine", () => {
     expect(next.profile.ownerAlias).toBe("Byron");
     expect(next.profile.avatar).toBe("🚀");
     expect(next.stats.xp).toBe(0);
+  });
+
+  it("breaks boss battles into smaller actions without awarding step XP", () => {
+    const initial = createInitialGameState(context);
+    const today = context.nowIso.slice(0, 10);
+    const boss = initial.questsByDate[today].find((quest) => quest.kind === "boss");
+    expect(boss?.steps?.length).toBeGreaterThanOrEqual(3);
+    const stepped = reduceGameState(initial, { type: "complete-step", questId: boss!.id, stepId: boss!.steps![0].id }, context);
+    expect(stepped.stats.xp).toBe(0);
+    expect(stepped.questsByDate[today].find((quest) => quest.id === boss!.id)?.steps?.[0].status).toBe("done");
+  });
+
+  it("does not award check-in XP twice from the button and the daily quest", () => {
+    const initial = createInitialGameState(context);
+    const today = context.nowIso.slice(0, 10);
+    const checked = reduceGameState(initial, { type: "daily-check-in" }, context);
+    const expected = 20 + 15; // check-in XP plus first-check-in achievement
+    expect(checked.stats.xp).toBe(expected);
+    const again = reduceGameState(
+      checked,
+      { type: "complete-quest", questId: `daily-checkin-${today}`, verification: attest("checkin") },
+      context,
+    );
+    expect(again.stats.xp).toBe(expected);
   });
 });

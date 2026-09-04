@@ -1,8 +1,9 @@
 # LifeOS Interactive Agent Runtime
 
-**Status:** Implemented on `feat/lifeos-interactive-agent-runtime`  
-**Baseline:** `main` @ `9895c4a805032f677a9acb90e4747669ed92bfc4`  
-**Workspace:** Conversation page at `/conversation` inside the existing vault portal
+**Status:** Included in operational closeout draft PR #60 (`cursor/lifeos-operational-closeout-a3b6`)  
+**Baseline:** `main` @ `dd20e61d58f2fc7136ba6b60df1e032cfbd99224`  
+**Workspace:** Conversation page at `/conversation` inside the existing vault portal  
+**Owner acceptance:** not complete
 
 This document is the current-state architecture for conversational voice, screen awareness, the agent runtime, tools, approvals, teaching, and session persistence. It extends LifeOS V1. It does not replace Voice V1, Workspace OS, Daily Brief, Portfolio, or ChangePlanPersistence.
 
@@ -37,7 +38,9 @@ Provider boundary:
 
 ## Voice
 
-Persistent conversation session states: idle, connecting, listening, thinking, speaking, muted, error, stopped.
+Persistent conversation session states: idle, connecting, listening, thinking, speaking, muted, error, permission-denied, stopped.
+
+Mute calls `stopListening()`, which **aborts** recognition and clears handlers so leftover finals cannot submit. Interrupt cancels server audio and `speechSynthesis`.
 
 Owner controls: start, stop, mute, unmute, interrupt, resume, push-to-talk, clear transcript, transcript privacy.
 
@@ -86,6 +89,7 @@ ChangePlanPersistence → draft change plan → draft pull request → human rev
 - Same-origin checks and rate limits on agent routes.
 - Prompt-injection sanitization before tool use.
 - No secret logging.
+- Approvals are server-authoritative records with expiry, nonce/replay protection, session/project/repository binding, path allowlists, and revision binding. A browser Approve indicator cannot authorize a write by itself.
 - Rejection means no execution.
 - Pause/stop halt further work.
 - Existing change-plan, voice, and vault privacy boundaries are unchanged.

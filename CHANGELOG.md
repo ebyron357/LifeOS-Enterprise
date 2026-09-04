@@ -7,17 +7,20 @@ All notable changes to LifeOS Enterprise are documented in this file.
 ### Added
 
 - Owner acceptance workbook (`docs/OWNER_ACCEPTANCE_WORKBOOK.md`)
-- Server-authoritative agent approvals (expiry, nonce/replay, session/project/repository binding)
-- Conversation mute that stops microphone capture; screen-share generation + unmount cleanup
+- Server-authoritative agent approvals (expiry, nonce/replay, session/project/repository binding, path allowlist, revision binding)
+- Conversation mute that aborts recognition capture; screen-share generation + unmount cleanup
+- Distinct voice `permission-denied` state
 - Game quest completion requires owner attestation; XP progress bar and profile controls
+- Boss battles decompose real blockers into smaller actions (steps never award XP)
+- Daily check-in button and daily quest share one XP event
 - Mobile widget chrome (reorder / minimize / hide) at 390px
 - Integration availability states (`available` / `configured` / `unavailable`) with missing requirements
-- Playwright projects for 1440 / 1024 / 390 viewports
+- Playwright projects for 1440 / 1024 / 390 viewports plus drag/resize/mute journeys
 
 ### Security
 
 - Browser Approve UI alone cannot authorize tool execution
-- Wrong-project and replayed approvals are rejected server-side
+- Wrong-project, replayed, expired, path-allowlist, and revision-binding mismatches are rejected server-side
 
 ## [1.0.0] — 2026-07-28
 

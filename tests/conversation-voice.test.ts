@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  denyMicrophone,
   describeConversationVoice,
   enablePushToTalk,
   failConversation,
@@ -51,5 +52,12 @@ describe("conversation voice session", () => {
     const failed = failConversation(INITIAL_CONVERSATION_VOICE, "Recognition failed.");
     expect(failed.state).toBe("error");
     expect(describeConversationVoice(failed)).toMatch(/Recognition failed/);
+  });
+
+  it("surfaces permission-denied as a distinct state and closes the microphone", () => {
+    const denied = denyMicrophone(startConversation(INITIAL_CONVERSATION_VOICE, "2026-08-26T12:00:00.000Z"));
+    expect(denied.state).toBe("permission-denied");
+    expect(denied.microphoneOpen).toBe(false);
+    expect(describeConversationVoice(denied)).toMatch(/permission was denied/i);
   });
 });

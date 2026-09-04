@@ -6,6 +6,7 @@ export type ConversationVoiceState =
   | "speaking"
   | "muted"
   | "error"
+  | "permission-denied"
   | "stopped";
 
 export type ConversationVoiceMode = "conversation" | "push-to-talk";
@@ -107,6 +108,19 @@ export function failConversation(session: ConversationVoiceSession, error: strin
   return { ...session, state: "error", connection: "error", error, microphoneOpen: false, speaking: false, processing: false };
 }
 
+export function denyMicrophone(session: ConversationVoiceSession): ConversationVoiceSession {
+  return {
+    ...session,
+    state: "permission-denied",
+    connection: "error",
+    error: "Microphone permission was denied.",
+    microphoneOpen: false,
+    speaking: false,
+    processing: false,
+    muted: false,
+  };
+}
+
 export function enablePushToTalk(session: ConversationVoiceSession): ConversationVoiceSession {
   return { ...session, mode: "push-to-talk", microphoneOpen: false, state: session.state === "stopped" ? "idle" : "idle" };
 }
@@ -132,6 +146,7 @@ export function formatDuration(durationMs: number): string {
 
 export function describeConversationVoice(session: ConversationVoiceSession): string {
   if (session.state === "error") return session.error || "Voice session error.";
+  if (session.state === "permission-denied") return "Microphone permission was denied. Grant access to start listening.";
   if (session.state === "stopped" || session.state === "idle") return "LifeOS is not listening.";
   if (session.muted) return "Microphone is muted. LifeOS cannot hear you.";
   if (session.state === "thinking") return "LifeOS is processing.";

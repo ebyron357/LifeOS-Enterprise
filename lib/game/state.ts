@@ -54,6 +54,31 @@ function normalizeQuestId(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
+function breakBlockerIntoSteps(project: ProjectBrief): NonNullable<Quest["steps"]> {
+  const blocker = project.blocker?.trim() || "Unnamed blocker";
+  const nextMove = project.nextAction?.trim() || "Take one concrete next move that does not invent progress.";
+  return [
+    {
+      id: "name-blocker",
+      title: "Name the real blocker",
+      detail: blocker,
+      status: "todo",
+    },
+    {
+      id: "smallest-move",
+      title: "Smallest verified next move",
+      detail: nextMove,
+      status: "todo",
+    },
+    {
+      id: "confirm-path",
+      title: "Confirm the path is unblocked",
+      detail: `Verify ${project.name} can proceed after the move. Do not mark this done without evidence.`,
+      status: "todo",
+    },
+  ];
+}
+
 function buildDailyQuests(date: string, projects: ProjectBrief[]): Quest[] {
   const ranked = sortProjects(projects);
   const active = ranked.filter((project) => project.status === "active").slice(0, 2);
@@ -92,10 +117,11 @@ function buildDailyQuests(date: string, projects: ProjectBrief[]): Quest[] {
       id: `boss-${index + 1}-${normalizeQuestId(project.path)}`,
       kind: "boss" as const,
       title: `Boss battle: ${project.name}`,
-      detail: project.blocker || project.nextAction || "Resolve the blocker with one concrete move.",
+      detail: `Break the blocker into smaller actions. Do not invent completion.`,
       xp: 90,
       status: "todo" as const,
       sourceProjectPath: project.path,
+      steps: breakBlockerIntoSteps(project),
     })),
   ];
 
@@ -228,9 +254,21 @@ function completeQuest(
     return { ...state, lastError: "Quest attestation id is required. XP was not granted." };
   }
 
+  if (quest.id === `daily-checkin-${date}`) {
+    return runCheckIn(state, context);
+  }
+
   const eventId = `quest:${date}:${quest.id}`;
   const granted = addXp(state, eventId, quest.xp);
-  const completedQuests = quests.map((item) => (item.id === quest.id ? { ...item, status: "done" as const } : item));
+  const completedQuests = quests.map((item) => (
+    item.id === quest.id
+      ? {
+          ...item,
+          status: "done" as const,
+          steps: item.steps?.map((step) => ({ ...step, status: "done" as const })),
+        }
+      : item
+  ));
 
   const next: GameState = {
     ...granted.state,
@@ -284,7 +322,48 @@ function runCheckIn(state: GameState, context: GameContext): GameState {
     streakRecovery: recovery,
     lastError: xpResult.granted ? null : "Daily check-in already recorded for today.",
   };
-  return refreshAchievements(next, context.nowIso);
+
+  const todayQuests = next.questsByDate[date] ?? [];
+  const marked = todayQuests.map((item) => (
+    item.id === `daily-checkin-${date}` ? { ...item, status: "done" as const } : item
+  ));
+  const questWasOpen = todayQuests.some((item) => item.id === `daily-checkin-${date}` && item.status !== "done");
+  return refreshAchievements({
+    ...next,
+    questsByDate: { ...next.questsByDate, [date]: marked },
+    stats: {
+      ...next.stats,
+      completedQuests: questWasOpen && xpResult.granted ? next.stats.completedQuests + 1 : next.stats.completedQuests,
+    },
+  }, context.nowIso);
+}
+
+function completeStep(state: GameState, context: GameContext, questId: string, stepId: string): GameState {
+  const date = isoDate(context.nowIso);
+  const quests = state.questsByDate[date] ?? [];
+  const quest = quests.find((item) => item.id === questId);
+  if (!quest?.steps?.length) {
+    return { ...state, lastError: "This quest has no smaller actions to mark." };
+  }
+  if (quest.status === "done") {
+    return { ...state, lastError: "Boss battle already completed. XP was not granted again." };
+  }
+  const step = quest.steps.find((item) => item.id === stepId);
+  if (!step) return { ...state, lastError: "Boss step was not found." };
+  if (step.status === "done") return { ...state, lastError: "That step is already marked. No XP is awarded for steps." };
+
+  const nextQuests = quests.map((item) => {
+    if (item.id !== quest.id) return item;
+    return {
+      ...item,
+      steps: item.steps?.map((entry) => (entry.id === stepId ? { ...entry, status: "done" as const } : entry)),
+    };
+  });
+  return {
+    ...state,
+    questsByDate: { ...state.questsByDate, [date]: nextQuests },
+    lastError: "Step recorded. Complete the attested boss battle to award XP.",
+  };
 }
 
 function dateFromOffset(date: string, offsetDays: number): string {
@@ -357,6 +436,7 @@ export function reduceGameState(
   const seeded = ensureTodayQuests(previous, context);
   if (action.type === "daily-check-in") return runCheckIn(seeded, context);
   if (action.type === "complete-quest") return completeQuest(seeded, context, action.questId, action.verification);
+  if (action.type === "complete-step") return completeStep(seeded, context, action.questId, action.stepId);
   if (action.type === "recover-streak") return recoverStreak(seeded, context);
   if (action.type === "end-day") return endDay(seeded, context);
   if (action.type === "reset-state") return createInitialGameState(context);
@@ -464,15 +544,29 @@ function parseQuestState(
     const quests = raw
       .map((entry) => asObject(entry))
       .filter((entry): entry is Record<string, unknown> => Boolean(entry && typeof entry.id === "string"))
-      .map((entry) => ({
-        id: String(entry.id),
-        kind: entry.kind === "main" || entry.kind === "side" || entry.kind === "boss" ? entry.kind : "daily",
-        title: typeof entry.title === "string" ? entry.title : "Quest",
-        detail: typeof entry.detail === "string" ? entry.detail : "",
-        xp: typeof entry.xp === "number" ? Math.max(0, Math.floor(entry.xp)) : 0,
-        status: entry.status === "done" ? "done" : "todo",
-        sourceProjectPath: typeof entry.sourceProjectPath === "string" ? entry.sourceProjectPath : null,
-      } satisfies Quest));
+      .map((entry) => {
+        const steps = Array.isArray(entry.steps)
+          ? entry.steps
+            .map((step) => asObject(step))
+            .filter((step): step is Record<string, unknown> => Boolean(step && typeof step.id === "string"))
+            .map((step) => ({
+              id: String(step.id),
+              title: typeof step.title === "string" ? step.title : "Step",
+              detail: typeof step.detail === "string" ? step.detail : "",
+              status: step.status === "done" ? "done" as const : "todo" as const,
+            }))
+          : undefined;
+        return {
+          id: String(entry.id),
+          kind: entry.kind === "main" || entry.kind === "side" || entry.kind === "boss" ? entry.kind : "daily",
+          title: typeof entry.title === "string" ? entry.title : "Quest",
+          detail: typeof entry.detail === "string" ? entry.detail : "",
+          xp: typeof entry.xp === "number" ? Math.max(0, Math.floor(entry.xp)) : 0,
+          status: entry.status === "done" ? "done" : "todo",
+          sourceProjectPath: typeof entry.sourceProjectPath === "string" ? entry.sourceProjectPath : null,
+          ...(steps?.length ? { steps } : {}),
+        } satisfies Quest;
+      });
     return [date, quests.length ? quests : buildDailyQuests(date, context.projects)] as const;
   });
   return Object.fromEntries(entries);

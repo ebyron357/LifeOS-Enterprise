@@ -64,6 +64,16 @@ npm run build
 pwsh -NoProfile -File ./scripts/audit-vault.ps1
 ```
 
+## Rollback procedure
+
+1. Do **not** merge draft PR #60 if acceptance fails.
+2. Production remains the last promoted `main` deployment. No closeout commit is on `main` until the owner merges.
+3. If a preview or mistaken promote must be undone: in Vercel, roll back to the previous Ready production deployment (last known `main` SHA).
+4. If a draft PR was merged in error: revert the merge with a new PR; delete the isolated change-plan branches if any were created.
+5. Close unused draft PRs (#55 / #59) only after the owner confirms PR #60 is the surviving closeout vehicle.
+
+Exact production SHA is recorded only after a verified production deploy of that SHA.
+
 ## Production checklist
 
 - [ ] `LIFEOS_WRITE_ENABLED=false` unless intentionally enabling
@@ -79,6 +89,22 @@ pwsh -NoProfile -File ./scripts/audit-vault.ps1
 - [ ] Reduced-motion / overload modes still usable
 - [ ] Owner acceptance workbook completed by owner
 - [ ] Rollback path known (previous Vercel deployment)
+
+## Test instructions
+
+```powershell
+npm ci
+npm run lint
+npm run typecheck
+npm test
+npm run build
+pwsh -NoProfile -File ./scripts/audit-vault.ps1
+npm audit --audit-level=high
+npx playwright install --with-deps chromium webkit
+npm run test:e2e
+```
+
+Playwright viewports: 1440 (desktop), 1024 (laptop), 390 (mobile). Vault audit covers required folders, metadata, and internal link checks.
 
 ## Security posture (operational closeout)
 

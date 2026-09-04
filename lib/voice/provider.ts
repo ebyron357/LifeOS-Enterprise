@@ -90,7 +90,15 @@ export function createBrowserVoiceTransport(): VoiceTransport {
       recognition.start();
     },
     stopListening() {
-      recognition?.stop();
+      if (!recognition) return;
+      recognition.onresult = null;
+      recognition.onerror = null;
+      recognition.onend = null;
+      try {
+        recognition.abort();
+      } catch {
+        recognition.stop();
+      }
       recognition = null;
     },
     speak(text, opts) {

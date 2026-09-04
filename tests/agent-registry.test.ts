@@ -25,4 +25,18 @@ describe("tool registry", () => {
     expect(adapters.find((item) => item.id === "slack")?.configured).toBe(false);
     expect(validateMcpAdapterConfig("unknown").configured).toBe(false);
   });
+
+  it("never reports connected or degraded without a live probe", () => {
+    const tools = listRegisteredTools({
+      SLACK_BOT_TOKEN: "x",
+      SLACK_DEFAULT_CHANNEL: "#ops",
+      CLICKUP_API_TOKEN: "x",
+      CLICKUP_LIST_ID: "list",
+    });
+    expect(tools.some((tool) => tool.availability === "connected" || tool.availability === "degraded")).toBe(false);
+    expect(getRegisteredTool("slack.send_message", {
+      SLACK_BOT_TOKEN: "x",
+      SLACK_DEFAULT_CHANNEL: "#ops",
+    })?.availability).toBe("configured");
+  });
 });

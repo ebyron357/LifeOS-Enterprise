@@ -61,6 +61,7 @@ describe("authoritative approvals", () => {
         decision: "approved",
         sessionId: "sess-a",
         nowIso: "2026-09-04T13:00:00.000Z",
+        projectPath: "Projects/Ship Voice.md",
       }),
     ).toMatchObject({ ok: false, error: expect.stringMatching(/expired/i) });
 
@@ -93,5 +94,59 @@ describe("authoritative approvals", () => {
       nowIso: "2026-09-04T12:00:00.000Z",
     });
     expect(result).toMatchObject({ ok: false, status: 404 });
+  });
+
+  it("rejects revision-binding and path-allowlist mismatches", () => {
+    const createdAt = "2026-09-04T12:00:00.000Z";
+    const approval = registerAuthoritativeApproval(
+      createAuthoritativeApproval({
+        sessionId: "sess-a",
+        toolId: "lifeos.stage_project_change",
+        riskLevel: "reversible",
+        summary: "Stage a project change",
+        args: { path: "Projects/Ship Voice.md" },
+        createdAt,
+        projectPath: "Projects/Ship Voice.md",
+        pathAllowlist: ["Projects/Ship Voice.md"],
+        revisionBinding: "rev-abc",
+        ttlMs: 60_000,
+      }),
+    );
+
+    expect(
+      consumeAuthoritativeApproval({
+        approvalId: approval.id,
+        decision: "approved",
+        sessionId: "sess-a",
+        nowIso: createdAt,
+        projectPath: "Projects/Ship Voice.md",
+        requestedPath: "Projects/Other.md",
+        revisionBinding: "rev-abc",
+      }),
+    ).toMatchObject({ ok: false, error: expect.stringMatching(/allowlist/i) });
+
+    expect(
+      consumeAuthoritativeApproval({
+        approvalId: approval.id,
+        decision: "approved",
+        sessionId: "sess-a",
+        nowIso: createdAt,
+        projectPath: "Projects/Ship Voice.md",
+        requestedPath: "Projects/Ship Voice.md",
+        revisionBinding: "rev-stale",
+      }),
+    ).toMatchObject({ ok: false, error: expect.stringMatching(/revision binding/i) });
+
+    expect(
+      consumeAuthoritativeApproval({
+        approvalId: approval.id,
+        decision: "approved",
+        sessionId: "sess-a",
+        nowIso: createdAt,
+        projectPath: "Projects/Ship Voice.md",
+        requestedPath: "Projects/Ship Voice.md",
+        revisionBinding: "rev-abc",
+      }).ok,
+    ).toBe(true);
   });
 });
