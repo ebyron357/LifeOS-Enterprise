@@ -2,6 +2,23 @@
 
 All notable changes to LifeOS Enterprise are documented in this file.
 
+## [Unreleased] — operational closeout (draft PR)
+
+### Added
+
+- Owner acceptance workbook (`docs/OWNER_ACCEPTANCE_WORKBOOK.md`)
+- Server-authoritative agent approvals (expiry, nonce/replay, session/project/repository binding)
+- Conversation mute that stops microphone capture; screen-share generation + unmount cleanup
+- Game quest completion requires owner attestation; XP progress bar and profile controls
+- Mobile widget chrome (reorder / minimize / hide) at 390px
+- Integration availability states (`available` / `configured` / `unavailable`) with missing requirements
+- Playwright projects for 1440 / 1024 / 390 viewports
+
+### Security
+
+- Browser Approve UI alone cannot authorize tool execution
+- Wrong-project and replayed approvals are rejected server-side
+
 ## [1.0.0] — 2026-07-28
 
 ### Added

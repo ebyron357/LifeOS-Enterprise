@@ -349,3 +349,34 @@ Remaining external / credential-only actions:
 ### Final pass/fail state
 
 Current repository validation state: **PASS** for agent-capable closeout implementation on branch `copilot/final-production-closeout`, with remaining external provider credential and browser permission steps left to owner acceptance flow.
+
+## Operational closeout hardening — 2026-09-04
+
+### Repairs completed
+
+- Continued from PR #59 tip (`copilot/final-production-closeout`) on branch `cursor/lifeos-operational-closeout-a3b6`.
+- Conversation **Mute** now stops recognition capture and blocks voice transcript submission (not label-only).
+- Screen share uses generation tokens; Stop Sharing and unmount/navigation cleanup stop all MediaStreamTracks.
+- Agent approvals are server-authoritative (expiry, nonce/replay, session/project/repository binding); browser Approve alone cannot authorize.
+- Game quest completion requires explicit owner attestation; XP awarded once; progress bar + profile controls.
+- Mobile widget chrome at 390px: reorder, minimize, hide (not a dead stacked feed).
+- Integration availability states: `available` / `configured` / `unavailable` with missing requirements.
+- Owner acceptance workbook: `docs/OWNER_ACCEPTANCE_WORKBOOK.md`.
+- Playwright projects for 1440 / 1024 / 390.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| `npm ci` | PASS |
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 47 files, 257 tests |
+| `npm run build` | PASS |
+| Chromium Playwright 1440/1024/390 | PASS — 69 tests |
+| `npm audit --audit-level=high` | PASS (0 vulnerabilities) |
+| `pwsh -File ./scripts/audit-vault.ps1` | PASS |
+
+### Final pass/fail state
+
+Agent-executable closeout: **PASS**. Owner acceptance and production credential verification remain **owner-only** (see workbook). LifeOS is **not** marked owner-accepted or production-operational for this closeout until the owner completes the workbook.

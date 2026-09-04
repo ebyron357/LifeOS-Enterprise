@@ -28,8 +28,10 @@
 | `LIFEOS_VOICE_SESSION_SECRET` | Optional | Enables HMAC voice session tokens |
 | `REVENUE_SHEET_ID` / Google SA | Optional | Revenue Radar |
 | `LIVEKIT_*` | Optional | Reserved; room tokens are not minted |
-| `LIFEOS_AGENT_LLM_API_KEY` / `OPENAI_API_KEY` / `OPENROUTER_API_KEY` | Optional | Server-side reply rewrite only; tools still go through the policy engine |
-| `CLICKUP_API_TOKEN` / `SLACK_BOT_TOKEN` / `N8N_WEBHOOK_URL` / `VERCEL_TOKEN` / `SUPABASE_SERVICE_ROLE_KEY` | Optional | Adapter discovery only; unconfigured tools stay unavailable |
+| `LIFEOS_AGENT_LLM_API_KEY` / `OPENAI_API_KEY` / `OPENROUTER_API_KEY` | Optional | Server-side LLM rewrite and OpenAI TTS when configured; tools still go through the policy engine |
+| `CLICKUP_API_TOKEN` / `CLICKUP_LIST_ID` / `SLACK_BOT_TOKEN` / `SLACK_DEFAULT_CHANNEL` / `N8N_WEBHOOK_URL` / `VERCEL_TOKEN` / `VERCEL_PROJECT_ID` / `SUPABASE_SERVICE_ROLE_KEY` | Optional | Adapter execution only when complete; unconfigured tools stay **unavailable** (never shown as connected) |
+
+Owner acceptance workbook: `docs/OWNER_ACCEPTANCE_WORKBOOK.md`.
 
 Never commit `.env.local` or real secrets.
 
@@ -68,15 +70,22 @@ pwsh -NoProfile -File ./scripts/audit-vault.ps1
 - [ ] No client-side GitHub tokens
 - [ ] Dashboard CI green on release commit
 - [ ] Vault Health green on release commit
-- [ ] `/dashboard` responsive at desktop and ~390px width
+- [ ] `/dashboard` responsive at 1440 / 1024 / 390
+- [ ] Widget Library, Repair Layout, and mobile reorder verified
+- [ ] Game loop XP awards only on attested completions
+- [ ] Conversation mute stops microphone capture
+- [ ] Screen share cleanup on Stop / navigate away
+- [ ] Approvals enforced server-side (not browser indicator alone)
 - [ ] Reduced-motion / overload modes still usable
+- [ ] Owner acceptance workbook completed by owner
 - [ ] Rollback path known (previous Vercel deployment)
 
-## Security posture (v1.0)
+## Security posture (operational closeout)
 
 - Reads: vault markdown via server components / APIs (no permanent provider keys in browser)
 - Writes: draft PR only; path allowlists; canonical conflict detection (409); never direct `main`
-- Voice: opt-in via `LIFEOS_VOICE_ENABLED`; browser speech; HMAC sessions when secret configured; no LiveKit readiness claim
+- Agent approvals: authoritative server records with expiry, nonce/replay protection, session + project + repository binding
+- Voice: server TTS when configured; browser fallback; mute stops recognition; HMAC sessions when secret configured; no LiveKit readiness claim
 - Prefer `LIFEOS_WRITE_ENABLED=false` in Vercel unless draft-PR writes are intentionally active with secret + GitHub token
 - Production smoke (2026-07-28): voice disabled; change-plan POST without valid bearer returns `401`; `directMainWrites:false`
 

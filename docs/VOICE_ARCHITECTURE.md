@@ -26,14 +26,18 @@ Command Board:
 
 ## Providers implemented
 
-| Layer | V1 implementation |
-|-------|-------------------|
-| Realtime transport | Browser only |
+| Layer | Implementation |
+|-------|----------------|
+| Realtime transport | Browser recognition + optional server TTS |
 | Speech-to-text | Web Speech Recognition API |
-| Language model | Deterministic command parser (no free-form tool calling) |
-| Text-to-speech | Web Speech Synthesis |
+| Language model | Deterministic command parser / agent runtime (policy-gated) |
+| Text-to-speech | Server OpenAI TTS when `OPENAI_API_KEY` is set; otherwise browser Speech Synthesis |
 | LiveKit | Credentials may be present; **room tokens are not minted**; provider is **not** advertised as ready |
 | Presence | CSS abstract presence |
+
+### Conversation mute contract
+
+Mute must stop microphone capture (`stopListening`) and prevent voice transcript submission. Changing a button label alone is insufficient. See `components/agent/AgentConversationWorkspace.tsx`.
 
 ## Security model
 
