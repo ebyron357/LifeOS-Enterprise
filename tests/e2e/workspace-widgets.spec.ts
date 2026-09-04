@@ -17,6 +17,9 @@ test.describe("workspace widget customization", () => {
   test("supports mobile reordering controls without overflow", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/dashboard");
+    await expect(page.locator('[data-workspace-layout="stacked"]')).toBeVisible();
+    await expect(page.locator(".workspace-mobile-chrome").first()).toBeVisible();
+    await page.locator(".workspace-mobile-chrome").first().getByRole("button", { name: "Move down" }).click();
     await page.getByRole("button", { name: /widget library \/ customize/i }).click();
     const gameRow = page.locator(".widget-library li", { hasText: "Game loop" }).first();
     await gameRow.getByRole("button", { name: "Move up" }).click();

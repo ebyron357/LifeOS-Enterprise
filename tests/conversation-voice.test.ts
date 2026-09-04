@@ -30,9 +30,11 @@ describe("conversation voice session", () => {
     expect(session.speaking).toBe(false);
     session = muteConversation(session);
     expect(session.muted).toBe(true);
+    expect(session.microphoneOpen).toBe(false);
     expect(describeConversationVoice(session)).toMatch(/cannot hear you/i);
     session = unmuteConversation(session);
     expect(session.state).toBe("listening");
+    expect(session.microphoneOpen).toBe(true);
     session = stopConversation(session);
     expect(session.state).toBe("stopped");
     expect(session.microphoneOpen).toBe(false);

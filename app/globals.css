@@ -794,6 +794,33 @@ html[data-lifeos-density="calm"] .app-section:not(#overview) { margin-top:100px;
   display: grid;
   gap: 14px;
 }
+.workspace-mobile-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.workspace-grid-item--mobile {
+  display: grid;
+  gap: 8px;
+}
+.workspace-mobile-chrome {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.workspace-mobile-chrome button {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font: inherit;
+  cursor: pointer;
+}
+.workspace-mobile-chrome button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 .workspace-grid-item {
   min-width: 0;
   height: 100%;
@@ -1035,6 +1062,51 @@ html[data-lifeos-density="calm"] .app-section:not(#overview) { margin-top:100px;
 .game-loop-head span {
   color: var(--muted);
   font-size: .7rem;
+}
+.game-loop-progress {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin: 10px 0 14px;
+}
+.game-loop-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #35e7ff, #5b8cff);
+}
+.game-loop-profile {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.game-loop-profile label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.game-loop-profile input {
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 8px;
+  font: inherit;
+}
+.game-loop-avatars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.game-loop-avatars button {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+.game-loop-avatars button[aria-pressed="true"] {
+  border-color: var(--line-hot);
 }
 .game-loop-grid {
   display: grid;

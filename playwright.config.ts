@@ -1,9 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * Playwright verification for the Daily Operations Brief. Runs against a
- * local `next start` production build so evidence reflects real rendering,
- * not a mocked API. Chromium covers both desktop and mobile-width journeys.
+ * Playwright verification for LifeOS operational surfaces.
+ * Runs against a local `next start` production build.
+ * Named viewports: desktop 1440, laptop 1024, mobile 390.
  */
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -17,10 +17,28 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   projects: [
-    { name: "chromium-desktop", use: { ...devices["Desktop Chrome"] } },
-    { name: "chromium-mobile", use: { ...devices["Pixel 7"] } },
-    { name: "webkit-desktop", testMatch: /conversation\.spec\.ts/, use: { ...devices["Desktop Safari"] } },
-    { name: "webkit-mobile", testMatch: /conversation\.spec\.ts/, use: { ...devices["iPhone 13"], viewport: { width: 390, height: 844 } } },
+    {
+      name: "chromium-desktop-1440",
+      use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } },
+    },
+    {
+      name: "chromium-laptop-1024",
+      use: { ...devices["Desktop Chrome"], viewport: { width: 1024, height: 768 } },
+    },
+    {
+      name: "chromium-mobile-390",
+      use: { ...devices["Pixel 7"], viewport: { width: 390, height: 844 } },
+    },
+    {
+      name: "webkit-desktop",
+      testMatch: /conversation\.spec\.ts/,
+      use: { ...devices["Desktop Safari"], viewport: { width: 1440, height: 900 } },
+    },
+    {
+      name: "webkit-mobile",
+      testMatch: /conversation\.spec\.ts/,
+      use: { ...devices["iPhone 13"], viewport: { width: 390, height: 844 } },
+    },
   ],
   webServer: {
     command: "npm run build && npm run start -- -p 4173",

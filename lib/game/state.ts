@@ -203,7 +203,12 @@ function refreshAchievements(state: GameState, nowIso: string): GameState {
   return next;
 }
 
-function completeQuest(state: GameState, context: GameContext, questId: string): GameState {
+function completeQuest(
+  state: GameState,
+  context: GameContext,
+  questId: string,
+  verification: { kind: "owner-attested"; attestationId: string; confirmed: true } | undefined,
+): GameState {
   const date = isoDate(context.nowIso);
   const quests = state.questsByDate[date] ?? [];
   const quest = quests.find((item) => item.id === questId);
@@ -212,6 +217,15 @@ function completeQuest(state: GameState, context: GameContext, questId: string):
   }
   if (quest.status === "done") {
     return { ...state, lastError: "Quest was already completed. XP not granted twice." };
+  }
+  if (!verification || verification.kind !== "owner-attested" || verification.confirmed !== true) {
+    return {
+      ...state,
+      lastError: "Quest completion requires an explicit owner attestation. XP was not granted.",
+    };
+  }
+  if (!verification.attestationId.trim()) {
+    return { ...state, lastError: "Quest attestation id is required. XP was not granted." };
   }
 
   const eventId = `quest:${date}:${quest.id}`;
@@ -342,11 +356,16 @@ export function reduceGameState(
 ): GameState {
   const seeded = ensureTodayQuests(previous, context);
   if (action.type === "daily-check-in") return runCheckIn(seeded, context);
-  if (action.type === "complete-quest") return completeQuest(seeded, context, action.questId);
+  if (action.type === "complete-quest") return completeQuest(seeded, context, action.questId, action.verification);
   if (action.type === "recover-streak") return recoverStreak(seeded, context);
   if (action.type === "end-day") return endDay(seeded, context);
   if (action.type === "reset-state") return createInitialGameState(context);
   if (action.type === "repair-state") return repairGameState(JSON.stringify(seeded), context).state;
+  if (action.type === "set-profile") {
+    const ownerAlias = action.ownerAlias.trim().slice(0, 40) || seeded.profile.ownerAlias;
+    const avatar = action.avatar.trim().slice(0, 8) || seeded.profile.avatar;
+    return { ...seeded, profile: { ownerAlias, avatar }, lastError: null };
+  }
   return seeded;
 }
 

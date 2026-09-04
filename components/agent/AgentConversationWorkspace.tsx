@@ -113,10 +113,12 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   const [fallbackProvider, setFallbackProvider] = useState<TtsProviderId>("browser");
   const [nowMs, setNowMs] = useState(() => Date.now());
   const streamRef = useRef<MediaStream | null>(null);
+  const shareGenerationRef = useRef(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const transportRef = useRef(createBrowserVoiceTransport());
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const keepListeningRef = useRef(false);
+  const mutedRef = useRef(false);
   const restartListeningRef = useRef<((continuous: boolean) => Promise<void>) | null>(null);
   const lastSubmissionRef = useRef<string>("");
   const skipFirstVoicePersistRef = useRef(true);
@@ -179,6 +181,26 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   useEffect(() => {
     if (videoRef.current) videoRef.current.srcObject = streamRef.current;
   }, [screen.state]);
+
+  useEffect(() => {
+    mutedRef.current = voice.muted;
+  }, [voice.muted]);
+
+  useEffect(() => {
+    const transport = transportRef.current;
+    return () => {
+      keepListeningRef.current = false;
+      shareGenerationRef.current += 1;
+      transport.disconnect();
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (skipFirstVoicePersistRef.current) {
@@ -250,6 +272,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   }, [headers, voiceSettings]);
 
   const sendTurn = useCallback(async (text: string, channel: "text" | "voice") => {
+    if (mutedRef.current && channel === "voice") return;
     const normalized = text.trim().toLowerCase();
     const dedupeKey = `${channel}:${normalized}`;
     if (!normalized || lastSubmissionRef.current === dedupeKey) return;
@@ -279,7 +302,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
       setTeaching(next.teaching);
       setActivity((events) => [...events, ...next.activity].slice(-80));
       if (voice.transcriptPrivacy !== "hidden") appendLine("lifeos", next.reply);
-      if (voice.muted || !voice.startedAt) {
+      if (mutedRef.current || voice.muted || !voice.startedAt) {
         setVoice((current) => ({ ...current, processing: false, state: current.muted ? "muted" : current.state === "stopped" ? "stopped" : "listening" }));
         return;
       }
@@ -298,6 +321,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   }, [appendLine, approvals, awareness, headers, paused, speakReply, voice.muted, voice.startedAt, voice.transcriptPrivacy]);
 
   const beginListening = useCallback(async (continuous: boolean) => {
+    if (mutedRef.current) return;
     keepListeningRef.current = continuous;
     const allowed = await transportRef.current.requestPermission();
     if (!allowed) {
@@ -310,23 +334,24 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
       lang: voiceSettings.transcriptionLanguage,
       continuous,
       onInterim: (text) => {
-        if (voice.transcriptPrivacy === "hidden") return;
+        if (mutedRef.current || voice.transcriptPrivacy === "hidden") return;
         setTranscript((entries) => {
           const without = entries.filter((entry) => !(entry.role === "user" && entry.interim));
           return [...without, createTranscriptEntry("user", text, { interim: true, temporary: true })];
         });
       },
       onFinal: (text) => {
+        if (mutedRef.current) return;
         if (text) void sendTurn(text, "voice");
       },
       onError: (message) => setVoice((current) => failConversation(current, message)),
       onEnd: () => {
-        if (keepListeningRef.current && !voice.muted) {
+        if (keepListeningRef.current && !mutedRef.current) {
           void restartListeningRef.current?.(true);
         }
       },
     });
-  }, [sendTurn, voice.muted, voice.transcriptPrivacy, voiceSettings.transcriptionLanguage]);
+  }, [sendTurn, voice.transcriptPrivacy, voiceSettings.transcriptionLanguage]);
 
   useEffect(() => {
     restartListeningRef.current = beginListening;
@@ -344,13 +369,37 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
     setActivity((events) => appendActivity(events, createActivityEvent("session-stopped", "Voice conversation stopped.")));
   }
 
+  function muteMic() {
+    keepListeningRef.current = false;
+    mutedRef.current = true;
+    transportRef.current.stopListening();
+    setVoice((current) => muteConversation(current));
+  }
+
+  function unmuteMic() {
+    mutedRef.current = false;
+    const continuous = voice.mode !== "push-to-talk";
+    setVoice((current) => unmuteConversation(current));
+    if (voice.state !== "stopped" && voice.startedAt) {
+      void beginListening(continuous);
+    }
+  }
+
   async function shareScreen() {
+    const generation = ++shareGenerationRef.current;
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
     const result = await requestDisplayMedia();
+    if (generation !== shareGenerationRef.current) {
+      result.stream?.getTracks().forEach((track) => track.stop());
+      return;
+    }
     streamRef.current = result.stream;
     setScreen(result.snapshot);
     if (result.stream) {
       const track = result.stream.getVideoTracks()[0];
       track?.addEventListener("ended", () => {
+        if (generation !== shareGenerationRef.current) return;
         streamRef.current = null;
         setScreen(stopScreenShare());
         setActivity((events) => appendActivity(events, createActivityEvent("screen-share-stopped", "The browser ended the shared screen.")));
@@ -360,11 +409,14 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   }
 
   function endScreen() {
+    shareGenerationRef.current += 1;
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
     setScreen(stopScreenShare());
     setActivity((events) => appendActivity(events, createActivityEvent("screen-share-stopped", "Owner stopped screen sharing.")));
   }
+
+  const currentProject = vault.priorities[0] ?? vault.projects[0] ?? null;
 
   async function decide(approval: ApprovalRequest, decision: "approved" | "rejected") {
     const response = await fetch("/api/lifeos/agent/approval", {
@@ -374,7 +426,8 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         sessionId: sessionId(),
         approvalId: approval.id,
         decision,
-        pendingApprovals: approvals,
+        projectPath: approval.projectPath ?? currentProject?.path ?? null,
+        repository: approval.repository ?? "ebyron357/LifeOS-Enterprise",
         screen: awareness,
       }),
     });
@@ -383,12 +436,15 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
       setError(payload.error || "Approval update failed.");
       return;
     }
-    setApprovals(payload.approvals);
+    setApprovals((current) => {
+      const decided = Array.isArray(payload.approvals) ? (payload.approvals as ApprovalRequest[]) : [];
+      const byId = new Map(decided.map((item) => [item.id, item]));
+      return current.map((item) => byId.get(item.id) ?? item);
+    });
     setActivity((events) => appendActivity(events, createActivityEvent(decision === "approved" ? "approval-accepted" : "approval-rejected", `${approval.toolId} ${decision}.`)));
     if (payload.result?.summary) appendLine("tool", payload.result.summary);
   }
 
-  const currentProject = vault.priorities[0] ?? vault.projects[0] ?? null;
   const visibleTranscript = voice.transcriptPrivacy === "hidden" ? [] : transcript;
   const voiceLabel = describeConversationVoice(voice);
   const screenLabel = describeScreenShare(screen, nowMs);
@@ -406,8 +462,8 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         <div className={styles.toolbar} role="toolbar" aria-label="Voice controls">
           <button type="button" onClick={() => void beginListening(true)}>Start conversation</button>
           <button type="button" onClick={endVoice}>Stop conversation</button>
-          <button type="button" onClick={() => setVoice((current) => muteConversation(current))} disabled={voice.muted}>Mute microphone</button>
-          <button type="button" onClick={() => setVoice((current) => unmuteConversation(current))} disabled={!voice.muted}>Unmute microphone</button>
+          <button type="button" onClick={muteMic} disabled={voice.muted}>Mute microphone</button>
+          <button type="button" onClick={unmuteMic} disabled={!voice.muted}>Unmute microphone</button>
           <button type="button" onClick={() => { transportRef.current.stopSpeaking(); if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; } setVoice((current) => interruptSpeech(current)); }}>Interrupt assistant</button>
           <button type="button" onClick={() => { setVoice((current) => resumeConversation(current)); void beginListening(true); }}>Resume conversation</button>
           <button type="button" onClick={() => { setVoice((current) => enablePushToTalk(current)); void beginListening(false); }}>Push to talk</button>

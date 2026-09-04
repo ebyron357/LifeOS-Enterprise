@@ -79,13 +79,21 @@ export type GameDiagnostics = {
   messages: string[];
 };
 
+export type QuestVerification = {
+  kind: "owner-attested";
+  /** Unique attestation id for this completion attempt. Replays with the same quest still award XP once. */
+  attestationId: string;
+  confirmed: true;
+};
+
 export type GameAction =
   | { type: "daily-check-in" }
-  | { type: "complete-quest"; questId: string }
+  | { type: "complete-quest"; questId: string; verification: QuestVerification }
   | { type: "recover-streak" }
   | { type: "end-day" }
   | { type: "repair-state" }
-  | { type: "reset-state" };
+  | { type: "reset-state" }
+  | { type: "set-profile"; ownerAlias: string; avatar: string };
 
 export type GameContext = {
   nowIso: string;
