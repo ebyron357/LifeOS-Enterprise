@@ -409,3 +409,7 @@ Agent-executable closeout: **PASS** (pending re-validation of this continuation)
 | `npm run build` | PASS (Playwright webServer rebuild) |
 | Playwright hold-to-talk (Chromium 1440/1024/390 + WebKit desktop/mobile) | PASS — 5 tests |
 | Prior full Playwright suite on `93b51bb` | PASS — 91 tests |
+
+### Hold-to-talk acceptance follow-up
+
+- Releasing Push to talk now returns visible voice state to `idle` and preserves push-to-talk mode. Capture already stopped on release; the leftover listening label was the verified gap.

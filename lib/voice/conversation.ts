@@ -47,7 +47,7 @@ export function startConversation(session: ConversationVoiceSession, nowIso: str
   return {
     ...session,
     state: "listening",
-    mode: "conversation",
+    mode: session.mode === "push-to-talk" ? "push-to-talk" : "conversation",
     startedAt: session.startedAt ?? nowIso,
     microphoneOpen: !session.muted,
     muted: session.muted,
@@ -123,6 +123,14 @@ export function denyMicrophone(session: ConversationVoiceSession): ConversationV
 
 export function enablePushToTalk(session: ConversationVoiceSession): ConversationVoiceSession {
   return { ...session, mode: "push-to-talk", microphoneOpen: false, state: session.state === "stopped" ? "idle" : "idle" };
+}
+
+export function releasePushToTalk(session: ConversationVoiceSession): ConversationVoiceSession {
+  if (session.muted) return { ...session, mode: "push-to-talk", microphoneOpen: false, state: "muted" };
+  if (session.state === "thinking" || session.state === "speaking" || session.state === "stopped") {
+    return { ...session, mode: "push-to-talk", microphoneOpen: false };
+  }
+  return { ...session, mode: "push-to-talk", state: "idle", microphoneOpen: false };
 }
 
 export function setTranscriptPrivacy(

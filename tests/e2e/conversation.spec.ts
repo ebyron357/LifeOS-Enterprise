@@ -119,7 +119,10 @@ test.describe("interactive conversation workspace", () => {
     await ptt.focus();
     await page.keyboard.down(" ");
     await expect.poll(async () => page.evaluate(() => (window as Window & { __lifeosRecognition?: { start: number } }).__lifeosRecognition?.start ?? 0)).toBeGreaterThan(0);
+    await expect(page.getByText(/state:\s*listening/i)).toBeVisible();
     await page.keyboard.up(" ");
     await expect.poll(async () => page.evaluate(() => (window as Window & { __lifeosRecognition?: { stop: number } }).__lifeosRecognition?.stop ?? 0)).toBeGreaterThan(0);
+    await expect(page.getByText(/state:\s*listening/i)).toHaveCount(0);
+    await expect(page.getByText(/state:\s*idle/i)).toBeVisible();
   });
 });

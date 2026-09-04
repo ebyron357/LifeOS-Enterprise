@@ -4,10 +4,12 @@ import {
   describeConversationVoice,
   enablePushToTalk,
   failConversation,
+  releasePushToTalk,
   formatDuration,
   INITIAL_CONVERSATION_VOICE,
   interruptSpeech,
   markSpeaking,
+  markThinking,
   muteConversation,
   setTranscriptPrivacy,
   startConversation,
@@ -46,6 +48,24 @@ describe("conversation voice session", () => {
     expect(hidden.mode).toBe("push-to-talk");
     expect(hidden.transcriptVisible).toBe(false);
     expect(formatDuration(65000)).toBe("1:05");
+  });
+
+  it("releases push-to-talk without leaving a listening microphone", () => {
+    let session = startConversation(enablePushToTalk(INITIAL_CONVERSATION_VOICE), "2026-08-26T12:00:00.000Z");
+    expect(session.mode).toBe("push-to-talk");
+    expect(session.state).toBe("listening");
+    session = releasePushToTalk(session);
+    expect(session.state).toBe("idle");
+    expect(session.microphoneOpen).toBe(false);
+    expect(session.mode).toBe("push-to-talk");
+  });
+
+  it("keeps thinking state when push-to-talk is released after a turn starts", () => {
+    let session = startConversation(enablePushToTalk(INITIAL_CONVERSATION_VOICE), "2026-08-26T12:00:00.000Z");
+    session = markThinking(session);
+    session = releasePushToTalk(session);
+    expect(session.state).toBe("thinking");
+    expect(session.microphoneOpen).toBe(false);
   });
 
   it("surfaces a visible error/recovery state", () => {

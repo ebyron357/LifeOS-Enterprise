@@ -9,6 +9,7 @@ import {
   describeConversationVoice,
   enablePushToTalk,
   failConversation,
+  releasePushToTalk,
   formatDuration,
   INITIAL_CONVERSATION_VOICE,
   interruptSpeech,
@@ -389,6 +390,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   function endPushToTalk() {
     keepListeningRef.current = false;
     transportRef.current.releaseListening();
+    setVoice((current) => releasePushToTalk(current));
   }
 
   function muteMic() {

@@ -17,6 +17,7 @@ All notable changes to LifeOS Enterprise are documented in this file.
 - Integration availability states (`available` / `configured` / `unavailable`) with missing requirements
 - Playwright projects for 1440 / 1024 / 390 viewports plus drag/resize/mute journeys
 - Hold-to-talk conversation control; new speech stops overlapping TTS
+- Push-to-talk release returns the visible voice state to idle and keeps PTT mode (does not leave a listening mic UI)
 - Command-palette Repair layout; accessible Move up/down swaps grid geometry
 - Daily check-in quest bound to the top-priority project next action
 - `github.inspect_health` read executor that does not invent CI counts
