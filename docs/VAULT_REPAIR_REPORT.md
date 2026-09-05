@@ -437,15 +437,64 @@ Branch: `fix/lifeos-post60-security-corrective` from `main` @ `c7d4e3507d7837e10
 | `npm run typecheck` | PASS — `tsc --noEmit` |
 | `npm test` | PASS — 49 files, 286 tests |
 | `npm run build` | PASS — Next.js 16.3.0 |
-| `npm run test:e2e` | First full run: 92 passed, 4 `webkit-desktop` failed with `Target page, context or browser has been closed`. Isolated serial rerun `--project=webkit-desktop --workers=1`: 6/6 passed. Chromium 1440/1024/390 and `webkit-mobile` passed in the first run. |
+| `npm run test:e2e` | See the 2026-09-05 complete Playwright closeout below. The complete local parallel suite did **not** pass. |
 | `npm audit --audit-level=high` | PASS — 0 vulnerabilities |
 | `pwsh -File ./scripts/audit-vault.ps1` | PASS — canonical vault structure, templates, Bases, metadata, links, and embeds are valid |
 
 ### Final pass/fail state
 
-**AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED**
+The complete local Playwright suite has **not** passed in parallel. This branch is **not** READY FOR OWNER ACCEPTANCE from that local run. Owner workbook steps remain. This corrective is not merged, not deployed, not owner-accepted, and not production-promoted.
 
-This corrective is not merged, not deployed, not owner-accepted, and not production-promoted. Live owner workbook steps remain.
+## Complete Playwright closeout — 2026-09-05 (PR #61)
+
+Playwright **1.62.1** browsers installed: Chromium 151.0.7922.34 (v1234) and WebKit 26.5 (v2336). Failure artifacts: screenshots, traces, videos, and logs under `test-results/` and `artifacts/pr61-e2e/full-parallel/`. Config now retains traces, screenshots, and videos on failure.
+
+### Complete parallel suite (`npx playwright test`, every configured project)
+
+Unedited totals:
+
+- passed: **76**
+- failed: **20**
+- skipped: **0**
+- flaky: **0**
+- duration: 15.5m
+
+Chromium:
+
+- `chromium-desktop-1440`: 28 passed, 0 failed
+- `chromium-laptop-1024`: 25 passed, 3 failed (`workspace-widgets` hydrate / minimize-repair / drag-resize)
+- `chromium-mobile-390`: 23 passed, 5 failed (conversation keyboard + PTT, daily-brief empty/loading, game-loop XP)
+
+WebKit:
+
+- `webkit-desktop`: 0 passed, 6 failed (all `conversation.spec.ts`)
+- `webkit-mobile`: 0 passed, 6 failed (all `conversation.spec.ts`)
+
+Failure classes: `Test timeout of 30000ms exceeded`, `browserContext.close: Test ended`, `Target crashed`, `Target page, context or browser has been closed`, teardown timeouts. The same cases passed on `chromium-desktop-1440` in this run.
+
+Diagnosis: **infrastructure / resource contention** under 3 parallel workers. No product defect was verified. No product assertion was weakened.
+
+### Serial supplemental evidence only (not a clean full-suite pass)
+
+`npx playwright test --project=chromium-laptop-1024 --project=chromium-mobile-390 --project=webkit-desktop --project=webkit-mobile --workers=1`
+
+- passed: **68**
+- failed: **0**
+- skipped: **0**
+- flaky: **0**
+
+This is supplemental only. It does **not** replace the complete parallel suite result.
+
+### Follow-up commands after the complete e2e attempt
+
+| Check | Result |
+|---|---|
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 49 files, 286 tests |
+| `npm run build` | PASS — Next.js 16.3.0 |
+| `npm audit --audit-level=high` | PASS — 0 vulnerabilities |
+| `pwsh -File ./scripts/audit-vault.ps1` | PASS — 156 markdown notes checked |
 
 ### Remaining credential-only or local-UI-only actions
 
