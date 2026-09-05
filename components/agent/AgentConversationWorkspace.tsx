@@ -103,6 +103,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   const [draft, setDraft] = useState("");
   const [tools, setTools] = useState<ToolDefinition[]>([]);
   const [token, setToken] = useState<string | null>(null);
+  const [writeSecret, setWriteSecret] = useState("");
   const [result, setResult] = useState<AgentTurnResult | null>(null);
   const [activity, setActivity] = useState<ActivityEvent[]>([]);
   const [approvals, setApprovals] = useState<ApprovalRequest[]>([]);
@@ -222,6 +223,12 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
     return next;
   }, [token]);
 
+  const writeHeaders = useCallback(() => {
+    const next: Record<string, string> = { "Content-Type": "application/json" };
+    if (writeSecret) next.Authorization = `Bearer ${writeSecret}`;
+    return next;
+  }, [writeSecret]);
+
   const speakReply = useCallback(async (text: string) => {
     if (!text.trim()) return;
     const selected = voiceSettings.provider;
@@ -229,7 +236,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
       try {
         const response = await fetch("/api/lifeos/voice/speak", {
           method: "POST",
-          headers: headers(),
+          headers: writeHeaders(),
           body: JSON.stringify({
             text,
             locale: voiceSettings.locale,
@@ -272,7 +279,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
       },
       onError: (message) => setVoice((current) => failConversation(current, message)),
     });
-  }, [headers, voiceSettings]);
+  }, [writeHeaders, voiceSettings]);
 
   const stopPlayback = useCallback(() => {
     transportRef.current.stopSpeaking();
@@ -414,7 +421,10 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
     const generation = ++shareGenerationRef.current;
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
-    const result = await requestDisplayMedia();
+    const result = await requestDisplayMedia((snapshot) => {
+      if (generation !== shareGenerationRef.current) return;
+      setScreen(snapshot);
+    });
     if (generation !== shareGenerationRef.current) {
       result.stream?.getTracks().forEach((track) => track.stop());
       return;
@@ -446,7 +456,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   async function decide(approval: ApprovalRequest, decision: "approved" | "rejected") {
     const response = await fetch("/api/lifeos/agent/approval", {
       method: "POST",
-      headers: headers(),
+      headers: writeHeaders(),
       body: JSON.stringify({
         sessionId: sessionId(),
         approvalId: approval.id,
@@ -663,10 +673,22 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
             <button type="button" onClick={() => setPaused(false)}>Resume agent</button>
             <button type="button" onClick={() => { setPaused(true); setResult(null); setApprovals([]); setActivity((events) => appendActivity(events, createActivityEvent("agent-stopped", "Owner stopped the current task."))); }}>Stop task</button>
           </div>
+          <label>
+            <span>Owner write secret</span>
+            <input
+              type="password"
+              autoComplete="off"
+              value={writeSecret}
+              onChange={(event) => setWriteSecret(event.target.value)}
+              aria-describedby="approval-write-secret-help"
+            />
+          </label>
+          <p id="approval-write-secret-help">Required to approve or reject writes. Voice session tokens cannot authorize Slack, ClickUp, n8n, Vercel, or other external actions. This value is not stored.</p>
           <ul className={styles.list} aria-label="Approvals">
             {approvals.filter((item) => item.decision === "pending").map((item) => (
               <li key={item.id}>
                 <strong>{item.summary}</strong>
+                <pre aria-label={`Approved arguments for ${item.toolId}`}>{JSON.stringify(item.args, null, 2)}</pre>
                 <div className={styles.toolbar}>
                   <button type="button" onClick={() => void decide(item, "approved")}>Approve</button>
                   <button type="button" onClick={() => void decide(item, "rejected")}>Reject</button>

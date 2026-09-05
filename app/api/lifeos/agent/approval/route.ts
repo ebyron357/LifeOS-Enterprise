@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Rate limit exceeded." }, { status: 429 });
   }
 
-  const auth = authorizeVoiceRequest(request);
+  const auth = authorizeVoiceRequest(request, { requireWriteSecret: true });
   if (!auth.ok) return NextResponse.json({ ok: false, error: auth.error }, { status: auth.status });
 
   let body: ApprovalBody;
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
   }
 
   const nowIso = new Date().toISOString();
-  const existing = getAuthoritativeApproval(body.approvalId);
+  const existing = await getAuthoritativeApproval(body.approvalId);
   const vault = await getVaultDashboardData();
   const boundProject = existing?.projectPath
     ? vault.projects.find((project) => project.path === existing.projectPath) ?? null
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
     : null;
   const requestedPath = typeof existing?.args.path === "string" ? existing.args.path : existing?.projectPath ?? null;
 
-  const consumed = consumeAuthoritativeApproval({
+  const consumed = await consumeAuthoritativeApproval({
     approvalId: body.approvalId,
     decision: body.decision,
     sessionId,
@@ -124,7 +124,7 @@ export async function POST(request: Request) {
   const result = await executeApprovedTool({
     sessionId,
     channel: "text",
-    text: decided.summary,
+    text: typeof decided.args.text === "string" ? decided.args.text : typeof decided.args.query === "string" ? decided.args.query : "",
     nowIso,
     vault,
     screen: body.screen ?? null,

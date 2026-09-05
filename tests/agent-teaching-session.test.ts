@@ -29,8 +29,8 @@ describe("teaching and session context", () => {
     expect(createActivityEvent("session-started", "started").kind).toBe("session-started");
   });
 
-  it("builds a teaching plan from a teach-me turn", () => {
-    const result = processAgentTurn({
+  it("builds a teaching plan from a teach-me turn", async () => {
+    const result = await processAgentTurn({
       sessionId: "s",
       channel: "text",
       text: "Teach me how to use LifeOS conversation.",

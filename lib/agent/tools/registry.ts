@@ -1,3 +1,4 @@
+import { approvalStorageConfigured } from "../approval-store";
 import type { IntegrationAvailability, ToolDefinition } from "../types";
 
 type AvailabilityPatch = Pick<
@@ -28,6 +29,14 @@ function configuredOnly(missingRequirements: string[] = []): AvailabilityPatch {
   };
 }
 
+function withDurableApprovalStore(env: EnvMap, patch: AvailabilityPatch): AvailabilityPatch {
+  if (approvalStorageConfigured(env)) return patch;
+  return unavailable(
+    "Durable approval storage is not configured. Write execution is fail-closed.",
+    ["UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN"],
+  );
+}
+
 export type EnvMap = Record<string, string | undefined>;
 
 export function discoverToolAvailability(env: EnvMap = process.env): Record<string, AvailabilityPatch> {
@@ -36,44 +45,44 @@ export function discoverToolAvailability(env: EnvMap = process.env): Record<stri
     "lifeos.read_attention": available(),
     "lifeos.search_knowledge": available(),
     "lifeos.read_screen_context": available(),
-    "lifeos.stage_project_change": available(),
+    "lifeos.stage_project_change": withDurableApprovalStore(env, available()),
     "github.inspect_health": available(),
-    "github.merge_pull_request": unavailable(
+    "github.merge_pull_request": withDurableApprovalStore(env, unavailable(
       "Merge is a high-risk action and is not enabled in this runtime.",
       ["owner enablement"],
-    ),
-    "clickup.create_task": env.CLICKUP_API_TOKEN && env.CLICKUP_LIST_ID
+    )),
+    "clickup.create_task": withDurableApprovalStore(env, env.CLICKUP_API_TOKEN && env.CLICKUP_LIST_ID
       ? configuredOnly()
       : unavailable("ClickUp is not configured. CLICKUP_API_TOKEN or CLICKUP_LIST_ID is missing.", [
         "CLICKUP_API_TOKEN",
         "CLICKUP_LIST_ID",
-      ]),
-    "slack.send_message": env.SLACK_BOT_TOKEN && env.SLACK_DEFAULT_CHANNEL
+      ])),
+    "slack.send_message": withDurableApprovalStore(env, env.SLACK_BOT_TOKEN && env.SLACK_DEFAULT_CHANNEL
       ? configuredOnly()
       : unavailable("Slack is not configured. SLACK_BOT_TOKEN or SLACK_DEFAULT_CHANNEL is missing.", [
         "SLACK_BOT_TOKEN",
         "SLACK_DEFAULT_CHANNEL",
-      ]),
-    "vercel.deploy_production": env.VERCEL_TOKEN && env.VERCEL_PROJECT_ID
+      ])),
+    "vercel.deploy_production": withDurableApprovalStore(env, env.VERCEL_TOKEN && env.VERCEL_PROJECT_ID
       ? configuredOnly()
       : unavailable("Vercel deploy is not configured. VERCEL_TOKEN or VERCEL_PROJECT_ID is missing.", [
         "VERCEL_TOKEN",
         "VERCEL_PROJECT_ID",
-      ]),
-    "supabase.destructive_change": unavailable("Supabase destructive changes are not enabled.", [
+      ])),
+    "supabase.destructive_change": withDurableApprovalStore(env, unavailable("Supabase destructive changes are not enabled.", [
       "SUPABASE_SERVICE_ROLE_KEY",
       "owner enablement",
-    ]),
-    "n8n.trigger_workflow": env.N8N_WEBHOOK_URL
+    ])),
+    "n8n.trigger_workflow": withDurableApprovalStore(env, env.N8N_WEBHOOK_URL
       ? configuredOnly()
-      : unavailable("n8n is not configured. No N8N_WEBHOOK_URL is present.", ["N8N_WEBHOOK_URL"]),
+      : unavailable("n8n is not configured. No N8N_WEBHOOK_URL is present.", ["N8N_WEBHOOK_URL"])),
     "calendar.read_availability": unavailable(
       "No authorized calendar integration exists in this workspace.",
       ["calendar OAuth"],
     ),
-    "email.send": unavailable("Email send is not configured and is a high-risk action.", [
+    "email.send": withDurableApprovalStore(env, unavailable("Email send is not configured and is a high-risk action.", [
       "email provider",
-    ]),
+    ])),
     "docs.retrieve": available(),
     "learning.teach_step": available(),
     "mcp.discover": available(),

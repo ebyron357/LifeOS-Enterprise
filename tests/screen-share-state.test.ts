@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   beginScreenShareRequest,
   denyScreenShare,
@@ -11,7 +11,7 @@ import {
   resumeScreenAnalysis,
   stopScreenShare,
 } from "@/lib/screen/state";
-import { toAwarenessSnapshot } from "@/lib/screen/browser";
+import { requestDisplayMedia, toAwarenessSnapshot } from "@/lib/screen/browser";
 
 describe("screen share state", () => {
   it("never starts in a sharing state", () => {
@@ -47,5 +47,39 @@ describe("screen share state", () => {
     });
     expect(isScreenContextStale(sharing, Date.parse("2026-08-26T12:00:20.000Z"))).toBe(true);
     expect(toAwarenessSnapshot(sharing, Date.parse("2026-08-26T12:00:20.000Z")).stale).toBe(true);
+  });
+
+  it("exposes the requesting state before the browser grant or denial settles", async () => {
+    let releaseGrant: (stream: MediaStream) => void = () => {};
+    const grant = new Promise<MediaStream>((resolve) => {
+      releaseGrant = resolve;
+    });
+    const getDisplayMedia = vi.fn(() => grant);
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getDisplayMedia },
+    });
+    const seen: string[] = [];
+    const pending = requestDisplayMedia((snapshot) => {
+      seen.push(snapshot.state);
+    });
+    await Promise.resolve();
+    expect(seen).toEqual(["requesting"]);
+    expect(describeScreenShare({
+      ...INITIAL_SCREEN_SHARE,
+      state: "requesting",
+    }, Date.now())).toMatch(/Waiting for you to choose a screen/);
+
+    const track = {
+      label: "Chrome Tab",
+      getSettings: () => ({ width: 1280, height: 720, displaySurface: "browser" }),
+    };
+    releaseGrant({
+      getVideoTracks: () => [track],
+      getTracks: () => [track],
+    } as unknown as MediaStream);
+    const result = await pending;
+    expect(result.snapshot.state).toBe("sharing");
+    expect(seen).toEqual(["requesting", "sharing"]);
   });
 });

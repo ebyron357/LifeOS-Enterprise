@@ -1,4 +1,9 @@
 import { createHash, randomBytes } from "node:crypto";
+import {
+  createMemoryApprovalStore,
+  getApprovalStore,
+  setApprovalStoreForTests,
+} from "./approval-store";
 import type { ApprovalRequest, RiskLevel } from "./types";
 
 export const LIFEOS_REPOSITORY = "ebyron357/LifeOS-Enterprise";
@@ -19,9 +24,6 @@ export type AuthoritativeApproval = ApprovalRequest & {
 export type ApprovalConsumeResult =
   | { ok: true; approval: AuthoritativeApproval }
   | { ok: false; error: string; status: number };
-
-const store = new Map<string, AuthoritativeApproval>();
-const consumedNonces = new Set<string>();
 
 function shaShort(value: string): string {
   return createHash("sha256").update(value).digest("hex").slice(0, 16);
@@ -48,7 +50,7 @@ export function createAuthoritativeApproval(input: {
     toolId: input.toolId,
     riskLevel: input.riskLevel,
     summary: input.summary,
-    args: input.args,
+    args: structuredClone(input.args),
     createdAt: input.createdAt,
     decision: "pending",
     decidedAt: null,
@@ -64,19 +66,19 @@ export function createAuthoritativeApproval(input: {
   };
 }
 
-export function registerAuthoritativeApproval(approval: AuthoritativeApproval): AuthoritativeApproval {
-  store.set(approval.id, approval);
+export async function registerAuthoritativeApproval(approval: AuthoritativeApproval): Promise<AuthoritativeApproval | ApprovalConsumeResult> {
+  const store = getApprovalStore();
+  if (!store.available) {
+    return { ok: false, error: store.unavailableReason || "Approval storage is unavailable.", status: 503 };
+  }
+  await store.set(approval);
   return approval;
 }
 
-export function getAuthoritativeApproval(id: string): AuthoritativeApproval | undefined {
+export async function getAuthoritativeApproval(id: string): Promise<AuthoritativeApproval | undefined> {
+  const store = getApprovalStore();
+  if (!store.available) return undefined;
   return store.get(id);
-}
-
-export function listAuthoritativeApprovals(sessionId?: string): AuthoritativeApproval[] {
-  const values = [...store.values()];
-  if (!sessionId) return values;
-  return values.filter((item) => item.sessionId === sessionId);
 }
 
 export function publicApprovalView(approval: AuthoritativeApproval): ApprovalRequest {
@@ -85,7 +87,7 @@ export function publicApprovalView(approval: AuthoritativeApproval): ApprovalReq
     toolId: approval.toolId,
     riskLevel: approval.riskLevel,
     summary: approval.summary,
-    args: approval.args,
+    args: structuredClone(approval.args),
     createdAt: approval.createdAt,
     decision: approval.decision,
     decidedAt: approval.decidedAt,
@@ -107,7 +109,7 @@ export function projectRevisionBinding(project: {
   return shaShort(`${project.path}|${project.status}|${project.nextAction}`);
 }
 
-export function consumeAuthoritativeApproval(input: {
+export async function consumeAuthoritativeApproval(input: {
   approvalId: string;
   decision: "approved" | "rejected";
   sessionId: string;
@@ -116,8 +118,12 @@ export function consumeAuthoritativeApproval(input: {
   repository?: string | null;
   requestedPath?: string | null;
   revisionBinding?: string | null;
-}): ApprovalConsumeResult {
-  const existing = store.get(input.approvalId);
+}): Promise<ApprovalConsumeResult> {
+  const store = getApprovalStore();
+  if (!store.available) {
+    return { ok: false, error: store.unavailableReason || "Approval storage is unavailable.", status: 503 };
+  }
+  const existing = await store.get(input.approvalId);
   if (!existing) {
     return { ok: false, error: "Unknown approval request.", status: 404 };
   }
@@ -129,9 +135,6 @@ export function consumeAuthoritativeApproval(input: {
   }
   if (existing.decision !== "pending" || existing.consumedAt) {
     return { ok: false, error: "Approval was already decided or replayed.", status: 409 };
-  }
-  if (consumedNonces.has(existing.nonce)) {
-    return { ok: false, error: "Approval nonce was already consumed.", status: 409 };
   }
   if (Date.parse(input.nowIso) > Date.parse(existing.expiresAt)) {
     return { ok: false, error: "Approval has expired.", status: 410 };
@@ -149,19 +152,27 @@ export function consumeAuthoritativeApproval(input: {
     }
   }
 
+  const ttlSeconds = Math.max(3600, Math.ceil((Date.parse(existing.expiresAt) - Date.parse(input.nowIso)) / 1000) + 86400);
+  const claimed = await store.addNonce(existing.nonce, ttlSeconds);
+  if (!claimed) {
+    return { ok: false, error: "Approval nonce was already consumed.", status: 409 };
+  }
+
   const next: AuthoritativeApproval = {
     ...existing,
+    args: structuredClone(existing.args),
     decision: input.decision,
     decidedAt: input.nowIso,
     consumedAt: input.nowIso,
   };
-  consumedNonces.add(existing.nonce);
-  store.set(existing.id, next);
+  await store.set(next);
   return { ok: true, approval: next };
 }
 
-/** Test helper — clears in-memory approval state. */
 export function resetAuthoritativeApprovalsForTests(): void {
-  store.clear();
-  consumedNonces.clear();
+  setApprovalStoreForTests(createMemoryApprovalStore());
+}
+
+export function isAuthoritativeApproval(value: AuthoritativeApproval | ApprovalConsumeResult): value is AuthoritativeApproval {
+  return !("ok" in value);
 }

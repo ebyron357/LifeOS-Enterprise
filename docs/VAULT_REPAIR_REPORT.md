@@ -413,3 +413,44 @@ Agent-executable closeout: **PASS** (pending re-validation of this continuation)
 ### Hold-to-talk acceptance follow-up
 
 - Releasing Push to talk now returns visible voice state to `idle` and preserves push-to-talk mode. Capture already stopped on release; the leftover listening label was the verified gap.
+
+## Post-#60 security corrective — 2026-09-05
+
+Branch: `fix/lifeos-post60-security-corrective` from `main` @ `c7d4e3507d7837e100a35a9eacb903e9319f1803`. PR #59 remains closed and was not used.
+
+### Repairs completed
+
+- `POST /api/lifeos/agent/approval` requires `LIFEOS_WRITE_ENABLED` and `LIFEOS_WRITE_SECRET`. Public voice-session tokens and anonymous callers cannot approve or execute Slack, ClickUp, n8n, Vercel, or other external actions.
+- Approval and nonce storage is shared and durable (Upstash Redis REST). Missing storage fails closed. Production does not silently use process-local Maps.
+- Approved tools execute the immutable stored arguments the owner reviewed. Slack, ClickUp, n8n, and Vercel no longer receive the approval summary as the payload.
+- `POST /api/lifeos/voice/speak` validates origin, requires owner/TTS authorization, limits text to 2000 characters, uses a trusted rate-limit identity, and returns sanitized errors.
+- `provider: "browser"` returns the browser-fallback response immediately and does not call OpenAI.
+- End-of-day check-in XP is counted once when the daily check-in quest is already complete.
+- Screen-share requesting state is applied to the visible conversation UI before grant or deny. Generation-safe stale-callback and track cleanup remain.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| `npm ci` | PASS — 607 packages added, 0 vulnerabilities |
+| `npm run lint` | PASS — `eslint . --max-warnings=0` |
+| `npm run typecheck` | PASS — `tsc --noEmit` |
+| `npm test` | PASS — 49 files, 286 tests |
+| `npm run build` | PASS — Next.js 16.3.0 |
+| `npm run test:e2e` | First full run: 92 passed, 4 `webkit-desktop` failed with `Target page, context or browser has been closed`. Isolated serial rerun `--project=webkit-desktop --workers=1`: 6/6 passed. Chromium 1440/1024/390 and `webkit-mobile` passed in the first run. |
+| `npm audit --audit-level=high` | PASS — 0 vulnerabilities |
+| `pwsh -File ./scripts/audit-vault.ps1` | PASS — canonical vault structure, templates, Bases, metadata, links, and embeds are valid |
+
+### Final pass/fail state
+
+**AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED**
+
+This corrective is not merged, not deployed, not owner-accepted, and not production-promoted. Live owner workbook steps remain.
+
+### Remaining credential-only or local-UI-only actions
+
+- Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` before enabling production writes.
+- Set `LIFEOS_WRITE_ENABLED=true` and `LIFEOS_WRITE_SECRET` only when the owner intends write execution.
+- Optional `LIFEOS_TTS_SECRET` / `OPENAI_API_KEY` for paid TTS; browser fallback remains.
+- Complete `docs/OWNER_ACCEPTANCE_WORKBOOK.md` on a preview, including write-secret, durable-store, displayed-args, browser TTS, and requesting-state rows.
+- Do not merge or deploy from the agent.
