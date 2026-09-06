@@ -3,6 +3,34 @@
 Date: 2026-07-14
 Repository: `ebyron357/LifeOS-Enterprise`
 
+## 2026-09-06 unified command center rebuild
+
+Branch: `rebuild/lifeos-unified-command-center`  
+Starting main SHA: `3ddf934afc12261bdf68e2bd86059f80db0a22db`
+
+This pass rebuilds the web operating surface around one Command Center, one conversation entry, and intent-first navigation. Vault data and PR #61 write/approval security are unchanged. Integrations only report CONNECTED after a live probe (GitHub public health). Hermes is an adapter: unavailable or configured, never connected without a probe.
+
+**AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED**
+
+This is not production-ready and not owner-accepted.
+
+### Validation evidence (this branch)
+
+| Check | Result |
+|---|---|
+| `npm ci` | PASS |
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 54 files, 298 tests |
+| `npm run build` | PASS — Next.js 16.3.0 |
+| `npm audit --audit-level=high` | PASS — 0 vulnerabilities |
+| `pwsh -File ./scripts/audit-vault.ps1` | PASS — 156 markdown notes checked |
+| Playwright `os-command-center.spec.ts` desktop 1440 + mobile 390 | 23 passed / 1 failed on the last full two-project run; the remaining resume case then passed 2/2 after scoping the click to `#main-content`. Not one clean 24/24 invocation after that last test edit. |
+
+Full parallel Playwright suite was not treated as a clean pass in this environment. Do not claim a complete e2e suite result from this rebuild.
+
+Screenshots: `artifacts/os-rebuild/`.
+
 ## Executive Summary
 
 The repository previously mixed a legacy folder model, Dataview-first dashboards, hard-coded local paths, and machine-specific Obsidian settings. The repair establishes a native-first, numbered Life OS while preserving existing notes and links.

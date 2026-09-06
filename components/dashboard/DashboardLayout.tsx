@@ -1,10 +1,10 @@
-import { DashboardQuickActions } from "@/components/dashboard/DashboardQuickActions";
-import { PortalSidebar } from "@/components/shell/PortalSidebar";
+import { AppShell } from "@/components/os/AppShell";
 import { CommandCenterWorkspace } from "@/components/workspace/CommandCenterWorkspace";
 import type { WidgetDefinition } from "@/components/widgets/registry";
 import type { GitHubHealthData } from "@/lib/github/health";
 import type { RevenueRadarData } from "@/lib/google/revenue";
 import type { VaultDashboardData } from "@/lib/lifeos/types";
+import { daypartGreeting } from "@/lib/os/greeting";
 import type { VaultSection } from "@/lib/vault/types";
 
 type DashboardLayoutProps = {
@@ -15,22 +15,10 @@ type DashboardLayoutProps = {
   counts?: Partial<Record<VaultSection, number>>;
 };
 
-export function DashboardLayout({ data, github, revenue, counts }: DashboardLayoutProps) {
+export function DashboardLayout({ data, github, revenue }: DashboardLayoutProps) {
   return (
-    <div className="lifeos-app">
-      <a className="skip-link" href="#main-content">Skip to main content</a>
-      <PortalSidebar
-        counts={counts}
-        dashboardActions={(
-          <DashboardQuickActions
-            projects={data.projects}
-            activeProjects={data.activeProjects}
-            reviewsDue={data.reviewsDue}
-          />
-        )}
-      />
-
-      <main id="main-content" className="dashboard-shell workspace-main" tabIndex={-1}>
+    <AppShell greeting={daypartGreeting()}>
+      <div className="dashboard-shell workspace-main">
         <nav className="command-bar" aria-label="LifeOS command status">
           <div className="command-brand">
             <span className="brand-mark">L</span>
@@ -43,7 +31,7 @@ export function DashboardLayout({ data, github, revenue, counts }: DashboardLayo
         </nav>
 
         <CommandCenterWorkspace data={data} github={github} revenue={revenue} />
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

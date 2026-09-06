@@ -6,24 +6,24 @@ The LifeOS Enterprise web application is a read-only portal over the canonical O
 
 | Route | Purpose |
 |-------|---------|
-| `/dashboard` | Executive overview (preserved dashboard) |
-| `/projects` | Project portfolio table |
-| `/tasks` | Extracted checklist tasks |
-| `/businesses` | Business records |
-| `/growth` | Areas and goals |
-| `/intelligence` | Dashboards and command centers |
-| `/agents` | AI workforce and agent docs |
-| `/resources` | Full library browser |
-| `/people` | People CRM view |
-| `/learning` | Learning records |
-| `/journal` | Daily notes |
-| `/reviews` | Review records |
-| `/sops` | Standard operating procedures |
-| `/templates` | Template discovery |
-| `/archive` | Archived and completed work |
-| `/search` | Global vault search |
-| `/note/[...slug]` | Note reader |
+| `/` | Command Center home (today, next action, blockers, integrations) |
+| `/conversation` | Ask LifeOS — typed/voice conversation and approval gate |
+| `/projects` | Project workspaces with resume actions |
+| `/today` | Today's mission and outcomes |
+| `/inbox` | Capture notes, tasks, ideas, reminders |
+| `/journal` | Today's journal entry |
+| `/learning` | Continue learning or add a topic |
+| `/files` | Find notes without browsing folders first |
+| `/automations` | n8n / automation status (honest, not rebuilt n8n) |
+| `/integrations` | Live integration health |
+| `/settings` | Owner posture and where things live |
+| `/more` | Advanced / vault browse destinations |
+| `/dashboard` | Legacy widget workspace (advanced) |
+| `/templates` | Human template catalog (no raw placeholders) |
+| `/search` | Advanced vault search |
+| `/note/[...slug]` | Note reader; project notes open as workspaces |
 | `/attachments/[...path]` | Approved attachment files |
+| `/tasks`, `/businesses`, `/growth`, `/intelligence`, `/agents`, `/resources`, `/people`, `/reviews`, `/sops`, `/archive`, `/daily-brief`, `/portfolio` | Advanced / More — capabilities kept, not primary nav |
 
 ## Privacy model
 

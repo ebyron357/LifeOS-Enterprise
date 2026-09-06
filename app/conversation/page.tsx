@@ -11,7 +11,7 @@ export default async function ConversationPage() {
   return (
     <VaultPageLayout
       title="Conversation"
-      description="Talk or type to LifeOS, share a screen when you choose, and keep every risky action visible and approval-gated. This does not replace the Command Board, Daily Brief, or draft-PR write path."
+      description="Talk or type. Share a screen only when you choose. Risky actions stay visible and approval-gated."
       counts={counts}
     >
       <AgentConversationWorkspace vault={vault} />

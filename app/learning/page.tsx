@@ -1,18 +1,17 @@
-import { VaultPageLayout } from "@/components/shell/VaultPageLayout";
-import { NoteList } from "@/components/vault/NoteList";
-import { getNotesBySection, getSectionCounts } from "@/lib/vault/index";
+import { AppShell } from "@/components/os/AppShell";
+import { LearningHome } from "@/components/os/LearningHome";
+import { daypartGreeting } from "@/lib/os/greeting";
+import { getNotesBySection } from "@/lib/vault/index";
 
 export const revalidate = 300;
 
 export default async function LearningPage() {
-  const [notes, counts] = await Promise.all([
-    getNotesBySection("learning"),
-    getSectionCounts(),
-  ]);
+  const notes = await getNotesBySection("learning");
+  const visible = notes.filter((note) => !/\{\{[^}]+\}\}/.test(note.title));
 
   return (
-    <VaultPageLayout title="Learning" description="Learning queue, topics, and mastery records." counts={counts}>
-      <NoteList notes={notes} emptyMessage="No learning records found yet." />
-    </VaultPageLayout>
+    <AppShell greeting={daypartGreeting()}>
+      <LearningHome notes={visible} />
+    </AppShell>
   );
 }

@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ProjectWorkspaceHeader } from "@/components/os/ProjectWorkspaceHeader";
 import { VaultPageLayout } from "@/components/shell/VaultPageLayout";
 import { LinkList, NoteMarkdown, NoteProperties } from "@/components/vault/NoteMarkdown";
+import { isProjectNote } from "@/lib/os/project-context";
 import { getBacklinks, getNoteBySlug, getSectionCounts, getVaultIndex } from "@/lib/vault/index";
 import { noteHref } from "@/lib/vault/slug";
 
@@ -37,14 +39,22 @@ export default async function NotePage({ params }: NotePageProps) {
     .filter((item, position, array) => item && array.findIndex((other) => other?.path === item.path) === position) as NonNullable<typeof index.notes[number]>[];
 
   const crumbs = note.path.split("/");
+  const project = isProjectNote(note);
 
   return (
     <VaultPageLayout
       title={note.title}
-      eyebrow="Note reader"
-      description={note.folder}
+      eyebrow={project ? "Project workspace" : "Note"}
+      description={project ? (note.nextAction || "Resume this project.") : undefined}
       counts={counts}
     >
+      {project ? <ProjectWorkspaceHeader note={note} /> : null}
+      {project ? (
+        <details className="os-card">
+          <summary>Advanced: file location</summary>
+          <p>{note.path}</p>
+        </details>
+      ) : (
       <nav className="breadcrumbs" aria-label="Breadcrumb">
         <Link href="/resources">Resources</Link>
         {crumbs.map((segment, indexPosition) => {
@@ -58,6 +68,7 @@ export default async function NotePage({ params }: NotePageProps) {
           );
         })}
       </nav>
+      )}
 
       <div className="note-reader-grid">
         <div className="note-reader-main">
