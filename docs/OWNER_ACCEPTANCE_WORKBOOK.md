@@ -2,7 +2,7 @@
 
 **Document type:** Printable owner acceptance workbook  
 **Repository:** `ebyron357/LifeOS-Enterprise`  
-**Governing status:** Agent closeout complete → owner acceptance required  
+**Governing status:** PR #60 is on `main`. This workbook now covers the post-#60 security corrective draft PR. Owner acceptance is still required.  
 **Do not mark owner acceptance complete in this workbook on the owner's behalf.**
 
 Use one row per test. Record evidence (screenshot, short note, or commit SHA). Separate agent-completed work from owner-required work.
@@ -11,7 +11,7 @@ Use one row per test. Record evidence (screenshot, short note, or commit SHA). S
 
 ## How to use
 
-1. Deploy or open the PR preview for the closeout branch.
+1. Open the post-#60 corrective draft PR preview. Do not treat `main` or PR #60 as owner-accepted.
 2. Complete every checkbox row.
 3. Mark Pass / Fail.
 4. Attach evidence.
@@ -23,7 +23,7 @@ Use one row per test. Record evidence (screenshot, short note, or commit SHA). S
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| A1 | Draft PR exists | Open the closeout draft PR | One draft PR contains widgets, game, voice, screen, approvals, tests, docs | ☐ | | |
+| A1 | Draft PR exists | Open the post-#60 corrective draft PR | One draft PR contains the write-auth, durable-store, approved-payload, TTS, XP, and screen-state fixes plus tests and docs. PR #59 stays closed. | ☐ | | |
 | A2 | Automated tests green | Review CI / local test report in PR | Lint, typecheck, unit, build, vault audit, Playwright reported | ☐ | | |
 | A3 | No secrets in repo | Spot-check `.env.example` and diff | Placeholders only; no live tokens | ☐ | | |
 | A4 | Integrations truthful | Open `/conversation` Context/tools | Unconfigured tools shown unavailable with requirements | ☐ | | |
@@ -59,7 +59,8 @@ Use one row per test. Record evidence (screenshot, short note, or commit SHA). S
 | C6 | Daily check-in | Click Daily check-in | +20 XP once per day; streak updates | ☐ | | |
 | C7 | Boss / side / main quests | Inspect today's quests | Quests derive from active/blocked/waiting projects; boss battles show smaller actions | ☐ | | |
 | C10 | Boss steps | Mark a boss step, then attest the battle | Step mark awards 0 XP; attested boss awards XP once | ☐ | | |
-| C8 | End of day | Click End day results | Summary of completed quests appears | ☐ | | |
+| C8 | End of day | Click End day results | Summary of completed quests appears; daily check-in XP is listed once | ☐ | | |
+| C11 | Check-in XP once | Daily check-in, complete the daily check-in quest if shown, End day, refresh | XP and the end-of-day total count the check-in once | ☐ | | |
 | C9 | Repair / reset | Repair then optionally Reset | Corrupted state recovers; reset clears progress intentionally | ☐ | | |
 
 ---
@@ -79,6 +80,8 @@ Use one row per test. Record evidence (screenshot, short note, or commit SHA). S
 | D9 | Push-to-talk | Hold Push to talk, then release | Listening starts on hold and stops on release; last phrase can flush | ☐ | | |
 | D10 | States visible | Observe UI during flow | listening / thinking / speaking / muted / stopped / error clear | ☐ | | |
 | D11 | Mobile voice | Repeat D5–D8 at 390px | Controls usable on mobile | ☐ | | |
+| D12 | Browser provider | Set Voice settings provider to Browser, then speak | Browser speech is used. Server TTS is not called. | ☐ | | |
+| D13 | Paid TTS auth | With OpenAI selected, omit the owner write/TTS secret | Server TTS is rejected or falls back; a public voice-session token cannot spend the OpenAI key | ☐ | | |
 
 ---
 
@@ -90,6 +93,7 @@ Use one row per test. Record evidence (screenshot, short note, or commit SHA). S
 | E2 | Browser end | End share from browser UI | App updates to ended; no false active state | ☐ | | |
 | E3 | Navigate away | Share then leave `/conversation` | Tracks released on cleanup | ☐ | | |
 | E4 | Deny permission | Deny share permission | Denied state; safe recovery | ☐ | | |
+| E5 | Requesting state | Click Share screen and wait on the browser picker | UI shows requesting before grant, deny, stop, pause, or end | ☐ | | |
 
 ---
 
@@ -103,6 +107,9 @@ Use one row per test. Record evidence (screenshot, short note, or commit SHA). S
 | F4 | Change-plan draft PR | Stage a change plan with write config enabled in preview | Creates/updates **draft** PR only; never writes `main` | ☐ | | |
 | F5 | Wrong project | Attempt write for mismatched project/path | Rejected server-side | ☐ | | |
 | F6 | Failed write honesty | Force a failing write (bad token) | UI/API reports failure; no success claim | ☐ | | |
+| F7 | Owner write secret | Approve a pending Slack/ClickUp/n8n/Vercel action without the write secret, then with it | Anonymous and voice-session tokens are rejected. Only `LIFEOS_WRITE_SECRET` with `LIFEOS_WRITE_ENABLED=true` can approve | ☐ | | |
+| F8 | Displayed args execute | Inspect the approval argument block, then approve | Slack/ClickUp/n8n/Vercel receive those exact stored arguments, not the summary sentence | ☐ | | |
+| F9 | Durable store fail-closed | Preview or production without Upstash Redis REST | Write/approval execution reports unavailable. No silent in-memory production fallback | ☐ | | |
 
 ---
 
@@ -114,6 +121,8 @@ Use one row per test. Record evidence (screenshot, short note, or commit SHA). S
 | G2 | Write fail-closed | Leave write secrets empty | Writes disabled; no crash | ☐ | | |
 | G3 | Optional voice | Leave OpenAI empty | Browser fallback; dashboard still loads | ☐ | | |
 | G4 | Production origin | Set `LIFEOS_ALLOWED_ORIGIN` | Cross-origin denied | ☐ | | |
+| G5 | Approval Redis | Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` only when enabling writes | Approvals survive cold starts; missing store fails closed | ☐ | | |
+| G6 | TTS secret | Optionally set `LIFEOS_TTS_SECRET` or reuse `LIFEOS_WRITE_SECRET` | Public session tokens cannot spend `OPENAI_API_KEY` | ☐ | | |
 
 ### Owner credential checklist (owner-only)
 
@@ -122,6 +131,8 @@ Use one row per test. Record evidence (screenshot, short note, or commit SHA). S
 - [ ] Enable writes only when ready → `LIFEOS_WRITE_ENABLED=true`
 - [ ] Allowed origin → `LIFEOS_ALLOWED_ORIGIN`
 - [ ] Optional OpenAI TTS → `OPENAI_API_KEY`
+- [ ] Paid TTS authorization → `LIFEOS_TTS_SECRET` or reuse `LIFEOS_WRITE_SECRET`
+- [ ] Durable approvals → `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`
 - [ ] Voice session HMAC → `LIFEOS_VOICE_SESSION_SECRET`
 - [ ] Optional tool tokens (ClickUp/Slack/n8n/Vercel) only if intentionally connecting
 

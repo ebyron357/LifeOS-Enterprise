@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     teachingMode: body.teachingMode ?? null,
   };
 
-  const result = processAgentTurn(input);
+  const result = await processAgentTurn(input);
   logAgentEvent({
     event: result.waitingForOwner ? "approval-requested" : "mission-completed",
     at: nowIso,

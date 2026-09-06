@@ -74,18 +74,32 @@ function looksLikeVisualQuestion(text: string): boolean {
   return /\b(what am i looking at|where do i click|walk me through this screen|what is wrong here|read this message|what should i do next|help me navigate|explain this error|show me what to click)\b/i.test(text);
 }
 
+function approvedArgsFor(toolId: string, text: string): Record<string, unknown> {
+  const trimmed = text.trim();
+  const args: Record<string, unknown> = {
+    query: trimmed,
+    text: trimmed,
+    message: trimmed,
+    name: `LifeOS action: ${trimmed.slice(0, 80)}`,
+    description: trimmed,
+    payload: { source: "lifeos", approved: true, action: trimmed },
+  };
+  if (toolId === "vercel.deploy_production") args.target = "production";
+  return args;
+}
+
 function makeInvocation(toolId: string, args: Record<string, unknown>, nowIso: string): ToolInvocation {
   return { id: `inv-${toolId}-${nowIso}`, toolId, args, requestedAt: nowIso };
 }
 
-function approvalFromInvocation(
+async function approvalFromInvocation(
   invocation: ToolInvocation,
   summary: string,
   sessionId: string,
   projectPath: string | null,
   revisionBinding: string | null,
-): ApprovalRequest {
-  const authoritative = registerAuthoritativeApproval(
+): Promise<ApprovalRequest | { unavailable: string }> {
+  const registered = await registerAuthoritativeApproval(
     createAuthoritativeApproval({
       sessionId,
       toolId: invocation.toolId,
@@ -99,7 +113,10 @@ function approvalFromInvocation(
       scope: `tool:${invocation.toolId}`,
     }),
   );
-  return publicApprovalView(authoritative);
+  if ("ok" in registered && registered.ok === false) {
+    return { unavailable: registered.error };
+  }
+  return publicApprovalView(registered as import("./approvals").AuthoritativeApproval);
 }
 
 function executeConfiguredTool(input: AgentTurnInput, invocation: ToolInvocation): ToolResult {
@@ -185,7 +202,7 @@ function executeConfiguredTool(input: AgentTurnInput, invocation: ToolInvocation
   };
 }
 
-export function processAgentTurn(input: AgentTurnInput): AgentTurnResult {
+export async function processAgentTurn(input: AgentTurnInput): Promise<AgentTurnResult> {
   const sanitized = sanitizeImportedText(input.text);
   const text = sanitized.text.trim();
   const activity = [
@@ -257,7 +274,7 @@ export function processAgentTurn(input: AgentTurnInput): AgentTurnResult {
   for (const toolId of uniqueToolIds) {
     const tool = getRegisteredTool(toolId);
     if (!tool) continue;
-    const invocation = makeInvocation(toolId, { query: text }, input.nowIso);
+    const invocation = makeInvocation(toolId, approvedArgsFor(toolId, text), input.nowIso);
     invocations.push(invocation);
     activity.push(createActivityEvent("tool-invoked", `Requested ${tool.name}.`, { at: input.nowIso, toolId }));
 
@@ -283,7 +300,7 @@ export function processAgentTurn(input: AgentTurnInput): AgentTurnResult {
       }
       const boundProject = input.vault.priorities[0] ?? input.vault.projects[0] ?? null;
       const projectPath = boundProject?.path ?? null;
-      const request = approvalFromInvocation(
+      const request = await approvalFromInvocation(
         invocation,
         `${tool.name} requires explicit approval.`,
         input.sessionId,
@@ -296,6 +313,18 @@ export function processAgentTurn(input: AgentTurnInput): AgentTurnResult {
             })
           : null,
       );
+      if ("unavailable" in request) {
+        results.push({
+          invocationId: invocation.id,
+          toolId: tool.id,
+          ok: false,
+          status: "unavailable",
+          summary: request.unavailable,
+          evidence: [],
+          error: "approval_store_unavailable",
+        });
+        continue;
+      }
       approvals.push(request);
       results.push({
         invocationId: invocation.id,
@@ -395,7 +424,7 @@ export async function executeApprovedTool(input: AgentTurnInput, approval: Appro
     };
   }
   if (["clickup.create_task", "slack.send_message", "n8n.trigger_workflow", "vercel.deploy_production"].includes(approval.toolId)) {
-    return executeExternalApprovedTool(input, approval.toolId, approval.id);
+    return executeExternalApprovedTool(input, approval.toolId, approval.id, approval.args);
   }
   return executeConfiguredTool(input, {
     id: approval.id,

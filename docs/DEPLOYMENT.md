@@ -21,9 +21,12 @@
 | Variable | Required | Default / notes |
 |----------|----------|-----------------|
 | `LIFEOS_WRITE_ENABLED` | No | `false` — keep false unless enabling draft-PR writes |
-| `LIFEOS_WRITE_SECRET` | If writes on | Shared bearer for change-plan + voice write staging |
+| `LIFEOS_WRITE_SECRET` | If writes on | Shared bearer for change-plan, conversation approvals, and optional paid TTS |
 | `LIFEOS_GITHUB_TOKEN` | If writes on | Fine-grained token with contents + PR create |
 | `LIFEOS_ALLOWED_ORIGIN` | Recommended if writes on | Exact dashboard origin |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | If writes/approvals on | Shared durable approval + nonce store for Vercel. Missing store fails closed |
+| `LIFEOS_APPROVAL_STORE` | No | Leave empty in production. `memory` is explicit local/test only. `none` forces unavailable |
+| `LIFEOS_TTS_SECRET` | If paid TTS on | Owner bearer required before spending `OPENAI_API_KEY`. Voice-session tokens are rejected. If empty, `LIFEOS_WRITE_SECRET` is accepted |
 | `LIFEOS_VOICE_ENABLED` | No | `false` — set `true` for browser voice console |
 | `LIFEOS_VOICE_BROWSER_FALLBACK` | No | `true` |
 | `LIFEOS_VOICE_SESSION_SECRET` | Optional | Enables HMAC voice session tokens |
@@ -67,11 +70,12 @@ pwsh -NoProfile -File ./scripts/audit-vault.ps1
 
 ## Rollback procedure
 
-1. Do **not** merge draft PR #60 if acceptance fails.
-2. Production remains the last promoted `main` deployment. No closeout commit is on `main` until the owner merges.
-3. If a preview or mistaken promote must be undone: in Vercel, roll back to the previous Ready production deployment (last known `main` SHA).
-4. If a draft PR was merged in error: revert the merge with a new PR; delete the isolated change-plan branches if any were created.
-5. Close unused draft PRs (#55 / #59) only after the owner confirms PR #60 is the surviving closeout vehicle.
+1. Do **not** merge the post-#60 security corrective draft PR if acceptance fails.
+2. Do **not** deploy the corrective branch. Production remains the current `main` deployment (`c7d4e3507d7837e100a35a9eacb903e9319f1803` includes merged PR #60).
+3. To abandon the corrective: close the draft PR. No `main` revert is required.
+4. If a preview or mistaken promote must be undone: in Vercel, roll back to the previous Ready production deployment (last known `main` SHA).
+5. If this corrective is merged in error: revert the merge with a new PR; delete isolated change-plan branches if any were created.
+6. PR #59 stays closed and superseded. Do not revive it.
 
 Exact production SHA is recorded only after a verified production deploy of that SHA.
 
@@ -86,7 +90,9 @@ Exact production SHA is recorded only after a verified production deploy of that
 - [ ] Game loop XP awards only on attested completions
 - [ ] Conversation mute stops microphone capture
 - [ ] Screen share cleanup on Stop / navigate away
-- [ ] Approvals enforced server-side (not browser indicator alone)
+- [ ] Approvals enforced server-side with owner write secret (not browser indicator or voice-session token)
+- [ ] Durable approval storage configured before enabling writes; missing store fails closed
+- [ ] Server TTS origin + owner authorization + 2000-character limit verified; `provider: "browser"` does not call OpenAI
 - [ ] Reduced-motion / overload modes still usable
 - [ ] Owner acceptance workbook completed by owner
 - [ ] Rollback path known (previous Vercel deployment)
@@ -111,8 +117,8 @@ Playwright viewports: 1440 (desktop), 1024 (laptop), 390 (mobile). Vault audit c
 
 - Reads: vault markdown via server components / APIs (no permanent provider keys in browser)
 - Writes: draft PR only; path allowlists; canonical conflict detection (409); never direct `main`
-- Agent approvals: authoritative server records with expiry, nonce/replay protection, session + project + repository binding
-- Voice: server TTS when configured; browser fallback; mute aborts recognition; new speech interrupts TTS; hold-to-talk flushes on release; HMAC sessions when secret configured; no LiveKit readiness claim
+- Agent approvals: authoritative durable records with expiry, nonce/replay protection, session + project + repository + path + revision binding. Execution uses stored args, not the summary. Production storage is Upstash Redis REST or fail-closed
+- Voice: server TTS only with origin checks, owner/TTS secret, trusted rate-limit identity, and a 2000-character limit; `provider: "browser"` returns immediately; mute aborts recognition; new speech interrupts TTS; hold-to-talk flushes on release; HMAC sessions when secret configured; no LiveKit readiness claim
 - Prefer `LIFEOS_WRITE_ENABLED=false` in Vercel unless draft-PR writes are intentionally active with secret + GitHub token
 - Production smoke (2026-07-28): voice disabled; change-plan POST without valid bearer returns `401`; `directMainWrites:false`
 

@@ -23,15 +23,24 @@ function failed(invocationId: string, toolId: string, message: string): ToolResu
   return { invocationId, toolId, ok: false, status: "failed", summary: message, evidence: [], error: "execution_failed" };
 }
 
+function stringArg(args: Record<string, unknown>, key: string): string | null {
+  const value = args[key];
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
 export async function executeExternalApprovedTool(
   input: AgentTurnInput,
   toolId: string,
   invocationId: string,
+  args: Record<string, unknown> = {},
 ): Promise<ToolResult> {
   if (toolId === "clickup.create_task") {
     const token = process.env.CLICKUP_API_TOKEN;
     const listId = process.env.CLICKUP_LIST_ID;
     if (!token || !listId) return unavailable(invocationId, toolId, "ClickUp execution requires CLICKUP_API_TOKEN and CLICKUP_LIST_ID.");
+    const name = stringArg(args, "name") || stringArg(args, "text");
+    const description = stringArg(args, "description") || stringArg(args, "text");
+    if (!name || !description) return failed(invocationId, toolId, "Approved ClickUp arguments are missing.");
     const controller = withTimeout();
     try {
       const response = await fetch(`https://api.clickup.com/api/v2/list/${listId}/task`, {
@@ -42,8 +51,8 @@ export async function executeExternalApprovedTool(
           Authorization: token,
         },
         body: JSON.stringify({
-          name: `LifeOS action: ${input.text.slice(0, 80)}`,
-          description: "Created from LifeOS approved runtime action.",
+          name,
+          description,
           priority: 3,
         }),
       });
@@ -61,6 +70,8 @@ export async function executeExternalApprovedTool(
     const token = process.env.SLACK_BOT_TOKEN;
     const channel = process.env.SLACK_DEFAULT_CHANNEL;
     if (!token || !channel) return unavailable(invocationId, toolId, "Slack execution requires SLACK_BOT_TOKEN and SLACK_DEFAULT_CHANNEL.");
+    const message = stringArg(args, "message") || stringArg(args, "text");
+    if (!message) return failed(invocationId, toolId, "Approved Slack arguments are missing.");
     const controller = withTimeout();
     try {
       const response = await fetch("https://slack.com/api/chat.postMessage", {
@@ -72,7 +83,7 @@ export async function executeExternalApprovedTool(
         },
         body: JSON.stringify({
           channel,
-          text: `LifeOS approved action: ${input.text}`,
+          text: message,
         }),
       });
       const payload = await response.json().catch(() => null) as { ok?: boolean; ts?: string; error?: string } | null;
@@ -87,6 +98,9 @@ export async function executeExternalApprovedTool(
   if (toolId === "n8n.trigger_workflow") {
     const webhook = process.env.N8N_WEBHOOK_URL;
     if (!webhook) return unavailable(invocationId, toolId, "n8n execution requires N8N_WEBHOOK_URL.");
+    const payload = args.payload && typeof args.payload === "object"
+      ? args.payload
+      : { source: "lifeos", approved: true, action: stringArg(args, "text") || input.text };
     const controller = withTimeout();
     try {
       const response = await fetch(webhook, {
@@ -95,12 +109,7 @@ export async function executeExternalApprovedTool(
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          source: "lifeos",
-          approved: true,
-          at: input.nowIso,
-          action: input.text,
-        }),
+        body: JSON.stringify(payload),
       });
       if (!response.ok) return failed(invocationId, toolId, `n8n webhook returned ${response.status}.`);
       return completed(invocationId, toolId, "Triggered n8n workflow.", [`n8n_status:${response.status}`]);
@@ -114,6 +123,8 @@ export async function executeExternalApprovedTool(
     const token = process.env.VERCEL_TOKEN;
     const projectId = process.env.VERCEL_PROJECT_ID;
     if (!token || !projectId) return unavailable(invocationId, toolId, "Vercel execution requires VERCEL_TOKEN and VERCEL_PROJECT_ID.");
+    const target = stringArg(args, "target") === "production" ? "production" : null;
+    if (!target) return failed(invocationId, toolId, "Approved Vercel arguments are missing or invalid.");
     const controller = withTimeout();
     try {
       const response = await fetch("https://api.vercel.com/v13/deployments", {
@@ -126,7 +137,7 @@ export async function executeExternalApprovedTool(
         body: JSON.stringify({
           name: process.env.VERCEL_PROJECT_NAME || "lifeos-enterprise",
           project: projectId,
-          target: "production",
+          target,
         }),
       });
       const payload = await response.json().catch(() => null) as { id?: string; url?: string; error?: { message?: string } } | null;

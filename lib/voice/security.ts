@@ -57,6 +57,35 @@ export function authorizeVoiceRequest(request: Request, opts?: { requireWriteSec
   return { ok: true, subject: hashSubject(token) };
 }
 
+export function trustedClientIdentity(request: Request): string {
+  const origin = request.headers.get("origin") || "";
+  const referer = request.headers.get("referer") || "";
+  const ua = request.headers.get("user-agent") || "unknown-ua";
+  const auth = request.headers.get("authorization") || "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  const subject = token ? hashSubject(token) : "anonymous";
+  return `${subject}:${hashSubject(`${origin}|${referer}|${ua}`)}`;
+}
+
+export function authorizePaidTts(request: Request): VoiceAuthResult {
+  const ttsSecret = process.env.LIFEOS_TTS_SECRET;
+  const writeSecret = process.env.LIFEOS_WRITE_SECRET;
+  if (!ttsSecret && !writeSecret) {
+    return { ok: false, status: 503, error: "Server TTS authorization is not configured." };
+  }
+  const header = request.headers.get("authorization") || "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  if (!token || verifyVoiceSessionToken(token)) {
+    return { ok: false, status: 401, error: "Unauthorized." };
+  }
+  const matchesTts = Boolean(ttsSecret) && safeEqual(token, ttsSecret as string);
+  const matchesWrite = Boolean(writeSecret) && safeEqual(token, writeSecret as string);
+  if (!matchesTts && !matchesWrite) {
+    return { ok: false, status: 401, error: "Unauthorized." };
+  }
+  return { ok: true, subject: hashSubject(token) };
+}
+
 export function rateLimit(key: string, limit = 30, windowMs = 60_000) {
   const now = Date.now();
   const hits = (recentHits.get(key) || []).filter((time) => now - time < windowMs);

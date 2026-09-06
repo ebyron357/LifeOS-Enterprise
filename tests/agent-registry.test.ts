@@ -39,4 +39,16 @@ describe("tool registry", () => {
       SLACK_DEFAULT_CHANNEL: "#ops",
     })?.availability).toBe("configured");
   });
+
+  it("marks write tools unavailable when durable approval storage is disabled", () => {
+    const slack = getRegisteredTool("slack.send_message", {
+      SLACK_BOT_TOKEN: "x",
+      SLACK_DEFAULT_CHANNEL: "#ops",
+      LIFEOS_APPROVAL_STORE: "none",
+    });
+    expect(slack?.configured).toBe(false);
+    expect(slack?.availability).toBe("unavailable");
+    expect(slack?.unavailableReason).toMatch(/approval storage/i);
+    expect(getRegisteredTool("lifeos.read_projects", { LIFEOS_APPROVAL_STORE: "none" })?.configured).toBe(true);
+  });
 });

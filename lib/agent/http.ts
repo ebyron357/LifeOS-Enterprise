@@ -1,4 +1,4 @@
-import { rateLimit } from "@/lib/voice/security";
+import { rateLimit, trustedClientIdentity } from "@/lib/voice/security";
 
 export function validOrigin(request: Request): boolean {
   const origin = request.headers.get("origin");
@@ -13,7 +13,7 @@ export function validOrigin(request: Request): boolean {
 }
 
 export function clientKey(request: Request): string {
-  return request.headers.get("x-forwarded-for") || "local";
+  return trustedClientIdentity(request);
 }
 
 export function withinAgentRateLimit(request: Request, limit = 40): boolean {

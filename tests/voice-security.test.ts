@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  authorizePaidTts,
   authorizeVoiceRequest,
   createEphemeralVoiceSessionToken,
   getConfiguredVoiceProvider,
@@ -87,5 +88,26 @@ describe("voice security helpers", () => {
 
   it("redacts bearer tokens from log-like strings", () => {
     expect(redactSecrets("Authorization Bearer abc.def.ghi")).toMatch(/\[redacted\]/);
+  });
+
+  it("does not let a public voice-session token authorize paid TTS", () => {
+    const previousTts = process.env.LIFEOS_TTS_SECRET;
+    const previousWrite = process.env.LIFEOS_WRITE_SECRET;
+    const previousSession = process.env.LIFEOS_VOICE_SESSION_SECRET;
+    process.env.LIFEOS_TTS_SECRET = "tts-secret";
+    process.env.LIFEOS_WRITE_SECRET = "write-secret";
+    process.env.LIFEOS_VOICE_SESSION_SECRET = "session-test-secret";
+    const sessionToken = createEphemeralVoiceSessionToken();
+    const denied = authorizePaidTts(new Request("http://localhost/api", {
+      headers: { Authorization: `Bearer ${sessionToken}` },
+    }));
+    expect(denied.ok).toBe(false);
+    const allowed = authorizePaidTts(new Request("http://localhost/api", {
+      headers: { Authorization: "Bearer tts-secret" },
+    }));
+    expect(allowed.ok).toBe(true);
+    process.env.LIFEOS_TTS_SECRET = previousTts;
+    process.env.LIFEOS_WRITE_SECRET = previousWrite;
+    process.env.LIFEOS_VOICE_SESSION_SECRET = previousSession;
   });
 });

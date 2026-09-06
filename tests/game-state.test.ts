@@ -144,6 +144,17 @@ describe("game state engine", () => {
     expect(again.stats.xp).toBe(expected);
   });
 
+  it("counts daily check-in XP once in the end-of-day report", () => {
+    const initial = createInitialGameState(context);
+    const today = context.nowIso.slice(0, 10);
+    const checked = reduceGameState(initial, { type: "daily-check-in" }, context);
+    const checkInQuest = checked.questsByDate[today].find((quest) => quest.id === `daily-checkin-${today}`);
+    expect(checkInQuest?.status).toBe("done");
+    const ended = reduceGameState(checked, { type: "end-day" }, context);
+    expect(ended.endOfDay[today]?.xpEarned).toBe(checkInQuest?.xp);
+    expect(ended.endOfDay[today]?.completedQuestIds).toContain(`daily-checkin-${today}`);
+  });
+
   it("binds the daily check-in quest to the top priority next action", () => {
     const initial = createInitialGameState(context);
     const today = context.nowIso.slice(0, 10);

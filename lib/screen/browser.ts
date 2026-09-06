@@ -36,14 +36,19 @@ export function toAwarenessSnapshot(snapshot: ScreenShareSnapshot, nowMs: number
   };
 }
 
-export async function requestDisplayMedia(): Promise<{
+export async function requestDisplayMedia(
+  onState?: (snapshot: ScreenShareSnapshot) => void,
+): Promise<{
   stream: MediaStream | null;
   snapshot: ScreenShareSnapshot;
 }> {
   if (typeof navigator === "undefined" || !navigator.mediaDevices?.getDisplayMedia) {
-    return { stream: null, snapshot: markUnsupported() };
+    const unsupported = markUnsupported();
+    onState?.(unsupported);
+    return { stream: null, snapshot: unsupported };
   }
-  beginScreenShareRequest(INITIAL_SCREEN_SHARE);
+  const requesting = beginScreenShareRequest(INITIAL_SCREEN_SHARE);
+  onState?.(requesting);
   try {
     const stream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
@@ -52,18 +57,19 @@ export async function requestDisplayMedia(): Promise<{
     const track = stream.getVideoTracks()[0];
     const settings = track?.getSettings();
     const nowIso = new Date().toISOString();
-    return {
-      stream,
-      snapshot: grantScreenShare(INITIAL_SCREEN_SHARE, {
-        sourceName: track?.label || settings?.displaySurface || "shared window",
-        width: settings?.width ?? null,
-        height: settings?.height ?? null,
-        nowIso,
-      }),
-    };
+    const snapshot = grantScreenShare(requesting, {
+      sourceName: track?.label || settings?.displaySurface || "shared window",
+      width: settings?.width ?? null,
+      height: settings?.height ?? null,
+      nowIso,
+    });
+    onState?.(snapshot);
+    return { stream, snapshot };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Screen share permission was denied.";
-    return { stream: null, snapshot: denyScreenShare(INITIAL_SCREEN_SHARE, message) };
+    const snapshot = denyScreenShare(requesting, message);
+    onState?.(snapshot);
+    return { stream: null, snapshot };
   }
 }
 

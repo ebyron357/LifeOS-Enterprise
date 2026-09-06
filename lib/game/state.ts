@@ -410,7 +410,10 @@ function endDay(state: GameState, context: GameContext): GameState {
   const date = isoDate(context.nowIso);
   const quests = state.questsByDate[date] ?? [];
   const completed = quests.filter((item) => item.status === "done");
-  const xpEarned = completed.reduce((sum, item) => sum + item.xp, 0) + (state.grantedEventIds.includes(`checkin:${date}`) ? 20 : 0);
+  const questXp = completed.reduce((sum, item) => sum + item.xp, 0);
+  const checkInAlreadyInQuests = completed.some((item) => item.id === `daily-checkin-${date}`);
+  const checkInOnly = !checkInAlreadyInQuests && state.grantedEventIds.includes(`checkin:${date}`);
+  const xpEarned = questXp + (checkInOnly ? 20 : 0);
   const summary = completed.length
     ? `Completed ${completed.length} quests and earned ${xpEarned} XP today.`
     : "No quests were completed today. Keep momentum with one small action tomorrow.";

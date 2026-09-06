@@ -1,28 +1,35 @@
 import { NextResponse } from "next/server";
-import { rateLimit, redactSecrets, verifyVoiceSessionToken } from "@/lib/voice/security";
-import { createOpenAiTtsProvider, selectPreferredTtsProvider, type TtsProviderId } from "@/lib/voice/tts-providers";
+import { validOrigin } from "@/lib/agent/http";
+import { authorizePaidTts, rateLimit, redactSecrets, trustedClientIdentity } from "@/lib/voice/security";
+import { createOpenAiTtsProvider, type TtsProviderId } from "@/lib/voice/tts-providers";
 
 export const runtime = "nodejs";
+
+const MAX_TTS_CHARS = 2000;
 
 type SpeakBody = {
   text?: string;
   locale?: string;
   speed?: number;
   style?: "balanced" | "concise" | "coach";
-  provider?: TtsProviderId;
+  provider?: TtsProviderId | string;
 };
 
-export async function POST(request: Request) {
-  const ip = request.headers.get("x-forwarded-for") || "local";
-  if (!rateLimit(`voice-speak:${ip}`, 50)) {
-    return NextResponse.json({ ok: false, error: "Rate limit exceeded." }, { status: 429 });
-  }
+function browserFallback(status: number, error: string) {
+  return NextResponse.json({
+    ok: false,
+    provider: "browser",
+    fallbackToBrowser: true,
+    error,
+  }, { status });
+}
 
-  const auth = request.headers.get("authorization") || "";
-  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-  const sessionRequired = Boolean(process.env.LIFEOS_VOICE_SESSION_SECRET);
-  if (sessionRequired && !verifyVoiceSessionToken(token)) {
-    return NextResponse.json({ ok: false, error: "Voice session required." }, { status: 401 });
+export async function POST(request: Request) {
+  if (!validOrigin(request)) {
+    return NextResponse.json({ ok: false, error: "Origin not allowed." }, { status: 403 });
+  }
+  if (!rateLimit(`voice-speak:${trustedClientIdentity(request)}`, 30)) {
+    return NextResponse.json({ ok: false, error: "Rate limit exceeded." }, { status: 429 });
   }
 
   let body: SpeakBody;
@@ -32,23 +39,36 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Invalid JSON body." }, { status: 400 });
   }
 
+  const requestedProvider = body.provider;
+  if (requestedProvider && requestedProvider !== "browser" && requestedProvider !== "openai") {
+    return NextResponse.json({ ok: false, error: "Invalid TTS provider." }, { status: 400 });
+  }
+
+  if (requestedProvider === "browser") {
+    return browserFallback(503, "Browser speech was requested. Server TTS was not used.");
+  }
+
   const text = body.text?.trim();
   if (!text) return NextResponse.json({ ok: false, error: "text is required." }, { status: 400 });
+  if (text.length > MAX_TTS_CHARS) {
+    return NextResponse.json({ ok: false, error: "text exceeds the server TTS length limit." }, { status: 413 });
+  }
+
+  const auth = authorizePaidTts(request);
+  if (!auth.ok) return NextResponse.json({ ok: false, error: auth.error }, { status: auth.status });
+
   const locale = body.locale?.trim() || "en-US";
   const speed = Number.isFinite(body.speed) ? Number(body.speed) : 1;
   const style = body.style ?? "balanced";
+  const provider = createOpenAiTtsProvider();
 
-  const provider = body.provider === "openai"
-    ? createOpenAiTtsProvider()
-    : selectPreferredTtsProvider();
-
-  if (provider.id === "browser") {
+  if (!provider.configured) {
     return NextResponse.json({
       ok: false,
-      provider: "browser",
+      provider: "openai",
       fallbackToBrowser: true,
       error: "Server-side TTS is unavailable. Use browser fallback.",
-    }, { status: 503 });
+    }, { status: 502 });
   }
 
   const result = await provider.synthesize({ text, locale, speed, style });
@@ -70,3 +90,5 @@ export async function POST(request: Request) {
     },
   });
 }
+
+export const TTS_MAX_CHARS = MAX_TTS_CHARS;
