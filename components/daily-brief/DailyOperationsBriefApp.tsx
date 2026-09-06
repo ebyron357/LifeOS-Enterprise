@@ -147,6 +147,10 @@ export function DailyOperationsBriefApp({ projects, generatedAtIso, timezone }: 
         ) : null}
       </section>
 
+      {brief.staleWarnings.length ? (
+        <p role="alert" className={styles.staleWarning}>{brief.staleWarnings.length} stale-data warning(s): {brief.staleWarnings.join(" ")}</p>
+      ) : null}
+
       <section aria-label="Start Here">
         <h3 className={styles.sectionTitle}>Start Here</h3>
         {brief.startHere ? (
@@ -319,9 +323,6 @@ export function DailyOperationsBriefApp({ projects, generatedAtIso, timezone }: 
         <ul>
           {brief.assumptions.map((assumption) => <li key={assumption}>{assumption}</li>)}
         </ul>
-        {brief.staleWarnings.length ? (
-          <p role="alert" className={styles.staleWarning}>{brief.staleWarnings.length} stale-data warning(s): {brief.staleWarnings.join(" ")}</p>
-        ) : null}
       </details>
 
       {review ? (

@@ -142,6 +142,7 @@
 
 .os-main {
   min-width: 0;
+  max-width: 100%;
   padding: 24px 24px 112px;
 }
 
@@ -316,6 +317,7 @@
 }
 
 @media (max-width: 900px) {
+  .os-app { overflow-x: clip; }
   .os-body { grid-template-columns: 1fr; }
   .os-rail { display: none; }
   .os-dock {
