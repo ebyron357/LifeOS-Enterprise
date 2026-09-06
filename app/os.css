@@ -1,0 +1,342 @@
+.os-app {
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.os-skip {
+  position: absolute;
+  left: -999px;
+  top: 8px;
+}
+
+.os-skip:focus {
+  left: 8px;
+  z-index: 80;
+  padding: 10px 14px;
+  background: var(--cyan);
+  color: #001014;
+}
+
+.os-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 64px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(5, 8, 13, 0.92);
+  backdrop-filter: blur(16px);
+}
+
+.os-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.os-brand strong {
+  letter-spacing: 0.08em;
+  font-size: 0.95rem;
+}
+
+.os-brand small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.os-ask {
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--cyan);
+  background: rgba(53, 231, 255, 0.1);
+  color: var(--text);
+  font: 700 0.95rem Arial, sans-serif;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.os-ask:hover,
+.os-ask:focus-visible {
+  background: rgba(53, 231, 255, 0.2);
+}
+
+.os-top-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.os-icon-btn,
+.os-ask,
+.os-dock a,
+.os-rail a,
+.os-card a.os-primary,
+.os-primary,
+.os-secondary,
+.os-capture button,
+.os-journal button,
+.os-page button {
+  min-height: 48px;
+}
+
+.os-icon-btn {
+  min-width: 48px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.os-body {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+}
+
+.os-rail {
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  overflow: auto;
+  padding: 16px 12px 96px;
+  border-right: 1px solid var(--line);
+}
+
+.os-rail a,
+.os-dock a,
+.os-more-grid a {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  color: var(--text);
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.os-rail a[aria-current="page"],
+.os-dock a[aria-current="page"] {
+  border-color: var(--cyan);
+  background: rgba(53, 231, 255, 0.08);
+}
+
+.os-rail a strong,
+.os-dock a strong,
+.os-more-grid a strong {
+  font-size: 0.95rem;
+}
+
+.os-rail a span,
+.os-more-grid a span {
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.os-main {
+  min-width: 0;
+  max-width: 100%;
+  padding: 24px 24px 112px;
+}
+
+.os-page-header h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  letter-spacing: -0.04em;
+}
+
+.os-page-header p,
+.os-lede {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  max-width: 42rem;
+}
+
+.os-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.os-grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.os-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  background: rgba(11, 16, 24, 0.84);
+}
+
+.os-card h2 {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+}
+
+.os-card ol,
+.os-card ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.os-card li + li {
+  margin-top: 8px;
+}
+
+.os-primary,
+.os-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  text-decoration: none;
+  cursor: pointer;
+  font: 700 0.95rem Arial, sans-serif;
+}
+
+.os-primary {
+  border: 1px solid var(--cyan);
+  background: rgba(53, 231, 255, 0.12);
+  color: var(--text);
+}
+
+.os-secondary {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+}
+
+.os-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  font: 700 0.68rem ui-monospace, monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.os-badge[data-state="connected"],
+.os-badge[data-state="available"] { color: var(--green); border-color: var(--green); }
+.os-badge[data-state="configured"] { color: var(--amber); border-color: var(--amber); }
+.os-badge[data-state="unavailable"],
+.os-badge[data-state="error"],
+.os-badge[data-state="degraded"] { color: var(--red); border-color: var(--red); }
+
+.os-empty {
+  padding: 24px;
+  border: 1px dashed var(--line);
+}
+
+.os-dock {
+  display: none;
+}
+
+.os-capture,
+.os-journal form {
+  display: grid;
+  gap: 10px;
+}
+
+.os-capture input,
+.os-capture select,
+.os-journal textarea,
+.os-journal select,
+.os-learning input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  background: rgba(7, 11, 17, 0.9);
+  color: var(--text);
+  font: 1rem Arial, sans-serif;
+}
+
+.os-journal textarea {
+  min-height: 160px;
+  resize: vertical;
+}
+
+.os-project-meta {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.os-more-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.os-palette-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.55);
+  display: grid;
+  place-items: start center;
+  padding-top: 12vh;
+}
+
+.os-palette {
+  width: min(640px, calc(100% - 24px));
+  border: 1px solid var(--line-hot);
+  background: var(--panel);
+  padding: 8px;
+}
+
+.os-palette input {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: 1.05rem Arial, sans-serif;
+}
+
+.os-palette [cmdk-item] {
+  min-height: 48px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.os-palette [cmdk-item][data-selected="true"] {
+  background: rgba(53, 231, 255, 0.1);
+}
+
+@media (max-width: 900px) {
+  .os-app { overflow-x: clip; }
+  .os-body { grid-template-columns: 1fr; }
+  .os-rail { display: none; }
+  .os-dock {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 30;
+    border-top: 1px solid var(--line);
+    background: rgba(5, 8, 13, 0.96);
+  }
+  .os-dock a {
+    align-items: center;
+    text-align: center;
+    font-size: 0.78rem;
+    min-height: 64px;
+    justify-content: center;
+  }
+  .os-main { padding: 18px 14px 96px; }
+  .os-topbar { gap: 8px; }
+  .os-ask { padding: 0 12px; }
+}

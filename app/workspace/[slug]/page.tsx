@@ -34,7 +34,7 @@ export default async function PreparedWorkspacePage({ params }: WorkspacePagePro
           Command Center is fully implemented in V1.
         </p>
         <p>No fake data is shown here. Canonical vault Markdown remains unchanged.</p>
-        <Link className="workspace-action workspace-action--primary" href="/dashboard">
+        <Link className="workspace-action workspace-action--primary" href="/">
           Return to Command Center
         </Link>
       </div>

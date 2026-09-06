@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
-import type { VaultSection } from "@/lib/vault/types";
-import { PortalSidebar } from "./PortalSidebar";
+import { AppShell } from "@/components/os/AppShell";
+import { daypartGreeting } from "@/lib/os/greeting";
 
 type VaultPageLayoutProps = {
   title: string;
   description?: string;
   eyebrow?: string;
-  counts?: Partial<Record<VaultSection, number>>;
+  counts?: unknown;
   dashboardActions?: ReactNode;
   children: ReactNode;
 };
@@ -14,23 +14,17 @@ type VaultPageLayoutProps = {
 export function VaultPageLayout({
   title,
   description,
-  eyebrow = "Vault portal",
-  counts,
-  dashboardActions,
+  eyebrow,
   children,
 }: VaultPageLayoutProps) {
   return (
-    <div className="lifeos-app">
-      <a className="skip-link" href="#main-content">Skip to main content</a>
-      <PortalSidebar counts={counts} dashboardActions={dashboardActions} />
-      <main id="main-content" className="dashboard-shell portal-main" tabIndex={-1}>
-        <header className="portal-page-header">
-          <p className="widget-eyebrow">{eyebrow}</p>
-          <h1>{title}</h1>
-          {description ? <p className="portal-page-description">{description}</p> : null}
-        </header>
-        {children}
-      </main>
-    </div>
+    <AppShell greeting={daypartGreeting()}>
+      <header className="os-page-header">
+        {eyebrow ? <p className="widget-eyebrow">{eyebrow}</p> : null}
+        <h1>{title}</h1>
+        {description ? <p>{description}</p> : null}
+      </header>
+      {children}
+    </AppShell>
   );
 }

@@ -1,22 +1,22 @@
-import { VaultPageLayout } from "@/components/shell/VaultPageLayout";
-import { ProjectsView } from "@/components/vault/ProjectsView";
-import { getNotesBySection, getSectionCounts } from "@/lib/vault/index";
+import { AppShell } from "@/components/os/AppShell";
+import { ProjectCards } from "@/components/os/ProjectCards";
+import { getVaultDashboardData } from "@/lib/lifeos/vault-data";
+import { daypartGreeting } from "@/lib/os/greeting";
 
 export const revalidate = 300;
 
 export default async function ProjectsPage() {
-  const [notes, counts] = await Promise.all([
-    getNotesBySection("projects"),
-    getSectionCounts(),
-  ]);
+  const vault = await getVaultDashboardData();
 
   return (
-    <VaultPageLayout
-      title="Projects"
-      description="Active, waiting, and blocked project records from the canonical vault."
-      counts={counts}
-    >
-      <ProjectsView notes={notes} />
-    </VaultPageLayout>
+    <AppShell greeting={daypartGreeting()}>
+      <div className="os-grid">
+        <header className="os-page-header">
+          <h1>Projects</h1>
+          <p>Open a workspace. Resume work. This is not a file tree.</p>
+        </header>
+        <ProjectCards projects={vault.projects} />
+      </div>
+    </AppShell>
   );
 }

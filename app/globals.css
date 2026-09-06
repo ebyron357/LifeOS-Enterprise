@@ -528,9 +528,9 @@ body::before { display:none; }
 .folder-tree a,.type-list a { color: var(--text); text-decoration: none; }
 .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag-cloud a { color: var(--cyan); text-decoration: none; font-size: .72rem; }
-.data-table-wrap { overflow: auto; border: 1px solid var(--line); }
-.data-table { width: 100%; border-collapse: collapse; font-size: .72rem; }
-.data-table th,.data-table td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.data-table-wrap { overflow: auto; max-width: 100%; min-width: 0; border: 1px solid var(--line); }
+.data-table { width: 100%; min-width: 0; border-collapse: collapse; font-size: .72rem; }
+.data-table th,.data-table td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; overflow-wrap: anywhere; word-break: break-word; }
 .data-table th { color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-size: .58rem; }
 .data-table a { color: var(--cyan); text-decoration: none; }
 .breadcrumbs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 18px; color: var(--muted); font-size: .68rem; }

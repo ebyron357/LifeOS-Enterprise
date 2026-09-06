@@ -168,5 +168,7 @@ test.describe("Daily Operations Brief", () => {
     await page.goto("/daily-brief");
     await page.getByText("Assumptions and confidence").click();
     await expect(page.getByText(/stale-data warning/)).toBeVisible();
+    await expect(page.getByText("Start Here").first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Daily Operations Brief" })).toBeVisible();
   });
 });

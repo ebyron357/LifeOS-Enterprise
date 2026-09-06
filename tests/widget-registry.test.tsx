@@ -43,11 +43,9 @@ describe("executive dashboard", () => {
     render(<DashboardLayout widgets={widgetRegistry} data={data} github={github} counts={{ search: 120, projects: 3, tasks: 8 }} />);
     expect(screen.getByRole("heading", { name: /good day,\s*bwa/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Command Center" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /overview/i })).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /ask lifeos/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole("link", { name: /projects/i }).length).toBeGreaterThan(0);
-    expect(screen.getByRole("link", { name: /growth/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /intelligence/i })).toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: /agents/i }).length).toBeGreaterThan(0);
+    expect(screen.getByRole("navigation", { name: "Primary" })).toBeInTheDocument();
     expect(screen.getByText("What deserves attention")).toBeInTheDocument();
     expect(screen.getByText("Lead with wisdom")).toBeInTheDocument();
     expect(screen.getAllByText("Revenue radar").length).toBeGreaterThan(0);
@@ -58,7 +56,6 @@ describe("executive dashboard", () => {
     expect(mission).toHaveTextContent(/Blocked\s*1/);
     expect(mission).toHaveTextContent(/Waiting\s*1/);
     expect(mission).toHaveTextContent(/Reviews due\s*1/);
-    expect(screen.getByText("120 indexed notes")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /restore default layout/i })).toBeInTheDocument();
   });
 
