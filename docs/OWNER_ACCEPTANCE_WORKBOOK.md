@@ -2,151 +2,197 @@
 
 **Document type:** Printable owner acceptance workbook  
 **Repository:** `ebyron357/LifeOS-Enterprise`  
-**Governing status:** PR #60 is on `main`. This workbook now covers the post-#60 security corrective draft PR. Owner acceptance is still required.  
+**Current production SHA:** `46a2514893b4e3557911403274cba695b1c89384`  
+**Production URL:** `https://lifeos-enterprise.vercel.app/`  
+**Governing status:** PRs #60, #61, and #62 are merged to `main`, and the current production deployment serves #62. Owner acceptance is still required.  
 **Do not mark owner acceptance complete in this workbook on the owner's behalf.**
 
-Use one row per test. Record evidence (screenshot, short note, or commit SHA). Separate agent-completed work from owner-required work.
+Use one row per test. Record evidence such as a screenshot, short note, deployment ID, or commit SHA. Separate agent-completed work from owner-required work.
 
 ---
 
 ## How to use
 
-1. Open the post-#60 corrective draft PR preview. Do not treat `main` or PR #60 as owner-accepted.
-2. Complete every checkbox row.
-3. Mark Pass / Fail.
-4. Attach evidence.
-5. Sign only after all owner-required rows pass.
+1. Confirm the deployed SHA is `46a2514893b4e3557911403274cba695b1c89384` before testing.
+2. Open `https://lifeos-enterprise.vercel.app/` on the real owner desktop/mobile browsers.
+3. Complete every applicable checkbox row below.
+4. Mark Pass / Fail and attach evidence.
+5. Do not enable production writes merely to finish the workbook; credential-gated checks are performed only when the owner intentionally enables those integrations.
+6. Sign only after all required owner rows pass and any accepted deferrals are documented.
 
 ---
 
-## Section A — Agent-completed prerequisites (verify, do not re-implement)
+## Section A — Production identity and unified Command Center
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| A1 | Draft PR exists | Open the post-#60 corrective draft PR | One draft PR contains the write-auth, durable-store, approved-payload, TTS, XP, and screen-state fixes plus tests and docs. PR #59 stays closed. | ☐ | | |
-| A2 | Automated tests green | Review CI / local test report in PR | Lint, typecheck, unit, build, vault audit, Playwright reported | ☐ | | |
-| A3 | No secrets in repo | Spot-check `.env.example` and diff | Placeholders only; no live tokens | ☐ | | |
-| A4 | Integrations truthful | Open `/conversation` Context/tools | Unconfigured tools shown unavailable with requirements | ☐ | | |
+| A1 | Deployment identity | Open production and confirm deployment evidence | Production is serving SHA `46a2514893b4e3557911403274cba695b1c89384` | ☐ | | |
+| A2 | Root Command Center | Open `/` | One clear LifeOS Command Center appears; the root does not redirect to the legacy dashboard | ☐ | | |
+| A3 | Primary mission | Read the Today card | A current mission, critical outcomes, and one Start Here action are visible without hunting folders | ☐ | | |
+| A4 | Resume work | Use Start Here / Projects to resume a project | Correct project workspace opens and the next action is visible | ☐ | | |
+| A5 | Ask LifeOS | Open `/conversation` from the persistent Ask LifeOS control | Conversation opens and existing voice/write safety behavior remains available | ☐ | | |
+| A6 | Capture | Open Capture and save a harmless test note | Item appears in Inbox; UI clearly states browser-local storage | ☐ | | |
+| A7 | Journal | Open `/journal` | Today's journal flow is usable and does not show raw template placeholders | ☐ | | |
+| A8 | Learning | Open `/learning` | Continue/add-learning flow is understandable; no misleading index-note behavior is accepted silently | ☐ | | |
+| A9 | Files | Open `/files` | Search-first file experience works without requiring folder reconstruction | ☐ | | |
+| A10 | Integration truth | Open `/integrations` | GitHub/LifeOS states are truthful; unconfigured tools are not labeled connected | ☐ | | |
+| A11 | Advanced dashboard retained | Open `/dashboard` from More/advanced tools | Existing widget dashboard remains accessible | ☐ | | |
+| A12 | Browser navigation | Use back/forward through several primary routes | History behaves normally; no forced navigation loop | ☐ | | |
+| A13 | Mobile shell | Repeat core navigation at 390px | Home, Ask LifeOS, Projects, Capture, and More are easy to reach | ☐ | | |
 
 ---
 
-## Section B — Dashboard and widgets
+## Section B — Agent-completed prerequisites to verify
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| B1 | Desktop hydrate @1440 | Open `/dashboard` at 1440px | Multi-column widgets visible; no uncaught console errors | ☐ | | |
-| B2 | Laptop hydrate @1024 | Open `/dashboard` at 1024px | Layout usable; widgets visible | ☐ | | |
-| B3 | Drag | Drag a widget by the ⋮⋮ handle | Coordinates change and persist after refresh | ☐ | | |
-| B4 | Resize | Resize a widget from SE handle | Dimensions change and persist | ☐ | | |
-| B5 | Minimize / restore | Minimize then Restore | Widget collapses and restores | ☐ | | |
-| B6 | Show / hide | Widget Library → Hide then Show | Widget disappears/reappears and persists | ☐ | | |
-| B7 | Accessible reorder | Widget Library → Move up/down | Order changes; keyboard operable | ☐ | | |
-| B8 | Repair Layout | Click Repair layout | Invalid layout recovers to defaults with visible message if repaired | ☐ | | |
-| B9 | Mobile @390 | Open dashboard at 390px | Stacked cards with Move up/down, Minimize, Hide — not a dead feed | ☐ | | |
-| B10 | Reduced motion | Enable reduced motion preference | Motion respects preference; controls remain usable | ☐ | | |
+| B1 | Current main contains merged fixes | Inspect current GitHub main | #60 operational closeout, #61 security/write corrective, and #62 Command Center rebuild are all present | ☐ | | |
+| B2 | Automated validation record | Review PR #61/#62 evidence | Lint, typecheck, unit, build, audit, and vault audit are recorded; browser-suite limitations are disclosed rather than hidden | ☐ | | |
+| B3 | No secrets in repo | Spot-check `.env.example` and recent diffs | Placeholders only; no live tokens | ☐ | | |
+| B4 | Integration availability truthful | Inspect `/integrations` and `/conversation` Context/tools | Unconfigured tools show unavailable/configured requirements, never invented success | ☐ | | |
+| B5 | Stale PR cleanup | Inspect open PR list | Superseded PR #55 is closed; no competing conversation-runtime PR remains active | ☐ | | |
 
 ---
 
-## Section C — Verified game loop
+## Section C — Advanced dashboard and widgets
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| C1 | Profile / avatar | Change alias and avatar | Profile updates; no XP invented | ☐ | | |
-| C2 | Progress bar | Complete one attested quest | XP bar advances; level math matches XP | ☐ | | |
-| C3 | Verified completion | Click Complete (attest) and confirm | XP awarded once | ☐ | | |
-| C4 | Duplicate protection | Confirm complete again / refresh | No duplicate XP | ☐ | | |
-| C5 | Cancel attestation | Click Complete then cancel dialog | No XP awarded | ☐ | | |
-| C6 | Daily check-in | Click Daily check-in | +20 XP once per day; streak updates | ☐ | | |
-| C7 | Boss / side / main quests | Inspect today's quests | Quests derive from active/blocked/waiting projects; boss battles show smaller actions | ☐ | | |
-| C10 | Boss steps | Mark a boss step, then attest the battle | Step mark awards 0 XP; attested boss awards XP once | ☐ | | |
-| C8 | End of day | Click End day results | Summary of completed quests appears; daily check-in XP is listed once | ☐ | | |
-| C11 | Check-in XP once | Daily check-in, complete the daily check-in quest if shown, End day, refresh | XP and the end-of-day total count the check-in once | ☐ | | |
-| C9 | Repair / reset | Repair then optionally Reset | Corrupted state recovers; reset clears progress intentionally | ☐ | | |
+| C1 | Desktop hydrate @1440 | Open `/dashboard` at 1440px | Multi-column widgets visible; no uncaught console errors | ☐ | | |
+| C2 | Laptop hydrate @1024 | Open `/dashboard` at 1024px | Layout usable; widgets visible | ☐ | | |
+| C3 | Drag | Drag a widget by the handle | Coordinates change and persist after refresh | ☐ | | |
+| C4 | Resize | Resize a widget from the resize handle | Dimensions change and persist | ☐ | | |
+| C5 | Minimize / restore | Minimize then restore | Widget collapses and restores | ☐ | | |
+| C6 | Show / hide | Widget Library → Hide then Show | Widget disappears/reappears and persists | ☐ | | |
+| C7 | Accessible reorder | Widget Library → Move up/down | Order changes; keyboard operable | ☐ | | |
+| C8 | Repair Layout | Click Repair layout | Invalid layout recovers to defaults with visible feedback | ☐ | | |
+| C9 | Mobile @390 | Open dashboard at 390px | Mobile customization/reorder controls are usable; not a dead feed | ☐ | | |
+| C10 | Reduced motion | Enable reduced-motion preference | Motion respects preference; controls remain usable | ☐ | | |
 
 ---
 
-## Section D — Voice system
+## Section D — Verified game loop
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| D1 | Voice settings | Open `/conversation` Voice settings | Provider, locale, input language, style, speed, pitch visible | ☐ | | |
-| D2 | Preview / reset | Preview voice; Reset to default | Audible preview; defaults restore | ☐ | | |
-| D3 | Persist prefs | Change settings; refresh | Settings restored from local storage | ☐ | | |
-| D4 | Provider truth | With/without `OPENAI_API_KEY` | Unconfigured OpenAI not shown as available | ☐ | | |
-| D5 | Start / stop | Start then Stop conversation | Listening starts/stops; no leftover capture | ☐ | | |
-| D6 | Mute stops mic | Start conversation; Mute | Mic capture stops; transcripts stop submitting | ☐ | | |
-| D7 | Unmute | Unmute | Listening resumes only after unmute | ☐ | | |
-| D8 | Interrupt | Speak while assistant talking; Interrupt | Speech stops immediately; no overlap | ☐ | | |
-| D9 | Push-to-talk | Hold Push to talk, then release | Listening starts on hold and stops on release; last phrase can flush | ☐ | | |
-| D10 | States visible | Observe UI during flow | listening / thinking / speaking / muted / stopped / error clear | ☐ | | |
-| D11 | Mobile voice | Repeat D5–D8 at 390px | Controls usable on mobile | ☐ | | |
-| D12 | Browser provider | Set Voice settings provider to Browser, then speak | Browser speech is used. Server TTS is not called. | ☐ | | |
-| D13 | Paid TTS auth | With OpenAI selected, omit the owner write/TTS secret | Server TTS is rejected or falls back; a public voice-session token cannot spend the OpenAI key | ☐ | | |
+| D1 | Profile / avatar | Change alias/avatar | Profile updates; no XP invented | ☐ | | |
+| D2 | Progress bar | Complete one attested quest | XP bar advances; level math matches XP | ☐ | | |
+| D3 | Verified completion | Click Complete/attest and confirm | XP awarded once | ☐ | | |
+| D4 | Duplicate protection | Confirm completion again / refresh | No duplicate XP | ☐ | | |
+| D5 | Cancel attestation | Start completion then cancel | No XP awarded | ☐ | | |
+| D6 | Daily check-in | Click Daily check-in | +20 XP once per day; streak updates | ☐ | | |
+| D7 | Quest grounding | Inspect main/side/boss quests | Quests derive from real active/blocked/waiting project evidence | ☐ | | |
+| D8 | Boss steps | Mark a boss step, then attest battle | Step mark awards 0 XP; attested boss awards once | ☐ | | |
+| D9 | End of day | Click End day results | Completed quests appear; daily check-in XP is listed once | ☐ | | |
+| D10 | Check-in idempotency | Daily check-in, interact with matching quest, refresh/end day | XP and totals count the check-in once | ☐ | | |
+| D11 | Repair / reset | Repair then optionally reset | Corrupted state recovers; reset clears intentionally | ☐ | | |
 
 ---
 
-## Section E — Screen sharing safety
+## Section E — Voice system
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| E1 | Share / stop | Share screen; Stop sharing | All tracks stop; indicator not active | ☐ | | |
-| E2 | Browser end | End share from browser UI | App updates to ended; no false active state | ☐ | | |
-| E3 | Navigate away | Share then leave `/conversation` | Tracks released on cleanup | ☐ | | |
-| E4 | Deny permission | Deny share permission | Denied state; safe recovery | ☐ | | |
-| E5 | Requesting state | Click Share screen and wait on the browser picker | UI shows requesting before grant, deny, stop, pause, or end | ☐ | | |
+| E1 | Voice settings | Open `/conversation` Voice settings | Provider, locale, input language, style, speed, pitch visible | ☐ | | |
+| E2 | Preview / reset | Preview voice; reset defaults | Audible preview; defaults restore | ☐ | | |
+| E3 | Persist prefs | Change settings; refresh | Settings restore safely | ☐ | | |
+| E4 | Provider truth | With/without `OPENAI_API_KEY` | Unconfigured OpenAI is not shown as available | ☐ | | |
+| E5 | Start / stop | Start then stop conversation | Listening starts/stops; no leftover capture | ☐ | | |
+| E6 | Mute stops mic | Start conversation; mute | Mic capture stops; transcripts stop submitting | ☐ | | |
+| E7 | Unmute | Unmute | Listening resumes only after explicit unmute/restart behavior | ☐ | | |
+| E8 | Interrupt | Interrupt while assistant speaks | Speech stops promptly; no overlapping assistant speech | ☐ | | |
+| E9 | Push-to-talk | Hold push-to-talk then release | Listening follows the intended hold/release interaction | ☐ | | |
+| E10 | States visible | Observe full flow | listening / thinking / speaking / muted / stopped / error states are clear | ☐ | | |
+| E11 | Mobile voice | Repeat core voice checks at 390px | Controls remain usable | ☐ | | |
+| E12 | Browser provider | Select Browser provider and speak | Browser speech is used; server OpenAI TTS is not called | ☐ | | |
+| E13 | Paid TTS auth | If intentionally configured, omit owner TTS/write secret | Paid server TTS is rejected/falls back; public session token cannot spend the key | ☐ | | |
 
 ---
 
-## Section F — Authorization, approvals, draft-PR-only writes
+## Section F — Screen sharing safety
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| F1 | Approval gate | Ask Conversation to send Slack / stage change when configured | Pending approval required; no silent execute | ☐ | | |
-| F2 | Reject | Reject approval | Nothing executes | ☐ | | |
-| F3 | Forged approval | Attempt client-only approve without server record | Server rejects unknown/replayed/expired/wrong-project | ☐ | | |
-| F4 | Change-plan draft PR | Stage a change plan with write config enabled in preview | Creates/updates **draft** PR only; never writes `main` | ☐ | | |
-| F5 | Wrong project | Attempt write for mismatched project/path | Rejected server-side | ☐ | | |
-| F6 | Failed write honesty | Force a failing write (bad token) | UI/API reports failure; no success claim | ☐ | | |
-| F7 | Owner write secret | Approve a pending Slack/ClickUp/n8n/Vercel action without the write secret, then with it | Anonymous and voice-session tokens are rejected. Only `LIFEOS_WRITE_SECRET` with `LIFEOS_WRITE_ENABLED=true` can approve | ☐ | | |
-| F8 | Displayed args execute | Inspect the approval argument block, then approve | Slack/ClickUp/n8n/Vercel receive those exact stored arguments, not the summary sentence | ☐ | | |
-| F9 | Durable store fail-closed | Preview or production without Upstash Redis REST | Write/approval execution reports unavailable. No silent in-memory production fallback | ☐ | | |
+| F1 | Share / stop | Share screen; stop sharing | All tracks stop; indicator not falsely active | ☐ | | |
+| F2 | Browser end | End share from browser UI | App updates to ended state | ☐ | | |
+| F3 | Navigate away | Share then leave `/conversation` | Tracks release on cleanup | ☐ | | |
+| F4 | Deny permission | Deny share permission | Denied state; safe recovery | ☐ | | |
+| F5 | Requesting state | Click Share screen and wait on picker | Requesting state is visible before grant/deny/end | ☐ | | |
 
 ---
 
-## Section G — Configuration and environment
+## Section G — Authorization, approvals, and draft-PR-only writes
+
+These checks are required only when the owner intentionally enables the relevant write configuration. Leaving writes disabled is a valid safe operating state.
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| G1 | Copy env | Copy `.env.example` → local/Vercel | Placeholders only | ☐ | | |
-| G2 | Write fail-closed | Leave write secrets empty | Writes disabled; no crash | ☐ | | |
-| G3 | Optional voice | Leave OpenAI empty | Browser fallback; dashboard still loads | ☐ | | |
-| G4 | Production origin | Set `LIFEOS_ALLOWED_ORIGIN` | Cross-origin denied | ☐ | | |
-| G5 | Approval Redis | Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` only when enabling writes | Approvals survive cold starts; missing store fails closed | ☐ | | |
-| G6 | TTS secret | Optionally set `LIFEOS_TTS_SECRET` or reuse `LIFEOS_WRITE_SECRET` | Public session tokens cannot spend `OPENAI_API_KEY` | ☐ | | |
+| G1 | Approval gate | Request a configured Slack/ClickUp/n8n/Vercel or canonical write action | Pending approval required; no silent execution | ☐ | | |
+| G2 | Reject | Reject approval | Nothing executes | ☐ | | |
+| G3 | Forged approval | Attempt client-only approval without valid server record | Server rejects unknown/replayed/expired/mismatched approval | ☐ | | |
+| G4 | Change-plan draft PR | Stage canonical change with write config enabled | Creates/updates a **draft** PR only; never writes directly to `main` | ☐ | | |
+| G5 | Wrong project/path | Attempt mismatched project/path write | Rejected server-side | ☐ | | |
+| G6 | Failed write honesty | Force a failing write with controlled bad credentials | UI/API reports failure; no success claim | ☐ | | |
+| G7 | Owner write secret | Attempt approval without then with write secret | Anonymous/voice-session tokens rejected; owner secret required | ☐ | | |
+| G8 | Displayed args execute | Inspect approval arguments then approve | Executed payload matches immutable stored arguments | ☐ | | |
+| G9 | Durable store fail-closed | Remove/omit Upstash Redis REST | Write/approval actions report unavailable; no production memory fallback | ☐ | | |
 
-### Owner credential checklist (owner-only)
+---
+
+## Section H — Configuration and environment
+
+| # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
+|---|---|---|---|---|---|---|
+| H1 | Environment placeholders | Review `.env.example` / Vercel settings | Repo has placeholders only; production secrets stay server-side | ☐ | | |
+| H2 | Write fail-closed | Leave write secrets empty | Writes disabled; application remains usable | ☐ | | |
+| H3 | Voice fallback | Leave OpenAI empty | Browser fallback remains available where supported | ☐ | | |
+| H4 | Production origin | If enabling writes, set `LIFEOS_ALLOWED_ORIGIN` | Cross-origin write attempts denied | ☐ | | |
+| H5 | Approval Redis | If enabling writes, set Upstash REST URL/token | Approvals survive cold starts; missing store fails closed | ☐ | | |
+| H6 | TTS secret | If enabling paid TTS, set dedicated/reused owner secret | Public session tokens cannot spend `OPENAI_API_KEY` | ☐ | | |
+| H7 | Integration credentials | Configure only intentionally approved tools | Integration health changes only after real prerequisites/probes | ☐ | | |
+| H8 | Hermes honesty | Leave Hermes unset unless a real runtime exists | Hermes remains unavailable; no fake delegated-run count | ☐ | | |
+
+### Owner credential checklist — only when intentionally enabling features
 
 - [ ] GitHub fine-grained token → `LIFEOS_GITHUB_TOKEN`
-- [ ] Write auth secret → `LIFEOS_WRITE_SECRET`
-- [ ] Enable writes only when ready → `LIFEOS_WRITE_ENABLED=true`
+- [ ] Write authorization secret → `LIFEOS_WRITE_SECRET`
+- [ ] Enable writes → `LIFEOS_WRITE_ENABLED=true`
 - [ ] Allowed origin → `LIFEOS_ALLOWED_ORIGIN`
-- [ ] Optional OpenAI TTS → `OPENAI_API_KEY`
-- [ ] Paid TTS authorization → `LIFEOS_TTS_SECRET` or reuse `LIFEOS_WRITE_SECRET`
 - [ ] Durable approvals → `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`
-- [ ] Voice session HMAC → `LIFEOS_VOICE_SESSION_SECRET`
-- [ ] Optional tool tokens (ClickUp/Slack/n8n/Vercel) only if intentionally connecting
+- [ ] Voice-session HMAC → `LIFEOS_VOICE_SESSION_SECRET`
+- [ ] Optional paid TTS → `OPENAI_API_KEY`
+- [ ] Paid-TTS authorization → `LIFEOS_TTS_SECRET` or intentionally reuse `LIFEOS_WRITE_SECRET`
+- [ ] Optional ClickUp credentials
+- [ ] Optional Slack credentials
+- [ ] Optional n8n webhook
+- [ ] Optional Vercel execution token/project ID
+- [ ] Optional Hermes endpoint/token only when a real runtime exists
 
 ---
 
-## Section H — Owner sign-off
+## Section I — Resource Intelligence boundary
+
+The current `/inbox` Capture surface is **not yet** the full Universal Resource Intelligence system. Do not mark resource intake complete merely because browser-local capture works.
+
+| # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
+|---|---|---|---|---|---|---|
+| I1 | Browser-local disclosure | Capture a harmless note | UI explicitly says the item is stored in this browser only | ☐ | | |
+| I2 | No false processor claim | Submit no external resource processor action | LifeOS does not pretend it classified/analyzed/stored a GitHub/YouTube/PDF resource when no processor exists | ☐ | | |
+| I3 | Future acceptance gate | After Resource Intelligence is implemented, submit one controlled external repo | The end-to-end intake/classify/disposition/asset/store/verify flow must pass before this lane is marked mature | ☐ | | Future platform phase |
+
+---
+
+## Section J — Owner sign-off
 
 | Field | Value |
 |---|---|
-| Preview / production URL | |
-| Verified commit SHA | |
+| Production URL | `https://lifeos-enterprise.vercel.app/` |
+| Verified deployment ID | `dpl_8YYkaeHeAQYsj2RzSVssYEYjgFmE` |
+| Verified commit SHA | `46a2514893b4e3557911403274cba695b1c89384` |
 | Owner name | |
 | Date | |
 | Overall result | ☐ READY TO ACCEPT · ☐ BLOCKED · ☐ NOT READY |
+| Accepted deferrals | |
 | Blockers | |
 
-**Rule:** Green CI alone is not acceptance. Live microphone, screen share, and write credentials must be verified by the owner on the candidate deployment.
+**Rule:** Green CI and a successful deployment are necessary evidence, not owner acceptance. Live microphone/screen interactions and any intentionally enabled write/paid-TTS integrations require owner verification on the actual production candidate.
