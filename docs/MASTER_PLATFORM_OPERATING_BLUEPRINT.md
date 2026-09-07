@@ -1,10 +1,11 @@
 # LifeOS Master Platform Operating Blueprint
 
-**Status:** CANONICAL
-**Version:** 1.0
-**Date:** 2026-08-26
-**Owner:** Emmanuel Byron
-**Purpose:** Define the permanent operating architecture for the user's AI engineering, business, monetization, cognitive-support, and automation environment.
+**Status:** CANONICAL  
+**Version:** 1.1  
+**Date:** 2026-09-07  
+**Owner:** Emmanuel Byron  
+**Supersedes:** Version 1.0 dated 2026-08-26  
+**Purpose:** Define the permanent operating architecture for the user's AI engineering, business, monetization, cognitive-support, knowledge-intake, and automation environment.
 
 ---
 
@@ -16,9 +17,9 @@ The system is designed to reduce cognitive load, preserve continuity, automate r
 
 The operating rule is:
 
-> **Discover → Classify → Adapt → Build → Test → Audit → Evidence → Approve → Deploy → Learn → Update the Playbook**
+> **Discover → Capture → Classify → Evaluate → Adapt → Build → Test → Audit → Evidence → Approve → Deploy → Learn → Update the Playbook**
 
-Every new tool, GitHub repository, agent, marketplace, workflow, or opportunity must enter through this loop.
+Every new tool, GitHub repository, video, document, agent, marketplace, workflow, opportunity, or idea that may materially affect the platform enters through this loop.
 
 ---
 
@@ -38,6 +39,8 @@ It must answer, at a glance:
 - What needs owner judgment?
 - What changed while the owner was away?
 - What can be resumed without reconstructing context?
+- What useful resources were discovered?
+- Which discovered resources actually deserve implementation?
 
 LifeOS must not become a second code repository or duplicate execution system.
 
@@ -62,6 +65,7 @@ Examples:
 - agent orchestration
 - shared design QA
 - shared marketplace intelligence
+- Universal Resource Intelligence
 
 A platform capability should not be reinstalled manually in every project if it can be inherited.
 
@@ -113,10 +117,10 @@ Project-specific functionality must not contaminate the global platform layer un
 
 ## 3. The Permanent Classification Question
 
-Whenever a new capability, tool, repository, MCP, agent, workflow, component library, or automation is discovered, the first decision is:
+Whenever a new capability, tool, repository, MCP, agent, workflow, component library, automation, or reusable knowledge asset is discovered, the architecture decision is:
 
 ### PLATFORM
-Use when it improves how many projects are built, tested, operated, documented, or managed.
+Use when it improves how many projects are built, tested, operated, documented, learned from, or managed.
 
 ### TEMPLATE
 Use when every new project should inherit it, but it does not need to run as a global service.
@@ -124,50 +128,416 @@ Use when every new project should inherit it, but it does not need to run as a g
 ### PROJECT
 Use when it solves a unique requirement for one project only.
 
-No implementation begins until this classification is recorded.
+No implementation begins until this architecture classification is recorded.
+
+Architecture classification is separate from the resource disposition decision defined below. A resource can be classified `PLATFORM` while its disposition is `EXTRACT`, for example.
 
 ---
 
-## 4. External GitHub Repository Intake Workflow
+## 4. Universal Resource Intelligence and Intake
 
-When the owner finds a useful GitHub repository, it must not be copied blindly.
+### 4.1 Purpose
 
-### Intake sequence
+LifeOS owns useful resources from discovery through verified use.
 
-1. Capture repository URL.
-2. Inspect purpose and architecture.
-3. Inspect license and reuse conditions.
-4. Check maintenance activity and security posture.
-5. Identify dependencies and external services.
-6. Classify as Platform, Template, or Project.
-7. Determine overlap with existing tools.
-8. Score expected cognitive-load reduction and business value.
-9. Map it to the standard stack.
-10. Adapt rather than blindly clone.
-11. Run isolated tests.
-12. Run browser QA when applicable.
-13. Run security and dependency checks.
-14. Run centralized audit.
-15. Capture evidence.
-16. Approve or reject adoption.
-17. Update the capability registry and playbook.
+The owner should be able to find something useful, drop the link/file into an approved intake surface, and later receive a concise explanation, project mapping, recommendation, durable knowledge assets, and an implementation path without having to reconstruct why the resource mattered.
 
-### Standard adaptation instruction
+The normal owner experience is:
 
-The implementation agent should be able to receive a repository and:
+> **FIND IT → DROP IT → USE THE RESULT**
 
-- understand the repository
-- preserve licensing requirements
-- refactor it to the standard environment
-- integrate required services
-- remove unnecessary dependencies
-- add missing tests
-- run it
-- browser-test it
-- repair reproducible defects
-- produce an evidence-backed blocked list
+Everything between capture and a usable result belongs to the Resource Intelligence system.
 
-Replit, Cursor, Claude Code, Codex, or another implementation agent may perform this work depending on task fit.
+### 4.2 Intake surfaces
+
+Approved intake surfaces may include:
+
+- LifeOS Capture / Inbox
+- Slack intake channel or approved Slack command
+- browser/share extension when implemented
+- direct upload
+- approved email intake
+- manual LifeOS entry
+
+Slack is an optional front door, not the permanent database. LifeOS is the durable knowledge and execution system.
+
+A capture surface must not claim that a resource is durably stored or processed when it exists only in browser-local state.
+
+### 4.3 Supported resource types
+
+The intake system should support at minimum:
+
+- GitHub repositories
+- YouTube videos
+- webpages and articles
+- PDFs and uploaded documents
+- screenshots/images when analysis is appropriate
+- software tools and applications
+- courses
+- social posts/threads
+- prompts
+- research papers
+- products/services
+- ideas and internal notes
+
+### 4.4 Canonical Resource record
+
+Every resource creates or updates one durable Resource record with at least:
+
+- Resource ID
+- Resource name/title
+- original source / exact URL or file reference
+- canonicalized source identity
+- resource type
+- date added
+- submitted-through surface
+- submitter when relevant
+- processing status
+- architecture classification: `PLATFORM / TEMPLATE / PROJECT`
+- disposition: `ADOPT / ADAPT / EXTRACT / WATCH / ARCHIVE / REJECT`
+- related projects/areas
+- summary
+- problem solved
+- target users
+- proven capabilities
+- possible capabilities
+- unverified claims
+- value mapping
+- risks
+- licensing/reuse constraints when applicable
+- dependencies/costs/credentials when applicable
+- generated assets
+- implementation owner/agent
+- evidence
+- last reviewed date
+- superseded/duplicate links
+
+### 4.5 Processing states
+
+Use clear processing states such as:
+
+- NEW
+- PROCESSING
+- NEEDS REVIEW
+- APPROVED
+- IMPLEMENTATION
+- COMPLETED
+- WATCH
+- ARCHIVED
+- REJECTED
+
+A resource is not `COMPLETED` merely because it was summarized.
+
+### 4.6 Standard analysis
+
+Every resource receives the same first-pass questions:
+
+1. **What is this?** Explain it in plain English.
+2. **What problem does it solve?** Separate the actual problem from marketing language.
+3. **Who is it for?** Identify intended users/roles.
+4. **What can it actually do?** Separate proven capability, possible capability, and creator/vendor claims.
+5. **Where could it help?** Map to active LifeOS projects, platform capabilities, money lanes, learning goals, or operations.
+6. **What does it overlap with?** Identify current tools/workflows that already solve the problem.
+7. **What would adoption cost?** Include implementation effort, dependencies, maintenance, credentials, API cost, licensing, and cognitive load.
+8. **What should happen next?** Record the disposition and exact next action.
+
+Initial summaries should be concise; durable generated assets may be detailed.
+
+### 4.7 Value mapping
+
+Score or explicitly evaluate whether the resource can:
+
+- improve an active project
+- replace or simplify an existing tool
+- remove manual work
+- reduce cost or API/agent usage
+- reduce cognitive load
+- create a reusable platform capability
+- become a client service
+- create a product/template/marketplace opportunity
+- generate or protect revenue
+- improve LifeOS itself
+- improve reliability/security/QA
+
+High-value, low-complexity items move first.
+
+### 4.8 Disposition engine
+
+Every processed resource receives one primary disposition:
+
+#### ADOPT
+Use substantially as-is because it fits the current architecture and provides clear value.
+
+#### ADAPT
+Use as a foundation/reference but modify it to the LifeOS/project standards.
+
+#### EXTRACT
+Do not install the original system. Extract useful architecture, processes, components, prompts, techniques, or knowledge.
+
+#### WATCH
+Potentially useful, but not valuable or mature enough to act on now. Add to a reviewed watchlist.
+
+#### ARCHIVE
+Retain as durable reference with no active execution work.
+
+#### REJECT
+Do not use because value is too low or risk/duplication/complexity/licensing/maintenance cost is unacceptable.
+
+Disposition is evidence-based and may change later when conditions change.
+
+### 4.9 GitHub repository processor
+
+When a GitHub repository is submitted, inspect:
+
+- purpose and problem solved
+- repository architecture
+- languages/frameworks
+- dependencies/external services
+- license and reuse obligations
+- recent maintenance activity
+- releases
+- issues/pull requests where useful
+- contributors/community health where useful
+- documentation/install complexity
+- tests/CI where visible
+- security/dependency concerns
+- overlap with the current stack
+- expected cognitive/business value
+
+Then:
+
+1. classify `PLATFORM / TEMPLATE / PROJECT`;
+2. determine `ADOPT / ADAPT / EXTRACT / WATCH / ARCHIVE / REJECT`;
+3. preserve licensing requirements;
+4. map required services/credentials/costs;
+5. if implementation is justified, produce an implementation blueprint and route it to the best execution agent;
+6. isolate/test before adoption;
+7. browser-test when applicable;
+8. run security/dependency checks;
+9. run the independent audit/release gate when applicable;
+10. capture evidence;
+11. update the capability/tool registry and relevant playbook.
+
+Repositories are never copied blindly.
+
+### 4.10 YouTube processor
+
+A YouTube resource is not considered processed when only summarized.
+
+Extract, where supported and lawful:
+
+- main idea
+- important claims
+- techniques
+- tools mentioned
+- processes/demonstrations
+- warnings
+- examples
+- actionable steps
+- relevant source/timestamp evidence
+
+Generate only the assets that materially help:
+
+- How-To guide
+- SOP
+- agent Skill
+- reusable Prompt
+- Checklist
+- Tool record
+- Implementation blueprint
+
+Do not fabricate transcripts, URLs, demonstrations, product usage, or claims. Preserve source provenance and copyright/privacy boundaries.
+
+### 4.11 Article, PDF, course, and generic-document processor
+
+Extract relevant:
+
+- principles
+- facts
+- frameworks
+- procedures
+- tools
+- examples
+- warnings
+- research
+- recommendations
+
+Then decide whether the useful output should become a Knowledge Note, SOP, Skill, How-To, Prompt, Checklist, Playbook, Tool record, or implementation project.
+
+### 4.12 Asset Factory standards
+
+#### Skill
+
+A Skill is a repeatable agent capability and contains:
+
+- Skill name
+- purpose
+- trigger
+- required inputs
+- procedure
+- allowed tools
+- decision rules
+- required output
+- verification
+
+#### How-To
+
+A How-To is human-facing and contains:
+
+- goal
+- what is needed
+- one-action-per-step instructions
+- what the user should see
+- common mistakes
+- completion check
+
+#### SOP
+
+An SOP is an operational repeatable process and contains:
+
+- purpose
+- trigger
+- owner
+- prerequisites
+- procedure
+- exception handling
+- quality-control checks
+- evidence requirements
+- definition of completion
+
+#### Implementation blueprint
+
+An implementation blueprint contains:
+
+- objective
+- business reason
+- target platform/project
+- architecture
+- required services/accounts/credentials
+- data flow
+- implementation steps
+- assigned agent
+- human-only steps
+- tests
+- acceptance criteria
+- rollback
+- evidence requirements
+- final completion definition
+
+#### Prompt / Checklist / Tool record
+
+Prompts and checklists must be reusable rather than tied to one chat. Tool records preserve purpose, category, pricing/cost model when relevant, license/open-source state, approved use cases, projects using it, setup requirements, alternatives, strengths/weaknesses, status, and review date.
+
+### 4.13 Execution router
+
+The Resource Intelligence owner does not assume one agent should perform every task.
+
+Route work based on fit:
+
+- ChatGPT: orchestration, research, connected systems, specifications, knowledge organization
+- Codex: repository implementation, tests, debugging, engineering work
+- Claude Code: large repository analysis, architecture/refactoring, engineering execution
+- Cursor: repo-local autonomous/iterative implementation
+- Replit: runnable implementation/browser test environments when appropriate
+- Manus or other approved autonomous agents: broad multi-step research/execution when appropriate
+- Human owner: credentials, payment, contracts, legal approval, MFA, irreversible or consequential judgment
+
+Tool availability changes over time; the router should select from currently approved and actually available executors rather than hard-code one vendor forever.
+
+### 4.14 Ownership and completion
+
+**System owner:** LifeOS Resource Intelligence.
+
+A submitted resource remains owned by Resource Intelligence until it reaches a final disposition and any approved implementation is either verified complete or explicitly blocked/archived.
+
+A resource is complete only when all applicable conditions are satisfied:
+
+- source captured
+- duplicate check completed
+- resource classified
+- core knowledge extracted
+- current-project/platform relevance evaluated
+- disposition recorded
+- useful assets generated
+- durable LifeOS records created
+- implementation task/owner created when justified
+- implementation evidence captured when applicable
+- final status recorded
+
+A handoff to another agent does not end Resource Intelligence ownership.
+
+### 4.15 Duplicate and stale-resource detection
+
+Before creating a new record, check where possible:
+
+- exact URL
+- canonical URL
+- GitHub repository identity
+- video ID
+- tool/product name
+- document/file hash
+- semantic similarity
+
+If an existing record already represents the same resource, update the canonical record instead of creating a competing record.
+
+Periodically identify:
+
+- dead tools
+- abandoned repositories
+- changed pricing/licensing
+- replaced products
+- stale instructions
+- duplicate SOPs/prompts
+- superseded workflows/documents
+
+The newest approved canonical version replaces the old version; superseded versions remain historical evidence rather than competing instructions.
+
+### 4.16 Resource-review cadence
+
+A recurring resource review should:
+
+1. find unprocessed/stalled resources;
+2. rank them by current project impact;
+3. process the highest-value items;
+4. generate missing durable assets;
+5. detect duplicates/stale records;
+6. surface owner decisions only when materially necessary;
+7. leave low-value noise unreported;
+8. update current execution lanes rather than creating redundant documents.
+
+### 4.17 Human approval boundaries for resource adoption
+
+Human approval is required when resource adoption introduces material:
+
+- spending
+- credentials/account ownership
+- production deployment risk
+- legal/licensing implications
+- destructive actions
+- security/privacy impact
+- major architectural replacement
+
+Reversible research, classification, drafting, analysis, and safe implementation preparation should continue autonomously when authorized.
+
+### 4.18 First end-to-end acceptance gate
+
+Universal Resource Intelligence is not operational merely because `/inbox` accepts browser-local notes.
+
+The first accepted end-to-end pilot must prove:
+
+1. submit a controlled external resource;
+2. persist one canonical Resource record;
+3. detect source type;
+4. perform source-specific analysis;
+5. classify `PLATFORM / TEMPLATE / PROJECT`;
+6. assign a disposition;
+7. generate useful durable assets;
+8. route implementation if justified;
+9. capture evidence;
+10. make the result searchable/resumable later;
+11. avoid duplicate records on resubmission.
+
+Until this gate passes, the resource-intake platform capability remains **NOT VERIFIED COMPLETE**.
 
 ---
 
@@ -377,7 +747,7 @@ Maintain a dedicated discovery queue for:
 - agent orchestration
 - assistive coding tools
 
-Every candidate goes through the same Platform / Template / Project classification and evidence process.
+Every candidate goes through the Universal Resource Intelligence workflow, including Platform / Template / Project classification, disposition, and evidence.
 
 ---
 
@@ -471,6 +841,8 @@ Whenever the system encounters an ecosystem:
 - create product specifications
 - hand approved opportunities to implementation agents
 - monitor post-launch feedback
+
+Discovered external resources enter the Universal Resource Intelligence workflow before adoption.
 
 ---
 
@@ -668,7 +1040,7 @@ No lane is considered mature without one.
 18. Quick-start version
 19. Detailed technical runbook
 
-When an operating rule changes, the canonical playbook is replaced with a complete updated version. Incremental fragments are not the source of truth.
+When an operating rule changes, retrieve the current canonical playbook, merge the approved change, remove duplicates, reorganize when needed, and replace the prior file with one complete updated version. Incremental fragments are not the source of truth.
 
 ---
 
@@ -830,15 +1202,11 @@ Every software project uses the same high-level closeout sequence:
 
 ---
 
-## 21. Tonight's Parallel Closeout Operating Model
+## 21. Parallel Project Closeout Operating Model
 
-Terrace is being handled separately by the owner.
-
-The platform closeout focus is:
+Project priorities are governed by current LifeOS project data and may change; this section defines the reusable closeout intent rather than a frozen nightly queue.
 
 ### ClientVerse Website Audit
-
-Priority: P0
 
 Objective:
 
@@ -848,8 +1216,6 @@ Objective:
 - prove APPROVED → controlled defect BLOCKED → repaired fresh APPROVED
 
 ### ClientVerse CRM
-
-Priority: P0
 
 Objective:
 
@@ -866,8 +1232,6 @@ Objective:
 
 ### Charlotte / Allure
 
-Priority: P0
-
 Objective:
 
 - consolidate branch/PR lines into one canonical closeout candidate
@@ -876,8 +1240,6 @@ Objective:
 - distinguish engineering work from credential-bound production gates
 
 ### CV Engine
-
-Priority: P1
 
 Objective:
 
@@ -890,18 +1252,14 @@ Objective:
 
 ### D'Affordable Homes
 
-Priority: P1
-
 Objective:
 
-- preserve already-completed code work
-- complete Sanity/account-bound checks once credentials exist
-- run real create/edit/preview/publish/revalidate flow
+- preserve completed code work
+- complete account/credential-bound checks only when authorized
+- run real create/edit/preview/publish/revalidate flows where applicable
 - verify production domain/deployed SHA
 
 ### Content Machine
-
-Priority: P1
 
 Objective:
 
@@ -916,11 +1274,9 @@ Objective:
 
 ### HyperFrames / Video Content Engine
 
-Priority: P2
-
 Objective:
 
-- Stripe commercial-flow testing
+- commercial-flow testing when applicable
 - creator workflow E2E
 - render verification
 - browser QA
@@ -928,14 +1284,14 @@ Objective:
 
 ### LifeOS
 
-Priority: P2
-
 Objective:
 
-- software-testable agent runtime gates
+- production-state truthfulness
+- agent runtime gates
 - approval-gate verification
 - conversation UI regression
 - owner-only mic/screen permission validation
+- Universal Resource Intelligence implementation and end-to-end proof
 
 ### Bravo Paws + Alternative
 
@@ -952,12 +1308,12 @@ Objective:
 
 ### P0 — Establish shared intelligence and control
 
+- implement Universal Resource Intelligence and durable external-resource intake
 - create platform capability registry
-- create GitHub repo intake workflow
-- create cognitive tool registry
+- create cognitive-tool registry and scoring model
 - create marketplace opportunity registry
 - create money-lane dashboard model
-- create unified playbook template
+- create unified living-playbook template
 - create journey-log model
 
 ### P0 — Establish shared GitHub standard
@@ -969,6 +1325,7 @@ Objective:
 - evidence fields
 - definition-of-done fields
 - owner/agent assignment conventions
+- resume/checkpoint convention
 
 ### P0 — Make audit reusable
 
@@ -987,10 +1344,11 @@ Objective:
 
 ### P1 — Build persistent agent roles
 
+- Resource Intake / Processing Agent
 - repository scout
 - capability evaluator
 - adaptation engineer
-- documentation agent
+- documentation/playbook agent
 - cognitive-tools scout
 - opportunity scout
 - auction analyst
@@ -1004,19 +1362,24 @@ Objective:
 1. **One canonical source of truth per concern.**
 2. **No duplicate command centers.**
 3. **Platform capabilities are installed once whenever practical.**
-4. **Every new tool is classified Platform / Template / Project.**
-5. **Every lane gets a living playbook.**
-6. **Money lanes remain visible at the front of LifeOS.**
-7. **Cognitive-load reduction is a product requirement.**
-8. **Agents must preserve interruption state and resumability.**
-9. **Builders do not self-certify.**
-10. **Evidence beats activity reports.**
-11. **Credential blockers are labeled honestly.**
-12. **Autonomy is encouraged for reversible work.**
-13. **Consequential actions remain approval-gated.**
-14. **New discoveries should compound the platform instead of creating random isolated workflows.**
-15. **The user's journey is documented as the system evolves.**
-16. **Every material workflow should become easier the second time it is performed.**
+4. **Every new tool/capability is classified Platform / Template / Project before implementation.**
+5. **Every processed resource receives an explicit ADOPT / ADAPT / EXTRACT / WATCH / ARCHIVE / REJECT disposition.**
+6. **Resource Intelligence owns submitted resources through final disposition and verified implementation or explicit stop.**
+7. **A browser-local capture is never represented as durable canonical processing.**
+8. **Duplicate resources update the canonical record rather than creating competing records.**
+9. **Every mature lane gets a living playbook.**
+10. **Approved operating-rule changes replace the full governing document; incremental fragments do not become a second source of truth.**
+11. **Money lanes remain visible at the front of LifeOS.**
+12. **Cognitive-load reduction is a product requirement.**
+13. **Agents must preserve interruption state and resumability.**
+14. **Builders do not self-certify.**
+15. **Evidence beats activity reports.**
+16. **Credential blockers are labeled honestly.**
+17. **Autonomy is encouraged for reversible work.**
+18. **Consequential actions remain approval-gated.**
+19. **New discoveries should compound the platform instead of creating random isolated workflows.**
+20. **The user's journey is documented as the system evolves.**
+21. **Every material workflow should become easier the second time it is performed.**
 
 ---
 
@@ -1034,5 +1397,8 @@ This operating system is successful when the owner can open LifeOS after an inte
 - the evidence supporting each status
 - the playbook for any lane
 - the history necessary to resume without reconstructing context
+- what useful resources were recently discovered
+- which of those resources were adopted, adapted, extracted, watched, archived, or rejected
+- where generated SOPs, skills, how-to guides, prompts, checklists, tool records, and implementation blueprints live
 
-The platform should carry memory, repetition, QA, and routine execution so human energy is reserved for judgment, creativity, relationships, and decisions that matter.
+The platform should carry memory, repetition, intake triage, QA, and routine execution so human energy is reserved for judgment, creativity, relationships, and decisions that matter.
