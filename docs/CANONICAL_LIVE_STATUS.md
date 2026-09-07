@@ -1,127 +1,183 @@
 # LifeOS Enterprise — Canonical Live Status
 
-**Status date:** 2026-09-05  
+**Status date:** 2026-09-07  
 **Canonical repository:** `ebyron357/LifeOS-Enterprise`  
 **Canonical branch:** `main`  
-**Production URL:** `https://lifeos-enterprise.vercel.app/dashboard`  
+**Production URL:** `https://lifeos-enterprise.vercel.app/`  
 **Released version:** `1.0.0`  
-**Verified main SHA:** `c7d4e3507d7837e100a35a9eacb903e9319f1803` (includes merged PR #60)  
-**Post-#60 corrective:** draft PR only; not merged; not deployed from this branch  
+**Current main SHA:** `46a2514893b4e3557911403274cba695b1c89384` (includes merged PRs #60, #61, and #62)  
+**Verified production deployment:** `dpl_8YYkaeHeAQYsj2RzSVssYEYjgFmE` — READY — target `production` — Git SHA `46a2514893b4e3557911403274cba695b1c89384`  
 **Owner acceptance:** not complete
 
 ## Governing status
 
-**LifeOS Enterprise V1.0 is built and present on `main`.** The 2026-09-04 operational closeout (widgets, verified game loop, conversation voice, screen-share safety, server-authoritative approvals) **merged through PR #60** at `c7d4e3507d7837e100a35a9eacb903e9319f1803`.
+**LifeOS Enterprise V1.0 is built on `main`, and the current production deployment is serving the unified AI Command Center from SHA `46a2514893b4e3557911403274cba695b1c89384`.**
 
-That merge does **not** mean owner acceptance, production promotion of later correctives, or a completed security closeout. Remaining write-authorization, durable-approval-storage, approved-payload, paid-TTS, check-in XP, and screen-requesting findings are on a **new draft corrective PR from current main**. Automated tests on that branch may be reported only as:
+The prior status edition is superseded because both the post-#60 security corrective and the unified-command-center rebuild have since merged and deployed:
+
+- PR #60 merged the operational closeout: interactive widgets/game loop, conversation voice, screen-share safety, server-authoritative approvals, and owner-acceptance evidence.
+- PR #61 merged the post-#60 corrective: owner write authorization, durable approval storage, exact approved payload execution, server-TTS hardening, check-in XP correction, and visible screen-share requesting state.
+- PR #62 merged and production-deployed the intent-first LifeOS rebuild: one Command Center, persistent Ask LifeOS, Projects, Today, Capture, Journal, Learning, Files, Automations, Integrations, Settings/More, and the previous widget dashboard retained as an advanced workspace.
+
+Automated validation and a successful production deployment do **not** equal owner acceptance. Until the owner completes `docs/OWNER_ACCEPTANCE_WORKBOOK.md`, the allowed success statement remains:
 
 **AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED**
 
-Do not report the product as production-ready, deployed, owner-accepted, secure, or complete until the owner finishes `docs/OWNER_ACCEPTANCE_WORKBOOK.md` on the candidate deployment.
+Do not report LifeOS as owner-accepted or fully operational for credential-gated writes, paid TTS, or live microphone/screen workflows until those owner-only checks are completed.
 
-PR #59 remains closed and superseded. Do not revive, merge, or build on it.
+This document is the single status source of truth. Earlier reports, draft-PR descriptions, percentages, and phase summaries are superseded whenever they conflict with this document or fresher production evidence.
 
-This document is the single status source of truth. Earlier reports, draft-PR descriptions, percentages, and phase summaries are superseded whenever they conflict with this document or the current production evidence.
+## Current production capabilities
 
-## Production-complete capabilities
+The following capabilities are present on the current production deployment:
 
 - Canonical Obsidian Markdown vault and numbered vault structure
 - Vault audit and validation scripts
-- Read-only full-vault web portal
-- Executive dashboard and Command Center
-- Projects, tasks, businesses, growth, intelligence, agents, resources, people, learning, journal, reviews, SOPs, templates, archive, search, and note-reader routes
-- Workspace OS V1
-- Browser-local workspace layout persistence
-- Accessible desktop, tablet, and mobile navigation
-- Command palette and cognitive-support controls
-- Interactive project Command Board
-- Command Map
+- Unified root Command Center at `/`
+- Persistent Ask LifeOS entry point at `/conversation`
+- Intent-first project workspace at `/projects`
+- Today workspace at `/today`
+- Quick Capture / Inbox at `/inbox`
+- Journal at `/journal`
+- Learning at `/learning`
+- Search-first files experience at `/files`
+- Automation status at `/automations`
+- Integration health at `/integrations`
+- Settings and More / advanced surfaces
+- Prior widget dashboard preserved at `/dashboard`
+- Accessible desktop/mobile application shell and command palette
+- Interactive project Command Board and project resume flows
 - Browser-staged project changes and approval-package generation
-- Conflict-safe, draft-PR-only persistence architecture
-- Voice Console architecture and user interface
-- GitHub health telemetry
+- Conflict-safe, draft-PR-only canonical persistence architecture
+- Conversation voice architecture, voice settings, interruption controls, and browser fallback
+- Owner-initiated screen sharing with safety-state handling
+- Server-authoritative approval policy
+- Durable-approval fail-closed architecture
+- GitHub health telemetry with live production read
 - Safe empty-state Revenue Radar
+- Truthful integration-state model that does not invent connectivity
 
-## Activation state
+## Current integration and activation state
 
-These capabilities are implemented but intentionally inactive until production credentials or settings are supplied:
+The production Command Center currently distinguishes available/connected capabilities from unconfigured integrations.
 
-| Capability | Current state | Activation requirement |
+| Capability | Current production state | Activation / owner requirement |
 |---|---|---|
-| Browser Voice Console | Disabled until owner enables | `LIFEOS_VOICE_ENABLED=true`; validate browser microphone and speech behavior |
-| Draft-PR persistence and conversation write approvals | Locked/default-deny | `LIFEOS_WRITE_ENABLED=true`, `LIFEOS_WRITE_SECRET`, `LIFEOS_GITHUB_TOKEN` (for GitHub draft PRs), durable approval store, and recommended `LIFEOS_ALLOWED_ORIGIN` |
-| Durable approvals | Fail-closed without Redis | `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`. No silent in-memory production fallback |
-| Paid server TTS | Unauthorized without owner secret | `OPENAI_API_KEY` plus `LIFEOS_TTS_SECRET` or `LIFEOS_WRITE_SECRET`. Voice-session tokens cannot spend the key. `provider: "browser"` never selects OpenAI |
-| Revenue Radar | No source connected | Connect an approved reporting sheet or supported commerce/payment source |
-
-Inactive integrations do not change V1.0 core-complete status.
+| LifeOS vault | AVAILABLE | Canonical Markdown vault is read server-side. |
+| GitHub health | CONNECTED | Public repository-health read is succeeding. |
+| Quick Capture | AVAILABLE, browser-local | Captures are stored in the current browser until intentionally promoted through the governed write path. |
+| Canonical writes / external tool approvals | FAIL-CLOSED unless configured | `LIFEOS_WRITE_ENABLED=true`, `LIFEOS_WRITE_SECRET`, durable approval storage, and tool-specific credentials are required. |
+| Durable approvals | UNAVAILABLE until Redis is configured | `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`. No silent production memory fallback. |
+| ClickUp execution | UNAVAILABLE | Requires durable approval storage plus `CLICKUP_API_TOKEN` and `CLICKUP_LIST_ID`. |
+| Slack execution | UNAVAILABLE | Requires durable approval storage plus `SLACK_BOT_TOKEN` and `SLACK_DEFAULT_CHANNEL`. |
+| n8n execution | UNAVAILABLE | Requires durable approval storage plus `N8N_WEBHOOK_URL`. |
+| Vercel execution from LifeOS | UNAVAILABLE | Production itself is deployed on Vercel, but LifeOS-triggered deploy actions require durable approval storage plus `VERCEL_TOKEN` and `VERCEL_PROJECT_ID`. |
+| Hermes delegated runtime | UNAVAILABLE | Requires a real `HERMES_ENDPOINT` and `HERMES_TOKEN`; no connection is claimed without them. |
+| Google Workspace / Revenue Radar source | UNAVAILABLE | Connect an approved source only when intentionally enabling Revenue Radar. |
+| Paid server TTS | OWNER-CONFIGURED ONLY | `OPENAI_API_KEY` plus `LIFEOS_TTS_SECRET` or `LIFEOS_WRITE_SECRET`; public voice-session tokens cannot spend the key. |
 
 ## Explicit V1 boundaries
 
-- Dashboard writes never go directly to `main`.
-- Canonical changes require a reviewable draft pull request.
-- Browser staging is not represented as a canonical save.
-- Voice is push-to-talk only; no wake word.
-- LiveKit realtime voice is deferred.
-- Haitian Creole and French voice locales are prepared but not verified.
-- Quick Capture and workspace layout preferences remain browser-local.
+- Canonical changes never write directly to `main`; they must use a reviewable draft-PR path.
+- Browser staging and Quick Capture are not represented as canonical persistence.
+- External writes remain fail-closed when durable approval storage or required credentials are absent.
+- Owner approval is required for consequential writes, production-affecting actions, credentials, and other governed actions.
+- Voice and screen-share quality/permission checks require real owner browser interaction.
+- LiveKit realtime voice remains deferred unless separately approved and implemented.
+- Haitian Creole and French voice locales may be prepared but are not represented as owner-verified without live evidence.
 - Dataview and Obsidian Bases are not executed by the web server.
-- Automation Hub, Developer Center, and Analytics are future workspace phases and are not V1 blockers.
-- Public voice-session tokens authorize read conversation only. They do not approve writes or paid TTS.
+- Hermes is an adapter contract, not an active runtime, until a real endpoint/token and reachability evidence exist.
+- Resource Intelligence / Universal Resource Intake remains a platform build item until capture, processing, classification, disposition, asset generation, durable storage, and verification are implemented end to end.
 
-## Verified release evidence
+## Verified current evidence
 
-The v1.0 release package records:
+### Production deployment
 
-- `npm ci` — pass
-- `npm run lint` — pass
-- `npm run typecheck` — pass
-- `npm test` — 87/87 pass
-- `npm run build` — pass
-- PowerShell vault audit — pass
-- Dashboard CI — success
-- Vault Health — success
-- Vercel production deployment — success
+Vercel reports the current production deployment as:
 
-PR #60 closeout evidence is recorded in `docs/VAULT_REPAIR_REPORT.md`. It is not owner acceptance.
+- Deployment: `dpl_8YYkaeHeAQYsj2RzSVssYEYjgFmE`
+- State: `READY`
+- Target: `production`
+- Git branch: `main`
+- Git SHA: `46a2514893b4e3557911403274cba695b1c89384`
+- Commit: `feat: rebuild LifeOS as unified AI command center (#62)`
 
-Post-#60 corrective command results belong in that report’s 2026-09-05 addendum and in the corrective draft PR. They do not promote this branch to production.
+A direct authenticated production fetch of `https://lifeos-enterprise.vercel.app/` returned HTTP 200 and rendered the new root Command Center with Ask LifeOS, Projects, Today, Capture, Journal, Learning, Files, Automations, Integrations, and More navigation.
+
+### PR #62 agent validation
+
+The merged PR recorded:
+
+- `npm ci` — PASS
+- `npm run lint` — PASS
+- `npm run typecheck` — PASS
+- `npm test` — PASS, 54 files / 298 tests
+- `npm run build` — PASS
+- `npm audit --audit-level=high` — PASS, 0 vulnerabilities
+- `pwsh -File ./scripts/audit-vault.ps1` — PASS, 156 notes
+- Dedicated Command Center Playwright run — 23 passed / 1 failed on the last full two-project run; the affected resume case then passed 2/2 after the fix
+- Full parallel Playwright suite — **not claimed as a clean final rerun**
+
+### PR #61 agent validation
+
+The merged corrective recorded:
+
+- `npm ci` — PASS
+- `npm run lint` — PASS
+- `npm run typecheck` — PASS
+- `npm test` — PASS, 49 files / 286 tests
+- `npm run build` — PASS
+- `npm audit --audit-level=high` — PASS, 0 vulnerabilities
+- Vault audit — PASS
+- Full E2E first run — 92 passed, 4 WebKit desktop failures caused by browser/context closure; isolated serial WebKit desktop rerun — 6/6 passed
+
+These are agent validation records, not owner acceptance.
 
 ## Repository disposition
 
-- PR #30: merged portal implementation
-- PR #31: closed as superseded by merged portal and v1.0 release
-- PR #32: closed because the Windows audit ran on the wrong host operating system
-- PRs #38 and #39: closed as superseded by release PR #40
-- PR #40: merged v1.0 release
-- PR #41: merged production release closeout
-- PR #25: historical standards package; remains governed by its recorded separate disposition restriction
-- PR #55: included upstream of the #60 closeout
-- PR #59: closed and superseded; do not revive
-- PR #60: merged operational closeout onto `main` (`c7d4e3507d7837e100a35a9eacb903e9319f1803`)
-- Post-#60 security corrective: new draft PR from current `main` only
+- PR #25: historical AI standards source package; closed/superseded and governed by its recorded disposition.
+- PR #30: merged portal implementation.
+- PR #31: closed as superseded by merged portal and v1.0 release.
+- PR #32: closed because the requested Windows audit ran on the wrong host OS.
+- PRs #38 and #39: closed as superseded by release PR #40.
+- PR #40: merged v1.0 release.
+- PR #41: merged production release closeout.
+- PR #55: closed as superseded; its conversation/agent-runtime work was incorporated upstream into the #60/#61/#62 line and must not remain an active competing implementation path.
+- PR #59: closed and superseded; do not revive.
+- PR #60: merged operational closeout onto `main` at `c7d4e3507d7837e100a35a9eacb903e9319f1803`.
+- PR #61: merged post-#60 security/write/TTS/state corrective onto `main` at `3ddf934afc12261bdf68e2bd86059f80db0a22db`.
+- PR #62: merged unified AI Command Center rebuild; current main/production SHA is `46a2514893b4e3557911403274cba695b1c89384`.
 
 ## Remaining owner work
 
-1. Complete `docs/OWNER_ACCEPTANCE_WORKBOOK.md` on the corrective draft PR preview after reviewing the write-secret, Redis, TTS, XP, and screen-requesting rows.
-2. Supply production credentials only when intentionally enabling writes: `LIFEOS_GITHUB_TOKEN`, `LIFEOS_WRITE_SECRET`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, optional `LIFEOS_TTS_SECRET` / `OPENAI_API_KEY`.
-3. Live microphone, screen-share requesting/deny/stop, browser TTS, and paid-TTS authorization verification.
-4. Approve merge and production promote only after those live steps. Do not auto-merge. Do not deploy from the agent.
+1. Complete the current `docs/OWNER_ACCEPTANCE_WORKBOOK.md` against the production deployment at SHA `46a2514893b4e3557911403274cba695b1c89384`.
+2. Verify the new root Command Center and mobile navigation through the owner journeys: resume work, capture, journal, learning, Ask LifeOS, integration health, and back/forward behavior.
+3. Complete live microphone, voice preview/interrupt/mute, screen-share request/deny/stop, and paid-TTS authorization checks where the relevant provider is intentionally enabled.
+4. Enable canonical/external writes only if intentionally desired and only after `LIFEOS_WRITE_SECRET`, durable Redis approvals, origin controls, and the specific tool credentials are configured together.
+5. Verify approval-required actions fail closed without the owner write secret and durable store.
+6. Run or obtain a clean final full parallel browser suite if it is required for owner acceptance; PR #62 did not claim that final suite as fully clean.
+7. Complete local Windows/Obsidian visual checks when access to the actual workstation is available.
 
-Maintenance / optional activation on current production `main`:
+## Active platform work after V1 acceptance
 
-1. Keep production write-back disabled unless all required secrets, the durable approval store, and origin controls are configured together.
-2. Activate and verify browser voice only when production voice is desired.
-3. Connect Revenue Radar only to a verified source; never display invented values.
-4. Complete local Windows/Obsidian visual checks when access to the actual workstation is available.
+These are platform-development items, not reasons to misreport the current deployment as absent:
+
+1. Universal Resource Intelligence / resource intake and processing.
+2. Platform capability registry.
+3. Cognitive-tool registry and scoring.
+4. Marketplace opportunity registry and money-lane data model.
+5. Shared GitHub cognitive-friendly standard rollout.
+6. Reusable release-audit integration across projects.
+7. Persistent agent-role implementation where useful.
 
 ## Status-reporting rule
 
 Future LifeOS status reports must:
 
 1. Start from this document and current production evidence.
-2. Separate shipped code, inactive configuration, external credentials, local-device validation, and future enhancements.
+2. Separate shipped code, production deployment identity, inactive configuration, external credentials, local-device validation, owner acceptance, and future enhancements.
 3. Never assign a changing completion percentage.
-4. Never treat future-phase features as V1 blockers.
-5. Update this complete document when the governing status changes instead of creating competing status fragments.
-6. Use only `AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED` for automated success until the owner signs the workbook.
+4. Never treat future-phase platform features as V1 deployment blockers.
+5. Update this complete document when governing status changes instead of creating competing status fragments.
+6. Use only **AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED** for automated success until the owner signs the workbook.
+7. Verify the deployed SHA before claiming production has changed.

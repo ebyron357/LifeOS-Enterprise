@@ -5,7 +5,8 @@ source: Official credential providers and current market review
 author: LifeOS
 topic: AI consultant certifications
 created: 2026-07-16
-review_date: 2026-08-01
+updated: 2026-09-07
+review_date: 2026-10-01
 tags:
   - resource
   - certification
@@ -18,31 +19,87 @@ tags:
 
 ## Objective
 
-Track credentials against current consulting demand, practical capability, cost, portfolio proof, and revenue value. This tracker is not a course wishlist.
+Track credentials against current consulting demand, practical capability, cost, portfolio proof, and revenue value. This tracker is not a course wishlist and does not infer study or exam progress without evidence.
+
+## Current Review Decision — 2026-09-07
+
+**Disposition: ADAPT / KEEP ACTIVE.**
+
+The credential strategy still supports the active `Build AI Consultant Portfolio` project, but the July/August schedule is stale. The portfolio evidence package remains the current P0 action. Certifications should strengthen demonstrated capability, not interrupt evidence collection or become a substitute for working case studies.
+
+Operating decision:
+
+1. Keep Microsoft AI Transformation Leader (AB-731) as the first strategy credential because its current official scope directly covers business value, Microsoft AI opportunities, implementation/adoption strategy, and responsible AI.
+2. Keep Google Cloud Generative AI Leader as the cross-cloud business credential. The former September 18 planning target is retained only as a planning marker until an actual booking is evidenced.
+3. Keep AWS Certified AI Practitioner as foundational AWS credibility unless a stronger implementation credential is justified by repeated market/client evidence.
+4. Keep Microsoft AI Agent Builder Associate (AB-620) gated behind working agent evidence because its current scope is intermediate and implementation-heavy.
+5. Keep IAPP AIGP conditional. Its current exam cost is material, so do not purchase without a documented governance-service opportunity and expected return.
+6. Do not mark any credential `scheduled`, `passed`, or `failed` without direct evidence.
 
 ## Current Recommended Sequence
 
-| Rank | Credential | Track | Status | Target | Exam Cost | Why It Matters | Required Portfolio Artifact | Evidence Status |
+| Rank | Credential | Track | Current Status | Current Planning Target | Current Official Cost | Why It Matters | Required Portfolio Artifact | Evidence Status |
 |---:|---|---|---|---|---:|---|---|---|
-| 1 | Microsoft Certified: AI Transformation Leader (AB-731) | Strategy and adoption | planned | 2026-08-21 | Region-based | Directly aligns with identifying AI opportunities, business value, adoption strategy, responsible AI, and transformation leadership | AI Readiness Assessment + Executive AI Adoption Roadmap | Verified credential; employer-demand fit partially verified |
-| 2 | Google Cloud Generative AI Leader | Business AI strategy | planned | 2026-09-18 | $99 | Validates business-level gen-AI knowledge, solution strategy, output improvement, and responsible adoption without requiring a technical background | Cross-cloud AI Use-Case Decision Matrix | Verified |
-| 3 | AWS Certified AI Practitioner (AIF-C01) | AI and cloud literacy | planned | 2026-10-16 | $100 | Covers AI/ML and generative-AI fundamentals, business applications, responsible AI, security, compliance, and governance | AWS AI Opportunity Brief + Security/Governance Checklist | Verified |
-| 4 | Microsoft Certified: AI Agent Builder Associate (AB-620) | Agent implementation | conditional | 2026-Q4 | Region-based | Strong implementation signal for Copilot Studio, APIs, connectors, RAG, MCP, multi-agent solutions, testing, and management | Two working agents + architecture and evaluation report | Verified credential; requires live testing |
-| 5 | IAPP Artificial Intelligence Governance Professional (AIGP) | Governance and risk | conditional | 2027-Q1 | $799 exam; training optional | Strong governance path covering AI lifecycle, laws, frameworks, risk, safety, trust, and responsible deployment | AI Governance Starter Pack + AI Inventory + Risk Register | Verified credential; ROI requires validation |
+| 1 | Microsoft Certified: AI Transformation Leader (AB-731) | Strategy and adoption | planned; booking/progress not evidenced | Rebaseline after current LifeOS evidence package | Region-based | Microsoft currently positions this credential for business decision-makers guiding AI transformation without a coding requirement. The exam assesses business value, Microsoft AI opportunities/capabilities, and implementation/adoption strategy. | AI Readiness Assessment + Executive AI Adoption Roadmap | Credential and current scope verified 2026-09-07 |
+| 2 | Google Cloud Generative AI Leader | Business AI strategy | planned; booking not evidenced | 2026-09-18 planning marker only | $99 + tax where applicable | Current exam validates gen-AI fundamentals, Google Cloud gen-AI offerings, output-improvement techniques, and business strategy. No technical prerequisite is required. | Cross-cloud AI Use-Case Decision Matrix | Credential, price, and scope verified 2026-09-07 |
+| 3 | AWS Certified AI Practitioner | AI and cloud literacy | planned; booking not evidenced | 2026-10-16 planning marker | $100 | Current foundational exam validates AI/ML and generative-AI concepts and use cases for AWS services. | AWS AI Opportunity Brief + Security/Governance Checklist | Credential, price, and scope verified 2026-09-07 |
+| 4 | Microsoft Certified: AI Agent Builder Associate (AB-620) | Agent implementation | conditional | After two working agent demonstrations exist | Region-based | Current intermediate exam covers planning/configuring agent solutions, integrating/extending agents in Copilot Studio, and testing/managing agents, including MCP, APIs, connectors, multi-agent solutions, evaluation, and ALM. | Two working agents + architecture and evaluation report | Credential and current scope verified 2026-09-07 |
+| 5 | IAPP Artificial Intelligence Governance Professional (AIGP) | Governance and risk | conditional | 2027-Q1 only if ROI gate passes | $649 member / $799 non-member | Current AIGP exam focuses on responsible and ethical AI development, deployment, and management. Certification has ongoing maintenance requirements. | AI Governance Starter Pack + AI Inventory + Risk Register | Price and exam structure verified 2026-09-07; ROI still requires validation |
+
+## Official Current Facts Used in This Review
+
+### Microsoft AI Transformation Leader — AB-731
+
+- Microsoft lists the certification as current and last updated July 22, 2026.
+- Intended for business leaders guiding AI transformation and adoption; coding is not expected.
+- Current exam time shown by Microsoft: 45 minutes.
+- Current assessed areas: business value of generative AI; benefits/capabilities/opportunities for Microsoft AI apps/services; implementation and adoption strategy.
+- Pricing varies by proctored region.
+
+### Google Cloud Generative AI Leader
+
+- Current registration fee: $99 plus tax where applicable.
+- Exam length: 90 minutes.
+- 50–60 multiple-choice questions.
+- No prerequisites.
+- Certification validity: 3 years.
+
+### AWS Certified AI Practitioner
+
+- Current category: Foundational.
+- Current cost: $100.
+- Exam duration: 90 minutes.
+- Exam format: 65 questions.
+- Validates foundational AI/ML/generative-AI knowledge and AWS use cases.
+
+### Microsoft AI Agent Builder Associate — AB-620
+
+- Current level: Intermediate.
+- Current exam duration: 120 minutes.
+- Current assessed domains: plan/configure agent solutions; integrate/extend agents in Copilot Studio; test/manage agents.
+- Current scope explicitly includes MCP, APIs, custom connectors, enterprise knowledge sources, multi-agent solutions, evaluation, and lifecycle management.
+- Pricing varies by proctored region.
+
+### IAPP AIGP
+
+- Current non-member exam price: $799.
+- Current member exam price: $649.
+- Exam: 100 questions, 2.75 hours plus a 15-minute break.
+- Exam must be completed within one year of purchase.
+- Certification term is two years and requires continuing education plus applicable maintenance requirements.
 
 ## Optional or Deferred Credentials
 
 | Credential | Decision | Reason |
 |---|---|---|
-| Microsoft AI Business Professional (AB-730) | Defer | Useful but overlaps the initial business-AI pathway. Take only if discounted, required, or needed as a quick foundational win. |
-| Microsoft Azure AI Fundamentals (AI-901) | Optional | Useful technical foundation; prioritize only if Azure implementation becomes a near-term service line or AB-620 preparation requires it. |
-| ISO/IEC 42001 individual training credential | Research provider carefully | ISO publishes the management-system standard but does not itself certify individual consultants. Verify the training body, accreditation claims, exam method, credential registry, and client recognition before purchase. |
-| Generic prompt-engineering course certificates | Skip unless practical | Course-completion badges do not replace evaluated work, case studies, and implementation evidence. |
-| High-cost private AI consultant certifications | Hold | Require independent verification, employer signal, practical assessment, and a documented return before purchase. |
+| Microsoft AI Business Professional | DEFER | Useful business-AI foundation but overlaps the initial strategy pathway. Add only if required, discounted, or directly tied to a client/partner need. |
+| Microsoft AI Agent Builder Associate (AB-620) | ADAPT / CONDITIONAL | High-value implementation signal, but only after current working-agent evidence exists so certification study compounds practical proof. |
+| IAPP AIGP | WATCH / CONDITIONAL | Strong governance signal but expensive enough to require an opportunity/ROI case before purchase. |
+| ISO/IEC 42001 individual training credential | WATCH | Verify provider/accreditation/credential claims carefully; the standard itself is not a generic individual consultant certification. |
+| Generic prompt-engineering course certificates | REJECT unless practical assessment exists | Course-completion badges do not replace evaluated work, case studies, or implementation evidence. |
+| High-cost private AI consultant certifications | REJECT / WATCH | Require independent verification, practical assessment, employer/client signal, and documented return before purchase. |
 
 ## Credential Record Template
-
-Copy this block for every credential under review.
 
 ```yaml
 credential:
@@ -72,18 +129,20 @@ next_action:
 review_date:
 ```
 
-## Weekly Tracker
+## Current Weekly Tracker
 
-| Week | Primary Credential | Study Hours | Practice Score | Portfolio Artifact Progress | Public Proof Published | Next Action |
-|---|---|---:|---:|---:|---|---|
-| 2026-07-13 | AB-731 | 0 | — | 0% | No | Inventory existing credentials and open the official AB-731 study guide |
-| 2026-07-20 | AB-731 |  |  |  |  |  |
-| 2026-07-27 | AB-731 |  |  |  |  |  |
-| 2026-08-03 | AB-731 |  |  |  |  |  |
+Do not backfill progress from assumptions. Empty evidence remains unknown rather than zero.
+
+| Week | Primary Credential | Study/Booking Evidence | Portfolio Artifact Progress | Public Proof | Next Action |
+|---|---|---|---|---|---|
+| 2026-09-07 | AB-731 | Not evidenced in LifeOS | Current P0 project action is the LifeOS Enterprise Evidence Package | Not evidenced | Finish the evidence package first; then record actual credential status and either schedule AB-731 or document the reason for changing sequence. |
+| 2026-09-14 | AB-731 or verified replacement |  |  |  | Review current credential state before starting another exam. |
+| 2026-09-21 | One primary credential only |  |  |  | Keep maximum one primary credential plus one practical lab. |
+| 2026-09-28 | One primary credential only |  |  |  | Prepare October market-demand review. |
 
 ## Monthly Market-Demand Review
 
-Review on the first business day of each month.
+Review on the first business day of each month or when a target client/partner creates a material new signal.
 
 ### Search Targets
 
@@ -114,53 +173,96 @@ Review on the first business day of each month.
 
 ### Decision Rule
 
-Do not change the certification roadmap because of one listing. Require one of the following:
+Do not change the certification roadmap because of one listing. Require one of:
 
 - the same signal appears in at least five relevant current listings;
 - a target client explicitly requests it;
 - a partner program requires it;
 - it unlocks a clearly defined service or implementation capability;
-- a credible employer or platform provides strong current demand evidence.
+- a credible employer/platform provides strong current demand evidence.
 
 ## Portfolio Proof Tracker
 
-| Artifact | Status | Context Label | Evidence | Publish Location | Review Date |
+Do not invent completion percentages. Use evidence-backed states only.
+
+| Artifact | Current State | Context Label | Evidence | Publish Location | Next Review |
 |---|---|---|---|---|---|
-| AI Readiness Assessment | planned | demonstration |  | Portfolio + GitHub | 2026-08-01 |
-| AI Opportunity Scoring Matrix | planned | demonstration |  | Portfolio + GitHub | 2026-08-01 |
-| Executive AI Adoption Roadmap | planned | demonstration |  | Portfolio + LinkedIn Featured | 2026-08-15 |
-| Workflow Transformation Case Study | planned | confirm context |  | Portfolio | 2026-08-15 |
-| Working AI Agent Demonstration | planned | demonstration |  | GitHub + video | 2026-09-15 |
-| Responsible AI Starter Policy | planned | demonstration |  | Portfolio + GitHub | 2026-09-30 |
-| AI Inventory and Risk Register | planned | demonstration |  | Portfolio + GitHub | 2026-09-30 |
-| Consultant Capability Statement | planned | personal professional brand |  | LinkedIn + website | 2026-08-01 |
+| LifeOS Enterprise Evidence Package | IN PROGRESS / current project action | demonstration / internal platform | Current production and repository evidence exist; owner-safe package still needs completion | Portfolio + GitHub as appropriate | 2026-09-14 |
+| AI Readiness Assessment | PLANNED | demonstration |  | Portfolio + GitHub | 2026-09-21 |
+| AI Opportunity Scoring Matrix | PLANNED | demonstration |  | Portfolio + GitHub | 2026-09-21 |
+| Executive AI Adoption Roadmap | PLANNED | demonstration |  | Portfolio + LinkedIn Featured | 2026-09-28 |
+| Workflow Transformation Case Study | PLANNED | confirm context |  | Portfolio | 2026-09-28 |
+| Working AI Agent Demonstration | PLANNED | demonstration |  | GitHub + video | 2026-10-05 |
+| Responsible AI Starter Policy | PLANNED | demonstration |  | Portfolio + GitHub | 2026-10-05 |
+| AI Inventory and Risk Register | PLANNED | demonstration |  | Portfolio + GitHub | 2026-10-05 |
+| Consultant Capability Statement | PLANNED | professional brand |  | LinkedIn + website | 2026-09-28 |
 
 ## Portfolio Credibility Score
 
-Score monthly out of 100.
+Do not publish a numeric score until each dimension has evidence. The prior all-zero score is removed because it falsely implied measured failure rather than missing evidence.
 
-| Dimension | Weight | Current |
-|---|---:|---:|
-| Recognized credentials | 15 | 0 |
-| Demonstrated implementation | 25 | 0 |
-| Case studies with evidence | 20 | 0 |
-| Governance and risk capability | 10 | 0 |
-| Executive communication assets | 10 | 0 |
-| Public professional brand | 10 | 0 |
-| Network and market engagement | 5 | 0 |
-| Client discovery and proposals | 5 | 0 |
-| **Total** | **100** | **0** |
+| Dimension | Weight | Current Evidence State |
+|---|---:|---|
+| Recognized credentials | 15 | Not yet recorded as earned in this tracker |
+| Demonstrated implementation | 25 | LifeOS implementation exists; portfolio-ready evidence package incomplete |
+| Case studies with evidence | 20 | Flagship candidates selected; final case-study evidence incomplete |
+| Governance and risk capability | 10 | Planned artifacts; no final public proof recorded |
+| Executive communication assets | 10 | Planned |
+| Public professional brand | 10 | Current proof not recorded here |
+| Network and market engagement | 5 | Current proof not recorded here |
+| Client discovery and proposals | 5 | Current proof not recorded here |
+
+## Execution Gate for the Active Portfolio Project
+
+Before adding another credential to the study queue:
+
+- [ ] Complete the current LifeOS Enterprise Evidence Package.
+- [ ] Record actual AB-731 status: not started, studying, scheduled, passed, deferred, or replaced.
+- [ ] Record any actual exam appointment evidence rather than relying on the old planning target.
+- [ ] Keep one primary credential at a time.
+- [ ] Tie the credential to a practical portfolio artifact.
+- [ ] Preserve privacy/permission evidence before publication.
+
+## Credential Gates
+
+### Gate 1 — Before Paying for Any Certification
+
+- [ ] Official credential source verified recently.
+- [ ] Exam or assessment is verifiable.
+- [ ] Target consulting service identified.
+- [ ] Portfolio artifact defined.
+- [ ] Study time and exam cost recorded.
+- [ ] At least one current market/client signal recorded.
+- [ ] No higher-priority overlapping credential is unfinished.
+
+### Gate 2 — Before Claiming Competency
+
+- [ ] Credential earned and verification URL saved.
+- [ ] Practical artifact completed.
+- [ ] Skill demonstrated in a live or documented workflow.
+- [ ] Limitations and scope stated accurately.
+- [ ] Evidence status updated.
+
+### Gate 3 — Before Marketing a Client Service
+
+- [ ] Discovery process tested.
+- [ ] Deliverables defined.
+- [ ] Pricing hypothesis documented.
+- [ ] Acceptance criteria defined.
+- [ ] Security/governance risks reviewed.
+- [ ] Case study or demonstration available.
+- [ ] Contract or statement-of-work language reviewed where appropriate.
 
 ## Official Sources
 
 - Microsoft AI Transformation Leader: https://learn.microsoft.com/en-us/credentials/certifications/ai-transformation-leader/
-- Microsoft AI Business Professional: https://learn.microsoft.com/en-us/credentials/certifications/ai-business-professional/
+- Microsoft AB-731 study guide: https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-731
 - Microsoft AI Agent Builder Associate: https://learn.microsoft.com/en-us/credentials/certifications/ai-agent-builder-associate/
+- Microsoft AB-620 study guide: https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ab-620
 - Google Cloud Generative AI Leader: https://cloud.google.com/learn/certification/generative-ai-leader
 - AWS Certified AI Practitioner: https://aws.amazon.com/certification/certified-ai-practitioner/
-- IAPP AIGP: https://iapp.org/certify/aigp
-- ISO/IEC 42001 overview: https://www.iso.org/standard/42001
+- IAPP AIGP exam: https://store.iapp.org/aigp-exam/
 
 ## Review Notes
 
-The current sequence is designed to prevent certificate collecting. Business transformation comes first, cross-cloud literacy comes next, implementation proof follows, and expensive governance specialization is gated by actual opportunity and return.
+This September review keeps the original anti-certificate-collecting intent but rebaselines it to current evidence. The resource remains useful and should be **ADAPTED**, not archived. The immediate improvement is to connect every credential to portfolio proof and stop treating old planning dates or empty tracker fields as evidence of actual progress.
