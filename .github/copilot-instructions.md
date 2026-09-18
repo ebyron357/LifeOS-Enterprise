@@ -74,8 +74,8 @@ uv add --dev pytest ruff mypy bandit
 ```
 
 ## Conventions
-- **Language**: All code comments and docstrings in **English**.
-  User-facing prompts and MCP tool descriptions may use **Traditional Chinese (zh-TW)**.
+- **Language**: All code comments and docstrings must be in **English**.
+  Respond in the user's language; default to **English** unless the user explicitly requests another language.
 - **Imports**: Always use absolute imports from `src.*`.
 - **Type hints**: Required on all public functions.
 - **Error handling**: Domain exceptions in `domain/exceptions.py`.
@@ -196,12 +196,12 @@ MCP_TRANSPORT=streamable-http uv run python -m src.presentation.server
 - 待解決事項
 - 下一步計畫
 
-## 回應風格
-- 使用繁體中文
-- 提供清晰的步驟說明
-- 執行操作後更新 Memory Bank
-- 遵循 Conventional Commits 格式
-- 程式碼是文檔的「編譯產物」
+## Response style
+- Respond in the user's language; default to English unless another language is explicitly requested.
+- Provide clear step-by-step explanations.
+- Update the Memory Bank after operations.
+- Follow Conventional Commits format.
+- Treat code as the compiled artifact of documentation.
 
 ## 常用指令
 

@@ -191,7 +191,7 @@ describe("FileSystemIdempotencyStore", () => {
     const store = new FileSystemIdempotencyStore(tmpDir);
     await checkAndSet(store, "key-one");
     await checkAndSet(store, "key-two");
-    const keys = store.listKeys();
+    const keys = await store.listKeys();
     expect(keys).toHaveLength(2);
   });
 });

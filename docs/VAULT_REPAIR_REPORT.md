@@ -3,6 +3,33 @@
 Date: 2026-07-14
 Repository: `ebyron357/LifeOS-Enterprise`
 
+## 2026-09-18 performance hardening
+
+### Repairs completed
+
+- Replaced serial Markdown note reads in `lib/vault/build-index.ts` with a bounded 16-worker parser while retaining sorted, deterministic output.
+- Changed workspace layout persistence from every transient grid update to drag/resize completion, eliminating repeated localStorage parsing, serialization, writes, and workspace context broadcasts during pointer movement.
+- Replaced request-path synchronous filesystem operations in the durable idempotency store with promise-based I/O. TTL scans now run at most once every five minutes instead of once per claim.
+- Split the optional voice console and its XState/browser speech dependency graph from the initial dashboard client path and schedule loading for browser idle time.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| Node 24 TypeScript syntax check (`build-index.ts`, `idempotency.ts`) | PASS |
+| `git diff --check` | PASS |
+| `pwsh -NoProfile -File ./scripts/audit-vault.ps1` | PASS — 139 Markdown notes checked |
+| `npm ci --no-audit --no-fund` | PASS — 607 locked packages installed |
+| `npm test` | PASS — 54 files, 298 tests |
+| `npm run typecheck` | PASS |
+| `npm run lint` | PASS |
+| `npm run build` | PASS — Next.js 16.3.5 production build, 32 static pages |
+| `npm audit --audit-level=high` | PASS — 0 vulnerabilities |
+
+### Final state
+
+Vault and web validation: **PASS.** The npm cache was safely cleared to recover build capacity; no source, Git history, configuration, credentials, or user data was removed.
+
 ## 2026-09-06 unified command center rebuild
 
 Branch: `rebuild/lifeos-unified-command-center`  
