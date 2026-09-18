@@ -50,12 +50,12 @@ export function OperationsSurface({ data }: OperationsSurfaceProps) {
   }, [setView]);
 
   useEffect(() => {
-    if ("requestIdleCallback" in window) {
+    if (typeof window.requestIdleCallback === "function") {
       const idleId = window.requestIdleCallback(() => setVoiceReady(true), { timeout: 2000 });
       return () => window.cancelIdleCallback(idleId);
     }
-    const timeoutId = window.setTimeout(() => setVoiceReady(true), 250);
-    return () => window.clearTimeout(timeoutId);
+    const timeoutId = setTimeout(() => setVoiceReady(true), 250);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const mapInput: CommandMapBuildInput = useMemo(() => ({
