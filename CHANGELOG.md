@@ -11,6 +11,7 @@ All notable changes to LifeOS Enterprise are documented in this file.
 - Approved Slack, ClickUp, n8n, and Vercel adapters execute the stored owner-reviewed arguments, not the approval summary
 - `POST /api/lifeos/voice/speak` validates origin, requires owner/TTS authorization, limits text to 2000 characters, uses a trusted rate-limit identity, and returns sanitized errors
 - Explicit `provider: "browser"` returns the browser-fallback response immediately and does not call OpenAI
+- Updated Next.js, Vitest, js-yaml, and Sharp dependency resolutions to remediate published critical, high, and moderate advisories
 
 ### Fixed
 
