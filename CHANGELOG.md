@@ -17,6 +17,13 @@ All notable changes to LifeOS Enterprise are documented in this file.
 - End-of-day check-in XP is counted once when the daily check-in quest is already complete
 - Screen-share requesting state is applied to the visible conversation UI before grant or deny
 
+### Performance
+
+- Vault Markdown parsing uses bounded concurrency while preserving deterministic index order
+- Workspace drag and resize operations persist layout only when interaction ends, avoiding per-frame storage writes and dashboard-wide updates
+- Filesystem idempotency claims use asynchronous I/O and throttle TTL directory sweeps
+- The optional voice console and its state-machine dependencies load after the dashboard becomes idle
+
 ### Documentation
 
 - Owner workbook, agent runtime, voice architecture, deployment, and canonical live status updated for the corrective. Owner acceptance remains required.

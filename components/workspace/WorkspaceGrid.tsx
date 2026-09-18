@@ -38,18 +38,16 @@ export function WorkspaceGrid({ widgets }: WorkspaceGridProps) {
 
   const layouts = useMemo(() => state.layouts as ResponsiveLayouts, [state.layouts]);
 
-  function handleLayoutChange(current: Layout, allLayouts: ResponsiveLayouts) {
+  function handleLayoutCommit(current: Layout) {
     if (!hydrated || isNarrow) return;
 
     const next = {
-      lg: allLayouts.lg ?? state.layouts.lg,
-      md: allLayouts.md ?? state.layouts.md,
-      sm: allLayouts.sm ?? state.layouts.sm,
-      xs: allLayouts.xs ?? state.layouts.xs,
+      lg: state.layouts.lg,
+      md: state.layouts.md,
+      sm: state.layouts.sm,
+      xs: state.layouts.xs,
     } as BreakpointLayouts;
 
-    // Ensure the active breakpoint always receives the latest committed layout,
-    // even if react-grid-layout omits a sparse key in `allLayouts`.
     const committed = current.map((item) => ({ ...item }));
     if (width >= BREAKPOINTS.lg) next.lg = committed;
     else if (width >= BREAKPOINTS.md) next.md = committed;
@@ -135,7 +133,8 @@ export function WorkspaceGrid({ widgets }: WorkspaceGridProps) {
           enabled: true,
           handles: ["se"],
         }}
-        onLayoutChange={handleLayoutChange}
+        onDragStop={handleLayoutCommit}
+        onResizeStop={handleLayoutCommit}
       >
         {visibleWidgets.map(({ id, node }) => (
           <div key={id} className="workspace-grid-item" data-grid-id={id}>

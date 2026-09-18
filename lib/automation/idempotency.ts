@@ -14,7 +14,7 @@
  *    `quarantine` decision so the event can be logged and reviewed rather
  *    than silently suppressed by an overly broad fallback key.
  * 4. TTL / retention: `FileSystemIdempotencyStore` accepts a `ttlMs` option
- *    and purges stale records on `set()`, keeping the store bounded.
+ *    and periodically purges stale records during claims, keeping the store bounded.
  * 5. Swappable: `IdempotencyStore` is an interface; adapters for Redis,
  *    databases, etc. can be dropped in without changing business logic.
  *
@@ -33,7 +33,7 @@
  * ```
  */
 
-import * as fs from "node:fs";
+import { mkdir, open, readFile, readdir, stat, unlink } from "node:fs/promises";
 import * as path from "node:path";
 import * as os from "node:os";
 
@@ -101,7 +101,7 @@ export interface IdempotencyStore {
  * Each processed delivery is stored as an individual JSON file:
  *   `{dir}/{key}.json`
  *
- * **Atomicity**: `claim()` uses `fs.openSync(path, 'wx')` (O_CREAT | O_EXCL),
+ * **Atomicity**: `claim()` uses `fs.promises.open(path, 'wx')` (O_CREAT | O_EXCL),
  * which the kernel guarantees to succeed for exactly one concurrent caller on
  * POSIX filesystems (including ext4, xfs, and overlayfs).  On Windows NTFS the
  * same exclusive-create guarantee holds.  This eliminates the TOCTOU gap
@@ -110,9 +110,9 @@ export interface IdempotencyStore {
  * **Restart persistence**: files survive process restart, container recycle, and
  * n8n restart because they live in `dir` (default `/data/n8n/idempotency`).
  *
- * **Retention/TTL**: on each `claim()` call a sweep deletes records older than
- * `ttlMs` (default 30 days — well beyond GitHub's 72-hour redelivery window).
- * The sweep is best-effort; failures are logged and ignored.
+ * **Retention/TTL**: `claim()` periodically sweeps records older than `ttlMs`
+ * (default 30 days — well beyond GitHub's 72-hour redelivery window). Sweeps
+ * run at most every five minutes and are best-effort.
  *
  * **Multi-instance n8n**: when multiple n8n worker processes share the same
  * mounted directory (e.g. NFS or a shared persistent volume), the O_EXCL
@@ -123,6 +123,9 @@ export interface IdempotencyStore {
 export class FileSystemIdempotencyStore implements IdempotencyStore {
   readonly dir: string;
   readonly ttlMs: number;
+  private readonly ready: Promise<void>;
+  private lastSweepAt = 0;
+  private sweepInFlight: Promise<void> | null = null;
 
   constructor(
     dir: string = path.join(os.homedir(), ".n8n", "idempotency"),
@@ -130,7 +133,7 @@ export class FileSystemIdempotencyStore implements IdempotencyStore {
   ) {
     this.dir = dir;
     this.ttlMs = ttlMs;
-    fs.mkdirSync(this.dir, { recursive: true });
+    this.ready = mkdir(this.dir, { recursive: true }).then(() => undefined);
   }
 
   private recordPath(key: string): string {
@@ -140,7 +143,8 @@ export class FileSystemIdempotencyStore implements IdempotencyStore {
 
   async get(key: string): Promise<ProcessedRecord | undefined> {
     try {
-      const raw = fs.readFileSync(this.recordPath(key), "utf8");
+      await this.ready;
+      const raw = await readFile(this.recordPath(key), "utf8");
       return JSON.parse(raw) as ProcessedRecord;
     } catch {
       return undefined;
@@ -148,32 +152,50 @@ export class FileSystemIdempotencyStore implements IdempotencyStore {
   }
 
   async claim(key: string, record: ProcessedRecord): Promise<boolean> {
-    this.sweepExpired();
+    await this.ready;
+    await this.maybeSweepExpired();
     const filePath = this.recordPath(key);
+    let file: Awaited<ReturnType<typeof open>> | undefined;
     try {
-      const fd = fs.openSync(filePath, "wx");
-      fs.writeSync(fd, JSON.stringify(record, null, 2));
-      fs.closeSync(fd);
+      file = await open(filePath, "wx");
+      await file.writeFile(JSON.stringify(record, null, 2));
       return true;
     } catch (err: unknown) {
       if (isNodeError(err) && err.code === "EEXIST") {
         return false;
       }
       throw err;
+    } finally {
+      await file?.close();
     }
   }
 
-  /** Remove records older than ttlMs.  Best-effort; never throws. */
-  private sweepExpired(): void {
+  private async maybeSweepExpired(): Promise<void> {
+    const intervalMs = Math.min(this.ttlMs, 5 * 60 * 1000);
+    if (Date.now() - this.lastSweepAt < intervalMs) return;
+    if (this.sweepInFlight) {
+      await this.sweepInFlight;
+      return;
+    }
+
+    this.lastSweepAt = Date.now();
+    this.sweepInFlight = this.sweepExpired().finally(() => {
+      this.sweepInFlight = null;
+    });
+    await this.sweepInFlight;
+  }
+
+  /** Remove records older than ttlMs. Best-effort; never throws. */
+  private async sweepExpired(): Promise<void> {
     try {
       const cutoff = Date.now() - this.ttlMs;
-      for (const entry of fs.readdirSync(this.dir)) {
+      for (const entry of await readdir(this.dir)) {
         if (!entry.endsWith(".json")) continue;
         const filePath = path.join(this.dir, entry);
         try {
-          const stat = fs.statSync(filePath);
-          if (stat.mtimeMs < cutoff) {
-            fs.unlinkSync(filePath);
+          const fileStat = await stat(filePath);
+          if (fileStat.mtimeMs < cutoff) {
+            await unlink(filePath);
             console.log(
               `[idempotency] TTL_EXPIRED removed file=${entry}`,
             );
@@ -188,10 +210,10 @@ export class FileSystemIdempotencyStore implements IdempotencyStore {
   }
 
   /** List all unexpired keys (test / diagnostic helper). */
-  listKeys(): string[] {
+  async listKeys(): Promise<string[]> {
     try {
-      return fs
-        .readdirSync(this.dir)
+      await this.ready;
+      return (await readdir(this.dir))
         .filter((f) => f.endsWith(".json"))
         .map((f) => decodeURIComponent(f.slice(0, -5).replace(/_/g, "%")));
     } catch {

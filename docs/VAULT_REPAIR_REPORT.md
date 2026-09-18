@@ -3,6 +3,29 @@
 Date: 2026-07-14
 Repository: `ebyron357/LifeOS-Enterprise`
 
+## 2026-09-18 performance hardening
+
+### Repairs completed
+
+- Replaced serial Markdown note reads in `lib/vault/build-index.ts` with a bounded 16-worker parser while retaining sorted, deterministic output.
+- Changed workspace layout persistence from every transient grid update to drag/resize completion, eliminating repeated localStorage parsing, serialization, writes, and workspace context broadcasts during pointer movement.
+- Replaced request-path synchronous filesystem operations in the durable idempotency store with promise-based I/O. TTL scans now run at most once every five minutes instead of once per claim.
+- Split the optional voice console and its XState/browser speech dependency graph from the initial dashboard client path and schedule loading for browser idle time.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| Node 24 TypeScript syntax check (`build-index.ts`, `idempotency.ts`) | PASS |
+| `git diff --check` | PASS |
+| `pwsh -NoProfile -File ./scripts/audit-vault.ps1` | PASS — 139 Markdown notes checked |
+| `npm ci --no-audit --no-fund` | BLOCKED — host volume had 0 bytes free; the incomplete `node_modules` directory was removed |
+| Vitest, TypeScript, ESLint, Next.js production build | NOT RUN — dependencies could not be restored with only 168 MiB free |
+
+### Final state
+
+Vault acceptance: **PASS.** Performance changes are implemented and syntax-checked. Package-dependent verification remains blocked only by host disk capacity; rerun `npm ci`, `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build` after freeing disk space.
+
 ## 2026-09-06 unified command center rebuild
 
 Branch: `rebuild/lifeos-unified-command-center`  
