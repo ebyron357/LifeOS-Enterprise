@@ -3,8 +3,8 @@
 **Document type:** Printable owner acceptance workbook  
 **Repository:** `ebyron357/LifeOS-Enterprise`  
 **Current repository `main` SHA:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35`  
-**Last verified READY production SHA:** `6f6d5d7578c03b89abe781cc11351ad66cb07c51`  
-**Production candidate:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35` — re-verify Vercel state before acceptance testing  
+**Verified READY production SHA:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35`  
+**Verified production deployment:** `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx`  
 **Production URL:** `https://lifeos-enterprise.vercel.app/`  
 **Governing status:** PRs #60 through #64 are merged as applicable to current `main`. Repository head and production identity are separate facts. Owner acceptance remains incomplete until testing is performed against an exact READY production deployment.  
 **Do not mark owner acceptance complete in this workbook on the owner's behalf.**
@@ -189,8 +189,8 @@ The current `/inbox` Capture surface is **not yet** the full Universal Resource 
 | Field | Value |
 |---|---|
 | Production URL | `https://lifeos-enterprise.vercel.app/` |
-| Verified deployment ID | Record the READY deployment actually tested |
-| Verified commit SHA | Record the READY deployment SHA actually tested |
+| Verified deployment ID | `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` |
+| Verified commit SHA | `7982c92a7080f60f9fb70e7c66c5220b8178bc35` |
 | Owner name | |
 | Date | |
 | Overall result | ☐ READY TO ACCEPT · ☐ BLOCKED · ☐ NOT READY |
