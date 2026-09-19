@@ -1,7 +1,7 @@
 # LifeOS Interactive Agent Runtime
 
-**Status:** PR #60 is merged to `main` @ `c7d4e3507d7837e100a35a9eacb903e9319f1803`. Post-#60 security corrective is a separate draft PR.  
-**Baseline:** `main` @ `c7d4e3507d7837e100a35a9eacb903e9319f1803`  
+**Status:** The interactive runtime is merged on current `main`. PR #61 hardened write authorization/durable approvals, PR #62 integrated the unified Command Center, and PR #64 added performance/dependency hardening without changing the approval model.  
+**Baseline:** `main` @ `7982c92a7080f60f9fb70e7c66c5220b8178bc35`  
 **Workspace:** Conversation page at `/conversation` inside the existing vault portal  
 **Owner acceptance:** not complete. Automated success is not owner acceptance.
 
@@ -113,17 +113,18 @@ See `80 SOPs/LifeOS Owner's Operating Manual.md` → **How to Use Interactive Li
 
 ## Rollback
 
-1. Do not merge this corrective draft PR until the owner completes the workbook.
-2. Do not deploy from the corrective branch. Production remains current `main`.
-3. Close the draft PR to abandon the corrective. No revert of `main` is required unless the owner later merges it.
-4. No vault schema change is required. No GitHub Project change is required.
-5. PR #59 stays closed and is not a rollback or continuation source.
+1. Treat the current runtime as part of `main`; there is no separate corrective branch to preserve or revive.
+2. If a runtime regression is introduced, revert or repair it through a new reviewable pull request; do not rewrite `main` history.
+3. Keep canonical project writes draft-PR-only and keep approval execution fail-closed during rollback/recovery.
+4. Use Vercel's previous known-good READY deployment if a production rollback is required, and record the exact deployment/SHA in `docs/CANONICAL_LIVE_STATUS.md`.
+5. PRs #55 and #59 remain closed/superseded and are not continuation or rollback sources.
 
 ## Known limitations
 
 - Continuous browser speech quality varies by browser. Hold-to-talk is the fallback; release flushes the last utterance.
 - LiveKit room tokens are still deferred.
 - Optional LLM rewrite is not used unless a server-side key exists, and even then tools stay policy-gated.
-- ClickUp, Slack, n8n, Vercel, and Supabase adapters stay unavailable until their env placeholders are set **and** durable approval storage is configured.
+- ClickUp, Slack, n8n, Vercel, and Supabase adapters stay unavailable until their env placeholders are set **and** durable approval storage is configured; credential presence alone is not reported as verified connectivity.
 - Production write/approval execution is unavailable until Upstash Redis REST is configured. There is no silent in-memory production store.
 - Screen-share permission cannot be granted by Playwright.
+- Voice production polish and real-device acceptance remain tracked separately; automated tests do not replace owner microphone/playback verification.
