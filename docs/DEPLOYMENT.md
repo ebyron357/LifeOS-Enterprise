@@ -19,8 +19,8 @@
 ## Current release state
 
 - Current repository `main`: `7982c92a7080f60f9fb70e7c66c5220b8178bc35` (PR #64 performance/dependency hardening)
-- Last production deployment verified READY during the 2026-09-19 reconciliation: `dpl_Ew6Ttwi7p6XynLw9VPqMKUdu6Rnd` at `6f6d5d7578c03b89abe781cc11351ad66cb07c51`
-- A production deployment for `7982c92a7080f60f9fb70e7c66c5220b8178bc35` was triggered automatically. Treat production identity as unchanged until that deployment reports READY.
+- Verified production deployment: `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` — READY — Git SHA `7982c92a7080f60f9fb70e7c66c5220b8178bc35`
+- Production alias `lifeos-enterprise.vercel.app` points to the READY PR #64 deployment.
 - `docs/CANONICAL_LIVE_STATUS.md` is authoritative for current deployment identity and owner-acceptance state.
 
 ## Environment variables
