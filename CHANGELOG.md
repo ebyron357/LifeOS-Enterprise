@@ -11,11 +11,19 @@ All notable changes to LifeOS Enterprise are documented in this file.
 - Approved Slack, ClickUp, n8n, and Vercel adapters execute the stored owner-reviewed arguments, not the approval summary
 - `POST /api/lifeos/voice/speak` validates origin, requires owner/TTS authorization, limits text to 2000 characters, uses a trusted rate-limit identity, and returns sanitized errors
 - Explicit `provider: "browser"` returns the browser-fallback response immediately and does not call OpenAI
+- Updated Next.js, Vitest, js-yaml, and Sharp dependency resolutions to remediate published critical, high, and moderate advisories
 
 ### Fixed
 
 - End-of-day check-in XP is counted once when the daily check-in quest is already complete
 - Screen-share requesting state is applied to the visible conversation UI before grant or deny
+
+### Performance
+
+- Vault Markdown parsing uses bounded concurrency while preserving deterministic index order
+- Workspace drag and resize operations persist layout only when interaction ends, avoiding per-frame storage writes and dashboard-wide updates
+- Filesystem idempotency claims use asynchronous I/O and throttle TTL directory sweeps
+- The optional voice console and its state-machine dependencies load after the dashboard becomes idle
 
 ### Documentation
 

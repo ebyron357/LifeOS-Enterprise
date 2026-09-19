@@ -16,6 +16,8 @@ import { isLegacyPath, mapNoteToSection } from "./section-map";
 import { pathToSlug } from "./slug";
 import type { VaultIndex, VaultNote, VaultSection, VaultTask } from "./types";
 
+const NOTE_PARSE_CONCURRENCY = 16;
+
 async function walkMarkdownFiles(root: string, relative = ""): Promise<string[]> {
   const absolute = path.join(root, relative);
   let entries: Array<{ name: string; isDirectory: () => boolean }>;
@@ -43,6 +45,27 @@ async function walkMarkdownFiles(root: string, relative = ""): Promise<string[]>
   }
 
   return files.sort();
+}
+
+async function mapWithConcurrency<T, R>(
+  values: T[],
+  concurrency: number,
+  mapper: (value: T) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(values.length);
+  let nextIndex = 0;
+
+  async function worker() {
+    while (nextIndex < values.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      results[index] = await mapper(values[index]);
+    }
+  }
+
+  const workerCount = Math.min(concurrency, values.length);
+  await Promise.all(Array.from({ length: workerCount }, () => worker()));
+  return results;
 }
 
 async function parseVaultNote(root: string, relativePath: string): Promise<{ note: VaultNote | null; error?: string; tasks: VaultTask[] }> {
@@ -119,8 +142,15 @@ export async function buildVaultIndex(root = process.cwd()): Promise<VaultIndex>
   const tasks: VaultTask[] = [];
   const errors: VaultIndex["errors"] = [];
 
-  for (const filePath of markdownPaths) {
-    const parsed = await parseVaultNote(root, filePath);
+  const parsedNotes = await mapWithConcurrency(
+    markdownPaths,
+    NOTE_PARSE_CONCURRENCY,
+    (filePath) => parseVaultNote(root, filePath),
+  );
+
+  for (let index = 0; index < markdownPaths.length; index += 1) {
+    const filePath = markdownPaths[index];
+    const parsed = parsedNotes[index];
     if (parsed.error) errors.push({ path: filePath, message: parsed.error });
     if (parsed.note) notes.push(parsed.note);
     tasks.push(...parsed.tasks);

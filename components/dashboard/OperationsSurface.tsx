@@ -6,7 +6,6 @@ import { InteractiveCommandCenter } from "@/components/dashboard/InteractiveComm
 import { ChangePlanPersistence } from "@/components/dashboard/ChangePlanPersistence";
 import { InteractionFeedbackProvider } from "@/components/feedback/InteractionFeedback";
 import { MotionProvider } from "@/components/motion/MotionProvider";
-import { VoiceConsole } from "@/components/voice/VoiceConsole";
 import { useBrowserStorageString } from "@/lib/lifeos/use-browser-storage";
 import type { VaultDashboardData } from "@/lib/lifeos/types";
 import type { CommandMapBuildInput } from "@/lib/command-map/types";
@@ -24,6 +23,11 @@ const CommandMap = dynamic(
   },
 );
 
+const VoiceConsole = dynamic(
+  () => import("@/components/voice/VoiceConsole").then((mod) => mod.VoiceConsole),
+  { ssr: false },
+);
+
 type OperationsSurfaceProps = {
   data: VaultDashboardData;
 };
@@ -31,6 +35,7 @@ type OperationsSurfaceProps = {
 export function OperationsSurface({ data }: OperationsSurfaceProps) {
   const [view, setView] = useBrowserStorageString("lifeos-operations-view-v1", "board");
   const [mapReady, setMapReady] = useState(view === "map");
+  const [voiceReady, setVoiceReady] = useState(false);
 
   useEffect(() => {
     function onView(event: Event) {
@@ -43,6 +48,15 @@ export function OperationsSurface({ data }: OperationsSurfaceProps) {
     window.addEventListener("lifeos-operations-view", onView);
     return () => window.removeEventListener("lifeos-operations-view", onView);
   }, [setView]);
+
+  useEffect(() => {
+    if (typeof window.requestIdleCallback === "function") {
+      const idleId = window.requestIdleCallback(() => setVoiceReady(true), { timeout: 2000 });
+      return () => window.cancelIdleCallback(idleId);
+    }
+    const timeoutId = setTimeout(() => setVoiceReady(true), 250);
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   const mapInput: CommandMapBuildInput = useMemo(() => ({
     projects: data.projects.map((project) => ({
@@ -114,13 +128,15 @@ export function OperationsSurface({ data }: OperationsSurfaceProps) {
             {mapReady ? <CommandMap input={mapInput} /> : null}
           </div>
 
-          <VoiceConsole
-            projects={data.projects}
-            agents={data.agents}
-            activeProjects={data.activeProjects}
-            waitingOn={data.waitingOn}
-            reviewsDue={data.reviewsDue}
-          />
+          {voiceReady ? (
+            <VoiceConsole
+              projects={data.projects}
+              agents={data.agents}
+              activeProjects={data.activeProjects}
+              waitingOn={data.waitingOn}
+              reviewsDue={data.reviewsDue}
+            />
+          ) : null}
         </section>
       </InteractionFeedbackProvider>
     </MotionProvider>

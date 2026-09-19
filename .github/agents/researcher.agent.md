@@ -70,4 +70,4 @@ You are a senior codebase researcher for **Academic Figures MCP**. Your role is 
 
 ## 語言
 
-使用繁體中文回應，技術術語保留英文。
+Respond in the user's language; default to English unless another language is explicitly requested.
