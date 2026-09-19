@@ -6,13 +6,12 @@
 **Production URL:** `https://lifeos-enterprise.vercel.app/`  
 **Released version:** `1.0.0`  
 **Current main SHA:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35` (includes merged PRs #60, #61, #62, #63, and #64)  
-**Last verified READY production deployment:** `dpl_Ew6Ttwi7p6XynLw9VPqMKUdu6Rnd` — target `production` — Git SHA `6f6d5d7578c03b89abe781cc11351ad66cb07c51`  
-**Newest production candidate:** `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` — target `production` — Git SHA `7982c92a7080f60f9fb70e7c66c5220b8178bc35`; state was `BUILDING` at the latest verification and must be rechecked before claiming it is live  
+**Verified production deployment:** `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` — READY — target `production` — Git SHA `7982c92a7080f60f9fb70e7c66c5220b8178bc35`  
 **Owner acceptance:** not complete
 
 ## Governing status
 
-**LifeOS Enterprise V1.0 is built on `main`. Repository head and production deployment identity are tracked separately: `main` is `7982c92a7080f60f9fb70e7c66c5220b8178bc35`, while the last deployment verified READY during this reconciliation is `6f6d5d7578c03b89abe781cc11351ad66cb07c51`. A production deployment for `7982c92a7080f60f9fb70e7c66c5220b8178bc35` has been triggered and must reach READY before production is reported at that SHA.**
+**LifeOS Enterprise V1.0 is built on `main`, and the verified production deployment is now aligned with repository head at `7982c92a7080f60f9fb70e7c66c5220b8178bc35`.**
 
 The prior status edition is superseded because both the post-#60 security corrective and the unified-command-center rebuild have since merged and deployed:
 
@@ -103,24 +102,17 @@ The production Command Center currently distinguishes available/connected capabi
 
 ### Production deployment
 
-The last deployment verified READY during this reconciliation is:
+Vercel reports the current production deployment as:
 
-- Deployment: `dpl_Ew6Ttwi7p6XynLw9VPqMKUdu6Rnd`
+- Deployment: `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx`
 - State: `READY`
 - Target: `production`
 - Git branch: `main`
-- Git SHA: `6f6d5d7578c03b89abe781cc11351ad66cb07c51`
-- Commit: `docs: reconcile Resource Intelligence and current LifeOS production status (#63)`
-
-A newer production deployment was triggered automatically by PR #64:
-
-- Deployment: `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx`
-- Target: `production`
-- Git branch: `main`
 - Git SHA: `7982c92a7080f60f9fb70e7c66c5220b8178bc35`
-- State at latest verification: `BUILDING`
+- Commit: `perf: optimize vault and dashboard hot paths (#64)`
+- Aliases include `lifeos-enterprise.vercel.app`
 
-Do not call `7982c92...` the live production SHA until Vercel reports that deployment READY.
+The prior READY production deployment at `6f6d5d7578c03b89abe781cc11351ad66cb07c51` remains rollback evidence, not the current production identity.
 
 ### PR #62 agent validation
 
@@ -166,11 +158,11 @@ These are agent validation records, not owner acceptance.
 - PR #61: merged post-#60 security/write/TTS/state corrective onto `main` at `3ddf934afc12261bdf68e2bd86059f80db0a22db`.
 - PR #62: merged unified AI Command Center rebuild at `46a2514893b4e3557911403274cba695b1c89384`.
 - PR #63: merged Resource Intelligence/governance reconciliation at `6f6d5d7578c03b89abe781cc11351ad66cb07c51`; a READY production deployment exists for this SHA.
-- PR #64: merged performance/dependency hardening at `7982c92a7080f60f9fb70e7c66c5220b8178bc35`; production deployment was still building at the latest verification.
+- PR #64: merged performance/dependency hardening at `7982c92a7080f60f9fb70e7c66c5220b8178bc35`; Vercel deployment `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` is READY in production.
 
 ## Remaining owner work
 
-1. Re-verify the active production deployment SHA after the PR #64 deployment finishes, then complete the current `docs/OWNER_ACCEPTANCE_WORKBOOK.md` against that exact READY deployment.
+1. Complete the current `docs/OWNER_ACCEPTANCE_WORKBOOK.md` against READY production deployment `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` at SHA `7982c92a7080f60f9fb70e7c66c5220b8178bc35`.
 2. Verify the new root Command Center and mobile navigation through the owner journeys: resume work, capture, journal, learning, Ask LifeOS, integration health, and back/forward behavior.
 3. Complete live microphone, voice preview/interrupt/mute, screen-share request/deny/stop, and paid-TTS authorization checks where the relevant provider is intentionally enabled.
 4. Enable canonical/external writes only if intentionally desired and only after `LIFEOS_WRITE_SECRET`, durable Redis approvals, origin controls, and the specific tool credentials are configured together.
