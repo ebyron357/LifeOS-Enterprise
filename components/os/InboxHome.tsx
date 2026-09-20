@@ -1,13 +1,14 @@
 "use client";
 
 import { InboxList } from "./QuickCaptureDock";
+import { ResourceIntakePanel } from "./ResourceIntakePanel";
 
 export function InboxHome() {
   return (
     <div className="os-grid">
       <header className="os-page-header">
         <h1>Capture</h1>
-        <p>Park a note, task, idea, or reminder. File it later. Do not decide the perfect folder first.</p>
+        <p>Park a note, task, idea, reminder, or resource. Browser capture stays lightweight; promote valuable resources into the canonical vault when you are ready.</p>
       </header>
       <section className="os-card os-page">
         <h2>Start here</h2>
@@ -20,6 +21,7 @@ export function InboxHome() {
           Capture something
         </button>
       </section>
+      <ResourceIntakePanel />
       <InboxList />
     </div>
   );
