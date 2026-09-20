@@ -9,7 +9,10 @@ import {
 describe("Resource Intelligence canonical identity", () => {
   it("dedupes GitHub repository URL variants to one identity", () => {
     const first = normalizeResource({ source: "https://github.com/Vercel-Labs/knowledge-agent-template.git?utm_source=test" });
-    const second = normalizeResource({ source: "github.com/vercel-labs/knowledge-agent-template/issues/12" });
+    const second = normalizeResource({
+      source: "github.com/vercel-labs/knowledge-agent-template/issues/12",
+      title: "A completely different display title",
+    });
 
     expect(first.sourceType).toBe("github");
     expect(first.sourceIdentity).toBe("github:vercel-labs/knowledge-agent-template");
@@ -18,14 +21,18 @@ describe("Resource Intelligence canonical identity", () => {
     expect(resourceRecordPath(second)).toBe(resourceRecordPath(first));
   });
 
-  it("dedupes YouTube URL forms by video ID", () => {
-    const short = normalizeResource({ source: "https://youtu.be/abc123XYZ?si=tracking" });
-    const watch = normalizeResource({ source: "https://www.youtube.com/watch?v=abc123XYZ&utm_source=test" });
+  it("dedupes YouTube URL forms and display titles by video ID", () => {
+    const short = normalizeResource({ source: "https://youtu.be/abc123XYZ?si=tracking", title: "First title" });
+    const watch = normalizeResource({
+      source: "https://www.youtube.com/watch?v=abc123XYZ&utm_source=test",
+      title: "Second title",
+    });
 
     expect(short.sourceType).toBe("youtube");
     expect(short.sourceIdentity).toBe("youtube:abc123XYZ");
     expect(watch.sourceIdentity).toBe(short.sourceIdentity);
     expect(watch.canonicalSource).toBe("https://www.youtube.com/watch?v=abc123XYZ");
+    expect(resourceRecordPath(watch)).toBe(resourceRecordPath(short));
   });
 
   it("removes common tracking parameters from webpage identity", () => {
