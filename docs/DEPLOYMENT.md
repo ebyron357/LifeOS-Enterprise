@@ -18,10 +18,11 @@
 
 ## Current release state
 
-- Current repository `main`: `7982c92a7080f60f9fb70e7c66c5220b8178bc35` (PR #64 performance/dependency hardening)
-- Verified production deployment: `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` — READY — Git SHA `7982c92a7080f60f9fb70e7c66c5220b8178bc35`
-- Production alias `lifeos-enterprise.vercel.app` points to the READY PR #64 deployment.
-- `docs/CANONICAL_LIVE_STATUS.md` is authoritative for current deployment identity and owner-acceptance state.
+- Last recorded application-code baseline: `7982c92a7080f60f9fb70e7c66c5220b8178bc35` (PR #64 performance/dependency hardening).
+- GitHub `main` is authoritative for the live repository head.
+- Vercel production for `lifeos-enterprise` is authoritative for the live deployment ID and deployed Git SHA.
+- Documentation-only merges may trigger production deployments without changing application runtime code; always report the application-code baseline and live deployment identity separately.
+- `docs/CANONICAL_LIVE_STATUS.md` is authoritative for capability/governance state, not a hard-coded live deployment SHA.
 
 ## Environment variables
 
@@ -82,9 +83,9 @@ pwsh -NoProfile -File ./scripts/audit-vault.ps1
 3. If a newly READY production deployment must be undone, use Vercel rollback/promote controls to restore the previous known-good READY production deployment.
 4. If the defect came from a merged GitHub change, create a normal revert/fix pull request; do not rewrite `main` history.
 5. Re-run Dashboard CI, Vault Health, production smoke checks, and any affected owner-acceptance rows before calling the rollback/fix complete.
-6. Record the resulting deployment ID and Git SHA in `docs/CANONICAL_LIVE_STATUS.md`.
+6. Record the resulting deployment ID and Git SHA in the release/acceptance evidence for that operation.
 
-Exact production SHA is recorded only after a verified READY production deployment of that SHA.
+Live production identity must be queried from Vercel when needed. Do not hard-code a "current production SHA" into this guide because merging the guide itself can trigger another production deployment.
 
 ## Production checklist
 

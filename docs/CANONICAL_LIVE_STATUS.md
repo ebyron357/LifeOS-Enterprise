@@ -5,13 +5,13 @@
 **Canonical branch:** `main`  
 **Production URL:** `https://lifeos-enterprise.vercel.app/`  
 **Released version:** `1.0.0`  
-**Current main SHA:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35` (includes merged PRs #60, #61, #62, #63, and #64)  
-**Verified production deployment:** `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` — READY — target `production` — Git SHA `7982c92a7080f60f9fb70e7c66c5220b8178bc35`  
+**Last application-code baseline:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35` — PR #64 performance/dependency hardening  
+**Live identity source:** GitHub `main` for repository head; Vercel production deployment for deployed SHA/ID. Query both at report or acceptance time.  
 **Owner acceptance:** not complete
 
 ## Governing status
 
-**LifeOS Enterprise V1.0 is built on `main`, and the verified production deployment is now aligned with repository head at `7982c92a7080f60f9fb70e7c66c5220b8178bc35`.**
+**LifeOS Enterprise V1.0 is built on `main`. PR #64 is the last application-code baseline recorded here. Repository head and production deployment identity are live operational facts and must be read from GitHub and Vercel when a status report or acceptance run begins.**
 
 The prior status edition is superseded because both the post-#60 security corrective and the unified-command-center rebuild have since merged and deployed:
 
@@ -27,7 +27,7 @@ Automated validation and a successful production deployment do **not** equal own
 
 Do not report LifeOS as owner-accepted or fully operational for credential-gated writes, paid TTS, or live microphone/screen workflows until those owner-only checks are completed.
 
-This document is the single status source of truth. Earlier reports, draft-PR descriptions, percentages, and phase summaries are superseded whenever they conflict with this document or fresher production evidence.
+This document is the single source of truth for capability state, governance, acceptance state, and status-reporting rules. It deliberately does **not** hard-code a permanent "current production SHA": a documentation-only merge can trigger Vercel and change that SHA without changing application code. GitHub and Vercel are authoritative for live repository/deployment identity. Earlier reports, draft-PR descriptions, percentages, and phase summaries are superseded whenever they conflict with this document or fresher operational evidence.
 
 ## Current production capabilities
 
@@ -91,28 +91,30 @@ The production Command Center currently distinguishes available/connected capabi
 - Hermes is an adapter contract, not an active runtime, until a real endpoint/token and reachability evidence exist.
 - Resource Intelligence / Universal Resource Intake remains a platform build item until capture, processing, classification, disposition, asset generation, durable storage, and verification are implemented end to end.
 
-## Verified current evidence
+## Verified release evidence
 
-### Repository head
+### Last application-code baseline
 
-- Branch: `main`
+PR #64 merged application performance/dependency hardening at:
+
 - Git SHA: `7982c92a7080f60f9fb70e7c66c5220b8178bc35`
 - Commit: `perf: optimize vault and dashboard hot paths (#64)`
-- PR #64 was merged only after its exact head SHA passed both Dashboard CI and Vault Health.
+- Exact PR head passed Dashboard CI and Vault Health before merge.
+- Validation recorded 54 test files / 298 tests, lint/typecheck/build pass, vault audit pass, and `npm audit --audit-level=high` with 0 vulnerabilities.
 
-### Production deployment
+### Deployment identity rule
 
-Vercel reports the current production deployment as:
+Deployment IDs and production SHAs are runtime evidence, not durable constants inside this file.
 
-- Deployment: `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx`
-- State: `READY`
-- Target: `production`
-- Git branch: `main`
-- Git SHA: `7982c92a7080f60f9fb70e7c66c5220b8178bc35`
-- Commit: `perf: optimize vault and dashboard hot paths (#64)`
-- Aliases include `lifeos-enterprise.vercel.app`
+At the start of every status report, release check, rollback, or owner-acceptance session:
 
-The prior READY production deployment at `6f6d5d7578c03b89abe781cc11351ad66cb07c51` remains rollback evidence, not the current production identity.
+1. Read current GitHub `main`.
+2. Read the Vercel production deployment for `lifeos-enterprise`.
+3. Record the exact deployment ID + Git SHA in the report/workbook evidence for that session.
+4. If production points at a documentation-only commit after the last application-code baseline, state both facts separately.
+5. Never infer deployed identity from repository head, and never use a historical deployment ID as though it were current.
+
+Historical evidence: PR #64 was verified READY in Vercel at deployment `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx`. PR #65 was a documentation-only reconciliation and subsequently produced a different READY production SHA without changing application code. These IDs are retained only as evidence examples, not as current-state claims.
 
 ### PR #62 agent validation
 
@@ -158,11 +160,12 @@ These are agent validation records, not owner acceptance.
 - PR #61: merged post-#60 security/write/TTS/state corrective onto `main` at `3ddf934afc12261bdf68e2bd86059f80db0a22db`.
 - PR #62: merged unified AI Command Center rebuild at `46a2514893b4e3557911403274cba695b1c89384`.
 - PR #63: merged Resource Intelligence/governance reconciliation at `6f6d5d7578c03b89abe781cc11351ad66cb07c51`; a READY production deployment exists for this SHA.
-- PR #64: merged performance/dependency hardening at `7982c92a7080f60f9fb70e7c66c5220b8178bc35`; Vercel deployment `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` is READY in production.
+- PR #64: merged the last recorded application-code baseline at `7982c92a7080f60f9fb70e7c66c5220b8178bc35`.
+- PR #65: merged documentation/governance reconciliation only; it did not change application runtime behavior.
 
 ## Remaining owner work
 
-1. Complete the current `docs/OWNER_ACCEPTANCE_WORKBOOK.md` against READY production deployment `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` at SHA `7982c92a7080f60f9fb70e7c66c5220b8178bc35`.
+1. At the start of the acceptance session, query Vercel and record the exact READY production deployment ID + SHA in `docs/OWNER_ACCEPTANCE_WORKBOOK.md`; then complete the workbook against that exact candidate.
 2. Verify the new root Command Center and mobile navigation through the owner journeys: resume work, capture, journal, learning, Ask LifeOS, integration health, and back/forward behavior.
 3. Complete live microphone, voice preview/interrupt/mute, screen-share request/deny/stop, and paid-TTS authorization checks where the relevant provider is intentionally enabled.
 4. Enable canonical/external writes only if intentionally desired and only after `LIFEOS_WRITE_SECRET`, durable Redis approvals, origin controls, and the specific tool credentials are configured together.
@@ -192,4 +195,4 @@ Future LifeOS status reports must:
 4. Never treat future-phase platform features as V1 deployment blockers.
 5. Update this complete document when governing status changes instead of creating competing status fragments.
 6. Use only **AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED** for automated success until the owner signs the workbook.
-7. Verify the deployed SHA before claiming production has changed; never infer production identity from repository head alone.
+7. Verify live GitHub head and Vercel production identity at report time; never maintain a self-invalidating hard-coded "current SHA" in this document.
