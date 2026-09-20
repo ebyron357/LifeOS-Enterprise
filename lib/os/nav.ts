@@ -10,7 +10,7 @@ export const PRIMARY_NAV: OsNavItem[] = [
   { href: "/conversation", label: "Ask LifeOS", intent: "ask", description: "Talk or type. Approve before anything writes." },
   { href: "/projects", label: "Projects", intent: "resume", description: "Open a project workspace and resume work." },
   { href: "/today", label: "Today", intent: "do", description: "Today's mission, outcomes, and next action." },
-  { href: "/inbox", label: "Capture", intent: "capture", description: "Park a note, task, idea, or reminder." },
+  { href: "/inbox", label: "Capture", intent: "capture", description: "Park notes, tasks, ideas, reminders, or resources; promote resources through governed intake." },
   { href: "/journal", label: "Journal", intent: "capture", description: "Write today's journal entry." },
   { href: "/learning", label: "Learning", intent: "resume", description: "Continue or add something to learn." },
   { href: "/files", label: "Files", intent: "review", description: "Find notes and files without browsing folders first." },
