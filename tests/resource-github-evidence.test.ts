@@ -15,8 +15,7 @@ describe("GitHub Resource Intelligence evidence", () => {
       "# Knowledge Agent Template",
       "Reusable template. Fork it, customize it, and deploy your own agent.",
       "File-system based knowledge search with source sync and isolated sandbox execution.",
-    ].join("
-");
+    ].join("\\n");
 
     const fetcher = vi.fn(async (url: string | URL | Request) => {
       const target = String(url);
@@ -84,8 +83,7 @@ describe("GitHub Resource Intelligence evidence", () => {
         });
       }
       if (target.includes("/readme?")) {
-        return json({ encoding: "base64", content: Buffer.from("# Project
-Internal application.").toString("base64") });
+        return json({ encoding: "base64", content: Buffer.from("# Project\\nInternal application.").toString("base64") });
       }
       if (target.includes("/contents?")) return json([{ name: "README.md", type: "file" }]);
       if (target.includes("/commits?")) return json([]);
