@@ -286,7 +286,7 @@ export function renderResourceRecord(
   return `---
 type: resource
 status: inbox
-source: ${yamlString(input.source.trim())}
+source: ${yamlString((input.source || resource.canonicalSource).trim())}
 canonical_source: ${yamlString(resource.canonicalSource)}
 source_type: ${yamlString(resource.sourceType)}
 source_identity: ${yamlString(resource.sourceIdentity)}
@@ -352,7 +352,7 @@ export function updateResourceRecord(
   const channel = input.captureChannel?.trim() || "lifeos-web";
 
   let updated = existing;
-  updated = replaceLine(updated, "source", input.source.trim());
+  updated = replaceLine(updated, "source", (input.source || resource.canonicalSource).trim());
   updated = replaceLine(updated, "canonical_source", resource.canonicalSource);
   updated = replaceLine(updated, "source_type", resource.sourceType);
   updated = replaceLine(updated, "source_identity", resource.sourceIdentity);
