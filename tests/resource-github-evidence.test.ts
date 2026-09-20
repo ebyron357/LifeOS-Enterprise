@@ -1,4 +1,5 @@
-import { Buffer } from "node:buffer";\nimport { describe, expect, it, vi } from "vitest";
+import { Buffer } from "node:buffer";
+import { describe, expect, it, vi } from "vitest";
 import { inspectGitHubRepository } from "@/lib/resource-intelligence/github-evidence";
 
 function json(data: unknown, status = 200) {
@@ -14,7 +15,8 @@ describe("GitHub Resource Intelligence evidence", () => {
       "# Knowledge Agent Template",
       "Reusable template. Fork it, customize it, and deploy your own agent.",
       "File-system based knowledge search with source sync and isolated sandbox execution.",
-    ].join("\n");
+    ].join("
+");
 
     const fetcher = vi.fn(async (url: string | URL | Request) => {
       const target = String(url);
@@ -82,7 +84,8 @@ describe("GitHub Resource Intelligence evidence", () => {
         });
       }
       if (target.includes("/readme?")) {
-        return json({ encoding: "base64", content: Buffer.from("# Project\nInternal application.").toString("base64") });
+        return json({ encoding: "base64", content: Buffer.from("# Project
+Internal application.").toString("base64") });
       }
       if (target.includes("/contents?")) return json([{ name: "README.md", type: "file" }]);
       if (target.includes("/commits?")) return json([]);
