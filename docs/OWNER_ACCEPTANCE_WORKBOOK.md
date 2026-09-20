@@ -2,11 +2,11 @@
 
 **Document type:** Printable owner acceptance workbook  
 **Repository:** `ebyron357/LifeOS-Enterprise`  
-**Current repository `main` SHA:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35`  
-**Verified READY production SHA:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35`  
-**Verified production deployment:** `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx`  
+**Last application-code baseline:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35` (PR #64)  
+**Acceptance candidate deployment ID:** ____________________  
+**Acceptance candidate Git SHA:** ____________________  
 **Production URL:** `https://lifeos-enterprise.vercel.app/`  
-**Governing status:** PRs #60 through #64 are merged as applicable to current `main`. Repository head and production identity are separate facts. Owner acceptance remains incomplete until testing is performed against an exact READY production deployment.  
+**Governing status:** Owner acceptance remains incomplete. At the start of each acceptance session, query GitHub `main` and Vercel production and fill in the exact candidate deployment ID/SHA above. Documentation-only deployments do not automatically create a new application-code baseline.  
 **Do not mark owner acceptance complete in this workbook on the owner's behalf.**
 
 Use one row per test. Record evidence such as a screenshot, short note, deployment ID, or commit SHA. Separate agent-completed work from owner-required work.
@@ -189,8 +189,9 @@ The current `/inbox` Capture surface is **not yet** the full Universal Resource 
 | Field | Value |
 |---|---|
 | Production URL | `https://lifeos-enterprise.vercel.app/` |
-| Verified deployment ID | `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` |
-| Verified commit SHA | `7982c92a7080f60f9fb70e7c66c5220b8178bc35` |
+| Acceptance candidate deployment ID | |
+| Acceptance candidate Git SHA | |
+| Last application-code baseline | `7982c92a7080f60f9fb70e7c66c5220b8178bc35` |
 | Owner name | |
 | Date | |
 | Overall result | ☐ READY TO ACCEPT · ☐ BLOCKED · ☐ NOT READY |
