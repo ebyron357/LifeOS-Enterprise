@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useBrowserStorage } from "@/lib/lifeos/use-browser-storage";
 
-export type CaptureKind = "note" | "task" | "idea" | "reminder";
+export type CaptureKind = "note" | "task" | "idea" | "reminder" | "resource";
 
 export type CapturedItem = {
   id: string;
@@ -48,13 +48,14 @@ export function QuickCaptureDock({ open, onClose }: { open: boolean; onClose: ()
               <option value="task">Task</option>
               <option value="idea">Idea</option>
               <option value="reminder">Reminder</option>
+              <option value="resource">Resource</option>
             </select>
           </label>
           <input
             value={text}
             onChange={(event) => setText(event.target.value)}
             onKeyDown={(event) => { if (event.key === "Enter") save(); }}
-            placeholder="What do you need to remember?"
+            placeholder={kind === "resource" ? "Paste a URL or source reference" : "What do you need to remember?"}
             autoFocus
           />
           <button type="button" className="os-primary" onClick={save}>Save to inbox</button>
@@ -72,7 +73,7 @@ export function InboxList() {
     return (
       <div className="os-empty">
         <h2>Nothing captured yet</h2>
-        <p>Park a note, task, idea, or reminder. LifeOS will keep it here until you file it.</p>
+        <p>Park a note, task, idea, reminder, or resource. Resource capture stays browser-local until you intentionally promote it through the governed draft-PR intake.</p>
       </div>
     );
   }
