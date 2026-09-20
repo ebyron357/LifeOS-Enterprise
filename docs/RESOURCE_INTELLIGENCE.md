@@ -1,6 +1,6 @@
 # LifeOS Universal Resource Intelligence — Foundation
 
-**Implementation status:** Foundation slice in development under Issue #56.  
+**Implementation status:** Durable intake foundation merged via PR #66; read-only GitHub evidence processor in development under Issue #56.  
 **System owner:** Resource Intelligence  
 **Canonical storage:** GitHub-backed Obsidian Markdown Resource records  
 **Write model:** Draft pull request only; no direct `main` writes
@@ -11,11 +11,12 @@ Universal Resource Intelligence gives LifeOS one governed path for capturing ext
 
 The foundation extends the existing Capture/Inbox and existing `type: resource` metadata contract.
 
-## Current foundation flow
+## Current flow
 
 ```text
 Quick Capture / Inbox
   → optional browser-local resource capture
+  → GitHub source? inspect read-only repository evidence
   → intentional canonical promotion
   → normalize source identity
   → exact identity duplicate check
@@ -24,7 +25,7 @@ Quick Capture / Inbox
   → owner review
 ```
 
-Canonical promotion is fail-closed unless the existing LifeOS write authorization and GitHub write token are configured.
+GitHub inspection is read-only and does not require canonical write authorization. Canonical promotion remains fail-closed unless the existing LifeOS write authorization and GitHub write token are configured.
 
 ## Stable identity rules
 
@@ -74,6 +75,29 @@ The foundation can identify:
 
 This categorization is source-shape detection only. It is not the later source processor.
 
+## GitHub evidence processor
+
+For GitHub repository sources, LifeOS can inspect source-grounded public/repository-authorized evidence before canonical promotion.
+
+The processor reads:
+
+- repository metadata: canonical name, description, default branch, archived/visibility state, stars/forks/open issues, update/push dates, and repository-reported license
+- README content
+- root file/directory names
+- recent commit evidence
+- package manifest presence
+- `SECURITY.md` presence
+- architecture/documentation presence
+- README signals for file-based knowledge, source synchronization, and sandboxing
+
+The processor may return an **architecture suggestion of `TEMPLATE` only when README evidence explicitly describes the repository as a template/starter/boilerplate and provides clone/fork/customization-style evidence**.
+
+It does not automatically suggest `PLATFORM` or `PROJECT` from weak heuristics. When evidence is insufficient, the architecture suggestion remains empty.
+
+The processor never chooses a business disposition. `dispositionSuggestion` remains `PENDING` until overlap, value, effort, risk, licensing, cost, and implementation evidence are reviewed.
+
+The web intake panel exposes this as **Inspect GitHub evidence** before the owner decides whether to stage a canonical Resource PR.
+
 ## Security and governance
 
 - Uses the existing `LIFEOS_WRITE_ENABLED` + `LIFEOS_WRITE_SECRET` owner gate.
@@ -89,7 +113,6 @@ This categorization is source-shape detection only. It is not the later source p
 The following Issue #56 lanes remain future implementation work and must not be reported as shipped:
 
 - semantic title/topic duplicate detection
-- GitHub repository inspection processor
 - YouTube Knowledge Engine routing
 - webpage/article extraction
 - PDF/document content extraction
@@ -116,11 +139,12 @@ Before merging this slice:
 
 ## Next implementation slice
 
-After this foundation is green:
+After the GitHub processor slice is green:
 
-1. Add source-grounded GitHub repository inspection.
-2. Add duplicate/review state UI around the canonical Resource records.
-3. Add architecture/disposition review controls with evidence.
+1. Add duplicate/review state UI around canonical Resource records.
+2. Add evidence-backed architecture/disposition review controls without auto-adoption.
+3. Add stack-overlap, value, effort, risk, licensing, dependency, and cost review fields.
 4. Route YouTube to existing YouTube Knowledge assets rather than duplicating them.
 5. Add semantic duplicate candidates as suggestions only.
-6. Run the Issue #56 controlled acceptance candidate end to end.
+6. Run the Issue #56 controlled acceptance candidate `vercel-labs/knowledge-agent-template` end to end.
+7. Preserve the current expected candidate disposition (`ADAPT`) as a review outcome to prove from LifeOS overlap/evidence, not as a hard-coded processor result.
