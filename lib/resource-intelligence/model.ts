@@ -87,6 +87,11 @@ function cleanSlug(value: string): string {
   return normalized || "resource";
 }
 
+function identitySlug(identity: string): string {
+  const readable = identity.replace(/^(github|youtube|url|file|internal):/i, "");
+  return `${cleanSlug(readable).slice(0, 58)}-${compactHash(identity)}`;
+}
+
 function looksLikeUrl(value: string): boolean {
   return /^https?:\/\//i.test(value) || /^[a-z0-9.-]+\.[a-z]{2,}(?:\/|$)/i.test(value);
 }
@@ -166,7 +171,7 @@ export function normalizeResource(input: ResourceCaptureInput): NormalizedResour
       canonicalSource: fileName ? `file:${fileName}` : source || "file:metadata",
       sourceType: "file",
       sourceIdentity,
-      slug: `${cleanSlug(title)}-${compactHash(sourceIdentity)}`,
+      slug: identitySlug(sourceIdentity),
       title,
       fileName,
       fileHash,
@@ -185,7 +190,7 @@ export function normalizeResource(input: ResourceCaptureInput): NormalizedResour
       canonicalSource: source,
       sourceType: "generic-internal",
       sourceIdentity,
-      slug: `${cleanSlug(title)}-${compactHash(sourceIdentity)}`,
+      slug: identitySlug(sourceIdentity),
       title,
       fileName,
       fileHash,
@@ -199,7 +204,7 @@ export function normalizeResource(input: ResourceCaptureInput): NormalizedResour
     const title = input.title?.trim() || github.sourceIdentity.replace(/^github:/, "");
     return {
       ...github,
-      slug: `${cleanSlug(title)}-${compactHash(github.sourceIdentity)}`,
+      slug: identitySlug(github.sourceIdentity),
       title,
       fileName,
       fileHash,
@@ -216,7 +221,7 @@ export function normalizeResource(input: ResourceCaptureInput): NormalizedResour
       canonicalSource: `https://www.youtube.com/watch?v=${videoId}`,
       sourceType: "youtube",
       sourceIdentity,
-      slug: `${cleanSlug(title)}-${compactHash(sourceIdentity)}`,
+      slug: identitySlug(sourceIdentity),
       title,
       fileName,
       fileHash,
@@ -239,7 +244,7 @@ export function normalizeResource(input: ResourceCaptureInput): NormalizedResour
     canonicalSource,
     sourceType,
     sourceIdentity,
-    slug: `${cleanSlug(title)}-${compactHash(sourceIdentity)}`,
+    slug: identitySlug(sourceIdentity),
     title,
     fileName,
     fileHash,
