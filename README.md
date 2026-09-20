@@ -101,6 +101,7 @@ Community plugins are optional. Add Templater, QuickAdd, Tasks, Calendar, or Dat
 - `app/dashboard/page.tsx` — executive overview and command center
 - `docs/WEB_VAULT_PORTAL.md` — read-only vault browser architecture
 - `docs/WEB_AGENT_OPERATIONS.md` — agent operating layer for Cursor, Claude Code, and Codex
+- `docs/wiki/Home.md` — wiki index: plain-English summary, technical build, access, recovery, cost, valuation
 
 ## Executive Web Dashboard
 
