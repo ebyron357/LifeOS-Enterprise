@@ -16,6 +16,13 @@
 - Canonical local clone for release work: `C:\Users\Admin\Desktop\LifeOS-Enterprise`
 - Do **not** treat `LifeOS-Enterprise-main` Desktop extracts as source of truth (non-git copies)
 
+## Current release state
+
+- Current repository `main`: `7982c92a7080f60f9fb70e7c66c5220b8178bc35` (PR #64 performance/dependency hardening)
+- Verified production deployment: `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` — READY — Git SHA `7982c92a7080f60f9fb70e7c66c5220b8178bc35`
+- Production alias `lifeos-enterprise.vercel.app` points to the READY PR #64 deployment.
+- `docs/CANONICAL_LIVE_STATUS.md` is authoritative for current deployment identity and owner-acceptance state.
+
 ## Environment variables
 
 | Variable | Required | Default / notes |
@@ -43,7 +50,7 @@ Never commit `.env.local` or real secrets.
 
 1. Ensure `main` is green (Dashboard CI + Vault Health).
 2. Vercel production deploy from `main` (auto on push, or promote preview).
-3. Verify `/dashboard` loads Command Center, Board/Map switch, and (if enabled) Voice console.
+3. Verify `/` loads the unified Command Center, then verify `/dashboard` loads the advanced Board/Map workspace and (if enabled) Voice console.
 4. Confirm change-plan panel shows writes disabled unless intentionally configured.
 5. Run vault audit locally after vault content changes:
    ```powershell
@@ -70,14 +77,14 @@ pwsh -NoProfile -File ./scripts/audit-vault.ps1
 
 ## Rollback procedure
 
-1. Do **not** merge the post-#60 security corrective draft PR if acceptance fails.
-2. Do **not** deploy the corrective branch. Production remains the current `main` deployment (`c7d4e3507d7837e100a35a9eacb903e9319f1803` includes merged PR #60).
-3. To abandon the corrective: close the draft PR. No `main` revert is required.
-4. If a preview or mistaken promote must be undone: in Vercel, roll back to the previous Ready production deployment (last known `main` SHA).
-5. If this corrective is merged in error: revert the merge with a new PR; delete isolated change-plan branches if any were created.
-6. PR #59 stays closed and superseded. Do not revive it.
+1. Identify the exact currently active READY production deployment in Vercel before changing anything.
+2. If a new production deployment fails build or runtime verification, leave the previous READY production deployment active; do not describe the failed candidate as live.
+3. If a newly READY production deployment must be undone, use Vercel rollback/promote controls to restore the previous known-good READY production deployment.
+4. If the defect came from a merged GitHub change, create a normal revert/fix pull request; do not rewrite `main` history.
+5. Re-run Dashboard CI, Vault Health, production smoke checks, and any affected owner-acceptance rows before calling the rollback/fix complete.
+6. Record the resulting deployment ID and Git SHA in `docs/CANONICAL_LIVE_STATUS.md`.
 
-Exact production SHA is recorded only after a verified production deploy of that SHA.
+Exact production SHA is recorded only after a verified READY production deployment of that SHA.
 
 ## Production checklist
 
@@ -120,12 +127,13 @@ Playwright viewports: 1440 (desktop), 1024 (laptop), 390 (mobile). Vault audit c
 - Agent approvals: authoritative durable records with expiry, nonce/replay protection, session + project + repository + path + revision binding. Execution uses stored args, not the summary. Production storage is Upstash Redis REST or fail-closed
 - Voice: server TTS only with origin checks, owner/TTS secret, trusted rate-limit identity, and a 2000-character limit; `provider: "browser"` returns immediately; mute aborts recognition; new speech interrupts TTS; hold-to-talk flushes on release; HMAC sessions when secret configured; no LiveKit readiness claim
 - Prefer `LIFEOS_WRITE_ENABLED=false` in Vercel unless draft-PR writes are intentionally active with secret + GitHub token
-- Production smoke (2026-07-28): voice disabled; change-plan POST without valid bearer returns `401`; `directMainWrites:false`
+- Historical production smoke (2026-07-28): voice disabled; change-plan POST without valid bearer returned `401`; `directMainWrites:false`
+- PR #64 validation (2026-09-18): 54 test files / 298 tests passed, typecheck/lint/build passed, vault audit passed, and `npm audit --audit-level=high` reported 0 vulnerabilities before merge
 
 ## Known limitations
 
 - LiveKit room-token minting deferred (browser speech only)
 - Haitian Creole / French voice locales not verified
-- In-memory rate limiting (not shared across serverless instances)
-- 13 known transitive `npm audit` vulnerabilities remain accepted technical debt
-- Interactive Visual (#38) and Voice (#39) stacked PRs were superseded by release PR #40
+- In-memory rate limiting remains process-local and is not shared across serverless instances
+- Live microphone/screen-share quality and permission behavior still require owner testing on real browsers/devices
+- Resource Intelligence remains a post-V1 platform build item until its durable intake/classification/disposition workflow is implemented end to end

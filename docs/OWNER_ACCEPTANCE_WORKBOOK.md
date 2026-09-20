@@ -2,9 +2,11 @@
 
 **Document type:** Printable owner acceptance workbook  
 **Repository:** `ebyron357/LifeOS-Enterprise`  
-**Current production SHA:** `46a2514893b4e3557911403274cba695b1c89384`  
+**Current repository `main` SHA:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35`  
+**Verified READY production SHA:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35`  
+**Verified production deployment:** `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx`  
 **Production URL:** `https://lifeos-enterprise.vercel.app/`  
-**Governing status:** PRs #60, #61, and #62 are merged to `main`, and the current production deployment serves #62. Owner acceptance is still required.  
+**Governing status:** PRs #60 through #64 are merged as applicable to current `main`. Repository head and production identity are separate facts. Owner acceptance remains incomplete until testing is performed against an exact READY production deployment.  
 **Do not mark owner acceptance complete in this workbook on the owner's behalf.**
 
 Use one row per test. Record evidence such as a screenshot, short note, deployment ID, or commit SHA. Separate agent-completed work from owner-required work.
@@ -13,7 +15,7 @@ Use one row per test. Record evidence such as a screenshot, short note, deployme
 
 ## How to use
 
-1. Confirm the deployed SHA is `46a2514893b4e3557911403274cba695b1c89384` before testing.
+1. Check Vercel first and record the exact deployment ID and READY Git SHA. Do not assume the `main` SHA is already production.
 2. Open `https://lifeos-enterprise.vercel.app/` on the real owner desktop/mobile browsers.
 3. Complete every applicable checkbox row below.
 4. Mark Pass / Fail and attach evidence.
@@ -26,7 +28,7 @@ Use one row per test. Record evidence such as a screenshot, short note, deployme
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| A1 | Deployment identity | Open production and confirm deployment evidence | Production is serving SHA `46a2514893b4e3557911403274cba695b1c89384` | ☐ | | |
+| A1 | Deployment identity | Open Vercel/production and confirm deployment evidence | Record the exact READY deployment ID and Git SHA; it must match the candidate being accepted | ☐ | | |
 | A2 | Root Command Center | Open `/` | One clear LifeOS Command Center appears; the root does not redirect to the legacy dashboard | ☐ | | |
 | A3 | Primary mission | Read the Today card | A current mission, critical outcomes, and one Start Here action are visible without hunting folders | ☐ | | |
 | A4 | Resume work | Use Start Here / Projects to resume a project | Correct project workspace opens and the next action is visible | ☐ | | |
@@ -46,8 +48,8 @@ Use one row per test. Record evidence such as a screenshot, short note, deployme
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| B1 | Current main contains merged fixes | Inspect current GitHub main | #60 operational closeout, #61 security/write corrective, and #62 Command Center rebuild are all present | ☐ | | |
-| B2 | Automated validation record | Review PR #61/#62 evidence | Lint, typecheck, unit, build, audit, and vault audit are recorded; browser-suite limitations are disclosed rather than hidden | ☐ | | |
+| B1 | Current main contains merged fixes | Inspect current GitHub main | #60 operational closeout, #61 security/write corrective, #62 Command Center rebuild, #63 governance reconciliation, and #64 performance/dependency hardening are present | ☐ | | |
+| B2 | Automated validation record | Review PR #61/#62/#64 evidence | Lint, typecheck, unit, build, audit, vault audit, and CI evidence are recorded; browser-suite limitations are disclosed rather than hidden | ☐ | | |
 | B3 | No secrets in repo | Spot-check `.env.example` and recent diffs | Placeholders only; no live tokens | ☐ | | |
 | B4 | Integration availability truthful | Inspect `/integrations` and `/conversation` Context/tools | Unconfigured tools show unavailable/configured requirements, never invented success | ☐ | | |
 | B5 | Stale PR cleanup | Inspect open PR list | Superseded PR #55 is closed; no competing conversation-runtime PR remains active | ☐ | | |
@@ -187,8 +189,8 @@ The current `/inbox` Capture surface is **not yet** the full Universal Resource 
 | Field | Value |
 |---|---|
 | Production URL | `https://lifeos-enterprise.vercel.app/` |
-| Verified deployment ID | `dpl_8YYkaeHeAQYsj2RzSVssYEYjgFmE` |
-| Verified commit SHA | `46a2514893b4e3557911403274cba695b1c89384` |
+| Verified deployment ID | `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` |
+| Verified commit SHA | `7982c92a7080f60f9fb70e7c66c5220b8178bc35` |
 | Owner name | |
 | Date | |
 | Overall result | ☐ READY TO ACCEPT · ☐ BLOCKED · ☐ NOT READY |

@@ -1,23 +1,25 @@
 # LifeOS Enterprise — Canonical Live Status
 
-**Status date:** 2026-09-07  
+**Status date:** 2026-09-19  
 **Canonical repository:** `ebyron357/LifeOS-Enterprise`  
 **Canonical branch:** `main`  
 **Production URL:** `https://lifeos-enterprise.vercel.app/`  
 **Released version:** `1.0.0`  
-**Current main SHA:** `46a2514893b4e3557911403274cba695b1c89384` (includes merged PRs #60, #61, and #62)  
-**Verified production deployment:** `dpl_8YYkaeHeAQYsj2RzSVssYEYjgFmE` — READY — target `production` — Git SHA `46a2514893b4e3557911403274cba695b1c89384`  
+**Current main SHA:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35` (includes merged PRs #60, #61, #62, #63, and #64)  
+**Verified production deployment:** `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` — READY — target `production` — Git SHA `7982c92a7080f60f9fb70e7c66c5220b8178bc35`  
 **Owner acceptance:** not complete
 
 ## Governing status
 
-**LifeOS Enterprise V1.0 is built on `main`, and the current production deployment is serving the unified AI Command Center from SHA `46a2514893b4e3557911403274cba695b1c89384`.**
+**LifeOS Enterprise V1.0 is built on `main`, and the verified production deployment is now aligned with repository head at `7982c92a7080f60f9fb70e7c66c5220b8178bc35`.**
 
 The prior status edition is superseded because both the post-#60 security corrective and the unified-command-center rebuild have since merged and deployed:
 
 - PR #60 merged the operational closeout: interactive widgets/game loop, conversation voice, screen-share safety, server-authoritative approvals, and owner-acceptance evidence.
 - PR #61 merged the post-#60 corrective: owner write authorization, durable approval storage, exact approved payload execution, server-TTS hardening, check-in XP correction, and visible screen-share requesting state.
 - PR #62 merged and production-deployed the intent-first LifeOS rebuild: one Command Center, persistent Ask LifeOS, Projects, Today, Capture, Journal, Learning, Files, Automations, Integrations, Settings/More, and the previous widget dashboard retained as an advanced workspace.
+- PR #63 merged the Resource Intelligence/governance reconciliation and subsequently produced a READY production deployment at `6f6d5d7578c03b89abe781cc11351ad66cb07c51`.
+- PR #64 merged performance and dependency hardening at `7982c92a7080f60f9fb70e7c66c5220b8178bc35`: bounded-concurrency vault parsing, reduced layout-write churn, asynchronous idempotency I/O, deferred optional voice-console loading, corrected agent-language instructions, and dependency remediation.
 
 Automated validation and a successful production deployment do **not** equal owner acceptance. Until the owner completes `docs/OWNER_ACCEPTANCE_WORKBOOK.md`, the allowed success statement remains:
 
@@ -91,18 +93,26 @@ The production Command Center currently distinguishes available/connected capabi
 
 ## Verified current evidence
 
+### Repository head
+
+- Branch: `main`
+- Git SHA: `7982c92a7080f60f9fb70e7c66c5220b8178bc35`
+- Commit: `perf: optimize vault and dashboard hot paths (#64)`
+- PR #64 was merged only after its exact head SHA passed both Dashboard CI and Vault Health.
+
 ### Production deployment
 
 Vercel reports the current production deployment as:
 
-- Deployment: `dpl_8YYkaeHeAQYsj2RzSVssYEYjgFmE`
+- Deployment: `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx`
 - State: `READY`
 - Target: `production`
 - Git branch: `main`
-- Git SHA: `46a2514893b4e3557911403274cba695b1c89384`
-- Commit: `feat: rebuild LifeOS as unified AI command center (#62)`
+- Git SHA: `7982c92a7080f60f9fb70e7c66c5220b8178bc35`
+- Commit: `perf: optimize vault and dashboard hot paths (#64)`
+- Aliases include `lifeos-enterprise.vercel.app`
 
-A direct authenticated production fetch of `https://lifeos-enterprise.vercel.app/` returned HTTP 200 and rendered the new root Command Center with Ask LifeOS, Projects, Today, Capture, Journal, Learning, Files, Automations, Integrations, and More navigation.
+The prior READY production deployment at `6f6d5d7578c03b89abe781cc11351ad66cb07c51` remains rollback evidence, not the current production identity.
 
 ### PR #62 agent validation
 
@@ -146,11 +156,13 @@ These are agent validation records, not owner acceptance.
 - PR #59: closed and superseded; do not revive.
 - PR #60: merged operational closeout onto `main` at `c7d4e3507d7837e100a35a9eacb903e9319f1803`.
 - PR #61: merged post-#60 security/write/TTS/state corrective onto `main` at `3ddf934afc12261bdf68e2bd86059f80db0a22db`.
-- PR #62: merged unified AI Command Center rebuild; current main/production SHA is `46a2514893b4e3557911403274cba695b1c89384`.
+- PR #62: merged unified AI Command Center rebuild at `46a2514893b4e3557911403274cba695b1c89384`.
+- PR #63: merged Resource Intelligence/governance reconciliation at `6f6d5d7578c03b89abe781cc11351ad66cb07c51`; a READY production deployment exists for this SHA.
+- PR #64: merged performance/dependency hardening at `7982c92a7080f60f9fb70e7c66c5220b8178bc35`; Vercel deployment `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` is READY in production.
 
 ## Remaining owner work
 
-1. Complete the current `docs/OWNER_ACCEPTANCE_WORKBOOK.md` against the production deployment at SHA `46a2514893b4e3557911403274cba695b1c89384`.
+1. Complete the current `docs/OWNER_ACCEPTANCE_WORKBOOK.md` against READY production deployment `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx` at SHA `7982c92a7080f60f9fb70e7c66c5220b8178bc35`.
 2. Verify the new root Command Center and mobile navigation through the owner journeys: resume work, capture, journal, learning, Ask LifeOS, integration health, and back/forward behavior.
 3. Complete live microphone, voice preview/interrupt/mute, screen-share request/deny/stop, and paid-TTS authorization checks where the relevant provider is intentionally enabled.
 4. Enable canonical/external writes only if intentionally desired and only after `LIFEOS_WRITE_SECRET`, durable Redis approvals, origin controls, and the specific tool credentials are configured together.
@@ -180,4 +192,4 @@ Future LifeOS status reports must:
 4. Never treat future-phase platform features as V1 deployment blockers.
 5. Update this complete document when governing status changes instead of creating competing status fragments.
 6. Use only **AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED** for automated success until the owner signs the workbook.
-7. Verify the deployed SHA before claiming production has changed.
+7. Verify the deployed SHA before claiming production has changed; never infer production identity from repository head alone.
