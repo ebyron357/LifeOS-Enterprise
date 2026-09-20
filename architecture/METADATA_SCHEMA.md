@@ -242,6 +242,8 @@ tags:
 
 ### Resource
 
+Base resource records may remain lightweight:
+
 ```yaml
 ---
 type: resource
@@ -255,6 +257,96 @@ tags:
   - resource
 ---
 ```
+
+Resource Intelligence records use the same `type: resource` and add governed intake fields rather than creating a competing note type:
+
+```yaml
+---
+type: resource
+status: inbox
+source:
+canonical_source:
+source_type:
+source_identity:
+capture_channel:
+captured_at:
+last_captured:
+capture_count: 1
+processing_state: needs-review
+architecture_classification: PENDING
+disposition: PENDING
+related_project:
+related_area:
+owner:
+review_date:
+file_name:
+file_hash:
+file_size:
+file_type:
+next_action:
+tags:
+  - resource
+  - resource-intelligence
+---
+```
+
+#### Resource Intelligence controlled values
+
+`source_type`:
+
+```text
+github
+youtube
+pdf-document
+tool-course
+social
+webpage
+file
+generic-internal
+```
+
+`processing_state`:
+
+```text
+new
+needs-review
+processing
+implementation
+watch
+completed
+archived
+rejected
+```
+
+`architecture_classification`:
+
+```text
+PENDING
+PLATFORM
+TEMPLATE
+PROJECT
+```
+
+`disposition`:
+
+```text
+PENDING
+ADOPT
+ADAPT
+EXTRACT
+WATCH
+ARCHIVE
+REJECT
+```
+
+#### Resource Intelligence validation rules
+
+1. `source_identity` is the stable duplicate key. GitHub repository identity, YouTube video ID, canonical URL, or supplied file hash takes precedence over display title.
+2. Exact duplicate captures update the existing canonical Resource record; they do not create a second record.
+3. `architecture_classification` and `disposition` remain `PENDING` at capture time unless source-grounded review has actually occurred.
+4. Capture evidence alone must never be represented as proof that a resource was adopted, implemented, licensed, secure, valuable, or production-ready.
+5. File intake may persist metadata and a hash without persisting file bytes. A hash is evidence of identity, not evidence of content quality.
+6. Semantic duplicate detection, source processors, asset generation, and implementation routing require their own verified evidence before being reported as active capabilities.
 
 ### SOP
 

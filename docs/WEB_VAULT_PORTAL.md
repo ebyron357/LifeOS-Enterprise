@@ -1,6 +1,6 @@
 # LifeOS Web Vault Portal
 
-The LifeOS Enterprise web application is a read-only portal over the canonical Obsidian Markdown vault. GitHub remains version control; Obsidian Markdown remains the data source; Vercel hosts the interactive interface.
+The LifeOS Enterprise web application is a primarily read-oriented portal over the canonical Obsidian Markdown vault. GitHub remains version control; Obsidian Markdown remains the data source; Vercel hosts the interactive interface. Canonical mutations are limited to explicitly authorized, reviewable draft-PR workflows such as project change plans and Resource Intelligence intake.
 
 ## Routes
 
@@ -10,7 +10,7 @@ The LifeOS Enterprise web application is a read-only portal over the canonical O
 | `/conversation` | Ask LifeOS — typed/voice conversation and approval gate |
 | `/projects` | Project workspaces with resume actions |
 | `/today` | Today's mission and outcomes |
-| `/inbox` | Capture notes, tasks, ideas, reminders |
+| `/inbox` | Capture notes, tasks, ideas, reminders, and resources; optionally promote resources through draft-PR-only canonical intake |
 | `/journal` | Today's journal entry |
 | `/learning` | Continue learning or add a topic |
 | `/files` | Find notes without browsing folders first |
@@ -64,9 +64,9 @@ powershell -ExecutionPolicy Bypass -File .\scripts\audit-vault.ps1
 
 ## Known limitations (v1)
 
-- Read-only: no vault writes from the web app
+- General vault browsing remains read-only; canonical mutations use explicit owner authorization and draft pull requests rather than direct `main` writes
 - Dataview and Obsidian Bases blocks are not executed server-side
-- Quick capture remains browser-local storage
+- Quick capture remains browser-local storage; Resource Intelligence can intentionally promote a resource to one canonical Markdown record through the governed draft-PR route
 - Duplicate basenames resolve to the first indexed match unless a path-qualified wikilink is used
 
 ## Attribution
