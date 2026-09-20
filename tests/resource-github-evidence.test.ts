@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { Buffer } from "node:buffer";\nimport { describe, expect, it, vi } from "vitest";
 import { inspectGitHubRepository } from "@/lib/resource-intelligence/github-evidence";
 
 function json(data: unknown, status = 200) {
