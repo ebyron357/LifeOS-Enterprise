@@ -7,6 +7,8 @@ description: "Draft a controlled, evidence-based agent assignment for meaningful
 
 **Status:** Draft — must pass repeatability QC before being treated as an approved organizational skill.
 
+Canonical prompt: [[Agent Work Order]]
+
 Use this skill whenever meaningful work is being delegated to an AI implementation or operations agent.
 
 ## Purpose

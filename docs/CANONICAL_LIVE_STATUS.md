@@ -61,6 +61,7 @@ The following capabilities are present on the current production deployment:
 - Truthful integration-state model that does not invent connectivity
 - Resource Intelligence durable intake (PR #66) and read-only GitHub evidence inspection (PR #68), with disposition still owner-reviewed
 - Derived Continuity / resume packages on Command Center and Today after this slice merges; they do not invent Slack, ClickUp, email, or calendar state
+- Prompt Intelligence canonical library at `/prompts` after this slice merges; it reuses `40 Resources/Prompts/` and does not create a second command center
 
 ## Current integration and activation state
 

@@ -85,6 +85,7 @@ export function isPrivateFrontmatter(frontmatter: Record<string, unknown>): bool
   if (publish === false || publish === "false") return true;
   if (isPrivate === true || isPrivate === "true") return true;
   if (visibility === "private" || visibility === "hidden") return true;
+  if (String(frontmatter.privacy_level ?? "").toLowerCase() === "private") return true;
 
   return false;
 }

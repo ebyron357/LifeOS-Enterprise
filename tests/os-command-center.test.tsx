@@ -109,6 +109,40 @@ describe("command center and rebuilt surfaces", () => {
     expect(screen.queryByText(/\{\{/)).not.toBeInTheDocument();
   });
 
+  it("surfaces a linked prompt on the existing resume card", () => {
+    const withPrompt = {
+      ...resume,
+      relevantPrompts: [{
+        id: "prompt:vercel-production-closeout@2.0",
+        title: "Vercel Production Closeout",
+        version: "2.0",
+        path: "40 Resources/Prompts/Vercel Production Closeout.md",
+        href: "/note/40%20Resources/Prompts/Vercel%20Production%20Closeout",
+        status: "approved",
+        current: true,
+        supersededBy: null,
+        lastResultStatus: "UNTESTED",
+        warning: null,
+        reason: "You already have a prompt for this: Vercel Production Closeout v2.0.",
+      }],
+    };
+    render(
+      <CommandCenterHome
+        greeting="Good afternoon"
+        dateLabel="Sunday, September 20, 2026"
+        vault={vault}
+        integrations={[]}
+        hermes={hermes}
+        github={github}
+        resume={withPrompt}
+      />,
+    );
+    expect(screen.getByRole("heading", { name: "Where was I" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Prompt for this work" })).toBeInTheDocument();
+    expect(screen.getAllByText(/You already have a prompt for this/).length).toBeGreaterThan(0);
+    expect(screen.getByRole("link", { name: "Prompt library" })).toHaveAttribute("href", "/prompts");
+  });
+
   it("shows journal writing, not template tokens", () => {
     render(<JournalToday todayNotes={[]} recent={[]} />);
     expect(screen.getByRole("heading", { name: /today's journal/i })).toBeInTheDocument();

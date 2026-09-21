@@ -23,7 +23,7 @@ The LifeOS Enterprise web application is a primarily read-oriented portal over t
 | `/search` | Advanced vault search |
 | `/note/[...slug]` | Note reader; project notes open as workspaces |
 | `/attachments/[...path]` | Approved attachment files |
-| `/tasks`, `/businesses`, `/growth`, `/intelligence`, `/agents`, `/resources`, `/people`, `/reviews`, `/sops`, `/archive`, `/daily-brief`, `/portfolio` | Advanced / More — capabilities kept, not primary nav |
+| `/tasks`, `/businesses`, `/growth`, `/intelligence`, `/agents`, `/resources`, `/people`, `/reviews`, `/sops`, `/archive`, `/daily-brief`, `/portfolio`, `/prompts` | Advanced / More — capabilities kept, not primary nav |
 
 ## Privacy model
 

@@ -27,7 +27,7 @@ LifeOS now answers, from verified vault and GitHub evidence:
 ## Current flow
 
 ```text
-Vault projects + Resource Intelligence records + optional checkpoint notes + GitHub health
+Vault projects + Resource Intelligence records + canonical prompts + optional checkpoint notes + GitHub health
   → ownership / authority classification
   → one Resume Package
   → Command Center / Today / GET /api/lifeos/continuity / voice "where was I"
@@ -62,3 +62,4 @@ Canonical writes of new checkpoint notes still use the existing draft-PR approva
 - LangGraph / Temporal runtime replacement
 - Automatic disposition of Resource Intelligence items
 - Owner-accepted voice/microphone quality
+- Invented prompt success scores; Continuity only links Prompt Intelligence records when context matching is strong

@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  isPromptLikeResource,
   normalizeResource,
+  PROMPT_INTELLIGENCE_FOLDER,
   renderResourceRecord,
   resourceRecordPath,
   updateResourceRecord,
@@ -74,5 +76,12 @@ describe("Resource Intelligence canonical identity", () => {
     expect(updated).toContain('disposition: "ADAPT"');
     expect(updated).toContain("capture_count: 2");
     expect(updated).toContain("exact identity dedupe matched the canonical record");
+  });
+
+  it("recognizes prompt-like captures so EXTRACT can route into Prompt Intelligence", () => {
+    expect(isPromptLikeResource({ title: "YouTube Transcript Knowledge Extraction Prompt", tags: ["resource"] })).toBe(true);
+    expect(isPromptLikeResource({ topic: "prompt" })).toBe(true);
+    expect(isPromptLikeResource({ title: "Random article" })).toBe(false);
+    expect(PROMPT_INTELLIGENCE_FOLDER).toBe("40 Resources/Prompts");
   });
 });

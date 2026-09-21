@@ -7,6 +7,8 @@ description: "Convert a meaningful conversation into durable decisions, executio
 
 **Status:** Draft — must pass repeatability QC before being treated as an approved organizational skill.
 
+Canonical prompt: [[Conversation Closeout Checkpoint]]
+
 Use this skill at the end of a meaningful work conversation or whenever the conversation has produced decisions, assignments, resources, blockers, lessons, or implementation changes.
 
 ## Purpose

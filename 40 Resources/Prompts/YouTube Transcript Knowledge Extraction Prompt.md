@@ -1,22 +1,43 @@
 ---
-type: resource
+type: prompt
+title: YouTube Transcript Knowledge Extraction Prompt
+purpose: Analyze an authorized YouTube transcript and produce a source-grounded learning package without inventing links, resources, commands, code, results, or claims.
 status: approved
-source: LifeOS requirements
-author: LifeOS
-topic: prompt
-tool: source-grounded AI assistant
-model:
 version: 1.0
 created: 2026-07-16
-updated: 2026-07-16
-review_date: 2026-08-01
-tags:
-  - resource
-  - prompt
-  - youtube
-  - transcript
-  - extraction
-  - learning
+updated: 2026-09-20
+last_used_at:
+owner: LifeOS
+project:
+area:
+client:
+business:
+agent:
+model:
+provider:
+tools: [source-grounded AI assistant]
+capabilities: [extraction, learning-package]
+tags: [prompt, youtube, transcript, extraction, learning]
+task_types: [extraction, youtube, learning]
+trigger_context: [youtube, transcript, extraction, learning package]
+recommended_context: Authorized YouTube transcript plus purpose, operating context, and rights status.
+source_path: 40 Resources/Prompts/YouTube Transcript Knowledge Extraction Prompt.md
+source_origin: vault-resource-converted
+canonical_prompt_id: prompt:youtube-transcript-knowledge-extraction
+supersedes:
+superseded_by:
+usage_count:
+success_count:
+failure_count:
+last_result:
+last_result_status: UNTESTED
+last_evidence:
+last_failure:
+quality_state: UNTESTED
+review_date: 2026-10-20
+privacy_level: internal
+sensitivity:
+allowed_destinations: [internal, agent]
 ---
 
 # YouTube Transcript Knowledge Extraction Prompt

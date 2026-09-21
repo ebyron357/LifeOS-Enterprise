@@ -398,6 +398,15 @@ Production / Data
 > [!info] WHY THESE PROMPTS ARE SHORT
 > Your best prompts should tell the agent: exact target, exact allowed action, exact prohibited action, and exact proof of success.
 
+Canonical Prompt Intelligence records live under `40 Resources/Prompts/`:
+
+- [[ClickUp Update One Task]]
+- [[n8n Controlled Proof]]
+- [[GitHub Read-Only Audit]]
+- [[Vercel Production Closeout]]
+
+The copy blocks below remain in this SOP for operator use. They are not a second prompt system.
+
 ## ClickUp - update one task
 
 ```text

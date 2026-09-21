@@ -43,3 +43,5 @@ A short execution brief:
 ## Prompt
 
 Review my LifeOS vault context. Identify the highest-impact next action, the biggest blocker, and what I should ignore today. Keep the answer short and execution-focused.
+
+Canonical prompt: [[Chief of Staff Daily Attention]]

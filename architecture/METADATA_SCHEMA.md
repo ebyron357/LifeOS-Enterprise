@@ -47,6 +47,8 @@ idea
 automation
 business
 dashboard
+prompt
+checkpoint
 ```
 
 ### `status`
@@ -406,6 +408,42 @@ tags:
 ```
 
 Canonical path: `Command Center/Checkpoints/`. `session_status` is `OPEN` or `CLOSED`.
+
+### Prompt
+
+Canonical Prompt Intelligence records. Identity is `canonical_prompt_id` plus content hash of the normalized prompt body, not display title. Store under `40 Resources/Prompts/`. Do not create a second prompt directory.
+
+```yaml
+---
+type: prompt
+title:
+purpose:
+status: approved
+version: 1.0
+owner:
+project:
+client:
+agent:
+model:
+tags: [prompt]
+task_types:
+trigger_context:
+recommended_context:
+source_path:
+source_origin:
+canonical_prompt_id:
+supersedes:
+superseded_by:
+last_result_status: UNTESTED
+quality_state: UNTESTED
+privacy_level: internal
+review_date:
+---
+```
+
+`last_result_status` is `UNTESTED | USED | PASS | PARTIAL | FAILED | SUPERSEDED`. A prompt is proven only when evidence supports `PASS`. `privacy_level` is `public-safe | internal | private`. Private prompt bodies are omitted from the web vault and agent API.
+
+Prompt Intelligence cooperates with Resource Intelligence: new prompt-like captures still enter as `type: resource` through the existing intake path. After `EXTRACT`, the reusable prompt body becomes a `type: prompt` record here.
 
 ## Validation Rules
 

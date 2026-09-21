@@ -1,3 +1,4 @@
+import { recommendPrompts } from "@/lib/prompt-intelligence/catalog";
 import { noteHref } from "@/lib/vault/slug";
 import { classifyContinuityAction, shouldInterruptOwner } from "./ownership";
 import type {
@@ -6,6 +7,7 @@ import type {
   ContinuityProjectInput,
   ResumeItem,
   ResumePackage,
+  ResumePromptLink,
 } from "./model";
 
 const PRIORITY_RANK: Record<string, number> = { P0: 0, P1: 1, P2: 2, P3: 3 };
@@ -233,6 +235,25 @@ export function deriveResumePackage(input: ContinuityInput): ResumePackage {
             detail: "No resumable project, resource, or checkpoint is available.",
           };
 
+  const relevantPrompts: ResumePromptLink[] = recommendPrompts(input.prompts ?? [], {
+    project: focus?.name,
+    business: focus?.business,
+    task: [checkpoint?.nextAction, focus?.nextAction, next.detail].filter(Boolean).join(" "),
+    query: [checkpoint?.lastCompleted, checkpoint?.currentState].filter(Boolean).join(" "),
+  }).map((item) => ({
+    id: item.prompt.id,
+    title: item.prompt.title,
+    version: item.prompt.version,
+    path: item.prompt.path,
+    href: projectHref(item.prompt.path),
+    status: item.prompt.status,
+    current: item.prompt.current,
+    supersededBy: item.prompt.supersededBy,
+    lastResultStatus: item.prompt.lastResultStatus,
+    warning: item.warning,
+    reason: item.reason,
+  }));
+
   return {
     generatedAt: input.nowIso,
     whereWasI,
@@ -254,6 +275,7 @@ export function deriveResumePackage(input: ContinuityInput): ResumePackage {
       ? { name: focus.name, path: focus.path, href: projectHref(focus.path), status: focus.status, priority: focus.priority }
       : null,
     source: checkpoint ? "checkpoint+derived" : "derived",
+    relevantPrompts,
   };
 }
 
@@ -264,6 +286,12 @@ export function speakResumePackage(resume: ResumePackage): string {
   const agentLine = resume.agentCanContinue.length
     ? `Agents can continue: ${resume.agentCanContinue.slice(0, 3).map((item) => item.title).join(", ")}.`
     : "No agent-doable continuation is recorded.";
+  const prompt = resume.relevantPrompts[0];
+  const promptLine = prompt
+    ? prompt.lastResultStatus === "PASS"
+      ? `Last implementation prompt used: ${prompt.title} v${prompt.version}.`
+      : `You already have a prompt for this: ${prompt.title} v${prompt.version}.`
+    : "";
   return [
     resume.whereWasI,
     `You were doing: ${resume.whatWasIDoing}.`,
@@ -271,5 +299,6 @@ export function speakResumePackage(resume: ResumePackage): string {
     `Next: ${resume.next.detail}.`,
     ownerLine,
     agentLine,
-  ].join(" ");
+    promptLine,
+  ].filter(Boolean).join(" ");
 }
