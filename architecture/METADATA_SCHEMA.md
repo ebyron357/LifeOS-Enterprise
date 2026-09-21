@@ -380,6 +380,33 @@ tags:
 ---
 ```
 
+### Checkpoint
+
+Durable interruption-recovery records used by Continuity. They extend conversation-closeout output; they do not replace project `next_action`.
+
+```yaml
+---
+type: checkpoint
+status: active
+title:
+project:
+owner:
+captured_at:
+last_completed:
+current_state:
+next_action:
+source_of_truth:
+blocker:
+session_status: OPEN
+review_date:
+tags:
+  - checkpoint
+  - continuity
+---
+```
+
+Canonical path: `Command Center/Checkpoints/`. `session_status` is `OPEN` or `CLOSED`.
+
 ## Validation Rules
 
 1. No active project may have a blank `next_action`.

@@ -191,6 +191,11 @@
   margin-top: 8px;
 }
 
+.os-card li .os-badge {
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
 .os-primary,
 .os-secondary {
   display: inline-flex;

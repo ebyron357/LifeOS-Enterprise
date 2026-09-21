@@ -16,6 +16,7 @@ export default async function Home() {
         integrations={os.integrations}
         hermes={os.hermes}
         github={os.github}
+        resume={os.resume}
       />
     </AppShell>
   );

@@ -71,7 +71,8 @@ $requiredTemplates = @(
   "99 Templates/Experiment.md",
   "99 Templates/Business or Product Idea.md",
   "99 Templates/Content Brief.md",
-  "99 Templates/Automation Workflow.md"
+  "99 Templates/Automation Workflow.md",
+  "99 Templates/Resume Checkpoint.md"
 )
 
 $requiredFiles = @(
@@ -174,6 +175,7 @@ $templateRequirements = @{
   "99 Templates/Person.md" = @("type: person", "last_contact:", "next_contact:")
   "99 Templates/SOP.md" = @("type: sop", "owner:", "version:", "last_tested:", "review_date:")
   "99 Templates/Agent Specification.md" = @("type: agent", "risk_level:", "version:", "review_date:")
+  "99 Templates/Resume Checkpoint.md" = @("type: checkpoint", "session_status:", "last_completed:", "next_action:", "source_of_truth:")
 }
 
 foreach ($template in $templateRequirements.Keys) {

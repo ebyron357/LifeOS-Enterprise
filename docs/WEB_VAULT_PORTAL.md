@@ -6,10 +6,10 @@ The LifeOS Enterprise web application is a primarily read-oriented portal over t
 
 | Route | Purpose |
 |-------|---------|
-| `/` | Command Center home (today, next action, blockers, integrations) |
+| `/` | Command Center home (today, where-was-I resume package, next action, blockers, integrations) |
 | `/conversation` | Ask LifeOS — typed/voice conversation and approval gate |
 | `/projects` | Project workspaces with resume actions |
-| `/today` | Today's mission and outcomes |
+| `/today` | Today's mission, continuity resume package, and outcomes |
 | `/inbox` | Capture notes, tasks, ideas, reminders, and resources; optionally promote resources through draft-PR-only canonical intake |
 | `/journal` | Today's journal entry |
 | `/learning` | Continue learning or add a topic |

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AppShell } from "@/components/os/AppShell";
+import { ContinuityResume } from "@/components/os/ContinuityResume";
 import { getOsContext } from "@/lib/os/page-data";
 import { noteHref } from "@/lib/vault/slug";
 
@@ -33,9 +34,13 @@ export default async function TodayPage() {
             </ol>
           ) : <p>No priority outcomes are recorded yet.</p>}
         </section>
+        <ContinuityResume resume={os.resume} />
         <section className="os-card">
           <h2>Start here</h2>
-          <p>{mission?.nextAction || mission?.blocker || "Ask LifeOS what needs attention, or capture the next action."}</p>
+          <p>{os.resume.next.detail || mission?.nextAction || mission?.blocker || "Ask LifeOS what needs attention, or capture the next action."}</p>
+          <Link className="os-primary" href={os.resume.next.href || (mission ? noteHref(mission.path) : "/inbox")}>
+            Continue from the last verified point
+          </Link>
         </section>
       </div>
     </AppShell>

@@ -1,3 +1,4 @@
+import { deriveResumePackage, speakResumePackage } from "@/lib/continuity/derive";
 import type { AgentBrief, ProjectBrief } from "@/lib/lifeos/types";
 import { buildMorningBriefSpeech } from "@/lib/lifeos/morning-brief-speech";
 import { noteHref } from "@/lib/vault/slug";
@@ -58,6 +59,9 @@ export function parseVoiceCommand(raw: string, context: VoiceCommandContext): Pa
   }
   if (/what needs (my )?attention|what deserves attention|what should i focus/.test(text)) {
     return { kind: "read", tool: "what_needs_attention", utterance };
+  }
+  if (/where was i|what was i doing|resume (me|work)|what needs me|pick me back up/.test(text)) {
+    return { kind: "read", tool: "read_resume_package", utterance };
   }
   if (/show blocked|what is blocked|what'?s blocked|blocked projects/.test(text)) {
     return { kind: "read", tool: "list_blocked_projects", utterance };
@@ -140,6 +144,14 @@ export function buildReadToolSpeech(tool: string, context: VoiceCommandContext, 
   switch (tool) {
     case "read_morning_brief":
       return buildMorningBriefSpeech({ activeProjects, projects, reviewsDue });
+    case "read_resume_package": {
+      const resume = deriveResumePackage({
+        nowIso: new Date().toISOString(),
+        projects: context.projects,
+        github: { connected: false, openPullRequests: 0, failedWorkflows: 0, defaultBranch: "main", lastWorkflow: "unavailable", updatedAt: "" },
+      });
+      return speakResumePackage(resume);
+    }
     case "what_needs_attention": {
       const top = projects
         .filter((project) => project.status === "active" || project.status === "blocked" || project.blocker)

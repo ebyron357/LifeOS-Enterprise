@@ -1,17 +1,18 @@
 # LifeOS Enterprise — Canonical Live Status
 
-**Status date:** 2026-09-19  
+**Status date:** 2026-09-20  
 **Canonical repository:** `ebyron357/LifeOS-Enterprise`  
 **Canonical branch:** `main`  
 **Production URL:** `https://lifeos-enterprise.vercel.app/`  
 **Released version:** `1.0.0`  
-**Last application-code baseline:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35` — PR #64 performance/dependency hardening  
+**Last application-code baseline on main before this continuity slice:** `45d5d018599e7b7d308523a3f38bf9ccf62e2c94` — PR #68 GitHub evidence processor  
+**Prior recorded baseline:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35` — PR #64. PRs #66 and #68 later merged Resource Intelligence application code.  
 **Live identity source:** GitHub `main` for repository head; Vercel production deployment for deployed SHA/ID. Query both at report or acceptance time.  
 **Owner acceptance:** not complete
 
 ## Governing status
 
-**LifeOS Enterprise V1.0 is built on `main`. PR #64 is the last application-code baseline recorded here. Repository head and production deployment identity are live operational facts and must be read from GitHub and Vercel when a status report or acceptance run begins.**
+**LifeOS Enterprise V1.0 is built on `main`. After PR #64, PRs #66 and #68 merged Resource Intelligence intake and GitHub evidence. Continuity/resume derivation is the next application-code slice and must not be reported as production until it is merged and deployed. Repository head and production deployment identity are live operational facts and must be read from GitHub and Vercel when a status report or acceptance run begins.**
 
 The prior status edition is superseded because both the post-#60 security corrective and the unified-command-center rebuild have since merged and deployed:
 
@@ -58,6 +59,8 @@ The following capabilities are present on the current production deployment:
 - GitHub health telemetry with live production read
 - Safe empty-state Revenue Radar
 - Truthful integration-state model that does not invent connectivity
+- Resource Intelligence durable intake (PR #66) and read-only GitHub evidence inspection (PR #68), with disposition still owner-reviewed
+- Derived Continuity / resume packages on Command Center and Today after this slice merges; they do not invent Slack, ClickUp, email, or calendar state
 
 ## Current integration and activation state
 
@@ -89,7 +92,8 @@ The production Command Center currently distinguishes available/connected capabi
 - Haitian Creole and French voice locales may be prepared but are not represented as owner-verified without live evidence.
 - Dataview and Obsidian Bases are not executed by the web server.
 - Hermes is an adapter contract, not an active runtime, until a real endpoint/token and reachability evidence exist.
-- Resource Intelligence / Universal Resource Intake remains a platform build item until capture, processing, classification, disposition, asset generation, durable storage, and verification are implemented end to end.
+- Resource Intelligence intake and GitHub evidence exist; semantic dedupe, source extraction, asset factory, review/disposition UI, and the Issue #56 end-to-end candidate proof remain unimplemented.
+- Continuity derives resume state from vault + GitHub + optional checkpoint notes. It does not yet persist checkpoints by itself and does not reconstruct unauthorized external systems.
 
 ## Verified release evidence
 
@@ -162,6 +166,9 @@ These are agent validation records, not owner acceptance.
 - PR #63: merged Resource Intelligence/governance reconciliation at `6f6d5d7578c03b89abe781cc11351ad66cb07c51`; a READY production deployment exists for this SHA.
 - PR #64: merged the last recorded application-code baseline at `7982c92a7080f60f9fb70e7c66c5220b8178bc35`.
 - PR #65: merged documentation/governance reconciliation only; it did not change application runtime behavior.
+- PR #66: merged Universal Resource Intelligence intake foundation at `c693c73`.
+- PR #67: merged documentation-only live-identity reconciliation.
+- PR #68: merged source-grounded GitHub evidence processor at `45d5d018599e7b7d308523a3f38bf9ccf62e2c94`.
 
 ## Remaining owner work
 
@@ -177,13 +184,14 @@ These are agent validation records, not owner acceptance.
 
 These are platform-development items, not reasons to misreport the current deployment as absent:
 
-1. Universal Resource Intelligence / resource intake and processing.
-2. Platform capability registry.
-3. Cognitive-tool registry and scoring.
-4. Marketplace opportunity registry and money-lane data model.
-5. Shared GitHub cognitive-friendly standard rollout.
-6. Reusable release-audit integration across projects.
-7. Persistent agent-role implementation where useful.
+1. Universal Resource Intelligence review/disposition UI, processors beyond GitHub, and the Issue #56 acceptance candidate.
+2. Continuity checkpoint writes through the existing draft-PR path; Graphiti/Cognee only as later vault indexes.
+3. Platform capability registry.
+4. Cognitive-tool registry and scoring.
+5. Marketplace opportunity registry and money-lane data model.
+6. Shared GitHub cognitive-friendly standard rollout.
+7. Reusable release-audit integration across projects.
+8. Persistent agent-role implementation where useful.
 
 ## Status-reporting rule
 
