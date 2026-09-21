@@ -1,6 +1,6 @@
 # LifeOS Universal Resource Intelligence — Foundation
 
-**Implementation status:** Durable intake foundation merged via PR #66; read-only GitHub evidence processor in development under Issue #56.  
+**Implementation status:** Durable intake foundation merged via PR #66; read-only GitHub evidence processor merged via PR #68. Review/disposition UI and end-to-end acceptance remain open under Issue #56.  
 **System owner:** Resource Intelligence  
 **Canonical storage:** GitHub-backed Obsidian Markdown Resource records  
 **Write model:** Draft pull request only; no direct `main` writes

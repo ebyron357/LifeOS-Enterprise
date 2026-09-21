@@ -3,6 +3,17 @@
 Date: 2026-07-14
 Repository: `ebyron357/LifeOS-Enterprise`
 
+## 2026-09-20 continuity / resume engine
+
+Branch: `feat/continuity-resume-engine`  
+Starting main SHA: `45d5d018599e7b7d308523a3f38bf9ccf62e2c94`
+
+This pass adds a derived Continuity / Resume Package on the existing Command Center and Today surfaces. It classifies owner vs agent work, answers interruption questions from vault + GitHub + optional checkpoint notes, and exposes `GET /api/lifeos/continuity` plus voice "where was I". It does not create a second command center or replace Resource Intelligence.
+
+Local validation: lint PASS, typecheck PASS, `npm test` 59 files / 319 tests PASS, `npm run build` PASS, vault audit PASS (162 notes), `npm audit --audit-level=high` 0 vulnerabilities. Playwright Chromium binary was missing in this environment; Command Center and Today were verified in the browser against the production build instead.
+
+**AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED**
+
 ## 2026-09-18 performance hardening
 
 ### Repairs completed

@@ -1,6 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { CommandCenterHome } from "@/components/os/CommandCenterHome";
+import { deriveResumePackage } from "@/lib/continuity/derive";
 import { LearningHome } from "@/components/os/LearningHome";
 import { JournalToday } from "@/components/os/JournalToday";
 import { TemplateCatalog } from "@/components/os/TemplateCatalog";
@@ -60,6 +61,12 @@ const github = {
   updatedAt: "",
 };
 
+const resume = deriveResumePackage({
+  nowIso: "2026-09-20T16:00:00.000Z",
+  projects: vault.projects,
+  github,
+});
+
 const hermes = {
   id: "hermes" as const,
   role: "Delegated agent runtime",
@@ -87,13 +94,18 @@ describe("command center and rebuilt surfaces", () => {
         integrations={[]}
         hermes={hermes}
         github={github}
+        resume={resume}
       />,
     );
     expect(screen.getByRole("heading", { name: "Good afternoon" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Where was I" })).toBeInTheDocument();
     expect(screen.getAllByText("D'Affordable Homes").length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Call the inspector/).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Missing credential/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Missing credential/).length).toBeGreaterThan(0);
     expect(screen.getByText(/Hermes is unavailable/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Needs you" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Agents can continue" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /this needs you|resume /i })).toBeInTheDocument();
     expect(screen.queryByText(/\{\{/)).not.toBeInTheDocument();
   });
 

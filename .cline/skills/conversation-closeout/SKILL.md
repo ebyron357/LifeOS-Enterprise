@@ -30,7 +30,7 @@ Prevent important work from remaining trapped inside chat or voice history. Conv
 4. **Convert action into execution.** Every actionable item gets one accountable owner, exact next action, status, QC method, and evidence requirement.
 5. **Route resources.** New repos, videos, documents, tools, prompts, or links enter Resource Intelligence for classification and `ADOPT / ADAPT / EXTRACT / WATCH / ARCHIVE / REJECT` disposition.
 6. **Record blockers honestly.** Separate engineering blockers from owner-only actions such as credentials, payment, legal approval, MFA, destructive operations, or consequential production decisions.
-7. **Capture the checkpoint.** Record last completed step, current state, blocker, next action, owner, source of truth, what not to repeat, and existing evidence.
+7. **Capture the checkpoint.** Record last completed step, current state, blocker, next action, owner, source of truth, what not to repeat, and existing evidence as a `type: checkpoint` note under `Command Center/Checkpoints/` using `99 Templates/Resume Checkpoint.md`. Continuity reads these records on the Command Center.
 8. **Capture learning candidates.** Ask whether the session created a reusable skill, human lesson, teaching guide, SOP, failure-library record, or automation opportunity. Create only materially useful assets.
 9. **Update living documents correctly.** When an approved operating rule changed, retrieve the current governing document and replace it with one complete merged version rather than creating a patch fragment.
 10. **Close only when structured.** If meaningful items still exist only in the conversation, the conversation remains operationally open.

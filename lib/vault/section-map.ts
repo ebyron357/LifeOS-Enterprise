@@ -31,11 +31,15 @@ export function mapNoteToSection(note: Pick<VaultNote, "path" | "type" | "status
   const top = path.split("/")[0];
 
   if (status === "archived" || status === "complete" || top === "90 Archive") return "archive";
+  if (top === "99 Templates" || top === "templates") return "templates";
   if (type === "project" || top === "10 Projects" || top === "Projects") return "projects";
   if (type === "business" || top === "Businesses") return "businesses";
   if (type === "person" || top === "50 People" || top === "People") return "people";
   if (type === "sop" || top === "80 SOPs" || top === "SOPs") return "sops";
   if (top === "70 Journal" || type === "daily") return "journal";
+  if (type === "checkpoint" || path.includes("/Checkpoints/") || path.startsWith("Command Center/Checkpoints/")) {
+    return "reviews";
+  }
   if (
     top === "60 Reviews" ||
     top === "Dashboards" ||
@@ -45,7 +49,6 @@ export function mapNoteToSection(note: Pick<VaultNote, "path" | "type" | "status
   ) {
     return "reviews";
   }
-  if (top === "99 Templates" || top === "templates") return "templates";
   if (type === "agent" || top === "AI" || path.startsWith(".github/agents/")) return "agents";
   if (top === "Learning" || type === "learning") return "learning";
   if (type === "area" || type === "goal" || path.includes("Personal Growth") || top === "20 Areas" || top === "30 Goals") {

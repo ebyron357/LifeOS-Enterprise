@@ -1,9 +1,11 @@
 import Link from "next/link";
+import type { ResumePackage } from "@/lib/continuity/model";
 import type { GitHubHealthData } from "@/lib/github/health";
 import type { IntegrationStatus } from "@/lib/os/integrations";
 import type { HermesContract } from "@/lib/os/hermes";
 import type { ProjectBrief, VaultDashboardData } from "@/lib/lifeos/types";
 import { noteHref } from "@/lib/vault/slug";
+import { ContinuityResume } from "./ContinuityResume";
 import { IntegrationBadge } from "./IntegrationBadge";
 
 type CommandCenterHomeProps = {
@@ -13,18 +15,18 @@ type CommandCenterHomeProps = {
   integrations: IntegrationStatus[];
   hermes: HermesContract;
   github: GitHubHealthData;
+  resume: ResumePackage;
 };
 
 function projectLine(project: ProjectBrief): string {
   return project.nextAction || project.blocker || project.waitingOn || "Open this project to choose the next move.";
 }
 
-export function CommandCenterHome({ greeting, dateLabel, vault, integrations, hermes, github }: CommandCenterHomeProps) {
+export function CommandCenterHome({ greeting, dateLabel, vault, integrations, hermes, github, resume }: CommandCenterHomeProps) {
   const mission = vault.priorities[0] ?? vault.projects[0] ?? null;
   const outcomes = vault.priorities.slice(0, 3);
   const blocked = vault.projects.filter((project) => project.status === "blocked" || project.blocker);
   const waiting = vault.projects.filter((project) => project.status === "waiting" || project.waitingOn);
-  const resume = mission;
 
   return (
     <div className="os-grid">
@@ -46,23 +48,15 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
         ) : <p>No priority outcomes are in the vault yet.</p>}
       </section>
 
-      <div className="os-grid os-grid-2">
-        <section className="os-card" aria-labelledby="start-heading">
-          <h2 id="start-heading">Start here</h2>
-          <p>{mission ? projectLine(mission) : "Capture what is on your mind, or ask LifeOS what needs attention."}</p>
-          {mission ? (
-            <Link className="os-primary" href={noteHref(mission.path)}>Resume {mission.name}</Link>
-          ) : (
-            <Link className="os-primary" href="/inbox">Capture something</Link>
-          )}
-        </section>
+      <ContinuityResume resume={resume} />
 
-        <section className="os-card" aria-labelledby="continue-heading">
-          <h2 id="continue-heading">Continue working</h2>
-          <p>{resume ? `${resume.name} · ${resume.status}` : "No recent project to resume."}</p>
-          <Link className="os-secondary" href="/conversation">Ask LifeOS what to resume</Link>
-        </section>
-      </div>
+      <section className="os-card" aria-labelledby="start-heading">
+        <h2 id="start-heading">Start here</h2>
+        <p>{resume.next.detail || (mission ? projectLine(mission) : "Capture what is on your mind, or ask LifeOS what needs attention.")}</p>
+        <Link className="os-primary" href={resume.next.href || (mission ? noteHref(mission.path) : "/inbox")}>
+          {resume.next.ownership === "owner" ? "This needs you" : mission ? `Resume ${mission.name}` : "Capture something"}
+        </Link>
+      </section>
 
       <div className="os-grid os-grid-2">
         <section className="os-card" aria-labelledby="blockers-heading">

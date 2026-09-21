@@ -87,6 +87,7 @@ describe("voice commands and tools", () => {
       tool: "open_project",
     });
     expect(parseVoiceCommand("Show the command map", context)).toMatchObject({ tool: "show_command_map" });
+    expect(parseVoiceCommand("Where was I", context)).toMatchObject({ tool: "read_resume_package" });
   });
 
   it("requires confirmation metadata for write commands", () => {
