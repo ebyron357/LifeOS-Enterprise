@@ -9,6 +9,7 @@ export const VOICE_TOOLS: VoiceToolDefinition[] = [
   { name: "read_morning_brief", description: "Speak the morning brief from live vault counts.", classification: "read", requiresAuth: false, requiresConfirmation: false, requiresAudit: false },
   { name: "what_needs_attention", description: "Summarize attention items from live projects.", classification: "read", requiresAuth: false, requiresConfirmation: false, requiresAudit: false },
   { name: "read_resume_package", description: "Answer where the owner left off and what needs them versus agents.", classification: "read", requiresAuth: false, requiresConfirmation: false, requiresAudit: false },
+  { name: "read_relevant_prompt", description: "Open Prompt Intelligence for the proven prompt matching current work.", classification: "read", requiresAuth: false, requiresConfirmation: false, requiresAudit: false },
   { name: "list_blocked_projects", description: "List blocked projects from vault data.", classification: "read", requiresAuth: false, requiresConfirmation: false, requiresAudit: false },
   { name: "list_waiting_projects", description: "List waiting projects from vault data.", classification: "read", requiresAuth: false, requiresConfirmation: false, requiresAudit: false },
   { name: "list_overdue_projects", description: "List projects with review dates due.", classification: "read", requiresAuth: false, requiresConfirmation: false, requiresAudit: false },

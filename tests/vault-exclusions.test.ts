@@ -22,6 +22,7 @@ describe("vault exclusions", () => {
     expect(isPrivateFrontmatter({ private: true })).toBe(true);
     expect(isPrivateFrontmatter({ publish: false })).toBe(true);
     expect(isPrivateFrontmatter({ web_visibility: "private" })).toBe(true);
+    expect(isPrivateFrontmatter({ privacy_level: "private" })).toBe(true);
     expect(isPrivateFrontmatter({ status: "active" })).toBe(false);
   });
 

@@ -55,6 +55,20 @@ test.describe("unified command center journeys", () => {
     await page.getByRole("button", { name: /^send$/i }).click();
   });
 
+  test("finds a canonical prompt without leaving the existing OS shell", async ({ page }) => {
+    await page.goto("/prompts");
+    await expect(page.getByRole("heading", { name: "Prompt Intelligence" })).toBeVisible();
+    await page.getByLabel("Search prompts").fill("YouTube Transcript");
+    await page.getByRole("button", { name: "Search" }).click();
+    await expect(page.getByRole("link", { name: /YouTube Transcript Knowledge Extraction/i })).toBeVisible();
+    await page.goto("/prompts?task=vercel+production+closeout&project=D%27Affordable+Homes");
+    await expect(page.getByRole("heading", { name: /you already have a prompt for this/i })).toBeVisible();
+    await expect(page.getByText(/Vercel Production Closeout/i).first()).toBeVisible();
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: "Where was I" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Today" })).toBeVisible();
+  });
+
   test("finds a project and a blocker surface", async ({ page }) => {
     await page.goto("/projects");
     await expect(page.getByRole("heading", { name: "Projects" })).toBeVisible();
@@ -114,6 +128,7 @@ test.describe("unified command center journeys", () => {
       ["/learning", "learning"],
       ["/templates", "templates"],
       ["/integrations", "integrations"],
+      ["/prompts", "prompts"],
     ] as const;
     for (const [href, name] of shots) {
       await page.goto(href);

@@ -60,7 +60,7 @@ export default async function FilesPage({ searchParams }: FilesPageProps) {
             </ul>
           </section>
         )}
-        <p><Link href="/search">Advanced vault search</Link></p>
+        <p><Link href="/prompts">Prompt Intelligence</Link> · <Link href="/search">Advanced vault search</Link></p>
       </div>
     </AppShell>
   );

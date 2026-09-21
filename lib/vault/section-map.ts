@@ -54,15 +54,7 @@ export function mapNoteToSection(note: Pick<VaultNote, "path" | "type" | "status
   if (type === "area" || type === "goal" || path.includes("Personal Growth") || top === "20 Areas" || top === "30 Goals") {
     return "growth";
   }
-  if (
-    top === "40 Resources" ||
-    top === "Knowledge" ||
-    top === "Tools" ||
-    top === "URLs" ||
-    type === "resource" ||
-    type === "decision" ||
-    type === "content"
-  ) {
+  if (type === "prompt" || top === "40 Resources" || top === "Knowledge" || top === "Tools" || top === "URLs" || type === "resource" || type === "decision" || type === "content") {
     return "resources";
   }
   if (top === "Command Center" || top === "00 Home" || top === "Automations" || type === "dashboard") {

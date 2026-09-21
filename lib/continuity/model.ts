@@ -1,6 +1,20 @@
 export type ResumeOwnership = "owner" | "agent" | "shared";
 export type ResumeAuthority = "always-allowed" | "review-required" | "owner-only" | "forbidden";
-export type ResumeItemKind = "project" | "resource" | "github" | "integration" | "checkpoint";
+export type ResumeItemKind = "project" | "resource" | "github" | "integration" | "checkpoint" | "prompt";
+
+export type ResumePromptLink = {
+  id: string;
+  title: string;
+  version: string;
+  path: string;
+  href: string;
+  status: string;
+  current: boolean;
+  supersededBy: string | null;
+  lastResultStatus: string;
+  warning: string | null;
+  reason: string;
+};
 
 export type ResumeItem = {
   id: string;
@@ -45,6 +59,7 @@ export type ResumePackage = {
   unverified: string[];
   focus: ResumeFocus | null;
   source: "derived" | "checkpoint+derived";
+  relevantPrompts: ResumePromptLink[];
 };
 
 export type ContinuityProjectInput = {
@@ -106,11 +121,33 @@ export type ContinuityHermesInput = {
   limitation: string;
 };
 
+export type ContinuityPromptInput = {
+  id: string;
+  title: string;
+  version: string;
+  path: string;
+  status: string;
+  current: boolean;
+  supersededBy: string | null;
+  lastResultStatus: string;
+  lastFailure: string | null;
+  project: string | null;
+  client: string | null;
+  business?: string | null;
+  agent?: string | null;
+  taskTypes: string[];
+  triggerContext: string[];
+  tags: string[];
+  purpose: string;
+  recommendedContext: string | null;
+};
+
 export type ContinuityInput = {
   nowIso: string;
   projects: ContinuityProjectInput[];
   resources?: ContinuityResourceInput[];
   checkpoints?: ContinuityCheckpointInput[];
+  prompts?: ContinuityPromptInput[];
   github: ContinuityGitHubInput;
   hermes?: ContinuityHermesInput;
 };

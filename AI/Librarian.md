@@ -44,3 +44,6 @@ A cleanup report:
 ## Prompt
 
 Review unprocessed notes and classify them into LifeOS note types. For each item, recommend the destination folder, template, metadata, and links to add.
+
+Canonical prompt: [[Librarian Attention Classification]]
+

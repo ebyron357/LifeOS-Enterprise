@@ -16,6 +16,7 @@ function ItemList({ items, empty }: { items: ResumeItem[]; empty: string }) {
 }
 
 export function ContinuityResume({ resume }: { resume: ResumePackage }) {
+  const prompt = resume.relevantPrompts[0];
   return (
     <section className="os-card" aria-labelledby="resume-heading">
       <h2 id="resume-heading">Where was I</h2>
@@ -38,6 +39,24 @@ export function ContinuityResume({ resume }: { resume: ResumePackage }) {
           <ItemList items={resume.agentCanContinue} empty="No agent-doable continuation is recorded." />
         </div>
       </div>
+      {prompt ? (
+        <div>
+          <h3>Prompt for this work</h3>
+          <p>
+            <strong>{prompt.lastResultStatus === "PASS" ? "Last implementation prompt used:" : "You already have a prompt for this."}</strong>
+            {" "}
+            {prompt.title} v{prompt.version}
+            {prompt.current ? "" : " (not current)"}
+            {prompt.supersededBy ? ` · superseded by ${prompt.supersededBy}` : ""}
+          </p>
+          <p className="widget-eyebrow">{prompt.reason}</p>
+          {prompt.warning ? <p>{prompt.warning}</p> : null}
+          <div className="os-top-actions">
+            <Link className="os-secondary" href={prompt.href}>Open prompt</Link>
+            <Link className="os-secondary" href="/prompts">Prompt library</Link>
+          </div>
+        </div>
+      ) : null}
       <p className="widget-eyebrow">Next</p>
       <p>{resume.next.detail}</p>
       <div className="os-top-actions">

@@ -373,3 +373,11 @@ export function updateResourceRecord(
 
   return updated;
 }
+
+export function isPromptLikeResource(input: { title?: string; topic?: string; tags?: string[] }): boolean {
+  const hay = `${input.title ?? ""} ${input.topic ?? ""} ${(input.tags ?? []).join(" ")}`.toLowerCase();
+  return /\bprompt\b/.test(hay);
+}
+
+export const PROMPT_INTELLIGENCE_FOLDER = "40 Resources/Prompts";
+

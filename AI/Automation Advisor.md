@@ -43,3 +43,5 @@ An automation recommendation:
 ## Prompt
 
 Review the current workflows and active projects. Identify the top automation candidate that saves the most time with the lowest risk. Return the exact next step to implement it.
+
+Canonical prompt: [[Automation Candidate]]

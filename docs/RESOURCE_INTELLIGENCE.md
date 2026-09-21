@@ -148,3 +148,5 @@ After the GitHub processor slice is green:
 5. Add semantic duplicate candidates as suggestions only.
 6. Run the Issue #56 controlled acceptance candidate `vercel-labs/knowledge-agent-template` end to end.
 7. Preserve the current expected candidate disposition (`ADAPT`) as a review outcome to prove from LifeOS overlap/evidence, not as a hard-coded processor result.
+
+Prompt-like captures (`title`/`topic`/`tags` containing `prompt`) remain Resource Intelligence records at intake. After `EXTRACT`, canonicalize the reusable prompt under `40 Resources/Prompts/` as `type: prompt`. See `docs/PROMPT_INTELLIGENCE.md`.

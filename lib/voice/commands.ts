@@ -63,6 +63,9 @@ export function parseVoiceCommand(raw: string, context: VoiceCommandContext): Pa
   if (/where was i|what was i doing|resume (me|work)|what needs me|pick me back up/.test(text)) {
     return { kind: "read", tool: "read_resume_package", utterance };
   }
+  if (/what prompt|which prompt|prompt for this|proven prompt/.test(text)) {
+    return { kind: "read", tool: "read_relevant_prompt", utterance };
+  }
   if (/show blocked|what is blocked|what'?s blocked|blocked projects/.test(text)) {
     return { kind: "read", tool: "list_blocked_projects", utterance };
   }
@@ -218,6 +221,8 @@ export function buildReadToolSpeech(tool: string, context: VoiceCommandContext, 
       if (!project) return "No live project next action is available.";
       return `${project.name}: ${project.nextAction}`;
     }
+    case "read_relevant_prompt":
+      return "Open Prompt Intelligence for the matching canonical prompt. I do not invent a prompt from memory.";
     default:
       return "I understood a read request, but that tool is not registered.";
   }
@@ -227,5 +232,6 @@ export function navigationForTool(tool: string, args: Record<string, unknown> = 
   if (tool === "show_command_map") return "map";
   if (tool === "show_command_board") return "board";
   if (tool === "open_project" && typeof args.path === "string") return noteHref(args.path);
+  if (tool === "read_relevant_prompt") return "/prompts";
   return undefined;
 }

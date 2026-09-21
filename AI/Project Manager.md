@@ -42,3 +42,5 @@ A project status report:
 ## Prompt
 
 Audit the current project notes. For each active project, confirm status, priority, blocker, and next action. Return only the actions needed to make the dashboard accurate.
+
+Canonical prompt: [[Project Dashboard Accuracy]]
