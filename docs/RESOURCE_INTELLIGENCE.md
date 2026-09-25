@@ -1,6 +1,6 @@
 # LifeOS Universal Resource Intelligence — Foundation
 
-**Implementation status:** Durable intake foundation merged via PR #66; read-only GitHub evidence processor merged via PR #68; owner review/disposition surface and resource state lanes added on branch `claude/quirky-sagan-1m56r5` (not production until merged and deployed). End-to-end acceptance with the Issue #56 candidate remains open.  
+**Implementation status:** Durable intake foundation merged via PR #66; read-only GitHub evidence processor merged via PR #68; owner review/disposition surface and resource state lanes merged and deployed via PR #71. End-to-end acceptance with the Issue #56 candidate remains open.  
 **System owner:** Resource Intelligence  
 **Canonical storage:** GitHub-backed Obsidian Markdown Resource records  
 **Write model:** Draft pull request only; no direct `main` writes

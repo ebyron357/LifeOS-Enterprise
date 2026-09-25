@@ -49,6 +49,13 @@ const snapshot: ContinuityCheckpointInput = {
 };
 
 describe("checkpoint rendering", () => {
+  it("bounds the title the same way everywhere it is used", () => {
+    const checkpoint = buildCheckpoint(snapshot, { title: "x".repeat(400) });
+    expect(checkpoint.title).toHaveLength(160);
+    expect(parseCheckpointRecord(checkpoint.path, renderCheckpointRecord(checkpoint))?.title).toBe(checkpoint.title);
+  });
+
+
   it("round-trips values containing colons, quotes, and newlines without corrupting frontmatter", () => {
     const checkpoint = buildCheckpoint(snapshot, {
       title: 'Resume: "alpha" plan',
@@ -65,13 +72,22 @@ describe("checkpoint rendering", () => {
     expect(source.split("\n---\n")[0].split("\n").every((line) => line === "---" || /^[a-z_]+:|^ {2}- /.test(line))).toBe(true);
   });
 
-  it("derives a canonical, deterministic path and titles untitled checkpoints", () => {
-    const checkpoint = buildCheckpoint(snapshot, {});
-    expect(checkpoint.path).toBe(checkpointRecordPath(snapshot.capturedAt, "LifeOS Enterprise"));
+  it("derives a canonical per-request path and titles untitled checkpoints", () => {
+    const checkpoint = buildCheckpoint(snapshot, {}, "abc123");
+    expect(checkpoint.path).toBe(checkpointRecordPath(snapshot.capturedAt, "LifeOS Enterprise", "abc123"));
+    expect(buildCheckpoint(snapshot, {}).path).not.toBe(buildCheckpoint(snapshot, {}).path);
     expect(isCheckpointRecordPath(checkpoint.path)).toBe(true);
     expect(checkpoint.title).toBe("Resume checkpoint — LifeOS Enterprise");
     expect(isCheckpointRecordPath("Command Center/Checkpoints/../../README.md")).toBe(false);
     expect(isCheckpointRecordPath("10 Projects/x.md")).toBe(false);
+    expect(checkpoint.path).toMatch(/-[a-f0-9]{16}\.md$/);
+    expect(isCheckpointRecordPath("Command Center/Checkpoints/2026-09-20-lifeos-0123abcd.md")).toBe(true);
+  });
+
+  it("bounds the fallback title built from a long project name", () => {
+    const checkpoint = buildCheckpoint({ ...snapshot, project: "p".repeat(400) }, {});
+    expect(checkpoint.title.length).toBeLessThanOrEqual(160);
+    expect(parseCheckpointRecord(checkpoint.path, renderCheckpointRecord(checkpoint))?.title).toBe(checkpoint.title);
   });
 
   it("validates override shapes", () => {
@@ -80,6 +96,9 @@ describe("checkpoint rendering", () => {
     expect(parseCheckpointOverrides({ nextAction: 5 }).ok).toBe(false);
     expect(parseCheckpointOverrides({ evidence: "one" }).ok).toBe(false);
     expect(parseCheckpointOverrides({ sessionStatus: "paused" }).ok).toBe(false);
+    expect(parseCheckpointOverrides({ sessionStatus: ["open"] }).ok).toBe(false);
+    expect(parseCheckpointOverrides({ nextAction: "   " })).toEqual({ ok: false, error: "nextAction cannot be blank." });
+    expect(parseCheckpointOverrides({ blocker: "   " })).toEqual({ ok: true, overrides: {} });
     const parsed = parseCheckpointOverrides({ nextAction: "  Ship\nit ", sessionStatus: "closed", evidence: ["a", ""] });
     expect(parsed).toEqual({ ok: true, overrides: { nextAction: "Ship it", sessionStatus: "CLOSED", evidence: ["a"] } });
   });
@@ -166,6 +185,45 @@ describe("checkpoint write route", () => {
 
     const pull = fetchMock.mock.calls.find(([url]) => String(url).endsWith("/pulls"));
     expect(JSON.parse(String(pull?.[1]?.body))).toMatchObject({ draft: true, base: "main" });
+  });
+
+  it("gives concurrent saves distinct checkpoint paths", async () => {
+    enableWrites();
+    const fetchMock = githubMock();
+    vi.stubGlobal("fetch", fetchMock);
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-09-25T06:45:00.000Z"));
+    try {
+      const responses = await Promise.all([POST(request({})), POST(request({}))]);
+      const paths = await Promise.all(responses.map(async (response) => (await response.json()).path));
+      expect(responses.map((response) => response.status)).toEqual([200, 200]);
+      expect(new Set(paths).size).toBe(2);
+      const puts = fetchMock.mock.calls.filter(([, init]) => init?.method === "PUT").map(([url]) => String(url));
+      expect(new Set(puts).size).toBe(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("rejects an explicit blank next action even when the snapshot has one", async () => {
+    enableWrites();
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    expect((await POST(request({ checkpoint: { nextAction: " \t " } }))).status).toBe(400);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a snapshot whose derived next action is blank", async () => {
+    enableWrites();
+    const { getContinuityResumePackage } = await import("@/lib/continuity/sources");
+    vi.mocked(getContinuityResumePackage).mockResolvedValueOnce({
+      ...(await getContinuityResumePackage()),
+      next: { detail: "   ", ownership: "agent", href: "/" },
+    } as ResumePackage);
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    expect((await POST(request({}))).status).toBe(400);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("never overwrites an existing checkpoint", async () => {

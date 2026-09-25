@@ -1,18 +1,22 @@
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { parseFrontmatter } from "@/lib/vault/parse-frontmatter";
 import type { ContinuityCheckpointInput } from "./model";
 import type { ResumePackage } from "./model";
 
 export const CHECKPOINT_FOLDER = "Command Center/Checkpoints";
 
-export function checkpointRecordPath(capturedAt: string, project: string): string {
+/**
+ * Pass a per-request nonce for writes: the path then differs even for two saves of the
+ * same project in the same millisecond, so concurrent requests never target one file.
+ */
+export function checkpointRecordPath(capturedAt: string, project: string, nonce = ""): string {
   const day = capturedAt.slice(0, 10) || "undated";
   const slug = project
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 48) || "session";
-  const stamp = createHash("sha256").update(`${capturedAt}:${project}`).digest("hex").slice(0, 8);
+  const stamp = createHash("sha256").update(`${capturedAt}:${project}:${nonce}`).digest("hex").slice(0, 16);
   return `${CHECKPOINT_FOLDER}/${day}-${slug}-${stamp}.md`;
 }
 
@@ -79,7 +83,7 @@ function bullets(values: string[]): string {
 }
 
 export function renderCheckpointRecord(input: ContinuityCheckpointInput): string {
-  const title = oneLine(input.title, 160) || "Resume checkpoint";
+  const title = oneLine(input.title, CHECKPOINT_TITLE_MAX) || "Resume checkpoint";
   return `---
 type: checkpoint
 status: ${input.sessionStatus === "CLOSED" ? "complete" : "active"}
@@ -127,6 +131,8 @@ ${bullets(input.evidence)}
 `;
 }
 
+export const CHECKPOINT_TITLE_MAX = 160;
+
 export type CheckpointOverrides = Partial<
   Pick<ContinuityCheckpointInput, "title" | "project" | "lastCompleted" | "currentState" | "nextAction" | "owner" | "blocker" | "sourceOfTruth">
 > & { doNotRepeat?: string[]; evidence?: string[]; sessionStatus?: "OPEN" | "CLOSED" };
@@ -144,6 +150,7 @@ export function parseCheckpointOverrides(input: unknown): { ok: true; overrides:
     if (typeof value !== "string") return { ok: false, error: `${field} must be a string.` };
     const cleaned = oneLine(value);
     if (cleaned) overrides[field] = cleaned;
+    else if (field === "nextAction") return { ok: false, error: "nextAction cannot be blank." };
   }
   for (const field of ["doNotRepeat", "evidence"] as const) {
     const value = raw[field];
@@ -154,7 +161,8 @@ export function parseCheckpointOverrides(input: unknown): { ok: true; overrides:
     overrides[field] = (value as string[]).map((item) => oneLine(item)).filter(Boolean).slice(0, 20);
   }
   if (raw.sessionStatus !== undefined) {
-    const status = String(raw.sessionStatus).toUpperCase();
+    if (typeof raw.sessionStatus !== "string") return { ok: false, error: "sessionStatus must be OPEN or CLOSED." };
+    const status = raw.sessionStatus.trim().toUpperCase();
     if (status !== "OPEN" && status !== "CLOSED") return { ok: false, error: "sessionStatus must be OPEN or CLOSED." };
     overrides.sessionStatus = status;
   }
@@ -165,6 +173,7 @@ export function parseCheckpointOverrides(input: unknown): { ok: true; overrides:
 export function buildCheckpoint(
   snapshot: ContinuityCheckpointInput,
   overrides: CheckpointOverrides,
+  nonce = randomBytes(16).toString("hex"),
 ): ContinuityCheckpointInput {
   const merged: ContinuityCheckpointInput = {
     ...snapshot,
@@ -173,16 +182,17 @@ export function buildCheckpoint(
     evidence: overrides.evidence ?? snapshot.evidence,
     sessionStatus: overrides.sessionStatus ?? snapshot.sessionStatus,
   };
-  const project = merged.project || "LifeOS";
+  const project = oneLine(merged.project) || "LifeOS";
   return {
     ...merged,
-    title: merged.title || `Resume checkpoint — ${project}`,
-    path: checkpointRecordPath(merged.capturedAt, project),
+    title: oneLine(merged.title || `Resume checkpoint — ${project}`, CHECKPOINT_TITLE_MAX),
+    nextAction: oneLine(merged.nextAction),
+    path: checkpointRecordPath(merged.capturedAt, project, nonce),
   };
 }
 
 export function isCheckpointRecordPath(path: string): boolean {
-  return new RegExp(`^${CHECKPOINT_FOLDER}/\\d{4}-\\d{2}-\\d{2}-[a-z0-9-]{1,48}-[a-f0-9]{8}\\.md$`).test(path);
+  return new RegExp(`^${CHECKPOINT_FOLDER}/\\d{4}-\\d{2}-\\d{2}-[a-z0-9-]{1,48}-(?:[a-f0-9]{8}|[a-f0-9]{16})\\.md$`).test(path);
 }
 
 export function resumePackageToCheckpoint(resume: ResumePackage, capturedAt: string): ContinuityCheckpointInput {

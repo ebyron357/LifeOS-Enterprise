@@ -1,6 +1,6 @@
 # LifeOS Continuity / Resume Engine
 
-**Implementation status:** Derived resume packages are live on the existing Command Center and Today surfaces. Governed checkpoint writes (`POST /api/lifeos/continuity/checkpoint`) are added on branch `claude/quirky-sagan-1m56r5` and are not production until merged and deployed.  
+**Implementation status:** Derived resume packages are live on the existing Command Center and Today surfaces. Governed checkpoint writes (`POST /api/lifeos/continuity/checkpoint`) are in production (PR #72) and stay fail-closed until the owner write secret and GitHub token are both configured.  
 **System owner:** Continuity  
 **Canonical storage:** Vault project/resource notes plus optional `type: checkpoint` records  
 **Write model:** `GET /api/lifeos/continuity` stays read-only. Checkpoints are written only through `POST /api/lifeos/continuity/checkpoint`, which stages a draft PR and never writes to `main`.
@@ -60,10 +60,10 @@ The resume card on the Command Center and Today has a **Save this as a checkpoin
 - is fail-closed behind the existing `LIFEOS_WRITE_ENABLED` + `LIFEOS_WRITE_SECRET` + `LIFEOS_GITHUB_TOKEN` gate, with the origin, rate-limit, and owner-secret checks running before any GitHub call;
 - snapshots the current derived resume package and applies optional fields (`title`, `project`, `lastCompleted`, `currentState`, `nextAction`, `owner`, `blocker`, `sourceOfTruth`, `doNotRepeat`, `evidence`, `sessionStatus`);
 - requires a next action;
-- writes a new record at a deterministic path under `Command Center/Checkpoints/` and returns 409 instead of overwriting an existing checkpoint;
+- writes a new record under `Command Center/Checkpoints/` at a path that includes the date, project, and a per-request random nonce, so two concurrent saves never target the same file, and returns 409 rather than overwrite if the path somehow already exists;
 - stages the record as a draft PR, using the same helper as Resource Intelligence (`lib/github/draft-pr.ts`).
 
-Checkpoint frontmatter values are written as single-line, JSON-quoted strings. The vault frontmatter parser decodes them exactly, so values containing colons, quotes, or line breaks cannot corrupt the record.
+Checkpoint frontmatter values are written as single-line, JSON-quoted strings. The vault frontmatter parser decodes them exactly, so values containing colons, quotes, or line breaks cannot corrupt the frontmatter. Line breaks inside a value are collapsed to spaces.
 
 ## Explicitly not claimed
 
