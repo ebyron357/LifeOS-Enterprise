@@ -1,4 +1,5 @@
 import { Buffer } from "node:buffer";
+import { randomBytes } from "node:crypto";
 
 export const RESOURCE_REPO_OWNER = "ebyron357";
 export const RESOURCE_REPO_NAME = "LifeOS-Enterprise";
@@ -72,7 +73,51 @@ export async function cleanupBranch(branch: string, token: string) {
 
 export function resourceBranchName(prefix: string, slug: string) {
   const safeSlug = slug.slice(0, 42).replace(/[^a-z0-9-]/gi, "-");
-  return `lifeos/${prefix}-${safeSlug}-${Date.now().toString(36)}`;
+  const unique = `${Date.now().toString(36)}-${randomBytes(4).toString("hex")}`;
+  return `lifeos/${prefix}-${safeSlug}-${unique}`;
+}
+
+export type BoundedJsonResult =
+  | { ok: true; value: Record<string, unknown> }
+  | { ok: false; status: number; error: string };
+
+/**
+ * Reads the body as text and enforces the byte limit on what was actually received,
+ * so a missing, chunked, or understated Content-Length cannot bypass it.
+ */
+export async function readBoundedJsonObject(request: Request, maxBytes: number): Promise<BoundedJsonResult> {
+  const declared = Number(request.headers.get("content-length") || "0");
+  if (Number.isFinite(declared) && declared > maxBytes) {
+    return { ok: false, status: 413, error: "Request body is too large." };
+  }
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+  try {
+    const reader = request.body?.getReader();
+    while (reader) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      received += value.byteLength;
+      if (received > maxBytes) {
+        await reader.cancel().catch(() => undefined);
+        return { ok: false, status: 413, error: "Request body is too large." };
+      }
+      chunks.push(value);
+    }
+  } catch {
+    return { ok: false, status: 400, error: "Could not read request body." };
+  }
+  const text = Buffer.concat(chunks).toString("utf8");
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    return { ok: false, status: 400, error: "Invalid JSON body." };
+  }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return { ok: false, status: 400, error: "Request body must be a JSON object." };
+  }
+  return { ok: true, value: parsed as Record<string, unknown> };
 }
 
 export function statusFromError(error: unknown) {

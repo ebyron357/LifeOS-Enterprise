@@ -12,7 +12,9 @@ Base SHA: `df4b182bae4884a482bd2efd652a07783f9b6111`
 
 - Added `/resources/review`, which puts canonical Resource records in six lanes (Needs review, Processing, Implementation, Watch, Completed, Archived), flags due reviews, shows exact-duplicate capture counts, and lists suggestion-only duplicate candidates (likely forks and titles sharing at least 60% of their words).
 - Added `POST /api/lifeos/resource-review`, which records an owner-entered architecture classification and disposition through a draft PR only. It is fail-closed behind the existing write secret and GitHub token, validates the record path, requires a rationale, refuses a silent overwrite of an earlier review, and keeps Capture History and source identity.
-- Moved the shared GitHub draft-PR helpers into `lib/resource-intelligence/github-write.ts`. Intake behavior is unchanged.
+- Moved the shared GitHub draft-PR helpers into `lib/resource-intelligence/github-write.ts`. Both intake and review now enforce the body-size limit on the bytes actually received (not the client's `Content-Length`), return a structured 400 for non-object JSON, and use a random branch suffix so concurrent submissions cannot collide.
+- Review dates must be real calendar dates, and the review page lists only records the write route accepts.
+- Test setup now unmounts React trees after every test, which fixes an intermittent `window is not defined` CI failure (about 1 in 5 runs).
 - Added Resource review to the advanced navigation and updated `docs/RESOURCE_INTELLIGENCE.md`, `docs/CANONICAL_LIVE_STATUS.md`, and `docs/WEB_VAULT_PORTAL.md`.
 
 ### Validation evidence
@@ -21,7 +23,7 @@ Base SHA: `df4b182bae4884a482bd2efd652a07783f9b6111`
 |---|---|
 | `npm run lint` | PASS |
 | `npm run typecheck` | PASS |
-| `npm test` | PASS — 63 files, 354 tests (21 new review tests) |
+| `npm test` | PASS — 63 files, 358 tests (25 new review/intake tests) |
 | `npm run build` | PASS — 35 static pages |
 | `npm audit --audit-level=high` | PASS — 0 vulnerabilities |
 | `pwsh -NoProfile -File ./scripts/audit-vault.ps1` | PASS |

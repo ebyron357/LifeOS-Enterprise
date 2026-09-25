@@ -72,6 +72,13 @@ function upper<T extends string>(value: unknown, allowed: readonly T[], fallback
   return allowed.includes(candidate) ? candidate : fallback;
 }
 
+export function isCalendarDate(value: string): boolean {
+  if (!DATE_PATTERN.test(value)) return false;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+}
+
 export function isResourceRecordPath(path: string): boolean {
   return RECORD_PATH_PATTERN.test(path) && !path.includes("..");
 }
@@ -90,7 +97,7 @@ export function resourceLane(
 
 export function isResourceRecordNote(note: Pick<VaultNote, "type" | "path" | "frontmatter">): boolean {
   return note.type === "resource"
-    && note.path.startsWith(`${RESOURCE_RECORDS_FOLDER}/`)
+    && isResourceRecordPath(note.path)
     && Boolean(text(note.frontmatter.source_identity));
 }
 
@@ -233,8 +240,8 @@ export function parseReviewDecision(input: unknown): { ok: true; decision: Resou
     return { ok: false, error: "ADOPT and ADAPT require a PLATFORM, TEMPLATE, or PROJECT architecture classification." };
   }
   const nextReviewDate = text(raw.nextReviewDate);
-  if (nextReviewDate && !DATE_PATTERN.test(nextReviewDate)) {
-    return { ok: false, error: "nextReviewDate must use YYYY-MM-DD." };
+  if (nextReviewDate && !isCalendarDate(nextReviewDate)) {
+    return { ok: false, error: "nextReviewDate must be a real calendar date in YYYY-MM-DD form." };
   }
   if (disposition === "WATCH" && !nextReviewDate) {
     return { ok: false, error: "WATCH requires a nextReviewDate." };

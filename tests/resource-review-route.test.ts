@@ -101,6 +101,43 @@ describe("Resource review route", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("rejects null, array, and oversized bodies with structured errors before GitHub access", async () => {
+    enableWrites();
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    expect((await POST(request(null))).status).toBe(400);
+    expect((await POST(request([validBody]))).status).toBe(400);
+
+    // Oversized body without a trustworthy Content-Length header is still rejected.
+    const huge = new Request("https://lifeos.example/api/lifeos/resource-review", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer test-secret", Origin: "https://lifeos.example" },
+      body: JSON.stringify({ ...validBody, padding: "x".repeat(40_000) }),
+    });
+    huge.headers.delete("content-length");
+    const response = await POST(huge);
+    expect(response.status).toBe(413);
+    expect(await response.json()).toMatchObject({ ok: false });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("gives concurrent submissions for the same record distinct branches", async () => {
+    enableWrites();
+    const fetchMock = githubMock();
+    vi.stubGlobal("fetch", fetchMock);
+    vi.spyOn(Date, "now").mockReturnValue(1_790_000_000_000);
+
+    await Promise.all([POST(request(validBody)), POST(request(validBody))]);
+
+    const refs = fetchMock.mock.calls
+      .filter(([url, init]) => String(url).endsWith("/git/refs") && init?.method === "POST")
+      .map(([, init]) => JSON.parse(String(init?.body)).ref);
+    expect(refs).toHaveLength(2);
+    expect(new Set(refs).size).toBe(2);
+    vi.restoreAllMocks();
+  });
+
   it("returns 404 when the record is not on main", async () => {
     enableWrites();
     vi.stubGlobal("fetch", githubMock(null));

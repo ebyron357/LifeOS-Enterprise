@@ -5,6 +5,7 @@ import {
   cleanupBranch,
   encodeRepoPath,
   github,
+  readBoundedJsonObject,
   readCanonicalFile,
   resourceBranchName,
   resourceWritesConfigured,
@@ -58,18 +59,12 @@ export async function POST(request: Request) {
   const auth = authorizeVoiceRequest(request, { requireWriteSecret: true });
   if (!auth.ok) return jsonError(auth.error, auth.status);
 
-  const size = Number(request.headers.get("content-length") || "0");
-  if (size > MAX_BODY_BYTES) return jsonError("Review decision is too large.", 413);
-
   const token = process.env.LIFEOS_GITHUB_TOKEN;
   if (!token) return jsonError("GitHub write token is not configured.", 503);
 
-  let body: Record<string, unknown>;
-  try {
-    body = await request.json() as Record<string, unknown>;
-  } catch {
-    return jsonError("Invalid JSON body.", 400);
-  }
+  const read = await readBoundedJsonObject(request, MAX_BODY_BYTES);
+  if (!read.ok) return jsonError(read.error, read.status);
+  const body = read.value;
 
   const path = typeof body.path === "string" ? body.path.trim() : "";
   if (!isResourceRecordPath(path)) {

@@ -83,6 +83,13 @@ describe("Resource review decisions", () => {
     expect(parseReviewDecision({ disposition: "WATCH", rationale: "Promising but immature.", nextReviewDate: "2026-12-01" }).ok).toBe(true);
   });
 
+  it("rejects impossible calendar dates", () => {
+    const base = { disposition: "WATCH", rationale: "Promising but immature." };
+    expect(parseReviewDecision({ ...base, nextReviewDate: "2026-02-30" }).ok).toBe(false);
+    expect(parseReviewDecision({ ...base, nextReviewDate: "2026-99-99" }).ok).toBe(false);
+    expect(parseReviewDecision({ ...base, nextReviewDate: "2028-02-29" }).ok).toBe(true);
+  });
+
   it("normalizes case, collapses multi-line input, and drops unknown ratings", () => {
     const result = parseReviewDecision({
       disposition: "extract",
@@ -181,6 +188,7 @@ describe("Resource review lanes", () => {
       note(`${base}/c.md`, { type: "resource", source_identity: "url:c", disposition: "ADOPT", architecture_classification: "PLATFORM" }, "C"),
       note(`${base}/README.md`, { type: "readme" }, "Readme"),
       note("40 Resources/Technology/tool.md", { type: "resource" }, "Legacy resource"),
+      note(`${base}/Nested/UPPER.md`, { type: "resource", source_identity: "url:nested" }, "Noncanonical path"),
     ];
     const records = catalogResourceRecords(notes, "2026-09-25");
     expect(records.map((r) => r.title)).toEqual(["A", "B", "C"]);
