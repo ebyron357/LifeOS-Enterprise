@@ -3,6 +3,36 @@
 Date: 2026-07-14
 Repository: `ebyron357/LifeOS-Enterprise`
 
+## 2026-09-25 post-#70 revalidation and status reconciliation
+
+Branch: `claude/quirky-sagan-1m56r5`  
+Validated SHA: `df4b182bae4884a482bd2efd652a07783f9b6111` (PR #70 Prompt Intelligence, current `main`)  
+Production: Vercel deployment `dpl_3A2f8wqnpBTkHiyHcFTftXpiQF6c` observed READY on the same SHA.
+
+### Repairs completed
+
+- Reconciled `docs/CANONICAL_LIVE_STATUS.md`: Continuity (PR #69) and Prompt Intelligence (PR #70) are now recorded as merged and deployed rather than pending, the application-code baseline moved to PR #70, and the Prompt Intelligence boundary and follow-up work were added.
+- No application code, vault notes, or configuration changed.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| `npm ci --no-audit --no-fund` | PASS |
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 61 files, 333 tests |
+| `npm run build` | PASS — Next.js 16.3.5 production build, 34 static pages |
+| `npm audit --audit-level=high` | PASS — 0 vulnerabilities |
+| `pwsh -NoProfile -File ./scripts/audit-vault.ps1` (PowerShell 7.4.6, Linux) | PASS — 153 notes, 36 folders, 48 system files, 10 Bases, 18 templates |
+| Playwright | Not run in this pass |
+
+### Final state
+
+**AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED**
+
+Remaining owner-only actions are unchanged: complete `docs/OWNER_ACCEPTANCE_WORKBOOK.md`, supply write/approval/integration credentials only if intentionally enabling those capabilities, and run the live microphone, screen-share, and local Windows/Obsidian checks.
+
 ## 2026-09-20 continuity / resume engine
 
 Branch: `feat/continuity-resume-engine`  
