@@ -3,6 +3,36 @@
 Date: 2026-07-14
 Repository: `ebyron357/LifeOS-Enterprise`
 
+## 2026-09-25 Continuity checkpoint writes
+
+Branch: `claude/quirky-sagan-1m56r5` (restarted from `main` after PR #71 merged)  
+Base SHA: `6bf7e2aff9920ba868de7381e0e68ae75d9866c7` (PR #71, READY in Vercel production at `dpl_EXRsoAHWuM7DqPUhqCE43XSZYLrs`)
+
+### Repairs completed
+
+- Added `POST /api/lifeos/continuity/checkpoint`, which snapshots the derived resume package, applies optional owner/agent fields, requires a next action, and stages a new `Command Center/Checkpoints/` record through a draft PR. It is fail-closed behind the existing write gate and never overwrites an existing checkpoint (409). `GET /api/lifeos/continuity` stays read-only.
+- Added a **Save this as a checkpoint** control to the resume card on the Command Center and Today.
+- Fixed checkpoint rendering: frontmatter values are now single-line, JSON-quoted strings. Previously a value containing a colon (the evidence lines include `source:...`) could corrupt the YAML.
+- The vault frontmatter parser now decodes JSON-escaped double-quoted scalars exactly and keeps the historical quote-stripping for everything else.
+- Moved the shared draft-PR helper to `lib/github/draft-pr.ts`, since Resource Intelligence and Continuity both use it.
+- Verified production after PR #71: `/resources/review` and `GET /api/lifeos/resource-review` return 200. The service reports `enabled: true, configured: false`, recorded as an owner configuration item in `docs/CANONICAL_LIVE_STATUS.md`.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 64 files, 367 tests (9 new), 3 consecutive clean runs |
+| `npm run build` | PASS — 35 static pages |
+| `npm audit --audit-level=high` | PASS — 0 vulnerabilities |
+| `pwsh -NoProfile -File ./scripts/audit-vault.ps1` | PASS |
+| Playwright, local Chromium projects (1440, 1024, 390) | 122 passed, 1 skipped by the suite |
+
+### Final state
+
+**AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED.** Not in production until merged and deployed.
+
 ## 2026-09-25 Resource Intelligence review/disposition slice
 
 Branch: `claude/quirky-sagan-1m56r5`  

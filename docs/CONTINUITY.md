@@ -1,9 +1,9 @@
 # LifeOS Continuity / Resume Engine
 
-**Implementation status:** Derived resume packages are live on the existing Command Center and Today surfaces.  
+**Implementation status:** Derived resume packages are live on the existing Command Center and Today surfaces. Governed checkpoint writes (`POST /api/lifeos/continuity/checkpoint`) are added on branch `claude/quirky-sagan-1m56r5` and are not production until merged and deployed.  
 **System owner:** Continuity  
 **Canonical storage:** Vault project/resource notes plus optional `type: checkpoint` records  
-**Write model:** This slice is read-only. Checkpoint Markdown is durable when an agent or owner writes it through the existing draft-PR path.
+**Write model:** `GET /api/lifeos/continuity` stays read-only. Checkpoints are written only through `POST /api/lifeos/continuity/checkpoint`, which stages a draft PR and never writes to `main`.
 
 ## Purpose
 
@@ -53,7 +53,17 @@ Use `99 Templates/Resume Checkpoint.md` and store records under `Command Center/
 
 The conversation-closeout skill already requires this checkpoint shape. This engine consumes those records when they exist and otherwise derives the same questions from live vault/GitHub state.
 
-Canonical writes of new checkpoint notes still use the existing draft-PR approval path. This slice does not add a new write API.
+### Saving a checkpoint
+
+The resume card on the Command Center and Today has a **Save this as a checkpoint** control. It calls `POST /api/lifeos/continuity/checkpoint`, which:
+
+- is fail-closed behind the existing `LIFEOS_WRITE_ENABLED` + `LIFEOS_WRITE_SECRET` + `LIFEOS_GITHUB_TOKEN` gate, with the origin, rate-limit, and owner-secret checks running before any GitHub call;
+- snapshots the current derived resume package and applies optional fields (`title`, `project`, `lastCompleted`, `currentState`, `nextAction`, `owner`, `blocker`, `sourceOfTruth`, `doNotRepeat`, `evidence`, `sessionStatus`);
+- requires a next action;
+- writes a new record at a deterministic path under `Command Center/Checkpoints/` and returns 409 instead of overwriting an existing checkpoint;
+- stages the record as a draft PR, using the same helper as Resource Intelligence (`lib/github/draft-pr.ts`).
+
+Checkpoint frontmatter values are written as single-line, JSON-quoted strings. The vault frontmatter parser decodes them exactly, so values containing colons, quotes, or line breaks cannot corrupt the record.
 
 ## Explicitly not claimed
 

@@ -136,7 +136,7 @@ LifeOS never chooses the disposition and never implements a resource. Merging th
 - Uses `LIFEOS_GITHUB_TOKEN` server-side only.
 - Checks same-origin policy and rate limits intake requests.
 - Creates a branch and **draft pull request** for every canonical Resource mutation, including review decisions.
-- Intake and review share one GitHub write helper (`lib/resource-intelligence/github-write.ts`).
+- Intake and review share one GitHub draft-PR helper (`lib/github/draft-pr.ts`), which Continuity checkpoints also use.
 - Never writes directly to `main`.
 - File metadata intake does not upload or persist file bytes.
 - The owner secret entered in the web UI is component state only and is not written to browser storage.

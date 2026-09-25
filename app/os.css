@@ -298,6 +298,22 @@
   resize: vertical;
 }
 
+.os-review-form summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.os-review-form .os-inline-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.os-review-form .os-inline-check input {
+  width: auto;
+  min-height: 0;
+}
+
 .os-project-meta {
   display: grid;
   gap: 6px;

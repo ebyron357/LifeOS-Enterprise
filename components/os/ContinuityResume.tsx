@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ResumeItem, ResumePackage } from "@/lib/continuity/model";
+import { CheckpointSaver } from "./CheckpointSaver";
 
 function ItemList({ items, empty }: { items: ResumeItem[]; empty: string }) {
   if (!items.length) return <p>{empty}</p>;
@@ -65,6 +66,7 @@ export function ContinuityResume({ resume }: { resume: ResumePackage }) {
         </Link>
         {resume.focus ? <Link className="os-secondary" href={resume.focus.href}>Open {resume.focus.name}</Link> : null}
       </div>
+      <CheckpointSaver defaultNextAction={resume.next.detail} />
     </section>
   );
 }

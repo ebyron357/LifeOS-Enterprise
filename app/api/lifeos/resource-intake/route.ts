@@ -13,7 +13,7 @@ import {
   RESOURCE_REPO_NAME,
   RESOURCE_REPO_OWNER,
   statusFromError,
-} from "@/lib/resource-intelligence/github-write";
+} from "@/lib/github/draft-pr";
 import {
   normalizeResource,
   renderResourceRecord,

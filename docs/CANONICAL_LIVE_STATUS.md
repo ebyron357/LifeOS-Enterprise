@@ -5,14 +5,14 @@
 **Canonical branch:** `main`  
 **Production URL:** `https://lifeos-enterprise.vercel.app/`  
 **Released version:** `1.0.0`  
-**Last application-code baseline on main:** `df4b182bae4884a482bd2efd652a07783f9b6111` — PR #70 Prompt Intelligence  
-**Prior recorded baselines:** `1ae3fddb65b75c08127b7fef995d5ff37926f80a` — PR #69 Continuity; `45d5d018599e7b7d308523a3f38bf9ccf62e2c94` — PR #68 GitHub evidence; `7982c92a7080f60f9fb70e7c66c5220b8178bc35` — PR #64 performance hardening.  
+**Last application-code baseline on main:** `6bf7e2aff9920ba868de7381e0e68ae75d9866c7` — PR #71 Resource review and disposition  
+**Prior recorded baselines:** `df4b182bae4884a482bd2efd652a07783f9b6111` — PR #70 Prompt Intelligence; `1ae3fddb65b75c08127b7fef995d5ff37926f80a` — PR #69 Continuity; `45d5d018599e7b7d308523a3f38bf9ccf62e2c94` — PR #68 GitHub evidence; `7982c92a7080f60f9fb70e7c66c5220b8178bc35` — PR #64 performance hardening.  
 **Live identity source:** GitHub `main` for repository head; Vercel production deployment for deployed SHA/ID. Query both at report or acceptance time.  
 **Owner acceptance:** not complete
 
 ## Governing status
 
-**LifeOS Enterprise V1.0 is built on `main`. After PR #64, PRs #66 and #68 merged Resource Intelligence intake and GitHub evidence, PR #69 merged Continuity / resume packages, and PR #70 merged Prompt Intelligence. All four are merged and were observed in a READY Vercel production deployment on 2026-09-25. Repository head and production deployment identity are live operational facts and must be read from GitHub and Vercel when a status report or acceptance run begins.**
+**LifeOS Enterprise V1.0 is built on `main`. After PR #64, PRs #66 and #68 merged Resource Intelligence intake and GitHub evidence, PR #69 merged Continuity / resume packages, PR #70 merged Prompt Intelligence, and PR #71 merged the Resource Intelligence owner review/disposition surface. All five are merged and were observed in a READY Vercel production deployment on 2026-09-25. Repository head and production deployment identity are live operational facts and must be read from GitHub and Vercel when a status report or acceptance run begins.**
 
 The prior status edition is superseded because the post-#60 security corrective, the unified-command-center rebuild, and the Resource Intelligence, Continuity, and Prompt Intelligence slices have since merged and deployed:
 
@@ -24,6 +24,7 @@ The prior status edition is superseded because the post-#60 security corrective,
 - PRs #66 and #68 merged Universal Resource Intelligence durable intake and the read-only, source-grounded GitHub evidence processor.
 - PR #69 merged derived Continuity / resume packages on the existing Command Center and Today surfaces, `GET /api/lifeos/continuity`, and the "where was I" voice command.
 - PR #70 merged Prompt Intelligence: canonical `type: prompt` records under `40 Resources/Prompts/`, the `/prompts` library, exact-body dedupe and versioning, Continuity prompt linkage, and the read-only `GET /api/lifeos/prompts` agent API.
+- PR #71 merged Resource Intelligence owner review: `/resources/review` with six state lanes and suggestion-only duplicate candidates, and `POST /api/lifeos/resource-review`, which records an owner-entered disposition through a draft PR only. It also hardened request handling for intake and review and fixed an intermittent test-teardown CI failure.
 
 Automated validation and a successful production deployment do **not** equal owner acceptance. Until the owner completes `docs/OWNER_ACCEPTANCE_WORKBOOK.md`, the allowed success statement remains:
 
@@ -65,6 +66,7 @@ The following capabilities are present on the current production deployment:
 - Resource Intelligence durable intake (PR #66) and read-only GitHub evidence inspection (PR #68), with disposition still owner-reviewed
 - Derived Continuity / resume packages on Command Center and Today (PR #69); they do not invent Slack, ClickUp, email, or calendar state
 - Prompt Intelligence canonical library at `/prompts` (PR #70); it reuses `40 Resources/Prompts/` and does not create a second command center or a second intake path
+- Resource Intelligence owner review at `/resources/review` (PR #71): state lanes, due-review flags, suggestion-only duplicate candidates, and a fail-closed draft-PR decision write
 
 ## Current integration and activation state
 
@@ -96,13 +98,20 @@ The production Command Center currently distinguishes available/connected capabi
 - Haitian Creole and French voice locales may be prepared but are not represented as owner-verified without live evidence.
 - Dataview and Obsidian Bases are not executed by the web server.
 - Hermes is an adapter contract, not an active runtime, until a real endpoint/token and reachability evidence exist.
-- Resource Intelligence intake and GitHub evidence are in production. The owner review/disposition surface (`/resources/review`, `POST /api/lifeos/resource-review`) is implemented on branch `claude/quirky-sagan-1m56r5` and is not production until merged and deployed. Semantic dedupe, source extraction, asset factory, automated scoring, and the Issue #56 end-to-end candidate proof remain unimplemented.
-- Continuity derives resume state from vault + GitHub + optional checkpoint notes. It does not yet persist checkpoints by itself and does not reconstruct unauthorized external systems.
+- Resource Intelligence intake and GitHub evidence are in production. The owner review/disposition surface (`/resources/review`, `POST /api/lifeos/resource-review`) is in production (PR #71); on 2026-09-25 its service reported `enabled: true, configured: false`, so decision writes stay fail-closed until the owner secret and GitHub token are both configured. Semantic dedupe, source extraction, asset factory, automated scoring, and the Issue #56 end-to-end candidate proof remain unimplemented.
+- Continuity derives resume state from vault + GitHub + optional checkpoint notes and does not reconstruct unauthorized external systems. Governed checkpoint writes through a draft PR are implemented on branch `claude/quirky-sagan-1m56r5` and are not production until merged and deployed.
 - Prompt Intelligence is read-only on the web: prompts are authored as vault Markdown and changed through the existing draft-PR path. It adds no new write API, and recommendation is deterministic and conservative, not model-generated.
 
 ## Verified release evidence
 
 ### Last application-code baseline
+
+PR #71 merged Resource Intelligence owner review/disposition at:
+
+- Git SHA: `6bf7e2aff9920ba868de7381e0e68ae75d9866c7`
+- Exact PR head `1ac283b` passed Dashboard CI (lint, typecheck, 358 unit tests, build, Playwright including WebKit), the PowerShell vault audit, and the Cursor security review before merge.
+
+### Prior application-code baselines
 
 PR #70 merged Prompt Intelligence at:
 
@@ -110,8 +119,6 @@ PR #70 merged Prompt Intelligence at:
 - Commit: `feat(prompts): add canonical Prompt Intelligence on existing vault (#70)`
 - 2026-09-25 agent revalidation on this exact SHA: `npm ci` PASS, `npm run lint` PASS, `npm run typecheck` PASS, `npm test` PASS (61 files / 333 tests), `npm run build` PASS (34 static pages), `npm audit --audit-level=high` PASS (0 vulnerabilities), `pwsh -File ./scripts/audit-vault.ps1` PASS (153 notes).
 - Playwright was not rerun in this revalidation.
-
-### Prior application-code baselines
 
 PR #64 merged application performance/dependency hardening at:
 
@@ -132,7 +139,7 @@ At the start of every status report, release check, rollback, or owner-acceptanc
 4. If production points at a documentation-only commit after the last application-code baseline, state both facts separately.
 5. Never infer deployed identity from repository head, and never use a historical deployment ID as though it were current.
 
-Historical evidence: PR #64 was verified READY in Vercel at deployment `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx`. PR #65 was a documentation-only reconciliation and subsequently produced a different READY production SHA without changing application code. On 2026-09-25, PR #70 (`df4b182`) was observed READY in Vercel production at deployment `dpl_3A2f8wqnpBTkHiyHcFTftXpiQF6c`, and PR #69 (`1ae3fdd`) at `dpl_HLUQQeSkJbpePq4j2EDWXgYkt9SE`. These IDs are retained only as evidence examples, not as current-state claims.
+Historical evidence: PR #64 was verified READY in Vercel at deployment `dpl_8QLjAaMSmsYs1VKAUBKCxqipXGCx`. PR #65 was a documentation-only reconciliation and subsequently produced a different READY production SHA without changing application code. On 2026-09-25, PR #71 (`6bf7e2a`) was observed READY in Vercel production at deployment `dpl_EXRsoAHWuM7DqPUhqCE43XSZYLrs`, with `/resources/review` and `GET /api/lifeos/resource-review` returning 200. Earlier the same day, PR #70 (`df4b182`) was observed READY at deployment `dpl_3A2f8wqnpBTkHiyHcFTftXpiQF6c`, and PR #69 (`1ae3fdd`) at `dpl_HLUQQeSkJbpePq4j2EDWXgYkt9SE`. These IDs are retained only as evidence examples, not as current-state claims.
 
 ### PR #62 agent validation
 
@@ -184,14 +191,15 @@ These are agent validation records, not owner acceptance.
 - PR #67: merged documentation-only live-identity reconciliation.
 - PR #68: merged source-grounded GitHub evidence processor at `45d5d018599e7b7d308523a3f38bf9ccf62e2c94`.
 - PR #69: merged derived Continuity / resume packages at `1ae3fddb65b75c08127b7fef995d5ff37926f80a`; a READY production deployment exists for this SHA.
-- PR #70: merged Prompt Intelligence at `df4b182bae4884a482bd2efd652a07783f9b6111`, the current application-code baseline; a READY production deployment exists for this SHA.
+- PR #70: merged Prompt Intelligence at `df4b182bae4884a482bd2efd652a07783f9b6111`; a READY production deployment exists for this SHA.
+- PR #71: merged Resource Intelligence owner review/disposition at `6bf7e2aff9920ba868de7381e0e68ae75d9866c7`, the current application-code baseline; a READY production deployment exists for this SHA.
 
 ## Remaining owner work
 
 1. At the start of the acceptance session, query Vercel and record the exact READY production deployment ID + SHA in `docs/OWNER_ACCEPTANCE_WORKBOOK.md`; then complete the workbook against that exact candidate.
 2. Verify the new root Command Center and mobile navigation through the owner journeys: resume work, capture, journal, learning, Ask LifeOS, integration health, and back/forward behavior.
 3. Complete live microphone, voice preview/interrupt/mute, screen-share request/deny/stop, and paid-TTS authorization checks where the relevant provider is intentionally enabled.
-4. Enable canonical/external writes only if intentionally desired and only after `LIFEOS_WRITE_SECRET`, durable Redis approvals, origin controls, and the specific tool credentials are configured together.
+4. Enable canonical/external writes only if intentionally desired and only after `LIFEOS_WRITE_SECRET`, durable Redis approvals, origin controls, and the specific tool credentials are configured together. As of 2026-09-25, production reports `LIFEOS_WRITE_ENABLED=true` but the governed write services report `configured: false`, so `LIFEOS_WRITE_SECRET` and/or `LIFEOS_GITHUB_TOKEN` are not both set; resource intake, resource review, and checkpoint writes stay fail-closed until they are.
 5. Verify approval-required actions fail closed without the owner write secret and durable store.
 6. Run or obtain a clean final full parallel browser suite if it is required for owner acceptance; PR #62 did not claim that final suite as fully clean.
 7. Complete local Windows/Obsidian visual checks when access to the actual workstation is available.
@@ -200,8 +208,8 @@ These are agent validation records, not owner acceptance.
 
 These are platform-development items, not reasons to misreport the current deployment as absent:
 
-1. Universal Resource Intelligence: merge and deploy the review/disposition slice, add processors beyond GitHub, and run the Issue #56 acceptance candidate.
-2. Continuity checkpoint writes through the existing draft-PR path; Graphiti/Cognee only as later vault indexes.
+1. Universal Resource Intelligence: add processors beyond GitHub and run the Issue #56 acceptance candidate once the owner write path is configured.
+2. Continuity: merge and deploy checkpoint writes; Graphiti/Cognee only as later vault indexes.
 3. Prompt Intelligence authoring/versioning through the existing draft-PR path and canonicalization of prompts extracted by Resource Intelligence.
 4. Platform capability registry.
 5. Cognitive-tool registry and scoring.
