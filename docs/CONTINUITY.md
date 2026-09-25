@@ -1,6 +1,6 @@
 # LifeOS Continuity / Resume Engine
 
-**Implementation status:** Derived resume packages are live on the existing Command Center and Today surfaces. Governed checkpoint writes (`POST /api/lifeos/continuity/checkpoint`) are added on branch `claude/quirky-sagan-1m56r5` and are not production until merged and deployed.  
+**Implementation status:** Derived resume packages are live on the existing Command Center and Today surfaces. Governed checkpoint writes (`POST /api/lifeos/continuity/checkpoint`) are in production (PR #72) and stay fail-closed until the owner write secret and GitHub token are both configured.  
 **System owner:** Continuity  
 **Canonical storage:** Vault project/resource notes plus optional `type: checkpoint` records  
 **Write model:** `GET /api/lifeos/continuity` stays read-only. Checkpoints are written only through `POST /api/lifeos/continuity/checkpoint`, which stages a draft PR and never writes to `main`.

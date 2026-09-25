@@ -3,6 +3,33 @@
 Date: 2026-07-14
 Repository: `ebyron357/LifeOS-Enterprise`
 
+## 2026-09-25 Checkpoint path concurrency fix
+
+Branch: `claude/quirky-sagan-1m56r5` (restarted from `main` after PR #72 merged)  
+Base SHA: `03657b621c2956c095c2e168f11ff159c3449651` (PR #72, READY in Vercel production at `dpl_5asoJhWnXGbZWuqEg3iHomF3Z9VE`)
+
+PR #72 merged before its review fix was pushed, so this carries that fix onto `main`.
+
+### Repairs completed
+
+- Each checkpoint save adds a random nonce to its path. Previously two saves for the same project in the same millisecond produced the same path, both passed the existence check, and both opened draft PRs.
+- `sessionStatus` must be a string; the title and next action are collapsed and bounded before use; a whitespace-only next action is rejected.
+- Status docs record PR #71 and #72 as merged and deployed.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| `npm run lint` / `npm run typecheck` | PASS |
+| `npm test` | PASS — 64 files, 370 tests |
+| `npm run build` | PASS |
+| `pwsh -NoProfile -File ./scripts/audit-vault.ps1` | PASS |
+| Production `GET /api/lifeos/continuity/checkpoint` | 200, `enabled: true, configured: false` |
+
+### Final state
+
+**AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED.**
+
 ## 2026-09-25 Continuity checkpoint writes
 
 Branch: `claude/quirky-sagan-1m56r5` (restarted from `main` after PR #71 merged)  
