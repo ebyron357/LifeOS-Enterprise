@@ -2,6 +2,22 @@ export function normalizeNewlines(source: string): string {
   return source.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 }
 
+/**
+ * Double-quoted scalars are decoded with JSON rules so escaped quotes and backslashes
+ * written by LifeOS round-trip exactly; anything else keeps the historical quote strip.
+ */
+function decodeScalar(raw: string): string {
+  if (raw.length >= 2 && raw.startsWith('"') && raw.endsWith('"')) {
+    try {
+      const decoded: unknown = JSON.parse(raw);
+      if (typeof decoded === "string") return decoded;
+    } catch {
+      // Not JSON-compatible (for example a YAML-only escape); fall back below.
+    }
+  }
+  return raw.replace(/^['"]|['"]$/g, "");
+}
+
 export function parseFrontmatter(source: string): { frontmatter: Record<string, unknown>; body: string } {
   const text = normalizeNewlines(source);
   if (!text.startsWith("---\n")) {
@@ -21,7 +37,7 @@ export function parseFrontmatter(source: string): { frontmatter: Record<string, 
     if (!match) continue;
 
     const key = match[1];
-    let value: unknown = match[2].trim().replace(/^['"]|['"]$/g, "");
+    let value: unknown = decodeScalar(match[2].trim());
 
     if (value === "true") value = true;
     else if (value === "false") value = false;

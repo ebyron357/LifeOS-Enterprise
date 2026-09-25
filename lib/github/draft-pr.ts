@@ -1,6 +1,7 @@
 import { Buffer } from "node:buffer";
 import { randomBytes } from "node:crypto";
 
+/** Canonical vault repository for governed draft-PR writes. Writes never target main directly. */
 export const RESOURCE_REPO_OWNER = "ebyron357";
 export const RESOURCE_REPO_NAME = "LifeOS-Enterprise";
 export const RESOURCE_BASE_BRANCH = "main";
@@ -64,7 +65,7 @@ export async function cleanupBranch(branch: string, token: string) {
       { method: "DELETE" },
     );
   } catch (error) {
-    console.error("lifeos_resource_cleanup_failed", {
+    console.error("lifeos_draft_pr_cleanup_failed", {
       branch,
       message: error instanceof Error ? error.message : "unknown",
     });

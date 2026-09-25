@@ -2,6 +2,14 @@ import { Buffer } from "node:buffer";
 import { NextResponse } from "next/server";
 import { validOrigin, withinAgentRateLimit } from "@/lib/agent/http";
 import {
+  buildCheckpoint,
+  isCheckpointRecordPath,
+  parseCheckpointOverrides,
+  renderCheckpointRecord,
+  resumePackageToCheckpoint,
+} from "@/lib/continuity/checkpoint";
+import { getContinuityResumePackage } from "@/lib/continuity/sources";
+import {
   cleanupBranch,
   encodeRepoPath,
   github,
@@ -14,16 +22,10 @@ import {
   RESOURCE_REPO_OWNER,
   statusFromError,
 } from "@/lib/github/draft-pr";
-import {
-  applyResourceReview,
-  isResourceRecordPath,
-  parseReviewDecision,
-  REVIEW_ARCHITECTURES,
-  REVIEW_DISPOSITIONS,
-} from "@/lib/resource-intelligence/review";
 import { authorizeVoiceRequest } from "@/lib/voice/security";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const OWNER = RESOURCE_REPO_OWNER;
 const REPO = RESOURCE_REPO_NAME;
@@ -41,13 +43,11 @@ export async function GET() {
     configured: resourceWritesConfigured(),
     mode: "draft-pr-only",
     directMainWrites: false,
-    architectures: REVIEW_ARCHITECTURES,
-    dispositions: REVIEW_DISPOSITIONS,
+    folder: "Command Center/Checkpoints",
     capabilities: {
-      ownerReviewedDisposition: true,
-      automaticDisposition: false,
-      autoImplementation: false,
-      revisionRequiresExplicitFlag: true,
+      snapshotFromDerivedResume: true,
+      ownerOverrides: true,
+      overwriteExisting: false,
     },
   });
 }
@@ -64,31 +64,23 @@ export async function POST(request: Request) {
 
   const read = await readBoundedJsonObject(request, MAX_BODY_BYTES);
   if (!read.ok) return jsonError(read.error, read.status);
-  const body = read.value;
 
-  const path = typeof body.path === "string" ? body.path.trim() : "";
-  if (!isResourceRecordPath(path)) {
-    return jsonError("path must be a canonical Resource Intelligence record.", 400);
-  }
-
-  const parsed = parseReviewDecision(body.decision);
+  const parsed = parseCheckpointOverrides(read.value.checkpoint);
   if (!parsed.ok) return jsonError(parsed.error, 400);
-  const decision = parsed.decision;
+
+  const capturedAt = new Date().toISOString();
+  const resume = await getContinuityResumePackage();
+  const checkpoint = buildCheckpoint(resumePackageToCheckpoint(resume, capturedAt), parsed.overrides);
+  if (!checkpoint.nextAction) return jsonError("A checkpoint needs a next action.", 400);
+  if (!isCheckpointRecordPath(checkpoint.path)) return jsonError("Could not derive a canonical checkpoint path.", 500);
 
   let existing;
   try {
-    existing = await readCanonicalFile(path, token);
+    existing = await readCanonicalFile(checkpoint.path, token);
   } catch (error) {
-    return jsonError(error instanceof Error ? error.message : "Could not read the canonical record.", statusFromError(error));
+    return jsonError(error instanceof Error ? error.message : "Could not check the checkpoint path.", statusFromError(error));
   }
-  if (!existing) return jsonError("Canonical resource record not found on main.", 404);
-
-  let review;
-  try {
-    review = applyResourceReview(existing.source, decision, new Date().toISOString());
-  } catch (error) {
-    return jsonError(error instanceof Error ? error.message : "Review could not be applied.", 409);
-  }
+  if (existing) return jsonError("A checkpoint already exists at this path; checkpoints are never overwritten.", 409);
 
   let ref;
   try {
@@ -99,9 +91,8 @@ export async function POST(request: Request) {
   const object = ref.object as { sha?: string } | undefined;
   if (!object?.sha) return jsonError("Could not resolve main branch.", 502);
 
-  const slug = path.split("/").pop()!.replace(/\.md$/, "");
-  const branch = resourceBranchName("resource-review", slug);
-  const title = path.split("/").pop()!;
+  const slug = checkpoint.path.split("/").pop()!.replace(/\.md$/, "");
+  const branch = resourceBranchName("checkpoint", slug);
 
   try {
     await github(`/repos/${OWNER}/${REPO}/git/refs`, token, {
@@ -109,54 +100,48 @@ export async function POST(request: Request) {
       body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: object.sha }),
     });
 
-    await github(`/repos/${OWNER}/${REPO}/contents/${encodeRepoPath(path)}`, token, {
+    await github(`/repos/${OWNER}/${REPO}/contents/${encodeRepoPath(checkpoint.path)}`, token, {
       method: "PUT",
       body: JSON.stringify({
-        message: `docs(resource): review ${slug} as ${decision.disposition}`,
-        content: Buffer.from(review.markdown).toString("base64"),
+        message: `docs(continuity): checkpoint ${checkpoint.project || "LifeOS"}`,
+        content: Buffer.from(renderCheckpointRecord(checkpoint)).toString("base64"),
         branch,
-        sha: existing.sha,
       }),
     });
 
     const pull = await github(`/repos/${OWNER}/${REPO}/pulls`, token, {
       method: "POST",
       body: JSON.stringify({
-        title: `resource review: ${decision.disposition} ${title}`,
+        title: `checkpoint: ${checkpoint.title}`,
         head: branch,
         base: BASE,
         draft: true,
         body: [
-          "## LifeOS Resource Intelligence review",
+          "## LifeOS Continuity checkpoint",
           "",
-          `- Canonical record: \`${path}\``,
-          `- Previous disposition: \`${review.previousDisposition}\``,
-          `- Architecture classification: \`${decision.architectureClassification}\``,
-          `- Disposition: \`${decision.disposition}\``,
-          `- Rationale: ${decision.rationale}`,
+          `- Record: \`${checkpoint.path}\``,
+          `- Project: ${checkpoint.project || "LifeOS"}`,
+          `- Next action: ${checkpoint.nextAction}`,
+          `- Session status: \`${checkpoint.sessionStatus}\``,
           "",
-          "This decision was entered by the owner. LifeOS did not choose the disposition and does not implement it.",
-          "Merging this draft PR records the decision; it never writes directly to main.",
+          "Snapshot of the derived resume package plus any supplied fields. Merging records it; this never writes directly to main.",
         ].join("\n"),
       }),
     });
 
     return NextResponse.json({
       ok: true,
-      path,
-      previousDisposition: review.previousDisposition,
-      decision: {
-        architectureClassification: decision.architectureClassification,
-        disposition: decision.disposition,
+      path: checkpoint.path,
+      checkpoint: {
+        title: checkpoint.title,
+        project: checkpoint.project,
+        nextAction: checkpoint.nextAction,
+        sessionStatus: checkpoint.sessionStatus,
       },
-      pullRequest: {
-        number: pull.number ?? null,
-        url: pull.html_url ?? null,
-        draft: true,
-      },
+      pullRequest: { number: pull.number ?? null, url: pull.html_url ?? null, draft: true },
     });
   } catch (error) {
     await cleanupBranch(branch, token);
-    return jsonError(error instanceof Error ? error.message : "Resource review draft PR failed.", statusFromError(error));
+    return jsonError(error instanceof Error ? error.message : "Checkpoint draft PR failed.", statusFromError(error));
   }
 }

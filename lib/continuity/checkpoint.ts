@@ -61,52 +61,128 @@ export function parseCheckpointRecord(path: string, source: string): ContinuityC
   return parseCheckpointFromFields(path, frontmatter, body);
 }
 
+function oneLine(value: string, max = 500): string {
+  return value.replace(/[\r\n]+/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
+}
+
+function yamlValue(value: string): string {
+  return JSON.stringify(oneLine(value));
+}
+
+function bullet(value: string): string {
+  return `- ${oneLine(value) || "none"}`;
+}
+
+function bullets(values: string[]): string {
+  const lines = values.map((item) => oneLine(item)).filter(Boolean);
+  return lines.length ? lines.map((item) => `- ${item}`).join("\n") : "- none";
+}
+
 export function renderCheckpointRecord(input: ContinuityCheckpointInput): string {
+  const title = oneLine(input.title, 160) || "Resume checkpoint";
   return `---
 type: checkpoint
 status: ${input.sessionStatus === "CLOSED" ? "complete" : "active"}
-title: ${input.title}
-project: ${input.project}
-owner: ${input.owner}
-captured_at: ${input.capturedAt}
-last_completed: ${input.lastCompleted}
-current_state: ${input.currentState}
-next_action: ${input.nextAction}
-source_of_truth: ${input.sourceOfTruth}
-blocker: ${input.blocker}
+title: ${yamlValue(title)}
+project: ${yamlValue(input.project)}
+owner: ${yamlValue(input.owner)}
+captured_at: ${yamlValue(input.capturedAt)}
+last_completed: ${yamlValue(input.lastCompleted)}
+current_state: ${yamlValue(input.currentState)}
+next_action: ${yamlValue(input.nextAction)}
+source_of_truth: ${yamlValue(input.sourceOfTruth)}
+blocker: ${yamlValue(input.blocker)}
 session_status: ${input.sessionStatus}
-review_date: ${input.capturedAt.slice(0, 10)}
+review_date: ${yamlValue(input.capturedAt.slice(0, 10))}
 tags:
   - checkpoint
   - continuity
 ---
 
-# ${input.title}
+# ${title}
 
 ## LAST COMPLETED
-- ${input.lastCompleted || "none"}
+${bullet(input.lastCompleted)}
 
 ## CURRENT STATE
-- ${input.currentState || "none"}
+${bullet(input.currentState)}
 
 ## NEXT ACTION
-- ${input.nextAction || "none"}
+${bullet(input.nextAction)}
 
 ## SOURCE OF TRUTH
-- ${input.sourceOfTruth || "none"}
+${bullet(input.sourceOfTruth)}
 
 ## BLOCKER
-- ${input.blocker || "none"}
+${bullet(input.blocker)}
 
 ## DO NOT REPEAT
-${input.doNotRepeat.length ? input.doNotRepeat.map((item) => `- ${item}`).join("\n") : "- none"}
+${bullets(input.doNotRepeat)}
 
 ## EVIDENCE
-${input.evidence.length ? input.evidence.map((item) => `- ${item}`).join("\n") : "- none"}
+${bullets(input.evidence)}
 
 ## SESSION STATUS
 - ${input.sessionStatus}
 `;
+}
+
+export type CheckpointOverrides = Partial<
+  Pick<ContinuityCheckpointInput, "title" | "project" | "lastCompleted" | "currentState" | "nextAction" | "owner" | "blocker" | "sourceOfTruth">
+> & { doNotRepeat?: string[]; evidence?: string[]; sessionStatus?: "OPEN" | "CLOSED" };
+
+const OVERRIDE_FIELDS = ["title", "project", "lastCompleted", "currentState", "nextAction", "owner", "blocker", "sourceOfTruth"] as const;
+
+export function parseCheckpointOverrides(input: unknown): { ok: true; overrides: CheckpointOverrides } | { ok: false; error: string } {
+  if (input === undefined || input === null) return { ok: true, overrides: {} };
+  if (typeof input !== "object" || Array.isArray(input)) return { ok: false, error: "checkpoint must be an object." };
+  const raw = input as Record<string, unknown>;
+  const overrides: CheckpointOverrides = {};
+  for (const field of OVERRIDE_FIELDS) {
+    const value = raw[field];
+    if (value === undefined) continue;
+    if (typeof value !== "string") return { ok: false, error: `${field} must be a string.` };
+    const cleaned = oneLine(value);
+    if (cleaned) overrides[field] = cleaned;
+  }
+  for (const field of ["doNotRepeat", "evidence"] as const) {
+    const value = raw[field];
+    if (value === undefined) continue;
+    if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
+      return { ok: false, error: `${field} must be a list of strings.` };
+    }
+    overrides[field] = (value as string[]).map((item) => oneLine(item)).filter(Boolean).slice(0, 20);
+  }
+  if (raw.sessionStatus !== undefined) {
+    const status = String(raw.sessionStatus).toUpperCase();
+    if (status !== "OPEN" && status !== "CLOSED") return { ok: false, error: "sessionStatus must be OPEN or CLOSED." };
+    overrides.sessionStatus = status;
+  }
+  return { ok: true, overrides };
+}
+
+/** Combines the derived snapshot with owner/agent-supplied fields; the path is always recomputed. */
+export function buildCheckpoint(
+  snapshot: ContinuityCheckpointInput,
+  overrides: CheckpointOverrides,
+): ContinuityCheckpointInput {
+  const merged: ContinuityCheckpointInput = {
+    ...snapshot,
+    ...overrides,
+    doNotRepeat: overrides.doNotRepeat ?? snapshot.doNotRepeat,
+    evidence: overrides.evidence ?? snapshot.evidence,
+    sessionStatus: overrides.sessionStatus ?? snapshot.sessionStatus,
+  };
+  const project = merged.project || "LifeOS";
+  return {
+    ...merged,
+    title: merged.title || `Resume checkpoint — ${project}`,
+    path: checkpointRecordPath(merged.capturedAt, project),
+  };
+}
+
+export function isCheckpointRecordPath(path: string): boolean {
+  return new RegExp(`^${CHECKPOINT_FOLDER}/\\d{4}-\\d{2}-\\d{2}-[a-z0-9-]{1,48}-[a-f0-9]{8}\\.md$`).test(path);
 }
 
 export function resumePackageToCheckpoint(resume: ResumePackage, capturedAt: string): ContinuityCheckpointInput {

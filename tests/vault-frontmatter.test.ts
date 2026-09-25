@@ -15,4 +15,23 @@ describe("frontmatter parsing", () => {
     expect(frontmatter).toEqual({});
     expect(body).toContain("No frontmatter");
   });
+
+  it("decodes JSON-escaped double-quoted scalars and keeps legacy quoting", () => {
+    const source = [
+      "---",
+      'title: "Resume: \\"alpha\\" plan"',
+      "note: 'single quoted'",
+      'path: "C:\\\\vault"',
+      'flag: "true"',
+      'bad: "unterminated \\q"',
+      "---",
+      "",
+    ].join("\n");
+    const { frontmatter } = parseFrontmatter(source);
+    expect(frontmatter.title).toBe('Resume: "alpha" plan');
+    expect(frontmatter.note).toBe("single quoted");
+    expect(frontmatter.path).toBe("C:\\vault");
+    expect(frontmatter.flag).toBe(true);
+    expect(frontmatter.bad).toBe("unterminated \\q");
+  });
 });
