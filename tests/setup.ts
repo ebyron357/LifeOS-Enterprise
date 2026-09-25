@@ -1,6 +1,13 @@
 import "@testing-library/jest-dom/vitest";
-import { vi } from "vitest";
+import { cleanup } from "@testing-library/react";
+import { afterEach, vi } from "vitest";
 import React from "react";
+
+// Vitest globals are off, so Testing Library cannot register its own auto-cleanup.
+// Unmount after every test so React never schedules work after jsdom is torn down.
+afterEach(() => {
+  cleanup();
+});
 
 vi.mock("motion/react", () => {
   const passthrough = ({ children, ...props }: { children?: React.ReactNode } & Record<string, unknown>) =>

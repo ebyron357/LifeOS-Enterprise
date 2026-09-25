@@ -3,6 +3,66 @@
 Date: 2026-07-14
 Repository: `ebyron357/LifeOS-Enterprise`
 
+## 2026-09-25 Resource Intelligence review/disposition slice
+
+Branch: `claude/quirky-sagan-1m56r5`  
+Base SHA: `df4b182bae4884a482bd2efd652a07783f9b6111`
+
+### Repairs completed
+
+- Added `/resources/review`, which puts canonical Resource records in six lanes (Needs review, Processing, Implementation, Watch, Completed, Archived), flags due reviews, shows exact-duplicate capture counts, and lists suggestion-only duplicate candidates (likely forks and titles sharing at least 60% of their words).
+- Added `POST /api/lifeos/resource-review`, which records an owner-entered architecture classification and disposition through a draft PR only. It is fail-closed behind the existing write secret and GitHub token, validates the record path, requires a rationale, refuses a silent overwrite of an earlier review, and keeps Capture History and source identity.
+- Moved the shared GitHub draft-PR helpers into `lib/resource-intelligence/github-write.ts`. Both intake and review now enforce the body-size limit on the bytes actually received (not the client's `Content-Length`), return a structured 400 for non-object JSON, and use a random branch suffix so concurrent submissions cannot collide.
+- Review dates must be real calendar dates, and the review page lists only records the write route accepts.
+- Test setup now unmounts React trees after every test, which fixes an intermittent `window is not defined` CI failure (about 1 in 5 runs).
+- Added Resource review to the advanced navigation and updated `docs/RESOURCE_INTELLIGENCE.md`, `docs/CANONICAL_LIVE_STATUS.md`, and `docs/WEB_VAULT_PORTAL.md`.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 63 files, 358 tests (25 new review/intake tests) |
+| `npm run build` | PASS — 35 static pages |
+| `npm audit --audit-level=high` | PASS — 0 vulnerabilities |
+| `pwsh -NoProfile -File ./scripts/audit-vault.ps1` | PASS |
+| Browser check of `/resources/review` (Chromium, 1280px and 390px, production build, temporary local record removed afterwards) | PASS — 6 lanes render, 0 page errors, no horizontal scroll, form shows fail-closed notice |
+
+### Final state
+
+**AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED.** Not in production until merged and deployed. Running the Issue #56 candidate end to end needs the owner write path configured.
+
+## 2026-09-25 post-#70 revalidation and status reconciliation
+
+Branch: `claude/quirky-sagan-1m56r5`  
+Validated SHA: `df4b182bae4884a482bd2efd652a07783f9b6111` (PR #70 Prompt Intelligence, current `main`)  
+Production: Vercel deployment `dpl_3A2f8wqnpBTkHiyHcFTftXpiQF6c` observed READY on the same SHA.
+
+### Repairs completed
+
+- Reconciled `docs/CANONICAL_LIVE_STATUS.md`: Continuity (PR #69) and Prompt Intelligence (PR #70) are now recorded as merged and deployed rather than pending, the application-code baseline moved to PR #70, and the Prompt Intelligence boundary and follow-up work were added.
+- No application code, vault notes, or configuration changed.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| `npm ci --no-audit --no-fund` | PASS |
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 61 files, 333 tests |
+| `npm run build` | PASS — Next.js 16.3.5 production build, 34 static pages |
+| `npm audit --audit-level=high` | PASS — 0 vulnerabilities |
+| `pwsh -NoProfile -File ./scripts/audit-vault.ps1` (PowerShell 7.4.6, Linux) | PASS — 153 notes, 36 folders, 48 system files, 10 Bases, 18 templates |
+| Playwright | Not run in this pass |
+
+### Final state
+
+**AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED**
+
+Remaining owner-only actions are unchanged: complete `docs/OWNER_ACCEPTANCE_WORKBOOK.md`, supply write/approval/integration credentials only if intentionally enabling those capabilities, and run the live microphone, screen-share, and local Windows/Obsidian checks.
+
 ## 2026-09-20 continuity / resume engine
 
 Branch: `feat/continuity-resume-engine`  

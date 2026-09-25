@@ -271,6 +271,33 @@
   resize: vertical;
 }
 
+.os-review-form {
+  display: grid;
+  gap: 12px;
+}
+
+.os-review-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.os-review-form input,
+.os-review-form select,
+.os-review-form textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  background: rgba(7, 11, 17, 0.9);
+  color: var(--text);
+  font: 1rem Arial, sans-serif;
+}
+
+.os-review-form textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
 .os-project-meta {
   display: grid;
   gap: 6px;

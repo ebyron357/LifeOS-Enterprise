@@ -67,6 +67,23 @@ describe("Resource Intelligence intake route", () => {
     expect(githubFetch).not.toHaveBeenCalled();
   });
 
+  it("returns a structured 400 for a null JSON body before GitHub access", async () => {
+    vi.stubEnv("LIFEOS_WRITE_ENABLED", "true");
+    vi.stubEnv("LIFEOS_WRITE_SECRET", "test-secret");
+    vi.stubEnv("LIFEOS_GITHUB_TOKEN", "server-only-token");
+    const githubFetch = vi.fn();
+    vi.stubGlobal("fetch", githubFetch);
+
+    const response = await POST(new Request("https://lifeos.example/api/lifeos/resource-intake", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer test-secret", Origin: "https://lifeos.example" },
+      body: "null",
+    }));
+
+    expect(response.status).toBe(400);
+    expect(githubFetch).not.toHaveBeenCalled();
+  });
+
   it("creates a draft PR for a new canonical resource and never writes main directly", async () => {
     vi.stubEnv("LIFEOS_WRITE_ENABLED", "true");
     vi.stubEnv("LIFEOS_WRITE_SECRET", "test-secret");

@@ -34,6 +34,7 @@ export const MORE_PRIMARY_NAV = PRIMARY_NAV.filter((item) => !mobileHrefs.has(it
 export const ADVANCED_NAV: OsNavItem[] = [
   { href: "/dashboard", label: "Widget workspace", intent: "more", description: "Existing Command Center widgets and layout." },
   { href: "/prompts", label: "Prompt Intelligence", intent: "review", description: "Find, reuse, and inspect canonical prompts." },
+  { href: "/resources/review", label: "Resource review", intent: "review", description: "Review captured resources and record owner dispositions." },
   { href: "/daily-brief", label: "Daily Brief", intent: "review", description: "Structured daily operations brief." },
   { href: "/templates", label: "Templates", intent: "more", description: "Reusable note templates." },
   { href: "/settings", label: "Settings", intent: "more", description: "Owner preferences and write posture." },

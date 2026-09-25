@@ -1,6 +1,6 @@
 # LifeOS Universal Resource Intelligence — Foundation
 
-**Implementation status:** Durable intake foundation merged via PR #66; read-only GitHub evidence processor merged via PR #68. Review/disposition UI and end-to-end acceptance remain open under Issue #56.  
+**Implementation status:** Durable intake foundation merged via PR #66; read-only GitHub evidence processor merged via PR #68; owner review/disposition surface and resource state lanes added on branch `claude/quirky-sagan-1m56r5` (not production until merged and deployed). End-to-end acceptance with the Issue #56 candidate remains open.  
 **System owner:** Resource Intelligence  
 **Canonical storage:** GitHub-backed Obsidian Markdown Resource records  
 **Write model:** Draft pull request only; no direct `main` writes
@@ -23,6 +23,8 @@ Quick Capture / Inbox
   → create or update one Resource Markdown record
   → create draft PR
   → owner review
+  → /resources/review: owner records architecture + disposition
+  → review draft PR (never main)
 ```
 
 GitHub inspection is read-only and does not require canonical write authorization. Canonical promotion remains fail-closed unless the existing LifeOS write authorization and GitHub write token are configured.
@@ -98,12 +100,43 @@ The processor never chooses a business disposition. `dispositionSuggestion` rema
 
 The web intake panel exposes this as **Inspect GitHub evidence** before the owner decides whether to stage a canonical Resource PR.
 
+## Owner review and disposition
+
+`/resources/review` shows every canonical record under `40 Resources/Resource Intelligence/Records/` in six lanes:
+
+| Lane | Rule |
+|---|---|
+| Needs review | disposition `PENDING` |
+| Processing | disposition `PENDING` and `processing_state: processing` |
+| Implementation | `ADOPT`, `ADAPT`, or `EXTRACT`, not yet completed |
+| Watch | `WATCH` |
+| Completed | `processing_state: completed` |
+| Archived | `ARCHIVE` or `REJECT` |
+
+Records whose `review_date` has passed are flagged as review due in the Needs review, Processing, and Watch lanes. Records captured more than once show the exact-duplicate capture count.
+
+The page also lists **possible duplicates** across different exact identities: GitHub repositories with the same name under different owners (possible forks), and records whose titles share at least 60% of their words. These are suggestions only. Nothing is merged, and the owner decides in review whether two records describe the same resource.
+
+The owner records a decision with `POST /api/lifeos/resource-review` (`lib/resource-intelligence/review.ts`):
+
+- The disposition must be one of `ADOPT / ADAPT / EXTRACT / WATCH / ARCHIVE / REJECT`; `PENDING` is not a decision.
+- A source-grounded rationale of at least 12 characters is required.
+- `ADOPT` and `ADAPT` require a `PLATFORM`, `TEMPLATE`, or `PROJECT` classification.
+- `WATCH` requires a next review date.
+- Optional review fields: evidence, stack overlap, value/effort/risk (`low / medium / high`), license, and cost. They are stored as `stack_overlap`, `value_rating`, `effort_rating`, `risk_rating`, `license_review`, and `cost_review`.
+- An already-reviewed record is never overwritten silently. A revision requires `revise: true` and is appended to Review History with the previous disposition.
+- The decision updates `status`, `processing_state`, `architecture_classification`, `disposition`, `reviewed_at`, `next_action`, and the Evaluation section, and appends a `## Review History` entry. Source identity and Capture History are untouched, and a later re-capture keeps the review.
+- The target path must match the canonical Records folder; any other path is rejected before GitHub access.
+
+LifeOS never chooses the disposition and never implements a resource. Merging the review draft PR records the owner's decision.
+
 ## Security and governance
 
 - Uses the existing `LIFEOS_WRITE_ENABLED` + `LIFEOS_WRITE_SECRET` owner gate.
 - Uses `LIFEOS_GITHUB_TOKEN` server-side only.
 - Checks same-origin policy and rate limits intake requests.
-- Creates a branch and **draft pull request** for every canonical Resource mutation.
+- Creates a branch and **draft pull request** for every canonical Resource mutation, including review decisions.
+- Intake and review share one GitHub write helper (`lib/resource-intelligence/github-write.ts`).
 - Never writes directly to `main`.
 - File metadata intake does not upload or persist file bytes.
 - The owner secret entered in the web UI is component state only and is not written to browser storage.
@@ -112,17 +145,16 @@ The web intake panel exposes this as **Inspect GitHub evidence** before the owne
 
 The following Issue #56 lanes remain future implementation work and must not be reported as shipped:
 
-- semantic title/topic duplicate detection
+- embedding-based semantic/topic duplicate detection (title-similarity and fork suggestions exist on `/resources/review`)
 - YouTube Knowledge Engine routing
 - webpage/article extraction
 - PDF/document content extraction
-- licensing/cost/security/maintenance scoring
-- stack-overlap analysis
+- automated licensing/cost/security/maintenance scoring (the owner can record license, cost, and risk manually in review)
+- automated stack-overlap analysis (the owner can record overlap manually in review)
 - automatic asset factory
 - implementation router / assigned execution agent
 - staleness/dead-tool monitoring
 - Slack intake adapter
-- end-to-end resource state views for Processing / Review / Implementation / Watch / Completed / Archived
 - acceptance proof using `vercel-labs/knowledge-agent-template`
 
 ## Foundation acceptance checks
@@ -141,12 +173,14 @@ Before merging this slice:
 
 After the GitHub processor slice is green:
 
-1. Add duplicate/review state UI around canonical Resource records.
-2. Add evidence-backed architecture/disposition review controls without auto-adoption.
-3. Add stack-overlap, value, effort, risk, licensing, dependency, and cost review fields.
-4. Route YouTube to existing YouTube Knowledge assets rather than duplicating them.
-5. Add semantic duplicate candidates as suggestions only.
-6. Run the Issue #56 controlled acceptance candidate `vercel-labs/knowledge-agent-template` end to end.
-7. Preserve the current expected candidate disposition (`ADAPT`) as a review outcome to prove from LifeOS overlap/evidence, not as a hard-coded processor result.
+Done in the review slice: resource state lanes, owner-entered architecture/disposition controls without auto-adoption, stack-overlap, value, effort, risk, license, and cost review fields, and suggestion-only duplicate candidates (title similarity and likely forks).
+
+Remaining:
+
+1. Route YouTube to existing YouTube Knowledge assets rather than duplicating them.
+2. Upgrade duplicate suggestions from title similarity to topic/embedding similarity, still as suggestions only.
+3. Add dependency review and an automatic Processing state when source evidence is being gathered.
+4. Run the Issue #56 controlled acceptance candidate `vercel-labs/knowledge-agent-template` end to end. This needs the owner write path configured.
+5. Preserve the current expected candidate disposition (`ADAPT`) as a review outcome to prove from LifeOS overlap/evidence, not as a hard-coded processor result.
 
 Prompt-like captures (`title`/`topic`/`tags` containing `prompt`) remain Resource Intelligence records at intake. After `EXTRACT`, canonicalize the reusable prompt under `40 Resources/Prompts/` as `type: prompt`. See `docs/PROMPT_INTELLIGENCE.md`.
