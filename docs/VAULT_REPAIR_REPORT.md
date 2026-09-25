@@ -10,7 +10,7 @@ Base SHA: `6bf7e2aff9920ba868de7381e0e68ae75d9866c7` (PR #71, READY in Vercel pr
 
 ### Repairs completed
 
-- Added `POST /api/lifeos/continuity/checkpoint`, which snapshots the derived resume package, applies optional owner/agent fields, requires a next action, and stages a new `Command Center/Checkpoints/` record through a draft PR. It is fail-closed behind the existing write gate and never overwrites an existing checkpoint (409). `GET /api/lifeos/continuity` stays read-only.
+- Added `POST /api/lifeos/continuity/checkpoint`, which snapshots the derived resume package, applies optional owner/agent fields, requires a next action, and stages a new `Command Center/Checkpoints/` record through a draft PR. It is fail-closed behind the existing write gate. Each save gets a per-request random nonce in its path, so concurrent saves never target the same file, and an existing path returns 409 instead of being overwritten. `GET /api/lifeos/continuity` stays read-only.
 - Added a **Save this as a checkpoint** control to the resume card on the Command Center and Today.
 - Fixed checkpoint rendering: frontmatter values are now single-line, JSON-quoted strings. Previously a value containing a colon (the evidence lines include `source:...`) could corrupt the YAML.
 - The vault frontmatter parser now decodes JSON-escaped double-quoted scalars exactly and keeps the historical quote-stripping for everything else.
@@ -23,7 +23,7 @@ Base SHA: `6bf7e2aff9920ba868de7381e0e68ae75d9866c7` (PR #71, READY in Vercel pr
 |---|---|
 | `npm run lint` | PASS |
 | `npm run typecheck` | PASS |
-| `npm test` | PASS — 64 files, 367 tests (9 new), 3 consecutive clean runs |
+| `npm test` | PASS — 64 files, 370 tests (12 new), 3 consecutive clean runs |
 | `npm run build` | PASS — 35 static pages |
 | `npm audit --audit-level=high` | PASS — 0 vulnerabilities |
 | `pwsh -NoProfile -File ./scripts/audit-vault.ps1` | PASS |
