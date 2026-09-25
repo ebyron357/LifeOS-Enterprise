@@ -18,6 +18,7 @@ describe("LifeOS primary navigation", () => {
     expect(PRIMARY_NAV.every((item) => item.intent !== "more")).toBe(true);
     expect(ADVANCED_NAV.some((item) => item.href === "/dashboard")).toBe(true);
     expect(ADVANCED_NAV.some((item) => item.href === "/prompts")).toBe(true);
+    expect(ADVANCED_NAV.some((item) => item.href === "/resources/review")).toBe(true);
     expect(ADVANCED_NAV.some((item) => item.href === "/search")).toBe(true);
     expect(MORE_PRIMARY_NAV.map((item) => item.href)).toEqual([
       "/today",

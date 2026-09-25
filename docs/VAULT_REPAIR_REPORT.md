@@ -3,6 +3,34 @@
 Date: 2026-07-14
 Repository: `ebyron357/LifeOS-Enterprise`
 
+## 2026-09-25 Resource Intelligence review/disposition slice
+
+Branch: `claude/quirky-sagan-1m56r5`  
+Base SHA: `df4b182bae4884a482bd2efd652a07783f9b6111`
+
+### Repairs completed
+
+- Added `/resources/review`, which puts canonical Resource records in six lanes (Needs review, Processing, Implementation, Watch, Completed, Archived), flags due reviews, and shows exact-duplicate capture counts.
+- Added `POST /api/lifeos/resource-review`, which records an owner-entered architecture classification and disposition through a draft PR only. It is fail-closed behind the existing write secret and GitHub token, validates the record path, requires a rationale, refuses a silent overwrite of an earlier review, and keeps Capture History and source identity.
+- Moved the shared GitHub draft-PR helpers into `lib/resource-intelligence/github-write.ts`. Intake behavior is unchanged.
+- Added Resource review to the advanced navigation and updated `docs/RESOURCE_INTELLIGENCE.md`, `docs/CANONICAL_LIVE_STATUS.md`, and `docs/WEB_VAULT_PORTAL.md`.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS — 63 files, 352 tests (19 new review tests) |
+| `npm run build` | PASS — 35 static pages |
+| `npm audit --audit-level=high` | PASS — 0 vulnerabilities |
+| `pwsh -NoProfile -File ./scripts/audit-vault.ps1` | PASS |
+| Browser check of `/resources/review` (Chromium, 1280px and 390px, production build, temporary local record removed afterwards) | PASS — 6 lanes render, 0 page errors, no horizontal scroll, form shows fail-closed notice |
+
+### Final state
+
+**AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED.** Not in production until merged and deployed. Running the Issue #56 candidate end to end needs the owner write path configured.
+
 ## 2026-09-25 post-#70 revalidation and status reconciliation
 
 Branch: `claude/quirky-sagan-1m56r5`  

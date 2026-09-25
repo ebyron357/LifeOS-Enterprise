@@ -96,7 +96,7 @@ The production Command Center currently distinguishes available/connected capabi
 - Haitian Creole and French voice locales may be prepared but are not represented as owner-verified without live evidence.
 - Dataview and Obsidian Bases are not executed by the web server.
 - Hermes is an adapter contract, not an active runtime, until a real endpoint/token and reachability evidence exist.
-- Resource Intelligence intake and GitHub evidence exist; semantic dedupe, source extraction, asset factory, review/disposition UI, and the Issue #56 end-to-end candidate proof remain unimplemented.
+- Resource Intelligence intake and GitHub evidence are in production. The owner review/disposition surface (`/resources/review`, `POST /api/lifeos/resource-review`) is implemented on branch `claude/quirky-sagan-1m56r5` and is not production until merged and deployed. Semantic dedupe, source extraction, asset factory, automated scoring, and the Issue #56 end-to-end candidate proof remain unimplemented.
 - Continuity derives resume state from vault + GitHub + optional checkpoint notes. It does not yet persist checkpoints by itself and does not reconstruct unauthorized external systems.
 - Prompt Intelligence is read-only on the web: prompts are authored as vault Markdown and changed through the existing draft-PR path. It adds no new write API, and recommendation is deterministic and conservative, not model-generated.
 
@@ -200,7 +200,7 @@ These are agent validation records, not owner acceptance.
 
 These are platform-development items, not reasons to misreport the current deployment as absent:
 
-1. Universal Resource Intelligence review/disposition UI, processors beyond GitHub, and the Issue #56 acceptance candidate.
+1. Universal Resource Intelligence: merge and deploy the review/disposition slice, add processors beyond GitHub, and run the Issue #56 acceptance candidate.
 2. Continuity checkpoint writes through the existing draft-PR path; Graphiti/Cognee only as later vault indexes.
 3. Prompt Intelligence authoring/versioning through the existing draft-PR path and canonicalization of prompts extracted by Resource Intelligence.
 4. Platform capability registry.
