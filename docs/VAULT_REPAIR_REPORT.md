@@ -12,8 +12,8 @@ PR #72 merged before its review fix was pushed, so this carries that fix onto `m
 
 ### Repairs completed
 
-- Each checkpoint save adds a random nonce to its path. Previously two saves for the same project in the same millisecond produced the same path, both passed the existence check, and both opened draft PRs.
-- `sessionStatus` must be a string; the title and next action are collapsed and bounded before use; a whitespace-only next action is rejected.
+- Each checkpoint save adds a 128-bit random nonce to its path, and the path keeps 64 bits of the resulting hash (older 32-bit paths remain valid). Previously two saves for the same project in the same millisecond produced the same path, both passed the existence check, and both opened draft PRs.
+- `sessionStatus` must be a string; the title (including the generated fallback) and next action are collapsed and bounded before use; an explicitly blank next action, or a blank derived one, is rejected with 400.
 - Status docs record PR #71 and #72 as merged and deployed.
 
 ### Validation evidence
@@ -21,7 +21,7 @@ PR #72 merged before its review fix was pushed, so this carries that fix onto `m
 | Check | Result |
 |---|---|
 | `npm run lint` / `npm run typecheck` | PASS |
-| `npm test` | PASS — 64 files, 370 tests |
+| `npm test` | PASS — 64 files, 372 tests |
 | `npm run build` | PASS |
 | `pwsh -NoProfile -File ./scripts/audit-vault.ps1` | PASS |
 | Production `GET /api/lifeos/continuity/checkpoint` | 200, `enabled: true, configured: false` |

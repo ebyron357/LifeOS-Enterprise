@@ -80,6 +80,14 @@ describe("checkpoint rendering", () => {
     expect(checkpoint.title).toBe("Resume checkpoint — LifeOS Enterprise");
     expect(isCheckpointRecordPath("Command Center/Checkpoints/../../README.md")).toBe(false);
     expect(isCheckpointRecordPath("10 Projects/x.md")).toBe(false);
+    expect(checkpoint.path).toMatch(/-[a-f0-9]{16}\.md$/);
+    expect(isCheckpointRecordPath("Command Center/Checkpoints/2026-09-20-lifeos-0123abcd.md")).toBe(true);
+  });
+
+  it("bounds the fallback title built from a long project name", () => {
+    const checkpoint = buildCheckpoint({ ...snapshot, project: "p".repeat(400) }, {});
+    expect(checkpoint.title.length).toBeLessThanOrEqual(160);
+    expect(parseCheckpointRecord(checkpoint.path, renderCheckpointRecord(checkpoint))?.title).toBe(checkpoint.title);
   });
 
   it("validates override shapes", () => {
@@ -89,6 +97,8 @@ describe("checkpoint rendering", () => {
     expect(parseCheckpointOverrides({ evidence: "one" }).ok).toBe(false);
     expect(parseCheckpointOverrides({ sessionStatus: "paused" }).ok).toBe(false);
     expect(parseCheckpointOverrides({ sessionStatus: ["open"] }).ok).toBe(false);
+    expect(parseCheckpointOverrides({ nextAction: "   " })).toEqual({ ok: false, error: "nextAction cannot be blank." });
+    expect(parseCheckpointOverrides({ blocker: "   " })).toEqual({ ok: true, overrides: {} });
     const parsed = parseCheckpointOverrides({ nextAction: "  Ship\nit ", sessionStatus: "closed", evidence: ["a", ""] });
     expect(parsed).toEqual({ ok: true, overrides: { nextAction: "Ship it", sessionStatus: "CLOSED", evidence: ["a"] } });
   });
@@ -195,7 +205,15 @@ describe("checkpoint write route", () => {
     }
   });
 
-  it("rejects a whitespace-only next action", async () => {
+  it("rejects an explicit blank next action even when the snapshot has one", async () => {
+    enableWrites();
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    expect((await POST(request({ checkpoint: { nextAction: " \t " } }))).status).toBe(400);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a snapshot whose derived next action is blank", async () => {
     enableWrites();
     const { getContinuityResumePackage } = await import("@/lib/continuity/sources");
     vi.mocked(getContinuityResumePackage).mockResolvedValueOnce({
@@ -204,7 +222,7 @@ describe("checkpoint write route", () => {
     } as ResumePackage);
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
-    expect((await POST(request({ checkpoint: { nextAction: "  \n " } }))).status).toBe(400);
+    expect((await POST(request({}))).status).toBe(400);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

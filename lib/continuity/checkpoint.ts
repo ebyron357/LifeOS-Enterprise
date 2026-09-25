@@ -16,7 +16,7 @@ export function checkpointRecordPath(capturedAt: string, project: string, nonce 
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 48) || "session";
-  const stamp = createHash("sha256").update(`${capturedAt}:${project}:${nonce}`).digest("hex").slice(0, 8);
+  const stamp = createHash("sha256").update(`${capturedAt}:${project}:${nonce}`).digest("hex").slice(0, 16);
   return `${CHECKPOINT_FOLDER}/${day}-${slug}-${stamp}.md`;
 }
 
@@ -150,6 +150,7 @@ export function parseCheckpointOverrides(input: unknown): { ok: true; overrides:
     if (typeof value !== "string") return { ok: false, error: `${field} must be a string.` };
     const cleaned = oneLine(value);
     if (cleaned) overrides[field] = cleaned;
+    else if (field === "nextAction") return { ok: false, error: "nextAction cannot be blank." };
   }
   for (const field of ["doNotRepeat", "evidence"] as const) {
     const value = raw[field];
@@ -172,7 +173,7 @@ export function parseCheckpointOverrides(input: unknown): { ok: true; overrides:
 export function buildCheckpoint(
   snapshot: ContinuityCheckpointInput,
   overrides: CheckpointOverrides,
-  nonce = randomBytes(4).toString("hex"),
+  nonce = randomBytes(16).toString("hex"),
 ): ContinuityCheckpointInput {
   const merged: ContinuityCheckpointInput = {
     ...snapshot,
@@ -184,14 +185,14 @@ export function buildCheckpoint(
   const project = oneLine(merged.project) || "LifeOS";
   return {
     ...merged,
-    title: oneLine(merged.title, CHECKPOINT_TITLE_MAX) || `Resume checkpoint — ${project}`,
+    title: oneLine(merged.title || `Resume checkpoint — ${project}`, CHECKPOINT_TITLE_MAX),
     nextAction: oneLine(merged.nextAction),
     path: checkpointRecordPath(merged.capturedAt, project, nonce),
   };
 }
 
 export function isCheckpointRecordPath(path: string): boolean {
-  return new RegExp(`^${CHECKPOINT_FOLDER}/\\d{4}-\\d{2}-\\d{2}-[a-z0-9-]{1,48}-[a-f0-9]{8}\\.md$`).test(path);
+  return new RegExp(`^${CHECKPOINT_FOLDER}/\\d{4}-\\d{2}-\\d{2}-[a-z0-9-]{1,48}-(?:[a-f0-9]{8}|[a-f0-9]{16})\\.md$`).test(path);
 }
 
 export function resumePackageToCheckpoint(resume: ResumePackage, capturedAt: string): ContinuityCheckpointInput {
