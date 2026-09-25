@@ -140,6 +140,70 @@ export function groupResourcesByLane(records: ResourceRecordView[]): Record<Reso
   return groups;
 }
 
+export type ResourceDuplicateCandidate = {
+  left: ResourceRecordView;
+  right: ResourceRecordView;
+  score: number;
+  reason: string;
+};
+
+const TITLE_STOP_WORDS = new Set(["the", "a", "an", "and", "for", "of", "to", "in", "on", "with", "youtube", "github"]);
+
+function titleTokens(value: string): Set<string> {
+  return new Set(
+    value
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((token) => token.length > 1 && !TITLE_STOP_WORDS.has(token)),
+  );
+}
+
+function jaccard(a: Set<string>, b: Set<string>): number {
+  if (!a.size || !b.size) return 0;
+  let shared = 0;
+  for (const token of a) if (b.has(token)) shared += 1;
+  return shared / (a.size + b.size - shared);
+}
+
+function githubRepositoryName(record: ResourceRecordView): string | null {
+  const match = record.sourceIdentity.match(/^github:[^/]+\/(.+)$/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Suggests possible duplicates across different exact identities. Suggestions only:
+ * nothing is merged, and the owner decides whether two records describe the same thing.
+ */
+export function resourceDuplicateCandidates(
+  records: ResourceRecordView[],
+  threshold = 0.6,
+): ResourceDuplicateCandidate[] {
+  const candidates: ResourceDuplicateCandidate[] = [];
+  const tokens = records.map((record) => titleTokens(record.title));
+
+  for (let i = 0; i < records.length; i += 1) {
+    for (let j = i + 1; j < records.length; j += 1) {
+      const left = records[i];
+      const right = records[j];
+      if (left.sourceIdentity === right.sourceIdentity) continue;
+
+      const leftRepo = githubRepositoryName(left);
+      const rightRepo = githubRepositoryName(right);
+      if (leftRepo && rightRepo && leftRepo === rightRepo) {
+        candidates.push({ left, right, score: 1, reason: `Same GitHub repository name "${leftRepo}" under different owners (possible fork).` });
+        continue;
+      }
+
+      const score = jaccard(tokens[i], tokens[j]);
+      if (score >= threshold) {
+        candidates.push({ left, right, score: Math.round(score * 100) / 100, reason: `Titles share ${Math.round(score * 100)}% of their words.` });
+      }
+    }
+  }
+
+  return candidates.sort((a, b) => b.score - a.score || a.left.title.localeCompare(b.left.title));
+}
+
 function singleLine(value: unknown, max: number): string {
   return text(value).replace(/[\r\n]+/g, " ").replace(/\s+/g, " ").slice(0, max);
 }

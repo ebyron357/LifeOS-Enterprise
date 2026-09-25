@@ -115,6 +115,8 @@ The web intake panel exposes this as **Inspect GitHub evidence** before the owne
 
 Records whose `review_date` has passed are flagged as review due in the Needs review, Processing, and Watch lanes. Records captured more than once show the exact-duplicate capture count.
 
+The page also lists **possible duplicates** across different exact identities: GitHub repositories with the same name under different owners (possible forks), and records whose titles share at least 60% of their words. These are suggestions only. Nothing is merged, and the owner decides in review whether two records describe the same resource.
+
 The owner records a decision with `POST /api/lifeos/resource-review` (`lib/resource-intelligence/review.ts`):
 
 - The disposition must be one of `ADOPT / ADAPT / EXTRACT / WATCH / ARCHIVE / REJECT`; `PENDING` is not a decision.
@@ -143,7 +145,7 @@ LifeOS never chooses the disposition and never implements a resource. Merging th
 
 The following Issue #56 lanes remain future implementation work and must not be reported as shipped:
 
-- semantic title/topic duplicate detection
+- embedding-based semantic/topic duplicate detection (title-similarity and fork suggestions exist on `/resources/review`)
 - YouTube Knowledge Engine routing
 - webpage/article extraction
 - PDF/document content extraction
@@ -171,12 +173,12 @@ Before merging this slice:
 
 After the GitHub processor slice is green:
 
-Done in the review slice: resource state lanes, owner-entered architecture/disposition controls without auto-adoption, and stack-overlap, value, effort, risk, license, and cost review fields.
+Done in the review slice: resource state lanes, owner-entered architecture/disposition controls without auto-adoption, stack-overlap, value, effort, risk, license, and cost review fields, and suggestion-only duplicate candidates (title similarity and likely forks).
 
 Remaining:
 
 1. Route YouTube to existing YouTube Knowledge assets rather than duplicating them.
-2. Add semantic duplicate candidates as suggestions only.
+2. Upgrade duplicate suggestions from title similarity to topic/embedding similarity, still as suggestions only.
 3. Add dependency review and an automatic Processing state when source evidence is being gathered.
 4. Run the Issue #56 controlled acceptance candidate `vercel-labs/knowledge-agent-template` end to end. This needs the owner write path configured.
 5. Preserve the current expected candidate disposition (`ADAPT`) as a review outcome to prove from LifeOS overlap/evidence, not as a hard-coded processor result.

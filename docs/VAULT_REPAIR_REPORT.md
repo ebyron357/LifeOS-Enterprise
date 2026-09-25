@@ -10,7 +10,7 @@ Base SHA: `df4b182bae4884a482bd2efd652a07783f9b6111`
 
 ### Repairs completed
 
-- Added `/resources/review`, which puts canonical Resource records in six lanes (Needs review, Processing, Implementation, Watch, Completed, Archived), flags due reviews, and shows exact-duplicate capture counts.
+- Added `/resources/review`, which puts canonical Resource records in six lanes (Needs review, Processing, Implementation, Watch, Completed, Archived), flags due reviews, shows exact-duplicate capture counts, and lists suggestion-only duplicate candidates (likely forks and titles sharing at least 60% of their words).
 - Added `POST /api/lifeos/resource-review`, which records an owner-entered architecture classification and disposition through a draft PR only. It is fail-closed behind the existing write secret and GitHub token, validates the record path, requires a rationale, refuses a silent overwrite of an earlier review, and keeps Capture History and source identity.
 - Moved the shared GitHub draft-PR helpers into `lib/resource-intelligence/github-write.ts`. Intake behavior is unchanged.
 - Added Resource review to the advanced navigation and updated `docs/RESOURCE_INTELLIGENCE.md`, `docs/CANONICAL_LIVE_STATUS.md`, and `docs/WEB_VAULT_PORTAL.md`.
@@ -21,7 +21,7 @@ Base SHA: `df4b182bae4884a482bd2efd652a07783f9b6111`
 |---|---|
 | `npm run lint` | PASS |
 | `npm run typecheck` | PASS |
-| `npm test` | PASS — 63 files, 352 tests (19 new review tests) |
+| `npm test` | PASS — 63 files, 354 tests (21 new review tests) |
 | `npm run build` | PASS — 35 static pages |
 | `npm audit --audit-level=high` | PASS — 0 vulnerabilities |
 | `pwsh -NoProfile -File ./scripts/audit-vault.ps1` | PASS |

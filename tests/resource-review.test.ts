@@ -6,7 +6,9 @@ import {
   groupResourcesByLane,
   isResourceRecordPath,
   parseReviewDecision,
+  resourceDuplicateCandidates,
   resourceLane,
+  type ResourceRecordView,
   type ResourceReviewDecision,
 } from "@/lib/resource-intelligence/review";
 import type { VaultNote } from "@/lib/vault/types";
@@ -189,5 +191,50 @@ describe("Resource review lanes", () => {
     expect(lanes.implementation).toHaveLength(1);
     expect(lanes.watch).toHaveLength(1);
     expect(lanes.archived).toHaveLength(0);
+  });
+});
+
+describe("Resource duplicate candidates", () => {
+  function view(title: string, sourceIdentity: string): ResourceRecordView {
+    return {
+      path: `40 Resources/Resource Intelligence/Records/${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.md`,
+      title,
+      sourceType: sourceIdentity.startsWith("github:") ? "github" : "webpage",
+      sourceIdentity,
+      canonicalSource: "",
+      processingState: "needs-review",
+      architecture: "PENDING",
+      disposition: "PENDING",
+      captureCount: 1,
+      lastCaptured: null,
+      reviewDate: null,
+      reviewDue: false,
+      lane: "review",
+    };
+  }
+
+  it("suggests likely forks and near-identical titles without merging", () => {
+    const records = [
+      view("Knowledge Agent Template", "github:vercel-labs/knowledge-agent-template"),
+      view("Knowledge agent template fork", "github:someone/knowledge-agent-template"),
+      view("Obsidian Dataview guide", "url:https://example.com/dataview"),
+      view("The Obsidian Dataview Guide", "url:https://blog.example.org/dataview-guide"),
+      view("Unrelated cooking video", "youtube:abc123"),
+    ];
+    const candidates = resourceDuplicateCandidates(records);
+    expect(candidates).toHaveLength(2);
+    expect(candidates[0].reason).toMatch(/possible fork/);
+    expect(candidates.some((c) => c.reason.includes("share"))).toBe(true);
+    expect(candidates.every((c) => c.left.sourceIdentity !== c.right.sourceIdentity)).toBe(true);
+    expect(records).toHaveLength(5);
+  });
+
+  it("ignores exact-identity matches and weak title overlap", () => {
+    const records = [
+      view("Next.js deployment checklist", "url:https://a.example/x"),
+      view("Next.js deployment checklist", "url:https://a.example/x"),
+      view("Deployment of cooking recipes", "url:https://b.example/y"),
+    ];
+    expect(resourceDuplicateCandidates(records)).toEqual([]);
   });
 });

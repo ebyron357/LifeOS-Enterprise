@@ -6,6 +6,7 @@ import {
   catalogResourceRecords,
   groupResourcesByLane,
   RESOURCE_LANES,
+  resourceDuplicateCandidates,
 } from "@/lib/resource-intelligence/review";
 import { getVaultIndex } from "@/lib/vault/index";
 import { noteHref } from "@/lib/vault/slug";
@@ -18,6 +19,7 @@ export default async function ResourceReviewPage() {
   const records = catalogResourceRecords(index.notes, today);
   const lanes = groupResourcesByLane(records);
   const due = records.filter((record) => record.reviewDue).length;
+  const duplicates = resourceDuplicateCandidates(records);
 
   return (
     <AppShell greeting={os.greeting}>
@@ -61,6 +63,27 @@ export default async function ResourceReviewPage() {
             </article>
           ))}
         </section>
+
+        {duplicates.length ? (
+          <section className="os-card" aria-labelledby="resource-duplicates-heading">
+            <h2 id="resource-duplicates-heading">
+              Possible duplicates <span className="os-badge">{duplicates.length}</span>
+            </h2>
+            <p className="widget-eyebrow">Suggestions only. Nothing is merged; decide in review whether these describe the same resource.</p>
+            <ul>
+              {duplicates.map((candidate) => (
+                <li key={`${candidate.left.path}|${candidate.right.path}`}>
+                  <p>
+                    <Link href={noteHref(candidate.left.path)}>{candidate.left.title}</Link>
+                    {" ↔ "}
+                    <Link href={noteHref(candidate.right.path)}>{candidate.right.title}</Link>
+                  </p>
+                  <p className="widget-eyebrow">{candidate.reason}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
 
         <ResourceReviewPanel
           records={records.map((record) => ({
