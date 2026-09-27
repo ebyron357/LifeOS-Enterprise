@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "description": "Canonical LifeOS Pulse routine registry. Register recurring unattended work here before treating it as operational.",
+  "routines": [
+    {
+      "id": "maps-integrity-check",
+      "name": "MAPS Integrity Check",
+      "enabled": true,
+      "schedule": "daily",
+      "machine": "github-actions-or-approved-runner",
+      "command": "powershell -ExecutionPolicy Bypass -File ./scripts/validate-maps.ps1",
+      "owner": "LifeOS",
+      "timeout_minutes": 10,
+      "failure_cap": 3,
+      "evidence_path": "Automations/runs/maps-integrity-check/"
+    }
+  ]
+}
