@@ -142,8 +142,14 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
           </div>
           <div className={styles.comms}>
             <div className={styles.threadList}>
-              <div className={styles.tabs}><span>All</span><span>Chat</span><span>Email</span><span>Slack</span><span>Systems</span></div>
-              <div className={styles.threadSearch}>Search conversations…</div>
+              <div className={styles.tabs}>
+                <Link href="/conversation">All</Link>
+                <Link href="/conversation">Chat</Link>
+                <Link href="/integrations">Email</Link>
+                <Link href="/integrations">Slack</Link>
+                <Link href="/integrations">Systems</Link>
+              </div>
+              <Link className={styles.threadSearch} href="/search">Search communications and context →</Link>
               <div className={styles.threads}>
                 <Link className={styles.thread} href="/conversation">
                   <span className={styles.avatar}>A</span>
@@ -175,7 +181,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
 
         <aside className={styles.rightRail}>
           <article className={styles.voicePanel}>
-            <div className={styles.voiceHead}><h2>◉ ARIA Voice Command</h2><span>{hermes.state === "unavailable" ? "LifeOS available" : "Ready"}</span></div>
+            <div className={styles.voiceHead}><h2>◉ ARIA Voice Command</h2><span>{hermes.state === "unavailable" ? "LifeOS available" : hermes.state}</span></div>
             <div className={styles.wave} aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /><i /><i /></div>
             <p>“Tell me what’s important today…”</p>
             <Link href="/conversation">Tap to speak or open voice</Link>
@@ -232,6 +238,25 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
             {visibleIntegrations.map((item) => (
               <Link key={item.id} href="/integrations"><strong>{item.service.slice(0, 2).toUpperCase()}</strong><small>{item.state}</small></Link>
             ))}
+          </div>
+        </article>
+      </section>
+
+      <section className={styles.agentDeck}>
+        <article className={styles.panel}>
+          <div className={styles.panelHead}>
+            <div><h2>AI Agents</h2><p>Recorded workforce state</p></div>
+            <Link href="/agents">Manage</Link>
+          </div>
+          <div className={styles.agentGrid}>
+            {vault.agents.slice(0, 6).map((agent) => (
+              <Link key={agent.name} href="/agents">
+                <strong>{agent.name}</strong>
+                <span>{agent.status || "status unavailable"}</span>
+                <small>{agent.purpose || "No purpose recorded."}</small>
+              </Link>
+            ))}
+            {!vault.agents.length ? <div className={styles.emptyState}>No agent records are currently available.</div> : null}
           </div>
         </article>
       </section>
