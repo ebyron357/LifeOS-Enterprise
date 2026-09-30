@@ -3,6 +3,33 @@
 Date: 2026-07-14
 Repository: `ebyron357/LifeOS-Enterprise`
 
+## 2026-09-25 Checkpoint path concurrency fix
+
+Branch: `claude/quirky-sagan-1m56r5` (restarted from `main` after PR #72 merged)  
+Base SHA: `03657b621c2956c095c2e168f11ff159c3449651` (PR #72, READY in Vercel production at `dpl_5asoJhWnXGbZWuqEg3iHomF3Z9VE`)
+
+PR #72 merged before its review fix was pushed, so this carries that fix onto `main`.
+
+### Repairs completed
+
+- Each checkpoint save adds a 128-bit random nonce to its path, and the path keeps 64 bits of the resulting hash (older 32-bit paths remain valid). Previously two saves for the same project in the same millisecond produced the same path, both passed the existence check, and both opened draft PRs.
+- `sessionStatus` must be a string; the title (including the generated fallback) and next action are collapsed and bounded before use; an explicitly blank next action, or a blank derived one, is rejected with 400.
+- Status docs record PR #71 and #72 as merged and deployed.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| `npm run lint` / `npm run typecheck` | PASS |
+| `npm test` | PASS — 64 files, 372 tests |
+| `npm run build` | PASS |
+| `pwsh -NoProfile -File ./scripts/audit-vault.ps1` | PASS |
+| Production `GET /api/lifeos/continuity/checkpoint` | 200, `enabled: true, configured: false` |
+
+### Final state
+
+**AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED.**
+
 ## 2026-09-25 Continuity checkpoint writes
 
 Branch: `claude/quirky-sagan-1m56r5` (restarted from `main` after PR #71 merged)  
@@ -10,7 +37,7 @@ Base SHA: `6bf7e2aff9920ba868de7381e0e68ae75d9866c7` (PR #71, READY in Vercel pr
 
 ### Repairs completed
 
-- Added `POST /api/lifeos/continuity/checkpoint`, which snapshots the derived resume package, applies optional owner/agent fields, requires a next action, and stages a new `Command Center/Checkpoints/` record through a draft PR. It is fail-closed behind the existing write gate and never overwrites an existing checkpoint (409). `GET /api/lifeos/continuity` stays read-only.
+- Added `POST /api/lifeos/continuity/checkpoint`, which snapshots the derived resume package, applies optional owner/agent fields, requires a next action, and stages a new `Command Center/Checkpoints/` record through a draft PR. It is fail-closed behind the existing write gate. Each save gets a per-request random nonce in its path, so concurrent saves never target the same file, and an existing path returns 409 instead of being overwritten. `GET /api/lifeos/continuity` stays read-only.
 - Added a **Save this as a checkpoint** control to the resume card on the Command Center and Today.
 - Fixed checkpoint rendering: frontmatter values are now single-line, JSON-quoted strings. Previously a value containing a colon (the evidence lines include `source:...`) could corrupt the YAML.
 - The vault frontmatter parser now decodes JSON-escaped double-quoted scalars exactly and keeps the historical quote-stripping for everything else.
@@ -23,7 +50,7 @@ Base SHA: `6bf7e2aff9920ba868de7381e0e68ae75d9866c7` (PR #71, READY in Vercel pr
 |---|---|
 | `npm run lint` | PASS |
 | `npm run typecheck` | PASS |
-| `npm test` | PASS — 64 files, 367 tests (9 new), 3 consecutive clean runs |
+| `npm test` | PASS — 64 files, 370 tests (12 new), 3 consecutive clean runs |
 | `npm run build` | PASS — 35 static pages |
 | `npm audit --audit-level=high` | PASS — 0 vulnerabilities |
 | `pwsh -NoProfile -File ./scripts/audit-vault.ps1` | PASS |
