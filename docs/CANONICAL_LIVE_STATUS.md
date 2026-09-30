@@ -5,15 +5,15 @@
 **Canonical branch:** `main`  
 **Production URL:** `https://lifeos-enterprise.vercel.app/`  
 **Released version:** `1.0.0`  
-**Last application-code baseline on main:** `21b921ce8c7acf98132748f3466800468e0664a1` — PR #73 Continuity checkpoint path fix  
-**Prior recorded baselines:** `03657b621c2956c095c2e168f11ff159c3449651` — PR #72 Continuity checkpoint writes; `6bf7e2aff9920ba868de7381e0e68ae75d9866c7` — PR #71 Resource review; `df4b182bae4884a482bd2efd652a07783f9b6111` — PR #70 Prompt Intelligence; `1ae3fddb65b75c08127b7fef995d5ff37926f80a` — PR #69 Continuity; `45d5d018599e7b7d308523a3f38bf9ccf62e2c94` — PR #68 GitHub evidence; `7982c92a7080f60f9fb70e7c66c5220b8178bc35` — PR #64 performance hardening.  
+**Last application-code baseline on main:** `abf6c8264bed2578382d8eb60adc572762b6ee17` — PR #75 LifeOS closeout (voice #58, widgets/game #42, resource provenance, owner manual v2.0)  
+**Prior recorded baselines:** `fc0729de8475c6c2f6b6343a99d9fac392a5442e` — Life Map and Dashboards hub (owner commit); `62a9df908608bf2c584f17be82d7f3754a582065` — PR #74 MAPS operating layer; `21b921ce8c7acf98132748f3466800468e0664a1` — PR #73 Continuity checkpoint path fix; `03657b621c2956c095c2e168f11ff159c3449651` — PR #72 Continuity checkpoint writes; `6bf7e2aff9920ba868de7381e0e68ae75d9866c7` — PR #71 Resource review; `df4b182bae4884a482bd2efd652a07783f9b6111` — PR #70 Prompt Intelligence; `1ae3fddb65b75c08127b7fef995d5ff37926f80a` — PR #69 Continuity; `45d5d018599e7b7d308523a3f38bf9ccf62e2c94` — PR #68 GitHub evidence; `7982c92a7080f60f9fb70e7c66c5220b8178bc35` — PR #64 performance hardening.  
 **Live identity source:** GitHub `main` for repository head; Vercel production deployment for deployed SHA/ID. Query both at report or acceptance time.  
 **Owner acceptance:** not complete  
-**Owner/operator manual:** `80 SOPs/LifeOS Owner's Operating Manual.md` (v2.0, step-by-step)
+**Owner/operator manual:** `80 SOPs/LifeOS Owner's Operating Manual.md` (v2.1, step-by-step)
 
 ## Governing status
 
-**LifeOS Enterprise V1.0 is built on `main`. After PR #64, PRs #66 and #68 merged Resource Intelligence intake and GitHub evidence, PR #69 merged Continuity / resume packages, PR #70 merged Prompt Intelligence, PR #71 merged the Resource Intelligence owner review/disposition surface, and PR #72 merged governed Continuity checkpoint writes. All six are merged and were observed in a READY Vercel production deployment on 2026-09-25. PR #73 (per-save unique checkpoint paths) merged afterwards and was observed READY in production on 2026-09-30. Repository head and production deployment identity are live operational facts and must be read from GitHub and Vercel when a status report or acceptance run begins.**
+**LifeOS Enterprise V1.0 is built on `main`. After PR #64, PRs #66 and #68 merged Resource Intelligence intake and GitHub evidence, PR #69 merged Continuity / resume packages, PR #70 merged Prompt Intelligence, PR #71 merged the Resource Intelligence owner review/disposition surface, and PR #72 merged governed Continuity checkpoint writes. All six are merged and were observed in a READY Vercel production deployment on 2026-09-25. PR #73 (per-save unique checkpoint paths) merged afterwards and was observed READY in production on 2026-09-30. On 2026-09-30, PR #74 (MAPS), the owner's Life Map / Dashboards commit, and the PR #75 closeout also merged; production deployment `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` was observed READY at the PR #75 merge `abf6c82`. Repository head and production deployment identity are live operational facts and must be read from GitHub and Vercel when a status report or acceptance run begins.**
 
 The prior status edition is superseded because the post-#60 security corrective, the unified-command-center rebuild, and the Resource Intelligence, Continuity, and Prompt Intelligence slices have since merged and deployed:
 
@@ -150,7 +150,7 @@ The production Command Center currently distinguishes available/connected capabi
 - Haitian Creole and French voice locales may be prepared but are not represented as owner-verified without live evidence.
 - Dataview and Obsidian Bases are not executed by the web server.
 - Hermes is an adapter contract, not an active runtime, until a real endpoint/token and reachability evidence exist.
-- Resource Intelligence intake and GitHub evidence are in production. The owner review/disposition surface (`/resources/review`, `POST /api/lifeos/resource-review`) is in production (PR #71); on 2026-09-25 its service reported `enabled: true, configured: false`, so decision writes stay fail-closed until the owner secret and GitHub token are both configured. The closeout change set adds write-time GitHub source evidence, deterministic source-type routing to existing processors/SOPs/templates, and open-draft-PR dedupe. Semantic dedupe, automated YouTube/web/PDF processors, asset factory, implementation router/executor, automated scoring, the staleness monitor, and the Issue #56 end-to-end candidate proof (which needs the owner write path configured) remain unimplemented.
+- Resource Intelligence intake and GitHub evidence are in production. The owner review/disposition surface (`/resources/review`, `POST /api/lifeos/resource-review`) is in production (PR #71); on 2026-09-25 its service reported `enabled: true, configured: false`, so decision writes stay fail-closed until the owner secret and GitHub token are both configured. PR #75 added write-time GitHub source evidence, deterministic source-type routing to existing processors/SOPs/templates, and open-draft-PR dedupe; production reported these capabilities on 2026-09-30. Semantic dedupe, automated YouTube/web/PDF processors, asset factory, implementation router/executor, automated scoring, the staleness monitor, and the Issue #56 end-to-end candidate proof (which needs the owner write path configured) remain unimplemented.
 - Continuity derives resume state from vault + GitHub + optional checkpoint notes and does not reconstruct unauthorized external systems. Governed checkpoint writes through a draft PR are in production (PR #72); on 2026-09-25 the service reported `enabled: true, configured: false`, so they stay fail-closed until the owner secret and GitHub token are both configured.
 - Prompt Intelligence is read-only on the web: prompts are authored as vault Markdown and changed through the existing draft-PR path. It adds no new write API, and recommendation is deterministic and conservative, not model-generated.
 
@@ -166,10 +166,19 @@ Agent validation on the closeout branch, after all fix sets were merged:
 - `npm run build`: PASS.
 - `pwsh -File scripts/audit-vault.ps1`: PASS (162 notes).
 - Playwright against the production build, Chromium desktop 1440 / laptop 1024 / mobile 390: 166 passed, 5 skipped (expected desktop-only and mobile-only splits, plus one pre-existing skip).
-- A scan of 17 routes found no console errors, page errors, or HTTP ≥ 400.
-- WebKit was not available in the agent container; Dashboard CI runs it on the PR.
+- A scan of 19 routes (including `/life-map` and `/dashboards`) found no console errors, page errors, or HTTP ≥ 400.
+- WebKit was not available in the agent container; Dashboard CI ran it on the PR.
+- PR #75 final head `c94d360` (with `main` at `fc0729d` merged in) was green on Dashboard CI (including WebKit), the PowerShell vault audit, MAPS structural validation, and the Cursor security review. All 11 review threads were resolved. It was squash-merged to `main` as `abf6c82`.
 
-Production observed on 2026-09-30:
+Production observed after the PR #75 merge (2026-09-30, about 20:49 UTC):
+- Deployment `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` was READY at `abf6c82` (= `main`) and aliased to `lifeos-enterprise.vercel.app`.
+- The `agent/session`, `voice/session`, `game/session`, `resource-intake`, `resource-review`, `continuity/checkpoint`, and `change-plan` APIs returned 200.
+- `resource-intake` reported `openDraftPrDedupe: true` and per-source `processorRoute`s with only GitHub automated. `game/session` served categorized side quests (health, learning, money, personal growth) and boss battles with steps.
+- `/today` rendered the LifeOS Game card and `/life-map` rendered all 13 zones.
+- The governed write services still reported `configured: false` with `mode: draft-pr-only` and `directMainWrites: false`. Voice reported `activeProvider: browser` (`OPENAI_API_KEY` missing). Durable approvals were missing (`UPSTASH_REDIS_REST_*`).
+- Vercel reported no runtime errors for the previous 7 days.
+
+Earlier production observation on 2026-09-30, before the closeout merged:
 - Deployment `dpl_CxF6WThSCMDdrftveicnzcN3FCC6` was READY at `21b921c` (= `main`).
 - `/` returned 200. The `continuity/checkpoint`, `resource-review`, `resource-intake`, `change-plan`, `voice/session`, `agent/session`, and `game/session` APIs returned 200.
 - The governed write services reported `configured: false`, and `directMainWrites` was false.
@@ -180,7 +189,9 @@ This is agent evidence, not owner acceptance.
 
 ### Last application-code baseline
 
-PR #73 merged the per-save unique Continuity checkpoint path at `21b921ce8c7acf98132748f3466800468e0664a1` and was observed READY in production at deployment `dpl_CxF6WThSCMDdrftveicnzcN3FCC6` on 2026-09-30.
+PR #75 merged the LifeOS closeout at `abf6c8264bed2578382d8eb60adc572762b6ee17` and was observed READY in production at deployment `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` on 2026-09-30.
+
+Before it, PR #73 merged the per-save unique Continuity checkpoint path at `21b921ce8c7acf98132748f3466800468e0664a1` and was observed READY in production at deployment `dpl_CxF6WThSCMDdrftveicnzcN3FCC6` on 2026-09-30.
 
 ### Prior application-code baselines
 
@@ -275,15 +286,16 @@ These are agent validation records, not owner acceptance.
 - PR #70: merged Prompt Intelligence at `df4b182bae4884a482bd2efd652a07783f9b6111`; a READY production deployment exists for this SHA.
 - PR #71: merged Resource Intelligence owner review/disposition at `6bf7e2aff9920ba868de7381e0e68ae75d9866c7`; a READY production deployment exists for this SHA.
 - PR #72: merged Continuity checkpoint writes at `03657b621c2956c095c2e168f11ff159c3449651`; a READY production deployment exists for this SHA. It merged before its review fix landed; the per-save path nonce followed in PR #73.
-- PR #73: merged per-save unique checkpoint paths at `21b921ce8c7acf98132748f3466800468e0664a1`, the current application-code baseline; READY in production on 2026-09-30.
+- PR #73: merged per-save unique checkpoint paths at `21b921ce8c7acf98132748f3466800468e0664a1`; READY in production on 2026-09-30 (superseded as baseline by PR #75).
 - PR #74: merged MAPS operating layer at `62a9df908608bf2c584f17be82d7f3754a582065` on 2026-09-30 (candidate `1ca01b2` green on every check). Mostly governance, routing, and CI; its only runtime change is the `next@16.3.8` security patch.
-- The 2026-09-30 closeout PR carries this edition (see the closeout edition section).
+- Owner commit `fc0729de8475c6c2f6b6343a99d9fac392a5442e` (2026-09-30) added the `/life-map` personal operating map and the `/dashboards` launch hub; a READY production deployment exists for this SHA.
+- PR #75: merged the LifeOS closeout at `abf6c8264bed2578382d8eb60adc572762b6ee17` on 2026-09-30 (final head `c94d360` green on every check); READY in production at `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9`.
 
 ## Remaining owner work
 
 Each item is written step-by-step in `80 SOPs/LifeOS Owner's Operating Manual.md` (Part K for credentials, Part J and `docs/OWNER_ACCEPTANCE_WORKBOOK.md` for acceptance).
 
-1. PR #74 (MAPS) was merged on the owner's instruction on 2026-09-30 (`62a9df9`). The closeout PR #75, which carries this edition, is to be merged once green, with its merge SHA recorded in a post-merge status update. Confirm the resulting production deployment is READY (step 2) before starting acceptance.
+1. Done by the agent on the owner's instruction: PR #74 (MAPS) merged as `62a9df9` and the closeout PR #75 merged as `abf6c82` on 2026-09-30, and production `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` was observed READY at `abf6c82`. Re-check production identity (step 2) before starting acceptance, because later merges change it.
 2. At the start of the acceptance session, query Vercel and record the exact READY production deployment ID + SHA in the workbook.
 3. Complete the workbook's live checks on desktop and phone: navigation journeys, widgets and game, and voice with a real microphone and speakers (voice choice, preview, interrupt, mute, recovery, persistence). Also check screen share request, deny, and stop.
 4. Decide whether to enable governed writes, and only then configure the credentials together:

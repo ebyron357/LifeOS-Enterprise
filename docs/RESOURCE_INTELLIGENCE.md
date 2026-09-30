@@ -1,6 +1,6 @@
 # LifeOS Universal Resource Intelligence — Foundation
 
-**Implementation status:** Durable intake foundation merged via PR #66; read-only GitHub evidence processor merged via PR #68; owner review/disposition surface and resource state lanes merged and deployed via PR #71. Intake hardening (write-time source evidence, source-type routing, open-draft-PR dedupe, clean upstream read errors, and the aligned Resource template) is implemented on its own change and is not merged or deployed until that PR merges. End-to-end acceptance with the Issue #56 candidate remains open.  
+**Implementation status:** Durable intake foundation merged via PR #66; read-only GitHub evidence processor merged via PR #68; owner review/disposition surface and resource state lanes merged and deployed via PR #71. Intake hardening (write-time source evidence, source-type routing, open-draft-PR dedupe, clean upstream read errors, and the aligned Resource template) merged via PR #75 (`abf6c82`) and was observed in production on 2026-09-30; writes stay fail-closed until the owner configures the write path. End-to-end acceptance with the Issue #56 candidate remains open.  
 **System owner:** Resource Intelligence  
 **Canonical storage:** GitHub-backed Obsidian Markdown Resource records  
 **Write model:** Draft pull request only; no direct `main` writes

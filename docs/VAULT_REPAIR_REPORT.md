@@ -720,12 +720,14 @@ This is supplemental only. It does **not** replace the complete parallel suite r
   - build: PASS
 - `pwsh -NoProfile -File scripts/audit-vault.ps1`: `PASS: canonical vault structure, templates, Bases, metadata, links, and embeds are valid.` (162 notes).
 - Playwright against the production build (Chromium 1440 / 1024 / 390): 166 passed, 5 skipped (expected viewport splits).
-- A scan of 17 routes: no console errors, page errors, or HTTP ≥ 400.
+- A scan of 19 routes (including `/life-map` and `/dashboards`): no console errors, page errors, or HTTP ≥ 400.
+- PR #75 final head `c94d360` (with `main` at `fc0729d` merged in): green on Dashboard CI (including WebKit), the vault audit, MAPS structural validation, and the security review, with all 11 review threads resolved. Squash-merged to `main` as `abf6c82`.
 - PR #74 candidate `1ca01b2`: green on every check, then merged to `main` as `62a9df9` on the owner's instruction. After merging `main` into the closeout branch, `validate-maps.ps1` passed there too.
   - Dashboard CI passed on its one re-run after the runner stall.
   - The other checks: vault audit, MAPS structural validation, and security review.
   - Local `validate-maps.ps1` passed, and every negative fixture was rejected.
-- Production on 2026-09-30: `dpl_CxF6WThSCMDdrftveicnzcN3FCC6` READY at `21b921c` (= `main`), key APIs returned 200, and Vercel reported no runtime errors in 7 days.
+- Production on 2026-09-30 before the closeout: `dpl_CxF6WThSCMDdrftveicnzcN3FCC6` READY at `21b921c` (= `main`), key APIs returned 200, and Vercel reported no runtime errors in 7 days.
+- Production after the closeout merge: `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` READY at `abf6c82` (= `main`). The session, game, intake, review, checkpoint, and change-plan APIs returned 200 and showed the closeout behavior (intake processor routes and open-draft dedupe, categorized side quests, boss steps). `/today` showed the LifeOS Game card. Governed writes stayed `configured: false`, voice stayed browser-only, and Vercel reported no runtime errors in 7 days.
 
 ### Final pass/fail state
 
@@ -733,7 +735,7 @@ This is supplemental only. It does **not** replace the complete parallel suite r
 
 ### Remaining credential-only or local-UI-only actions
 
-1. On the owner's instruction, PR #74 was merged (`62a9df9`). The closeout PR #75, which carries this report, is to be merged once green. Its merge SHA and production deployment are recorded in a post-merge status update. Confirm the production deployment is READY before acceptance.
+1. Done on the owner's instruction: PR #74 merged as `62a9df9` and PR #75 as `abf6c82`, and production `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` was observed READY at `abf6c82`. Re-check the production deployment before acceptance.
 2. Configure the governed write credentials (`LIFEOS_WRITE_SECRET`, `LIFEOS_GITHUB_TOKEN`, `LIFEOS_ALLOWED_ORIGIN`) and, for approvals, Upstash Redis. Only if writes are intended.
 3. Optional paid voice: `OPENAI_API_KEY` (billing decision).
 4. Owner-only live checks:
