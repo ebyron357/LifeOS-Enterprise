@@ -1,0 +1,37 @@
+name: MAPS Integrity
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Pulse routine `maps-integrity-check` (Automations/ROUTINE_REGISTRY.json): daily at 06:17 UTC.
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  maps:
+    name: MAPS structural validation
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+
+      - name: Validate MAPS routes, signposts, and Pulse registry (Windows PowerShell)
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/validate-maps.ps1 -EvidenceDirectory Automations/runs/maps-integrity-check
+
+      - name: Preserve routine run evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maps-integrity-check-evidence
+          path: Automations/runs/maps-integrity-check/run-*.json
+          if-no-files-found: error
+          retention-days: 90
