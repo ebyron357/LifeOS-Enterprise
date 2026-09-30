@@ -20,10 +20,10 @@ export const PRIMARY_NAV: OsNavItem[] = [
 ];
 
 export const MOBILE_NAV: OsNavItem[] = [
-  PRIMARY_NAV[0],
-  PRIMARY_NAV[1],
-  PRIMARY_NAV[2],
-  PRIMARY_NAV[4],
+  PRIMARY_NAV.find((item) => item.href === "/")!,
+  PRIMARY_NAV.find((item) => item.href === "/conversation")!,
+  PRIMARY_NAV.find((item) => item.href === "/projects")!,
+  PRIMARY_NAV.find((item) => item.href === "/inbox")!,
   { href: "/more", label: "More", intent: "more", description: "Settings, vault browse, and advanced tools." },
 ];
 
