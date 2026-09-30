@@ -49,9 +49,15 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
   return (
     <div>
       <section className={styles.hero} aria-label="LifeOS command center summary">
-        <div>
+        <div className={styles.heroCopy}>
+          <div className={styles.heroEyebrow}>PERSONAL COMMAND CENTER · LIVE OPERATIONS</div>
           <h1>{greeting}</h1>
           <p>Focus. Execute. Build the life you designed.</p>
+          <div className={styles.heroActions}>
+            <Link href={resume.next.href || "/today"}>Resume mission</Link>
+            <Link href="/conversation">Talk to ARIA</Link>
+            <Link href="/life-map">Open My Life</Link>
+          </div>
         </div>
         <div className={styles.heroMeta}>
           <div><span>Date</span><strong>{dateLabel}</strong></div>
@@ -71,10 +77,19 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
       </nav>
 
       <section className={styles.grid}>
-        <article className={styles.panel}>
+        <article className={`${styles.panel} ${styles.attentionPanel}`}>
           <div className={styles.panelHead}>
-            <h2>What Needs You Now</h2>
+            <div>
+              <span className={styles.panelKicker}>TODAY</span>
+              <h2>What Needs You Now</h2>
+            </div>
             <Link href="/today">View all</Link>
+          </div>
+          <div className={styles.startHere}>
+            <h3>Start here</h3>
+            <strong>{resumeLabel}</strong>
+            <span>{resume.next.detail || (mission ? projectLine(mission) : "Choose the next verified action.")}</span>
+            <Link href={resume.next.href || (mission ? noteHref(mission.path) : "/today")}>Continue →</Link>
           </div>
           <div className={styles.focusList}>
             {focus.length ? focus.map((item, index) => (
@@ -99,11 +114,22 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
               </div>
             )}
           </div>
+          <div className={styles.blockerStrip}>
+            <div>
+              <h3>Blockers</h3>
+              <strong>{blocked.length}</strong>
+            </div>
+            <p>{blocked[0]?.blocker || "No blocker is currently recorded."}</p>
+            <Link href="/projects">Inspect blockers →</Link>
+          </div>
         </article>
 
-        <article className={styles.panel}>
+        <article className={`${styles.panel} ${styles.commsPanel}`}>
           <div className={styles.panelHead}>
-            <h2>Communications Hub</h2>
+            <div>
+              <span className={styles.panelKicker}>COMMS / AI / APPROVALS</span>
+              <h2>Communications Hub</h2>
+            </div>
             <Link href="/conversation">Open conversation</Link>
           </div>
 
@@ -152,7 +178,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
 
         <div className={styles.rightStack}>
           <article className={styles.panel}>
-            <div className={styles.panelHead}><h2>Today&apos;s Overview</h2><Link href="/today">Open Today</Link></div>
+            <div className={styles.panelHead}><div><span className={styles.panelKicker}>MISSION CLOCK</span><h2>Today</h2></div><Link href="/today">Open Today</Link></div>
             <div className={styles.metricGrid}>
               <div className={styles.metric}><strong>{vault.activeProjects}</strong><span>Active Projects</span></div>
               <div className={styles.metric}><strong>{vault.waitingOn}</strong><span>Waiting</span></div>
@@ -185,6 +211,12 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
             </div>
           </article>
         </div>
+      </section>
+
+      <section className={styles.sectionBar} aria-label="Execution systems">
+        <span>EXECUTION DECK</span>
+        <strong>Agents · Systems · Actions</strong>
+        <span>Everything routes somewhere real</span>
       </section>
 
       <section className={styles.bottomGrid}>
