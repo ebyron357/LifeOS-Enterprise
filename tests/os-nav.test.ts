@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { ADVANCED_NAV, MORE_PRIMARY_NAV, PRIMARY_NAV, isNavActive } from "@/lib/os/nav";
+import { ADVANCED_NAV, MOBILE_NAV, MORE_PRIMARY_NAV, PRIMARY_NAV, isNavActive } from "@/lib/os/nav";
 
 describe("LifeOS primary navigation", () => {
   it("keeps intent-first destinations and hides advanced browse from the primary list", () => {
     expect(PRIMARY_NAV.map((item) => item.href)).toEqual([
       "/",
+      "/life-map",
       "/conversation",
       "/projects",
       "/today",
@@ -20,7 +21,9 @@ describe("LifeOS primary navigation", () => {
     expect(ADVANCED_NAV.some((item) => item.href === "/prompts")).toBe(true);
     expect(ADVANCED_NAV.some((item) => item.href === "/resources/review")).toBe(true);
     expect(ADVANCED_NAV.some((item) => item.href === "/search")).toBe(true);
+    expect(MOBILE_NAV.map((item) => item.href)).toEqual(["/", "/conversation", "/projects", "/inbox", "/more"]);
     expect(MORE_PRIMARY_NAV.map((item) => item.href)).toEqual([
+      "/life-map",
       "/today",
       "/journal",
       "/learning",
