@@ -41,42 +41,62 @@ export function AppShell({ children, greeting }: AppShellProps) {
   return (
     <div className="os-app">
       <a className="os-skip skip-link" href="#main-content">Skip to main content</a>
-      <header className="os-topbar">
+
+      <aside className="os-sidebar">
         <Link className="os-brand" href="/">
           <span className="brand-mark">L</span>
           <div>
             <strong>LifeOS</strong>
-            <small>{greeting || "Command Center"}</small>
+            <small>Personal Command System</small>
           </div>
         </Link>
-        <Link className="os-ask" href="/conversation">Ask LifeOS</Link>
-        <div className="os-top-actions">
-          <button type="button" className="os-icon-btn" onClick={() => setPaletteOpen(true)} aria-label="Open command palette">
-            Search
-          </button>
-          <button type="button" className="os-icon-btn" onClick={() => setCaptureOpen(true)}>
-            Capture
-          </button>
-        </div>
-      </header>
 
-      <div className="os-body">
+        <div className="os-sidebar-label">COMMAND CENTER</div>
         <nav className="os-rail" aria-label="Primary">
-          {PRIMARY_NAV.map((item) => (
+          {PRIMARY_NAV.map((item, index) => (
             <Link key={item.href} href={item.href} aria-current={isNavActive(pathname, item.href) ? "page" : undefined}>
-              <strong>{item.label}</strong>
-              <span>{item.description}</span>
+              <span className="os-nav-index">{String(index + 1).padStart(2, "0")}</span>
+              <span className="os-nav-copy">
+                <strong>{item.label}</strong>
+                <span>{item.description}</span>
+              </span>
             </Link>
           ))}
           <Link href="/more" aria-current={isNavActive(pathname, "/more") ? "page" : undefined}>
-            <strong>More</strong>
-            <span>Settings, vault browse, and advanced tools.</span>
+            <span className="os-nav-index">11</span>
+            <span className="os-nav-copy">
+              <strong>More</strong>
+              <span>Settings, vault, systems, and advanced tools.</span>
+            </span>
           </Link>
         </nav>
 
-        <div className="os-main" id="main-content" tabIndex={-1}>
-          {children}
+        <div className="os-sidebar-footer">
+          <span className="os-status-dot" aria-hidden="true" />
+          <div>
+            <strong>System online</strong>
+            <span>{greeting || "Command Center"}</span>
+          </div>
         </div>
+      </aside>
+
+      <div className="os-shell">
+        <header className="os-topbar">
+          <div>
+            <span className="os-topbar-kicker">LIFE OPERATIONS</span>
+            <strong className="os-topbar-title">Command Center</strong>
+          </div>
+          <div className="os-top-actions">
+            <button type="button" className="os-command-trigger" onClick={() => setPaletteOpen(true)} aria-label="Open command palette">
+              <span>Search anything</span>
+              <kbd>Ctrl K</kbd>
+            </button>
+            <button type="button" className="os-icon-btn" onClick={() => setCaptureOpen(true)}>Capture</button>
+            <Link className="os-ask" href="/conversation">Ask LifeOS</Link>
+          </div>
+        </header>
+
+        <main className="os-main" id="main-content" tabIndex={-1}>{children}</main>
       </div>
 
       <nav className="os-dock" aria-label="Mobile">
@@ -90,7 +110,7 @@ export function AppShell({ children, greeting }: AppShellProps) {
       {paletteOpen ? (
         <div className="os-palette-overlay" role="presentation" onMouseDown={() => setPaletteOpen(false)}>
           <Command className="os-palette" label="LifeOS commands" onMouseDown={(event) => event.stopPropagation()}>
-            <Command.Input placeholder="Go somewhere or ask LifeOS…" aria-label="Search LifeOS destinations" />
+            <Command.Input placeholder="Search LifeOS, projects, tools, or destinations…" aria-label="Search LifeOS destinations" />
             <Command.List>
               <Command.Empty>No matching destination.</Command.Empty>
               {destinations.map((item) => (
@@ -102,7 +122,8 @@ export function AppShell({ children, greeting }: AppShellProps) {
                     router.push(item.href);
                   }}
                 >
-                  {item.label}
+                  <span>{item.label}</span>
+                  <small>{item.description}</small>
                 </Command.Item>
               ))}
             </Command.List>
