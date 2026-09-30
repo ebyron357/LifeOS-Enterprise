@@ -866,7 +866,8 @@
   background:linear-gradient(#7c6cff,#3dd9c4);
 }
 .os-card-topline { display:flex; justify-content:space-between; gap:16px; color:#667084; font-size:.66rem; font-weight:900; letter-spacing:.14em; }
-.os-focus-card h2 { max-width:760px; margin:28px 0 10px; font-size:clamp(1.5rem,2.7vw,2.4rem); letter-spacing:-.035em; }
+.os-focus-label { margin: 22px 0 0; color:#8d82ff; font-size:.72rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+.os-focus-card h2 { max-width:760px; margin:10px 0 10px; font-size:clamp(1.5rem,2.7vw,2.4rem); letter-spacing:-.035em; }
 .os-focus-card > p { max-width:760px; color:#8b95a8; line-height:1.55; }
 .os-outcomes { display:grid; gap:0; margin:22px 0 0; padding:0; list-style:none; }
 .os-outcomes li { display:grid; gap:4px; padding:13px 0; border-top:1px solid rgba(255,255,255,.07); }
@@ -927,7 +928,7 @@
 .os-capture input, .os-capture select, .os-journal textarea, .os-journal select, .os-learning input,
 .os-review-form input, .os-review-form select, .os-review-form textarea {
   width:100%; min-height:48px; padding:10px 12px; border:1px solid rgba(255,255,255,.1);
-  border-radius:11px; background:#0c1017; color:#f5f7fb; font:1rem inherit;
+  border-radius:11px; background:#0c1017; color:#f5f7fb; font-family: inherit; font-size: 1rem;
 }
 .os-journal textarea { min-height:160px; resize:vertical; }
 .os-review-form textarea { min-height:96px; resize:vertical; }
@@ -944,7 +945,7 @@
   background:rgba(2,4,8,.74); backdrop-filter:blur(12px);
 }
 .os-palette { width:min(680px,calc(100% - 24px)); padding:10px; border:1px solid rgba(124,108,255,.34); border-radius:18px; background:#0b0f17; box-shadow:0 30px 100px rgba(0,0,0,.5); }
-.os-palette input { width:100%; min-height:52px; padding:0 12px; border:0; outline:0; background:transparent; color:#fff; font:1rem inherit; }
+.os-palette input { width:100%; min-height:52px; padding:0 12px; border:0; outline:0; background:transparent; color:#fff; font-family: inherit; font-size: 1rem; }
 .os-palette [cmdk-item] { display:grid; gap:3px; min-height:50px; padding:10px 12px; border-radius:10px; cursor:pointer; }
 .os-palette [cmdk-item] small { color:#697387; }
 .os-palette [cmdk-item][data-selected="true"] { background:rgba(124,108,255,.12); }
