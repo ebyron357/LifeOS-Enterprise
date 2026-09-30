@@ -86,6 +86,7 @@ describe("Workspace OS Command Center", () => {
 
   afterEach(() => {
     cleanup();
+    vi.restoreAllMocks();
   });
 
   it("renders the default Command Center widgets", async () => {
@@ -105,18 +106,77 @@ describe("Workspace OS Command Center", () => {
     custom.focusedWidgetId = "morning-brief";
     window.localStorage.setItem(LAYOUT_STORAGE_KEY, serializeWorkspaceLayout(custom));
 
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
     render(<CommandCenterWorkspace data={data} github={github} />);
     fireEvent.click(await screen.findByRole("button", { name: /command palette/i }));
     expect(screen.getByLabelText("Search commands")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Reset dashboard layout"));
+    expect(confirm).toHaveBeenCalledTimes(1);
     expect(screen.getByText(/default layout restored/i)).toBeInTheDocument();
+    expect(parseWorkspaceLayout(window.localStorage.getItem(LAYOUT_STORAGE_KEY)).focusedWidgetId).toBeNull();
+  });
+
+  it("keeps the custom layout when the reset confirmation is cancelled", async () => {
+    const custom = createDefaultWorkspaceLayout();
+    custom.focusedWidgetId = "morning-brief";
+    custom.widgets["prayer"] = { minimized: false, hidden: true };
+    window.localStorage.setItem(LAYOUT_STORAGE_KEY, serializeWorkspaceLayout(custom));
+    const before = window.localStorage.getItem(LAYOUT_STORAGE_KEY);
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+
+    render(<CommandCenterWorkspace data={data} github={github} />);
+    fireEvent.click(await screen.findByRole("button", { name: /restore default layout/i }));
+    expect(confirm).toHaveBeenCalledTimes(1);
+    expect(screen.getByText(/restore cancelled/i)).toBeInTheDocument();
+    expect(window.localStorage.getItem(LAYOUT_STORAGE_KEY)).toBe(before);
+
+    fireEvent.click(screen.getByRole("button", { name: /command palette/i }));
+    fireEvent.click(screen.getByText("Reset dashboard layout"));
+    expect(confirm).toHaveBeenCalledTimes(2);
+    expect(window.localStorage.getItem(LAYOUT_STORAGE_KEY)).toBe(before);
   });
 
   it("opens the command palette and repairs layout", async () => {
     render(<CommandCenterWorkspace data={data} github={github} />);
     fireEvent.click(await screen.findByRole("button", { name: /command palette/i }));
     fireEvent.click(screen.getByText("Repair dashboard layout"));
-    expect(screen.getByText(/layout state repaired/i)).toBeInTheDocument();
+    expect(screen.getByText(/layout checked: no problems found/i)).toBeInTheDocument();
+  });
+
+  it("repairs a corrupted stored layout and lists what was fixed", async () => {
+    const corrupted = createDefaultWorkspaceLayout() as unknown as Record<string, unknown>;
+    const defaults = createDefaultWorkspaceLayout();
+    corrupted.layouts = {
+      ...defaults.layouts,
+      lg: [
+        ...defaults.layouts.lg.filter((item) => item.i !== "game-loop"),
+        { i: "ghost-widget", x: 0, y: 99, w: 4, h: 4 },
+      ],
+    };
+    corrupted.widgets = { ...defaults.widgets, "game-loop": { minimized: 3, hidden: "yes" } };
+    corrupted.widgetOrder = ["ghost-widget", ...defaults.widgetOrder, "mission-status"];
+    corrupted.focusedWidgetId = "ghost-widget";
+    window.localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(corrupted));
+
+    render(<CommandCenterWorkspace data={data} github={github} />);
+    // The truthy "yes" string hides the widget until the layout is repaired.
+    expect(screen.queryByLabelText("Game loop")).not.toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("button", { name: /^repair layout$/i }));
+
+    expect(screen.getByText(/layout state repaired \(\d+ fixes\)/i)).toBeInTheDocument();
+    const report = screen.getByLabelText("Layout repair report");
+    expect(report).toHaveTextContent("Removed unknown widget ids: ghost-widget.");
+    expect(report).toHaveTextContent("Removed duplicate entries for: Mission status.");
+    expect(report).toHaveTextContent("Restored default positions for: Game loop.");
+    expect(report).toHaveTextContent("Fixed invalid show/hide or minimize values for: Game loop.");
+    expect(report).toHaveTextContent('Cleared stale focus on "ghost-widget".');
+    expect(await screen.findByLabelText("Game loop")).toBeInTheDocument();
+
+    const stored = parseWorkspaceLayout(window.localStorage.getItem(LAYOUT_STORAGE_KEY));
+    expect(stored.widgets["game-loop"]).toEqual({ minimized: false, hidden: false });
+    expect(stored.focusedWidgetId).toBeNull();
+    expect(stored.widgetOrder).toEqual(defaults.widgetOrder);
+    expect(stored.layouts.lg.map((item) => item.i).sort()).toEqual([...defaults.widgetOrder].sort());
   });
 
   it("minimizes and restores a widget", async () => {
@@ -147,6 +207,7 @@ describe("Workspace OS Command Center", () => {
   });
 
   it("persists layout changes after restore and local-storage recovery", async () => {
+    vi.spyOn(window, "confirm").mockReturnValue(true);
     render(<CommandCenterWorkspace data={data} github={github} />);
     fireEvent.click(await screen.findByRole("button", { name: /restore default layout/i }));
     expect(screen.getByText(/default layout restored/i)).toBeInTheDocument();
@@ -179,6 +240,39 @@ describe("Workspace OS Command Center", () => {
     const { container } = render(<CommandCenterWorkspace data={data} github={github} />);
     expect(await screen.findByLabelText("Mission status")).toBeInTheDocument();
     expect(container.querySelector('[data-workspace-layout="stacked"]')).not.toBeNull();
+  });
+
+  it("moves a mobile widget past a hidden neighbor so the visible order changes", async () => {
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      value: (query: string) => ({
+        matches: query.includes("max-width: 900px"),
+        media: query,
+        onchange: null,
+        addListener() {},
+        removeListener() {},
+        addEventListener() {},
+        removeEventListener() {},
+        dispatchEvent() {
+          return false;
+        },
+      }),
+    });
+    const layout = createDefaultWorkspaceLayout();
+    // mission-status, [cognitive-support hidden], project-command-board ...
+    layout.widgets["cognitive-support"] = { minimized: false, hidden: true };
+    window.localStorage.setItem(LAYOUT_STORAGE_KEY, serializeWorkspaceLayout(layout));
+
+    const { container } = render(<CommandCenterWorkspace data={data} github={github} />);
+    await screen.findByLabelText("Mission status");
+    const visibleOrder = () => Array.from(container.querySelectorAll("[data-grid-id]")).map((node) => node.getAttribute("data-grid-id"));
+    expect(visibleOrder().slice(0, 2)).toEqual(["mission-status", "project-command-board"]);
+
+    const toolbar = screen.getByRole("toolbar", { name: "mission-status mobile controls" });
+    fireEvent.click(within(toolbar).getByRole("button", { name: "Move down" }));
+    expect(visibleOrder().slice(0, 2)).toEqual(["project-command-board", "mission-status"]);
+    const stored = parseWorkspaceLayout(window.localStorage.getItem(LAYOUT_STORAGE_KEY));
+    expect(stored.widgetOrder.slice(0, 3)).toEqual(["project-command-board", "cognitive-support", "mission-status"]);
   });
 
   it("supports widget library add/remove and ordering controls", async () => {

@@ -3,7 +3,13 @@
 import { Command } from "cmdk";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { filterCommands, type WorkspaceCommandId } from "@/lib/workspace/commands";
+import {
+  announceWorkspaceStatus,
+  filterCommands,
+  RESET_LAYOUT_CONFIRMATION,
+  type WorkspaceCommandId,
+} from "@/lib/workspace/commands";
+import { describeLayoutRepairs } from "@/lib/workspace/layout-storage";
 import { getWorkspace } from "@/lib/workspace/workspaces";
 import { useWorkspace } from "./WorkspaceProvider";
 
@@ -36,13 +42,18 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         window.dispatchEvent(new CustomEvent("lifeos-open-quick-capture"));
         break;
       case "reset-layout":
+        if (!window.confirm(RESET_LAYOUT_CONFIRMATION)) {
+          announceWorkspaceStatus("Default layout restore cancelled. Nothing changed.");
+          break;
+        }
         resetLayout();
-        window.dispatchEvent(new CustomEvent("lifeos-workspace-status", { detail: "Default layout restored." }));
+        announceWorkspaceStatus({ message: "Default layout restored.", repairs: [] });
         break;
-      case "repair-layout":
-        repairLayout();
-        window.dispatchEvent(new CustomEvent("lifeos-workspace-status", { detail: "Layout state repaired." }));
+      case "repair-layout": {
+        const repairs = repairLayout();
+        announceWorkspaceStatus({ message: describeLayoutRepairs(repairs), repairs });
         break;
+      }
       case "focus-next-widget":
         focusNextWidget();
         window.dispatchEvent(new CustomEvent("lifeos-workspace-status", { detail: "Focused next widget." }));

@@ -2,8 +2,11 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
+import { announceWorkspaceStatus } from "@/lib/workspace/commands";
 import { COMMAND_CENTER_WIDGET_META } from "@/lib/workspace/default-layout";
+import { describeLayoutRepairs } from "@/lib/workspace/layout-storage";
 import type { CommandCenterWidgetId, WidgetStatus } from "@/lib/workspace/types";
+import { WidgetErrorBoundary } from "./WidgetErrorBoundary";
 import { useWorkspace } from "./WorkspaceProvider";
 
 type WorkspaceWidgetProps = {
@@ -30,7 +33,7 @@ export function WorkspaceWidget({
   onOpenDetails,
   detailsLabel = "Open details",
 }: WorkspaceWidgetProps) {
-  const { state, setFocusedWidget, toggleMinimized } = useWorkspace();
+  const { state, setFocusedWidget, toggleMinimized, repairLayout } = useWorkspace();
   const prefersReducedMotion = useReducedMotion();
   const meta = COMMAND_CENTER_WIDGET_META[id];
   const chrome = state.widgets[id] ?? { minimized: false, hidden: false };
@@ -38,6 +41,11 @@ export function WorkspaceWidget({
   const reduceMotion = state.reducedMotion || Boolean(prefersReducedMotion);
 
   if (chrome.hidden) return null;
+
+  function repairFromWidget() {
+    const repairs = repairLayout();
+    announceWorkspaceStatus({ message: describeLayoutRepairs(repairs), repairs });
+  }
 
   return (
     <motion.section
@@ -84,7 +92,13 @@ export function WorkspaceWidget({
           ) : null}
         </div>
       </header>
-      {!chrome.minimized ? <div className="workspace-widget-body">{children}</div> : (
+      {!chrome.minimized ? (
+        <div className="workspace-widget-body">
+          <WidgetErrorBoundary widgetName={meta.title} onRepairLayout={repairFromWidget}>
+            {children}
+          </WidgetErrorBoundary>
+        </div>
+      ) : (
         <p className="workspace-widget-minimized-note">{meta.primaryAction}. Restore to continue.</p>
       )}
     </motion.section>

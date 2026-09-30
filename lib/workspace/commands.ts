@@ -58,3 +58,15 @@ export function filterCommands(query: string): WorkspaceCommand[] {
     return haystack.includes(normalized);
   });
 }
+
+export const WORKSPACE_STATUS_EVENT = "lifeos-workspace-status";
+
+export type WorkspaceStatusDetail = string | { message: string; repairs?: string[] };
+
+/** Sends a status line (and optional repair list) to the workspace shell's live region. */
+export function announceWorkspaceStatus(detail: WorkspaceStatusDetail): void {
+  window.dispatchEvent(new CustomEvent<WorkspaceStatusDetail>(WORKSPACE_STATUS_EVENT, { detail }));
+}
+
+export const RESET_LAYOUT_CONFIRMATION =
+  "Restore the default layout? This replaces your widget positions, sizes, minimized and hidden widgets in this browser. Your vault notes are not changed.";
