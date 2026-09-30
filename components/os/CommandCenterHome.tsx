@@ -22,6 +22,30 @@ function projectLine(project: ProjectBrief): string {
   return project.nextAction || project.blocker || project.waitingOn || "Open this project to choose the next move.";
 }
 
+const ownerLanes = [
+  { label: "ClientVerse", href: "/projects" },
+  { label: "Bravo Paws", href: "/businesses" },
+  { label: "Website Builds", href: "/portfolio" },
+  { label: "White Label", href: "/portfolio" },
+  { label: "Website Flipping", href: "/portfolio" },
+  { label: "Product Hunt", href: "/resources" },
+  { label: "n8n", href: "/automations" },
+  { label: "Claude", href: "/agents" },
+  { label: "Cursor", href: "/integrations" },
+  { label: "Adobe", href: "/resources" },
+  { label: "IBM", href: "/learning" },
+  { label: "AMP", href: "/automations" },
+  { label: "Veteran Resources", href: "/search" },
+  { label: "HyperFrames", href: "/projects" },
+  { label: "TikTok", href: "/growth" },
+  { label: "YouTube", href: "/growth" },
+  { label: "Content Systems", href: "/resources" },
+  { label: "Projects / Clients", href: "/projects" },
+  { label: "Finance", href: "/dashboard" },
+  { label: "Real Estate", href: "/dashboards" },
+  { label: "Communications", href: "/conversation" },
+];
+
 const launchers = [
   { label: "Communications", sub: "All channels", href: "/conversation", icon: "●" },
   { label: "Calendar", sub: "Your time", href: "/today", icon: "▣" },
@@ -79,6 +103,16 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
           </Link>
         ))}
       </nav>
+
+      <section className={styles.ownerWorld} aria-label="My operating world">
+        <div className={styles.ownerWorldTitle}>
+          <span>MY OPERATING WORLD</span>
+          <strong>Everything I run, build, learn, sell, and manage</strong>
+        </div>
+        <div className={styles.ownerLaneRow}>
+          {ownerLanes.map((item) => <Link key={item.label} href={item.href}>{item.label}</Link>)}
+        </div>
+      </section>
 
       <section className={styles.cockpit}>
         <article className={styles.panel}>
@@ -182,8 +216,12 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
         <article className={styles.panel}>
           <div className={styles.panelHead}><h2>Resume Where You Left Off</h2><Link href="/projects">View all</Link></div>
           <div className={styles.resumeStrip}>
-            {resumeProjects.map((project) => (
-              <Link key={project.path} href={noteHref(project.path)}><strong>{project.name}</strong><small>{projectLine(project)}</small><span>Resume →</span></Link>
+            {resumeProjects.map((project, index) => (
+              <Link key={project.path} href={noteHref(project.path)}>
+                <strong>{project.name}</strong>
+                <small>{projectLine(project)}</small>
+                <span>{index === 0 ? "Resume →" : "Open project →"}</span>
+              </Link>
             ))}
           </div>
         </article>
