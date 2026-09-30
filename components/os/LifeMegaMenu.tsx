@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 const groups = [
   {
@@ -93,13 +93,19 @@ const groups = [
 export function LifeMegaMenu() {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const panelId = useId();
 
   useEffect(() => {
+    if (!open) return;
     function onPointer(event: MouseEvent) {
       if (!root.current?.contains(event.target as Node)) setOpen(false);
     }
     function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      // Closing unmounts the panel; return focus so keyboard users are not dropped on <body>.
+      trigger.current?.focus();
     }
     document.addEventListener("mousedown", onPointer);
     document.addEventListener("keydown", onKey);
@@ -107,22 +113,24 @@ export function LifeMegaMenu() {
       document.removeEventListener("mousedown", onPointer);
       document.removeEventListener("keydown", onKey);
     };
-  }, []);
+  }, [open]);
 
   return (
     <div className="os-life-menu-root" ref={root}>
       <button
+        ref={trigger}
         type="button"
         className="os-life-menu-trigger"
         aria-expanded={open}
-        aria-haspopup="true"
+        aria-controls={open ? panelId : undefined}
         onClick={() => setOpen((value) => !value)}
       >
         My Life <span aria-hidden="true">⌄</span>
       </button>
 
       {open ? (
-        <div className="os-life-mega" role="menu" aria-label="LifeOS personal navigation">
+        // Disclosure of plain links (not an ARIA menu): Tab moves through the links in order.
+        <nav id={panelId} className="os-life-mega" aria-label="LifeOS personal navigation">
           <div className="os-life-mega-head">
             <div>
               <span>SECOND BRAIN NAVIGATION</span>
@@ -152,7 +160,7 @@ export function LifeMegaMenu() {
               </section>
             ))}
           </div>
-        </div>
+        </nav>
       ) : null}
     </div>
   );
