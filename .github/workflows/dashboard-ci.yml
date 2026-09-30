@@ -53,3 +53,14 @@ jobs:
       - name: Run browser journeys
         timeout-minutes: 20
         run: npm run test:e2e
+
+      - name: Upload visual acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifeos-visual-proof
+          path: |
+            artifacts/os-rebuild/*.png
+            test-results/**/*.png
+          if-no-files-found: warn
+          retention-days: 7
