@@ -18,7 +18,8 @@
 
 ## Current release state
 
-- Last recorded application-code baseline: `7982c92a7080f60f9fb70e7c66c5220b8178bc35` (PR #64 performance/dependency hardening).
+- The last recorded application-code baseline lives in `docs/CANONICAL_LIVE_STATUS.md` (not duplicated here, because it changes on every application merge).
+- Step-by-step owner/operator instructions (access, commands, redeploy, rollback, logs, credentials): `80 SOPs/LifeOS Owner's Operating Manual.md`.
 - GitHub `main` is authoritative for the live repository head.
 - Vercel production for `lifeos-enterprise` is authoritative for the live deployment ID and deployed Git SHA.
 - Documentation-only merges may trigger production deployments without changing application runtime code; always report the application-code baseline and live deployment identity separately.
@@ -114,6 +115,7 @@ npm run typecheck
 npm test
 npm run build
 pwsh -NoProfile -File ./scripts/audit-vault.ps1
+pwsh -NoProfile -File ./scripts/validate-maps.ps1   # after PR #74 (MAPS) merges
 npm audit --audit-level=high
 npx playwright install --with-deps chromium webkit
 npm run test:e2e
@@ -137,4 +139,5 @@ Playwright viewports: 1440 (desktop), 1024 (laptop), 390 (mobile). Vault audit c
 - Haitian Creole / French voice locales not verified
 - In-memory rate limiting remains process-local and is not shared across serverless instances
 - Live microphone/screen-share quality and permission behavior still require owner testing on real browsers/devices
-- Resource Intelligence remains a post-V1 platform build item until its durable intake/classification/disposition workflow is implemented end to end
+- Resource Intelligence has durable intake, write-time GitHub source evidence, source-type routing, open-draft-PR dedupe, and owner review. Automated YouTube/web/PDF processors, asset factory, implementation router, semantic dedupe, and staleness monitoring are post-V1 platform work. The Issue #56 acceptance candidate needs the owner write path configured.
+- Dashboard CI caps the job at 45 minutes, the browser install at 15, and browser journeys at 20. A stalled download fails fast and can be re-run once.

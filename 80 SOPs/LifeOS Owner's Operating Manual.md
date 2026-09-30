@@ -357,7 +357,7 @@ All steps are 🌐 Browser steps at `https://lifeos-enterprise.vercel.app/`.
 3. Read **Start here**: the single most important next action.
 4. Read **Where was I**: what you were doing, what is waiting, and what an agent can continue.
 5. Click **Resume work** to jump into that work.
-6. Optional: under **Where was I**, click **Save checkpoint** to save your place as an official record 🔑 (needs the Owner write secret; switched off until Part K is done).
+6. Optional: under **Where was I**, click **Save this as a checkpoint** to open it, then click **Save checkpoint** to save your place as an official record 🔑 (needs the Owner write secret; switched off until Part K is done).
 
 ## F2. Navigate the major areas
 

@@ -686,3 +686,61 @@ This is supplemental only. It does **not** replace the complete parallel suite r
 - Optional `LIFEOS_TTS_SECRET` / `OPENAI_API_KEY` for paid TTS; browser fallback remains.
 - Complete `docs/OWNER_ACCEPTANCE_WORKBOOK.md` on a preview, including write-secret, durable-store, displayed-args, browser TTS, and requesting-state rows.
 - Do not merge or deploy from the agent.
+
+## LifeOS closeout run — 2026-09-30 (`claude/eager-noether-oacbox` + PR #74)
+
+### Repairs completed
+
+- **PR #74 (MAPS):** fixed 9 Copilot findings over 3 review rounds, and all threads are resolved:
+  - the missing routine evidence directory
+  - a registry without `routines` being accepted
+  - legacy `SOPs/` routes, including paths beneath legacy folders
+  - only 2 of the 7 signposts being required
+  - the missing Learning and tests routes
+  - colliding evidence file names
+  - a stale evidence doc
+
+  Also added the scheduled `MAPS Integrity` workflow (daily 06:17 UTC, Windows PowerShell, evidence artifact).
+- **Dependency advisories:** pinned `next@16.3.8` (critical GHSA-vcvr-r3jv-pc5j) and took the `brace-expansion` fixes. `npm audit --audit-level=high` had turned CI red on `main`.
+- **Voice (#58):** fixed 15 items with tests (see `CHANGELOG.md`).
+- **Widgets and game loop (#42):** fixed 13 items with tests (see `CHANGELOG.md`).
+- **Resource Intelligence:** write-time source evidence, source-type routing, open-draft-PR dedupe, a clean 502 on upstream read failure, and a template aligned to the record contract.
+- **Vault parser:** YAML block-list frontmatter now parses, restoring tags for about 59 notes and every Resource record.
+- **App icon:** added, which removes the favicon 404 console error.
+- **Dashboard CI:** added timeouts after a Playwright browser install hung for more than 23 minutes.
+- **Owner manual:** replaced with a step-by-step v2.0. The owner acceptance workbook, canonical live status, and deployment guide are reconciled.
+
+### Validation evidence
+
+- Closeout branch, all fix sets merged:
+  - `npm audit --audit-level=high`: 0 vulnerabilities
+  - lint: PASS
+  - typecheck: PASS
+  - `npm test`: 72 files, 504 tests, all passing
+  - build: PASS
+- `pwsh -NoProfile -File scripts/audit-vault.ps1`: `PASS: canonical vault structure, templates, Bases, metadata, links, and embeds are valid.` (153 notes).
+- Playwright against the production build (Chromium 1440 / 1024 / 390): 160 passed, 5 skipped (expected viewport splits).
+- A scan of 17 routes: no console errors, page errors, or HTTP ≥ 400.
+- PR #74 candidate `1ca01b2`: green on every check.
+  - Dashboard CI passed on its one re-run after the runner stall.
+  - The other checks: vault audit, MAPS structural validation, and security review.
+  - Local `validate-maps.ps1` passed, and every negative fixture was rejected.
+- Production on 2026-09-30: `dpl_CxF6WThSCMDdrftveicnzcN3FCC6` READY at `21b921c` (= `main`), key APIs returned 200, and Vercel reported no runtime errors in 7 days.
+
+### Final pass/fail state
+
+**AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED.** The vault audit passes, and the Daily Command Center note and the web Command Center are operational.
+
+### Remaining credential-only or local-UI-only actions
+
+1. Merge PR #74 and the closeout PR (owner approval).
+2. Configure the governed write credentials (`LIFEOS_WRITE_SECRET`, `LIFEOS_GITHUB_TOKEN`, `LIFEOS_ALLOWED_ORIGIN`) and, for approvals, Upstash Redis. Only if writes are intended.
+3. Optional paid voice: `OPENAI_API_KEY` (billing decision).
+4. Owner-only live checks:
+   - real microphone and speakers
+   - screen share
+   - phone
+   - the Issue #56 Resource Intelligence acceptance candidate, after step 2
+   - local Windows/Obsidian visual checks
+
+   Step-by-step instructions are in `80 SOPs/LifeOS Owner's Operating Manual.md` and `docs/OWNER_ACCEPTANCE_WORKBOOK.md`.

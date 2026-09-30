@@ -2,6 +2,52 @@
 
 All notable changes to LifeOS Enterprise are documented in this file.
 
+## [Unreleased] — 2026-09-30 LifeOS closeout (claude/eager-noether-oacbox)
+
+### Security
+
+- Pin `next@16.3.8` (GHSA-vcvr-r3jv-pc5j, critical `next/og` RCE) and take lockfile-only `brace-expansion` fixes so `npm audit --audit-level=high` passes again.
+
+### Fixed — voice (#58)
+
+- OpenAI TTS sends `response_format` (the documented parameter) instead of `format`.
+- OpenAI voice is reported configured only when a paid-TTS authorization secret also exists. The client never auto-selects it and only calls it after the owner types the secret.
+- Interrupt, Stop conversation, and newer replies cancel in-flight turn and speech requests, so stale replies never speak and clips never overlap.
+- Added a voice picker (browser voices for the locale; OpenAI allowlist validated server-side), BCP-47 locale speech, and a visible warning instead of silent language switching.
+- Settings load from browser storage independently of the session fetch and are never overwritten by defaults.
+- Fixed a recognition restart loop and the push-to-talk mode reset. The error alert clears on recovery (**Try again**).
+- Duplicate-turn protection (in-flight guard + identical-transcript window). A visible provider/fallback indicator. Capability and privacy notes before the microphone starts.
+- `concise` response style shortens the spoken reply deterministically. Primary voice controls are ≥ 44 px.
+
+### Fixed — widgets and game loop (#42)
+
+- A per-widget error boundary plus `app/error.tsx` and `app/global-error.tsx`, so one failing widget no longer takes down the page. Browser storage failures surface a diagnostic instead of throwing.
+- **Repair layout** now removes unknown/duplicate ids, restores missing widgets, clears stale focus, and lists what it fixed. Mobile reorder skips hidden widgets.
+- **Reset game** and **Restore default layout** ask first. The game keeps a backup of the previous state.
+- Streak recovery restores the pre-gap streak. Boss battles require every step before they can be claimed.
+- Side quests (health, learning, money, relationships, service, personal growth) are derived only from canonical vault records.
+- Reward/level-up/achievement announcements. An end-of-day results panel. A read-only **LifeOS Game** card on `/today`.
+- E2E: real resize, drag-persistence, hide-after-reload, repair, mobile-order, console-error, XP-exactly-once (double-click + reload), level-up, and achievement-once checks.
+
+### Fixed — Resource Intelligence
+
+- The intake re-fetches GitHub evidence server-side at write time and writes a `## Source Evidence` section plus `evidence_status`/`evidence_inspected_at`.
+- Records get a deterministic `processor_route` per source type, pointing only at existing processors, SOPs, or templates.
+- Repeated captures before merge update the one open draft PR on a deterministic branch instead of opening competing PRs.
+- Upstream read failures return a clean 502. `99 Templates/Resource.md` matches the record contract.
+
+### Fixed — platform
+
+- The vault frontmatter parser reads YAML block lists (`tags:` + `- item`), restoring tags for about 59 notes and all Resource records.
+- Added `app/icon.svg`: the first page load no longer logs a favicon 404 console error.
+- Dashboard CI job and browser steps have timeouts, so a hung browser download fails fast.
+
+### Documentation
+
+- `80 SOPs/LifeOS Owner's Operating Manual.md` v2.0 is a complete step-by-step owner/operator guide.
+- `docs/OWNER_ACCEPTANCE_WORKBOOK.md` is refreshed for voice, Resource Intelligence, and MAPS.
+- Canonical status, deployment guide, and vault repair report are reconciled.
+
 ## [Unreleased] — post-#60 security corrective (draft PR)
 
 ### Security
