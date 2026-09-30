@@ -55,7 +55,7 @@ Each routine must declare:
 
 Evidence contract:
 - Each routine keeps a tracked directory under `Automations/runs/<routine-id>/` (a `.gitkeep` holds it in Git).
-- Local runs that pass `-EvidenceDirectory` write `run-<UTC timestamp>.json` records there; those local records are Git-ignored machine output.
+- Local runs that pass `-EvidenceDirectory` write `run-<yyyyMMddTHHmmssfffZ>-<8-hex nonce>.json` records there (created with create-new semantics, so concurrent runs never overwrite each other); those local records are Git-ignored machine output.
 - Scheduled GitHub Actions runs keep their durable evidence as a workflow artifact named in the registry entry's `evidence_artifact` field (for `maps-integrity-check`: `maps-integrity-check-evidence`, 90-day retention), next to the run log.
 - Failure escalation for GitHub Actions routines is the failed-run notification GitHub sends the repository owner. The registry `failure_cap` is the owner's stop rule: after that many consecutive failed runs, disable the workflow in GitHub Actions until the cause is fixed.
 
