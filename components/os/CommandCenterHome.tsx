@@ -93,7 +93,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
           <h2>{mission ? mission.name : "Choose today's lead mission"}</h2>
           <p>{mission ? projectLine(mission) : "No active project is marked as the lead mission."}</p>
           <Link className="os-primary" href={resume.next.href || (mission ? noteHref(mission.path) : "/inbox")}>
-            {resume.next.ownership === "owner" ? "Handle next action" : mission ? "Resume mission" : "Capture next move"}
+            {resume.next.ownership === "owner" ? "This needs you" : mission ? `Resume ${mission.name}` : "Capture next move"}
           </Link>
         </article>
 
