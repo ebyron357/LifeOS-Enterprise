@@ -738,7 +738,10 @@
   .os-life-mega-head { align-items: flex-start; flex-direction: column; }
   .os-life-mega-grid { grid-template-columns: 1fr; }
 }
-\n\n/* Premium command center visual layer */\n.os-app {
+
+
+/* Premium command center visual layer */
+.os-app {
   min-height: 100vh;
   color: #f5f7fb;
   background:
