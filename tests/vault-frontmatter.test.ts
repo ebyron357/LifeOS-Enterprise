@@ -10,6 +10,34 @@ describe("frontmatter parsing", () => {
     expect(body.startsWith("# Title")).toBe(true);
   });
 
+  it("parses YAML block-list values such as tags and aliases", () => {
+    const source = [
+      "---",
+      "type: area",
+      "tags:",
+      "  - health",
+      "  - \"mobility\"",
+      "aliases:",
+      "- Health",
+      "status: active",
+      "empty:",
+      "review_date: 2026-10-01",
+      "---",
+      "# Physical Health",
+    ].join("\n");
+    const { frontmatter } = parseFrontmatter(source);
+    expect(frontmatter.tags).toEqual(["health", "mobility"]);
+    expect(frontmatter.aliases).toEqual(["Health"]);
+    expect(frontmatter.status).toBe("active");
+    expect(frontmatter.empty).toBe("");
+    expect(frontmatter.review_date).toBe("2026-10-01");
+  });
+
+  it("keeps inline list values unchanged", () => {
+    const { frontmatter } = parseFrontmatter("---\ntags: [a, 'b']\n---\n");
+    expect(frontmatter.tags).toEqual(["a", "b"]);
+  });
+
   it("returns empty frontmatter for malformed blocks without crashing", () => {
     const { frontmatter, body } = parseFrontmatter("# No frontmatter");
     expect(frontmatter).toEqual({});

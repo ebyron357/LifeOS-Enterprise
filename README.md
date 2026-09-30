@@ -81,6 +81,8 @@ Community plugins are optional. Add Templater, QuickAdd, Tasks, Calendar, or Dat
 
 ## Key Files
 
+- `80 SOPs/LifeOS Owner's Operating Manual.md` — step-by-step owner/operator manual (start here)
+- `MAPS.md` — master routing map to every canonical area (`maps/` signposts)
 - `00 Home/Life OS.md` — main Bases-first dashboard
 - `Command Center/Daily Command Center.md` — Dataview command center for daily execution
 - `Dashboards/Weekly Review.md` and `Dashboards/Monthly Review.md` — periodic review dashboards
@@ -98,6 +100,7 @@ Community plugins are optional. Add Templater, QuickAdd, Tasks, Calendar, or Dat
 - `CHANGELOG.md` — version history
 - `scripts/setup-obsidian.ps1` — non-destructive local setup
 - `scripts/audit-vault.ps1` — structural and metadata validation
+- `scripts/validate-maps.ps1` — MAPS routes and Pulse routine registry validation
 - `app/dashboard/page.tsx` — executive overview and command center
 - `docs/WEB_VAULT_PORTAL.md` — read-only vault browser architecture
 - `docs/WEB_AGENT_OPERATIONS.md` — agent operating layer for Cursor, Claude Code, and Codex

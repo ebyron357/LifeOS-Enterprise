@@ -1243,3 +1243,62 @@ html[data-lifeos-reduced-motion="true"] .workspace-rgl * {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Widget resilience and game feedback (issue #42). */
+.widget-error,
+.route-error {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--red);
+  background: rgba(255, 83, 104, .08);
+  color: var(--text);
+}
+.route-error { max-width: 64ch; margin: 48px auto; }
+.widget-error-message { margin: 0; color: var(--amber); font: 700 .75rem ui-monospace, monospace; overflow-wrap: anywhere; }
+.widget-error-hint { margin: 0; color: var(--muted); font-size: .72rem; }
+.widget-error-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.widget-error button,
+.route-error button {
+  min-height: 36px;
+  border: 1px solid var(--line-hot);
+  background: transparent;
+  color: var(--text);
+  font: 700 .62rem ui-monospace, monospace;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.workspace-repair-report { display: grid; gap: 6px; padding: 10px; border: 1px solid var(--line); }
+.workspace-repair-report p,
+.workspace-repair-report ul { margin: 0; }
+.workspace-repair-report ul { padding-left: 18px; display: grid; gap: 4px; }
+.workspace-repair-report .workspace-action { justify-self: start; }
+.game-loop-celebration { display: grid; gap: 4px; min-height: 0; }
+.game-loop-celebration p {
+  margin: 0;
+  padding: 6px 10px;
+  border-left: 3px solid var(--green);
+  background: rgba(55, 243, 162, .08);
+  color: var(--text);
+  font: 700 .72rem ui-monospace, monospace;
+  animation: game-loop-reward 1.2s ease-out 1;
+}
+@keyframes game-loop-reward {
+  from { background: rgba(55, 243, 162, .32); }
+  to { background: rgba(55, 243, 162, .08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .game-loop-celebration p { animation: none; }
+}
+html[data-lifeos-reduced-motion="true"] .game-loop-celebration p { animation: none; }
+.game-loop-hint,
+.game-loop-note { color: var(--muted); font-size: .68rem; margin: 0; }
+.game-loop-eod { display: grid; gap: 8px; margin-top: 12px; padding: 10px; border: 1px solid var(--line); }
+.game-loop-eod p { margin: 0; }
+.game-loop-eod-quests { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.game-loop-eod-quests li { display: flex; justify-content: space-between; gap: 10px; font-size: .75rem; }
+.game-loop-eod-quests strong { color: var(--green); white-space: nowrap; }
+.game-loop-eod-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin: 0; }
+.game-loop-eod-stats div { border: 1px solid var(--line); padding: 8px; }
+.game-loop-eod-stats dt { color: var(--muted); font-size: .58rem; text-transform: uppercase; }
+.game-loop-eod-stats dd { margin: 4px 0 0; color: var(--cyan); font-weight: 700; }

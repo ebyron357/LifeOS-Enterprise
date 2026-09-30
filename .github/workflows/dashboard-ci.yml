@@ -13,6 +13,9 @@ jobs:
   validate:
     name: Next.js dashboard validation
     runs-on: ubuntu-latest
+    # A hung dependency or browser download must fail fast instead of holding the
+    # runner for the 6-hour default.
+    timeout-minutes: 45
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -44,7 +47,9 @@ jobs:
         run: npm run build
 
       - name: Install Playwright browsers
+        timeout-minutes: 15
         run: npx playwright install --with-deps chromium webkit
 
       - name: Run browser journeys
+        timeout-minutes: 20
         run: npm run test:e2e

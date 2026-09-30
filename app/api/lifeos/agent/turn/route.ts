@@ -5,6 +5,7 @@ import { validOrigin, withinAgentRateLimit } from "@/lib/agent/http";
 import type { AgentTurnInput, ApprovalRequest, ScreenAwarenessSnapshot, TeachingMode } from "@/lib/agent/types";
 import { getVaultDashboardData } from "@/lib/lifeos/vault-data";
 import { authorizeVoiceRequest } from "@/lib/voice/security";
+import { composeSpokenReply, isResponseStyle, type ResponseStyle } from "@/lib/voice/voice-options";
 
 export const runtime = "nodejs";
 
@@ -17,6 +18,8 @@ type TurnBody = {
   teachingMode?: TeachingMode | null;
   pendingApprovals?: ApprovalRequest[];
   transcriptPrivacy?: "ephemeral" | "hidden";
+  /** Voice response style. `concise` shortens the spoken reply only; the written reply is unchanged. */
+  responseStyle?: ResponseStyle | string;
 };
 
 export async function POST(request: Request) {
@@ -54,7 +57,9 @@ export async function POST(request: Request) {
     teachingMode: body.teachingMode ?? null,
   };
 
-  const result = await processAgentTurn(input);
+  const responseStyle: ResponseStyle = isResponseStyle(body.responseStyle) ? body.responseStyle : "balanced";
+  const processed = await processAgentTurn(input);
+  const result = { ...processed, spokenReply: composeSpokenReply(processed.spokenReply, responseStyle) };
   logAgentEvent({
     event: result.waitingForOwner ? "approval-requested" : "mission-completed",
     at: nowIso,
@@ -62,5 +67,5 @@ export async function POST(request: Request) {
     status: result.state,
   });
 
-  return NextResponse.json({ ok: true, result });
+  return NextResponse.json({ ok: true, result, responseStyle });
 }

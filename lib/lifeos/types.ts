@@ -22,6 +22,8 @@ export type BusinessBrief = {
   name: string;
   path: string;
   status: string;
+  /** Canonical `kpi_focus` frontmatter, when the business note records one. */
+  kpiFocus?: string;
 };
 
 export type PersonBrief = {
@@ -29,6 +31,19 @@ export type PersonBrief = {
   path: string;
   organization: string;
   role: string;
+};
+
+/** Minimal brief of an active `type: area` note. Used to derive honest, canonical side quests. */
+export type AreaBrief = {
+  name: string;
+  path: string;
+  status: string;
+  tags: string[];
+  /** Frontmatter `standard`, when present. */
+  standard: string;
+  /** First sentence of the `## Purpose` section, when present. */
+  purpose: string;
+  reviewDate: string;
 };
 
 export type GrowthBrief = {
@@ -47,5 +62,7 @@ export type VaultDashboardData = {
   agents: AgentBrief[];
   businesses: BusinessBrief[];
   people: PersonBrief[];
+  /** Active area notes. Optional so older fixtures and callers remain valid. */
+  areas?: AreaBrief[];
   growth: GrowthBrief;
 };

@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import { RESET_LAYOUT_CONFIRMATION, WORKSPACE_STATUS_EVENT, type WorkspaceStatusDetail } from "@/lib/workspace/commands";
+import { describeLayoutRepairs, LAYOUT_SAVE_FAILED_MESSAGE } from "@/lib/workspace/layout-storage";
 import { WORKSPACES, workspaceFromPath } from "@/lib/workspace/workspaces";
 import { CommandPalette } from "./CommandPalette";
 import { useWorkspace } from "./WorkspaceProvider";
@@ -29,6 +31,23 @@ export function WorkspaceShell({
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState("Workspace ready.");
+  const [repairReport, setRepairReport] = useState<string[]>([]);
+
+  function restoreDefaultLayout() {
+    if (!window.confirm(RESET_LAYOUT_CONFIRMATION)) {
+      setStatusMessage("Default layout restore cancelled. Nothing changed.");
+      return;
+    }
+    const saved = resetLayout();
+    setRepairReport([]);
+    setStatusMessage(saved ? "Default layout restored." : `Default layout could not be saved. ${LAYOUT_SAVE_FAILED_MESSAGE}`);
+  }
+
+  function runLayoutRepair() {
+    const { repairs, saved } = repairLayout();
+    setRepairReport(saved ? repairs : []);
+    setStatusMessage(describeLayoutRepairs(repairs, saved));
+  }
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -50,15 +69,21 @@ export function WorkspaceShell({
     }
 
     function onStatus(event: Event) {
-      const detail = (event as CustomEvent<string>).detail;
-      if (detail) setStatusMessage(detail);
+      const detail = (event as CustomEvent<WorkspaceStatusDetail>).detail;
+      if (!detail) return;
+      if (typeof detail === "string") {
+        setStatusMessage(detail);
+        return;
+      }
+      setStatusMessage(detail.message);
+      if (detail.repairs) setRepairReport(detail.repairs);
     }
 
     document.addEventListener("keydown", onKeyDown);
-    window.addEventListener("lifeos-workspace-status", onStatus);
+    window.addEventListener(WORKSPACE_STATUS_EVENT, onStatus);
     return () => {
       document.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("lifeos-workspace-status", onStatus);
+      window.removeEventListener(WORKSPACE_STATUS_EVENT, onStatus);
     };
   }, []);
 
@@ -78,20 +103,14 @@ export function WorkspaceShell({
           <button
             type="button"
             className="workspace-action workspace-action--primary"
-            onClick={() => {
-              resetLayout();
-              setStatusMessage("Default layout restored.");
-            }}
+            onClick={restoreDefaultLayout}
           >
             Restore default layout
           </button>
           <button
             type="button"
             className="workspace-action"
-            onClick={() => {
-              repairLayout();
-              setStatusMessage("Layout state repaired.");
-            }}
+            onClick={runLayoutRepair}
           >
             Repair layout
           </button>
@@ -143,6 +162,17 @@ export function WorkspaceShell({
       </nav>
 
       <p className="workspace-live-region" aria-live="polite">{statusMessage}</p>
+      {repairReport.length ? (
+        <section className="workspace-diagnostics workspace-repair-report" aria-label="Layout repair report">
+          <p>What was repaired:</p>
+          <ul>
+            {repairReport.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+          <button type="button" className="workspace-action" onClick={() => setRepairReport([])}>
+            Dismiss repair report
+          </button>
+        </section>
+      ) : null}
       {diagnostics.length ? (
         <p className="workspace-diagnostics" role="status">{diagnostics.join(" ")}</p>
       ) : null}

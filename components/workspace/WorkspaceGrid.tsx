@@ -12,6 +12,7 @@ import "react-resizable/css/styles.css";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { BreakpointLayouts, CommandCenterWidgetId } from "@/lib/workspace/types";
 import { useWorkspace } from "./WorkspaceProvider";
+import { WORKSPACE_GRID_COLS } from "@/lib/workspace/default-layout";
 
 type WorkspaceGridProps = {
   widgets: Array<{ id: CommandCenterWidgetId; node: ReactNode }>;
@@ -20,7 +21,7 @@ type WorkspaceGridProps = {
 // lg starts below typical sidebar-adjusted desktop widths so the multi-column
 // board is active around 1100px content width, not only at full 1200px+.
 const BREAKPOINTS = { lg: 1100, md: 901, sm: 600, xs: 0 };
-const COLS = { lg: 12, md: 10, sm: 6, xs: 4 };
+const COLS = WORKSPACE_GRID_COLS;
 
 export function WorkspaceGrid({ widgets }: WorkspaceGridProps) {
   const { state, hydrated, setLayouts, moveWidget, setWidgetHidden, toggleMinimized } = useWorkspace();
@@ -87,12 +88,12 @@ export function WorkspaceGrid({ widgets }: WorkspaceGridProps) {
         {visibleWidgets.map(({ id, node }, index) => (
           <div key={id} className="workspace-grid-item workspace-grid-item--mobile" data-grid-id={id}>
             <div className="workspace-mobile-chrome" role="toolbar" aria-label={`${id} mobile controls`}>
-              <button type="button" onClick={() => moveWidget(id, "up")} disabled={index === 0}>
+              <button type="button" onClick={() => moveWidget(id, "up", { visibleOnly: true })} disabled={index === 0}>
                 Move up
               </button>
               <button
                 type="button"
-                onClick={() => moveWidget(id, "down")}
+                onClick={() => moveWidget(id, "down", { visibleOnly: true })}
                 disabled={index === visibleWidgets.length - 1}
               >
                 Move down

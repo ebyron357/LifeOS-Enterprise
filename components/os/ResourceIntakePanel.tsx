@@ -12,9 +12,24 @@ type IntakeResult = {
   ok?: boolean;
   duplicate?: boolean;
   resource?: { path?: string; sourceType?: string; sourceIdentity?: string };
-  pullRequest?: { number?: number | null; url?: string | null; draft?: boolean };
+  pullRequest?: { number?: number | null; url?: string | null; draft?: boolean; reused?: boolean };
+  routing?: { processorRoute?: string; automated?: boolean };
+  evidence?: { status?: string; inspectedAt?: string | null; error?: string };
   error?: string;
 };
+
+function intakeOutcome(result: IntakeResult): { heading: string; detail: string } {
+  if (result.pullRequest?.reused) {
+    return {
+      heading: "Open draft PR updated",
+      detail: "An open intake draft PR already stages this record, so it was updated instead of opening a competing PR.",
+    };
+  }
+  if (result.duplicate) {
+    return { heading: "Canonical record matched", detail: "Exact identity dedupe updated the existing record in a draft PR." };
+  }
+  return { heading: "Canonical record staged", detail: "A new canonical Resource record was created in a draft PR." };
+}
 
 type GitHubEvidence = {
   repository: string;
@@ -189,6 +204,10 @@ export function ResourceIntakePanel() {
                 This is read-only source evidence. A TEMPLATE suggestion is shown only when the README explicitly describes
                 the repository as a reusable template/starter. LifeOS does not auto-adopt or implement it.
               </p>
+              <p className="os-lede">
+                This preview is not sent with the capture. Staging the canonical PR re-inspects the repository on the server
+                and records the result in the record&apos;s Source Evidence section.
+              </p>
             </div>
           ) : null}
 
@@ -227,13 +246,21 @@ export function ResourceIntakePanel() {
 
       {state === "completed" && result ? (
         <div className="os-empty" role="status">
-          <h3>{result.duplicate ? "Canonical record matched" : "Canonical record staged"}</h3>
+          <h3>{intakeOutcome(result).heading}</h3>
           <p>{result.resource?.path}</p>
-          <p>
-            {result.duplicate
-              ? "Exact identity dedupe updated the existing record in a draft PR."
-              : "A new canonical Resource record was created in a draft PR."}
-          </p>
+          <p>{intakeOutcome(result).detail}</p>
+          {result.evidence?.status ? (
+            <p>
+              Source evidence: {result.evidence.status}
+              {result.evidence.error ? ` (${result.evidence.error})` : ""}
+            </p>
+          ) : null}
+          {result.routing?.processorRoute ? (
+            <p>
+              Processor route: {result.routing.processorRoute}
+              {result.routing.automated ? " (automated, read-only)" : " (manual next step)"}
+            </p>
+          ) : null}
           {result.pullRequest?.url ? (
             <a href={result.pullRequest.url} target="_blank" rel="noreferrer">
               Open draft PR #{result.pullRequest.number}

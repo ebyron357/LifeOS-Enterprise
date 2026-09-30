@@ -41,10 +41,15 @@ export function encodeRepoPath(path: string) {
   return path.split("/").map(encodeURIComponent).join("/");
 }
 
-export async function readCanonicalFile(path: string, token: string): Promise<{ sha: string; source: string } | null> {
+/** Reads a file from `main` (default) or from another branch. Returns null when the file does not exist there. */
+export async function readCanonicalFile(
+  path: string,
+  token: string,
+  ref: string = RESOURCE_BASE_BRANCH,
+): Promise<{ sha: string; source: string } | null> {
   try {
     const data = await github(
-      `/repos/${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}/contents/${encodeRepoPath(path)}?ref=${RESOURCE_BASE_BRANCH}`,
+      `/repos/${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}/contents/${encodeRepoPath(path)}?ref=${encodeURIComponent(ref)}`,
       token,
     );
     const content = typeof data.content === "string" ? data.content : "";
@@ -76,6 +81,93 @@ export function resourceBranchName(prefix: string, slug: string) {
   const safeSlug = slug.slice(0, 42).replace(/[^a-z0-9-]/gi, "-");
   const unique = `${Date.now().toString(36)}-${randomBytes(4).toString("hex")}`;
   return `lifeos/${prefix}-${safeSlug}-${unique}`;
+}
+
+/**
+ * Branch prefix shared by every intake branch for one canonical Resource record. Each request stages
+ * on its own branch (`<prefix><nonce>`), so no request ever moves or overwrites another request's
+ * branch; repeated captures find the record's open intake PR by this prefix and update that PR.
+ */
+export function resourceIntakeBranchPrefix(recordSlug: string) {
+  const safeSlug = recordSlug.slice(0, 96).replace(/[^a-z0-9-]/gi, "-").replace(/^-+|-+$/g, "") || "resource";
+  return `lifeos/resource-intake/${safeSlug}--`;
+}
+
+/** A new, unique intake branch for one request. */
+export function resourceIntakeBranchName(recordSlug: string, nonce: string = randomBytes(5).toString("hex")) {
+  return `${resourceIntakeBranchPrefix(recordSlug)}${nonce}`;
+}
+
+export type OpenPullRequest = {
+  number: number | null;
+  url: string | null;
+  draft: boolean;
+  headRef: string;
+};
+
+type PullPayload = {
+  number?: number;
+  html_url?: string;
+  draft?: boolean;
+  state?: string;
+  head?: { ref?: string; repo?: { full_name?: string } | null };
+};
+
+/** Finds an open pull request into `main` whose head is `branch` in the canonical vault repository. */
+export async function findOpenPullRequestForBranch(branch: string, token: string): Promise<OpenPullRequest | null> {
+  const head = encodeURIComponent(`${RESOURCE_REPO_OWNER}:${branch}`);
+  const data: unknown = await github(
+    `/repos/${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}/pulls?state=open&base=${RESOURCE_BASE_BRANCH}&head=${head}&per_page=10`,
+    token,
+  );
+  const repository = `${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}`.toLowerCase();
+  const pull = (Array.isArray(data) ? (data as PullPayload[]) : []).find((candidate) =>
+    candidate?.state === "open"
+    && candidate.head?.ref === branch
+    && (!candidate.head.repo?.full_name || candidate.head.repo.full_name.toLowerCase() === repository),
+  );
+  if (!pull) return null;
+  return {
+    number: typeof pull.number === "number" ? pull.number : null,
+    url: typeof pull.html_url === "string" ? pull.html_url : null,
+    draft: pull.draft !== false,
+    headRef: branch,
+  };
+}
+
+/**
+ * Finds the oldest open **draft** pull request into `main` whose head branch starts with `prefix` in
+ * the canonical vault repository (the open intake PR for one Resource record, whatever its nonce).
+ */
+export async function findOpenPullRequestByBranchPrefix(prefix: string, token: string): Promise<OpenPullRequest | null> {
+  const repository = `${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}`.toLowerCase();
+  for (let page = 1; page <= 3; page += 1) {
+    const data: unknown = await github(
+      `/repos/${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}/pulls?state=open&base=${RESOURCE_BASE_BRANCH}&per_page=100&page=${page}`,
+      token,
+    );
+    const list = Array.isArray(data) ? (data as PullPayload[]) : [];
+    const match = list
+      .filter((candidate) =>
+        candidate?.state === "open"
+        // Only draft PRs are reused: once the owner marks an intake PR ready for review, its
+        // content is frozen and a later capture opens a new draft instead.
+        && candidate.draft !== false
+        && typeof candidate.head?.ref === "string"
+        && candidate.head.ref.startsWith(prefix)
+        && (!candidate.head.repo?.full_name || candidate.head.repo.full_name.toLowerCase() === repository))
+      .sort((a, b) => (a.number ?? Number.MAX_SAFE_INTEGER) - (b.number ?? Number.MAX_SAFE_INTEGER))[0];
+    if (match) {
+      return {
+        number: typeof match.number === "number" ? match.number : null,
+        url: typeof match.html_url === "string" ? match.html_url : null,
+        draft: match.draft !== false,
+        headRef: match.head!.ref!,
+      };
+    }
+    if (list.length < 100) break;
+  }
+  return null;
 }
 
 export type BoundedJsonResult =
