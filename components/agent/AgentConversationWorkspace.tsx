@@ -678,7 +678,28 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
 
   return (
     <div className={styles.workspace}>
-      <section className={styles.panel} aria-label="Conversation">
+      <header className={styles.commsHero}>
+        <div>
+          <span className={styles.eyebrow}>COMMUNICATIONS COMMAND</span>
+          <h1>ARIA Communications Hub</h1>
+          <p>Talk, type, share your screen, review approvals, and keep the mission moving from one place.</p>
+        </div>
+        <div className={styles.commsStatus}>
+          <span data-tone={voice.microphoneOpen ? "ok" : "warn"}>{voiceLabel}</span>
+          <span data-tone={screen.state === "active" ? "ok" : "neutral"}>{screen.state === "active" ? "Screen shared" : "Screen off"}</span>
+          <span data-tone={paused ? "warn" : "ok"}>{paused ? "Agent paused" : "Agent ready"}</span>
+        </div>
+      </header>
+
+      <nav className={styles.channelBar} aria-label="Communication modes">
+        <a href="#conversation-heading">ARIA Chat</a>
+        <a href="#agent-activity">Approvals</a>
+        <a href="#screen-share">Screen</a>
+        <a href="#context-panel">Context</a>
+        <a href="#advanced-settings">Settings</a>
+      </nav>
+
+      <section className={`${styles.panel} ${styles.conversationPanel}`} aria-label="Conversation">
         <h2 id="conversation-heading" tabIndex={-1}>Conversation</h2>
         <div className={styles.statusRow} aria-live="polite">
           <span className={styles.badge} data-tone={voice.microphoneOpen ? "ok" : "warn"}>{voiceLabel}</span>
@@ -774,7 +795,9 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         ) : null}
       </section>
 
-      <section className={styles.panel} aria-label="Voice settings">
+      <details className={styles.advanced} id="advanced-settings">
+        <summary>Voice & accessibility settings</summary>
+        <section className={styles.panel} aria-label="Voice settings">
         <h2>Voice settings</h2>
         <div className={styles.toolbar}>
           <label>
@@ -891,10 +914,11 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         {unavailableProviders.map((provider) => (
           <p key={provider.id}>{provider.id} unavailable: {provider.reason}</p>
         ))}
-      </section>
+        </section>
+      </details>
 
       <div className={styles.grid}>
-        <section className={styles.panel} aria-label="Screen share">
+        <section className={styles.panel} aria-label="Screen share" id="screen-share">
           <h2>Screen</h2>
           <p className={styles.status}>{screenLabel}</p>
           <div className={styles.toolbar} role="toolbar" aria-label="Screen share controls">
@@ -907,7 +931,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
           <p>LifeOS never starts capture by itself and does not store full recordings.</p>
         </section>
 
-        <section className={styles.panel} aria-label="Agent activity">
+        <section className={styles.panel} aria-label="Agent activity" id="agent-activity">
           <h2>Agent</h2>
           <div className={styles.statusRow} aria-live="polite">
             <span className={styles.badge} data-tone={paused ? "warn" : result?.waitingForOwner ? "warn" : "ok"}>{paused ? "paused" : result?.state ?? "idle"}</span>
@@ -950,7 +974,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
           </ul>
         </section>
 
-        <section className={styles.panel} aria-label="Context">
+        <section className={styles.panel} aria-label="Context" id="context-panel">
           <h2>Context</h2>
           <p>Workspace: Conversation</p>
           <p>Current project: {currentProject ? `${currentProject.name} (${currentProject.status})` : "None selected"}</p>
