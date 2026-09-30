@@ -5,15 +5,15 @@
 **Canonical branch:** `main`  
 **Production URL:** `https://lifeos-enterprise.vercel.app/`  
 **Released version:** `1.0.0`  
-**Last application-code baseline on main:** `d66467e2701e5f11fa12b0b2f60e5257756c988c` — PR #78 My Life mega navigation  
-**Prior recorded baselines:** `abf6c8264bed2578382d8eb60adc572762b6ee17` — PR #75 LifeOS closeout (voice #58, widgets/game #42, resource provenance, owner manual v2.0); `fc0729de8475c6c2f6b6343a99d9fac392a5442e` — Life Map and Dashboards hub (owner commit); `62a9df908608bf2c584f17be82d7f3754a582065` — PR #74 MAPS operating layer; `21b921ce8c7acf98132748f3466800468e0664a1` — PR #73 Continuity checkpoint path fix; `03657b621c2956c095c2e168f11ff159c3449651` — PR #72 Continuity checkpoint writes; `6bf7e2aff9920ba868de7381e0e68ae75d9866c7` — PR #71 Resource review; `df4b182bae4884a482bd2efd652a07783f9b6111` — PR #70 Prompt Intelligence; `1ae3fddb65b75c08127b7fef995d5ff37926f80a` — PR #69 Continuity; `45d5d018599e7b7d308523a3f38bf9ccf62e2c94` — PR #68 GitHub evidence; `7982c92a7080f60f9fb70e7c66c5220b8178bc35` — PR #64 performance hardening.  
+**Last application-code baseline on main:** `0d3ed7018fed006e853c134c17ae930ebecda23f` — PR #82 final LifeOS command center (redesigned shell and home)  
+**Prior recorded baselines:** `d66467e2701e5f11fa12b0b2f60e5257756c988c` — PR #78 My Life mega navigation; `abf6c8264bed2578382d8eb60adc572762b6ee17` — PR #75 LifeOS closeout (voice #58, widgets/game #42, resource provenance, owner manual v2.0); `fc0729de8475c6c2f6b6343a99d9fac392a5442e` — Life Map and Dashboards hub (owner commit); `62a9df908608bf2c584f17be82d7f3754a582065` — PR #74 MAPS operating layer; `21b921ce8c7acf98132748f3466800468e0664a1` — PR #73 Continuity checkpoint path fix; `03657b621c2956c095c2e168f11ff159c3449651` — PR #72 Continuity checkpoint writes; `6bf7e2aff9920ba868de7381e0e68ae75d9866c7` — PR #71 Resource review; `df4b182bae4884a482bd2efd652a07783f9b6111` — PR #70 Prompt Intelligence; `1ae3fddb65b75c08127b7fef995d5ff37926f80a` — PR #69 Continuity; `45d5d018599e7b7d308523a3f38bf9ccf62e2c94` — PR #68 GitHub evidence; `7982c92a7080f60f9fb70e7c66c5220b8178bc35` — PR #64 performance hardening.  
 **Live identity source:** GitHub `main` for repository head; Vercel production deployment for deployed SHA/ID. Query both at report or acceptance time.  
 **Owner acceptance:** not complete  
-**Owner/operator manual:** `80 SOPs/LifeOS Owner's Operating Manual.md` (v2.2, step-by-step)
+**Owner/operator manual:** `80 SOPs/LifeOS Owner's Operating Manual.md` (v2.3, step-by-step)
 
 ## Governing status
 
-**LifeOS Enterprise V1.0 is built on `main`. After PR #64, PRs #66 and #68 merged Resource Intelligence intake and GitHub evidence, PR #69 merged Continuity / resume packages, PR #70 merged Prompt Intelligence, PR #71 merged the Resource Intelligence owner review/disposition surface, and PR #72 merged governed Continuity checkpoint writes. All six are merged and were observed in a READY Vercel production deployment on 2026-09-25. PR #73 (per-save unique checkpoint paths) merged afterwards and was observed READY in production on 2026-09-30. On 2026-09-30, PR #74 (MAPS), the owner's Life Map / Dashboards commit, and the PR #75 closeout also merged; production deployment `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` was observed READY at the PR #75 merge `abf6c82`. The PR #79 status docs (`95e71d1`) and PR #78, the My Life mega navigation (`d66467e`), merged afterwards the same day. Repository head and production deployment identity are live operational facts and must be read from GitHub and Vercel when a status report or acceptance run begins.**
+**LifeOS Enterprise V1.0 is built on `main`. After PR #64, PRs #66 and #68 merged Resource Intelligence intake and GitHub evidence, PR #69 merged Continuity / resume packages, PR #70 merged Prompt Intelligence, PR #71 merged the Resource Intelligence owner review/disposition surface, and PR #72 merged governed Continuity checkpoint writes. All six are merged and were observed in a READY Vercel production deployment on 2026-09-25. PR #73 (per-save unique checkpoint paths) merged afterwards and was observed READY in production on 2026-09-30. On 2026-09-30, PR #74 (MAPS), the owner's Life Map / Dashboards commit, and the PR #75 closeout also merged; production deployment `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` was observed READY at the PR #75 merge `abf6c82`. The PR #79 status docs (`95e71d1`), PR #78 My Life mega navigation (`d66467e`), PR #81 docs (`a179a9c`), and PR #82, the redesigned command-center shell and home (`0d3ed70`), merged afterwards the same day. Repository head and production deployment identity are live operational facts and must be read from GitHub and Vercel when a status report or acceptance run begins.**
 
 The prior status edition is superseded because the post-#60 security corrective, the unified-command-center rebuild, and the Resource Intelligence, Continuity, and Prompt Intelligence slices have since merged and deployed:
 
@@ -170,6 +170,18 @@ Agent validation on the closeout branch, after all fix sets were merged:
 - WebKit was not available in the agent container; Dashboard CI ran it on the PR.
 - PR #75 final head `c94d360` (with `main` at `fc0729d` merged in) was green on Dashboard CI (including WebKit), the PowerShell vault audit, MAPS structural validation, and the Cursor security review. All 11 review threads were resolved. It was squash-merged to `main` as `abf6c82`.
 
+Production observed after the PR #82 merge (2026-09-30, about 21:34 UTC):
+- Deployment `dpl_7XfMJ6z5wfFKXJbaZmv1bpEziAnp` was READY at `0d3ed70` (= `main`).
+- `/` rendered the redesigned home with:
+  - the numbered left menu (01 Home … 13 More)
+  - the top bar: **My Life**, **Life Map**, **Ask LifeOS**, **Search anything** (Ctrl K), and **Capture**
+  - the active / waiting / blocked / reviews health strip
+  - **Today**, with **Start here** and a **Resume …** button naming the lead project
+  - **Your operating lanes**, **Where was I**, **Needs you**, and **Agents can continue**
+  - "Hermes is unavailable" and honest integration states
+- PR #82 final head `5119be9` was green on Dashboard CI (including WebKit), the vault audit, MAPS, and the security review before it merged. An earlier head, `148a3d1`, had failed 12 home-journey e2e tests; that head was not merged.
+- Vercel reported no runtime errors for the previous 7 days.
+
 Production observed after the PR #78 merge (2026-09-30, about 21:11 UTC):
 - Deployment `dpl_8TmFFkc8y3bvBzrfZNDR2YCZbnaj` was READY at `d66467e` (= `main`) and aliased to `lifeos-enterprise.vercel.app`.
 - `/` served the top bar with the **My Life** button (`aria-expanded="false"`, no `aria-haspopup`), **Life Map**, and **Ask LifeOS**. `resource-intake` returned 200 with the same fail-closed, draft-PR-only capabilities.
@@ -195,9 +207,9 @@ This is agent evidence, not owner acceptance.
 
 ### Last application-code baseline
 
-PR #78 merged the My Life mega navigation at `d66467e2701e5f11fa12b0b2f60e5257756c988c` and was observed READY in production at deployment `dpl_8TmFFkc8y3bvBzrfZNDR2YCZbnaj` on 2026-09-30.
+PR #82 merged the redesigned command-center shell and home at `0d3ed7018fed006e853c134c17ae930ebecda23f` and was observed READY in production at deployment `dpl_7XfMJ6z5wfFKXJbaZmv1bpEziAnp` on 2026-09-30.
 
-Before it, PR #75 merged the LifeOS closeout at `abf6c8264bed2578382d8eb60adc572762b6ee17` and was observed READY in production at deployment `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` on 2026-09-30. Before that, PR #73 merged the per-save unique Continuity checkpoint path at `21b921ce8c7acf98132748f3466800468e0664a1` and was observed READY in production at deployment `dpl_CxF6WThSCMDdrftveicnzcN3FCC6` on 2026-09-30.
+Before it, PR #78 merged the My Life mega navigation at `d66467e2701e5f11fa12b0b2f60e5257756c988c`, observed READY at `dpl_8TmFFkc8y3bvBzrfZNDR2YCZbnaj`. Before that, PR #75 merged the LifeOS closeout at `abf6c8264bed2578382d8eb60adc572762b6ee17` and was observed READY in production at deployment `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` on 2026-09-30. Before that, PR #73 merged the per-save unique Continuity checkpoint path at `21b921ce8c7acf98132748f3466800468e0664a1` and was observed READY in production at deployment `dpl_CxF6WThSCMDdrftveicnzcN3FCC6` on 2026-09-30.
 
 ### Prior application-code baselines
 
@@ -297,6 +309,8 @@ These are agent validation records, not owner acceptance.
 - Owner commit `fc0729de8475c6c2f6b6343a99d9fac392a5442e` (2026-09-30) added the `/life-map` personal operating map and the `/dashboards` launch hub; a READY production deployment exists for this SHA.
 - PR #75: merged the LifeOS closeout at `abf6c8264bed2578382d8eb60adc572762b6ee17` on 2026-09-30 (final head `c94d360` green on every check); READY in production at `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9`.
 - PR #79: merged the post-closeout status docs and manual F18 at `95e71d19bf5752d1aae81b63175334236098af7e`.
+- PR #82: merged the redesigned command-center shell and home at `0d3ed7018fed006e853c134c17ae930ebecda23f` (final head `5119be9` green on every check; supersedes #76 and #80, both closed without merge); READY in production at `dpl_7XfMJ6z5wfFKXJbaZmv1bpEziAnp`.
+- PR #81: merged the My Life manual and status docs at `a179a9c714580c590e4661d8efda60735e4f7b5d`.
 - PR #78: merged the "My Life" mega navigation at `d66467e2701e5f11fa12b0b2f60e5257756c988c` (head `830ca40` green on every check, with the Escape focus, disclosure semantics, and e2e coverage fixes). Production deployment identity for this SHA is recorded under the verified release evidence.
 
 ## Remaining owner work
@@ -313,15 +327,9 @@ Each item is written step-by-step in `80 SOPs/LifeOS Owner's Operating Manual.md
    - for approvals, `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`
 
    As of 2026-09-30, none of the governed write services are configured, so they stay fail-closed.
-5. Decide on the command-center redesign: PR #76, and PR #80, which consolidates #76 with the merged My Life menu. As of 2026-09-30 about 21:15 UTC, neither is mergeable:
-   - Both fail the unit test `answers what to do next without inventing agent work`. The redesigned home no longer shows the "Hermes is unavailable" honest-status text that the test enforces.
-   - Both conflict with `main` in `components/os/AppShell.tsx` and `app/os.css`.
-   - #76 also drops the `.os-page-header`, `.os-grid`, and `.os-grid-2` styles that other pages still use; #80 keeps them.
-
-   Keep one of them: restore the honest Hermes status and bring it up to date with current `main`. Close the other.
-6. After step 4, run the Issue #56 acceptance candidate (`vercel-labs/knowledge-agent-template`) through `/inbox` and `/resources/review` (workbook Section I).
-7. Optional paid voice: `OPENAI_API_KEY` plus a TTS/write secret. This is a billing decision.
-8. Complete the local Windows/Obsidian visual checks on the actual workstation.
+5. After step 4, run the Issue #56 acceptance candidate (`vercel-labs/knowledge-agent-template`) through `/inbox` and `/resources/review` (workbook Section I).
+6. Optional paid voice: `OPENAI_API_KEY` plus a TTS/write secret. This is a billing decision.
+7. Complete the local Windows/Obsidian visual checks on the actual workstation.
 
 ## Active platform work after V1 acceptance
 

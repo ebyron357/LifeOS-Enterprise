@@ -19,7 +19,7 @@ aliases:
 
 # LifeOS Owner's Operating Manual
 
-**Version 2.2 • 30 September 2026** (2.1 added F18, Life Map and Dashboards; 2.2 adds the **My Life** menu)
+**Version 2.3 • 30 September 2026** (2.1 added F18, Life Map and Dashboards; 2.2 added the **My Life** menu; 2.3 matches the redesigned Command Center home)
 **Replaces:** Version 1.0 (August 2026). This page is the one owner/operator manual. Do not start a second one.
 
 > [!info] How to read this manual
@@ -41,7 +41,7 @@ aliases:
 
 1. 🌐 Open `https://lifeos-enterprise.vercel.app/`.
 2. Read the **Today** card and the **Start here** card.
-3. Click **Resume work** (or **Resume this project**) and do the one next action you see.
+3. Under **Start here**, click the **Resume …** button (it names your top project, for example **Resume Build AI Consultant Portfolio**) and do the one next action you see.
 4. If a thought pops up, click **Capture**, type it, and click **Save to inbox**.
 5. At the end of the day, open **Journal**, write two sentences, and click **Save**.
 
@@ -68,7 +68,7 @@ aliases:
 3. Type exactly: `https://lifeos-enterprise.vercel.app/`
 4. Press **Enter**.
 
-**Success looks like:** a page titled **LifeOS** with a greeting, a **Today** card, a **Start here** card, and a left menu with **Home, Ask LifeOS, Projects, Today, Capture, Journal, Learning, Files, Automations, Integrations**.
+**Success looks like:** a page titled **LifeOS** with a greeting, a **Today** section with a **Start here** card, and a numbered left menu with **Home, Life Map, Dashboards, Ask LifeOS, Projects, Today, Capture, Journal, Learning, Files, Automations, Integrations, More**. (On a phone the left menu is replaced by the bottom dock.)
 
 5. Press **Ctrl + D** (Windows) or **Cmd + D** (Mac) to bookmark it. Name the bookmark `LifeOS`.
 
@@ -357,7 +357,7 @@ All steps are 🌐 Browser steps at `https://lifeos-enterprise.vercel.app/`.
 2. Read **Today**: your primary mission and critical outcomes.
 3. Read **Start here**: the single most important next action.
 4. Read **Where was I**: what you were doing, what is waiting, and what an agent can continue.
-5. Click **Resume work** to jump into that work.
+5. Click the **Resume …** button under **Start here** (it names the project) to jump into that work. The counts at the top of the page, above **Today**, show active, waiting, blocked, and review-due work. **Your operating lanes**, below **Today**, link to each part of your business.
 6. Optional: under **Where was I**, click **Save this as a checkpoint** to open it, then click **Save checkpoint** to save your place as an official record 🔑 (needs the Owner write secret; switched off until Part K is done).
 
 ## F2. Navigate the major areas
@@ -365,7 +365,7 @@ All steps are 🌐 Browser steps at `https://lifeos-enterprise.vercel.app/`.
 - Desktop: use the left menu.
 - Phone: use the bottom dock; everything else is under **More**.
 - Top bar: click **My Life** to see every area at once (see F18 step 7).
-- Keyboard: press **Ctrl + K** (or click the search/command button) to open the command palette, type a place such as `journal`, and press **Enter**.
+- Keyboard: press **Ctrl + K** (or click **Search anything** in the top bar) to open the command palette, type a place such as `journal`, and press **Enter**.
 
 ## F3. Capture — `/inbox`
 
@@ -381,7 +381,7 @@ All steps are 🌐 Browser steps at `https://lifeos-enterprise.vercel.app/`.
 
 1. Click **Projects**.
 2. Each card shows status, priority, next action, and blockers from the official project note.
-3. Click **Resume this project** to open its workspace.
+3. Click **Resume work** on a card to open that project's workspace. (On **Today**, the same button is called **Resume this project**.)
 4. To change a project's status or next action, use the **Command Board** on **More → Widget workspace**. Changes are *staged* in the browser, then packaged for approval; they only become official through a draft pull request that you merge.
 
 ## F5. Today — `/today`
@@ -703,7 +703,7 @@ Only you can do these. LifeOS is safe and usable without them; they switch on op
 ## Daily start — 5 minutes
 - [ ] Open LifeOS Home.
 - [ ] Read **Start here**.
-- [ ] Click **Resume work**.
+- [ ] Click the **Resume …** button under it.
 - [ ] Do the one next action.
 - [ ] Optional: **Daily check-in** in the game.
 
