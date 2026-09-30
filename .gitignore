@@ -33,3 +33,9 @@ docs/portfolio-sync-last-run.json
 # Playwright test output (not committed)
 /playwright-report/
 /test-results/
+
+# Local Pulse routine run records written by scripts such as
+# `validate-maps.ps1 -EvidenceDirectory ...`. Scheduled runs keep their
+# durable evidence as GitHub Actions artifacts; the per-routine directories
+# stay tracked through .gitkeep.
+Automations/runs/*/run-*.json
