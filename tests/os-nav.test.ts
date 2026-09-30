@@ -6,6 +6,7 @@ describe("LifeOS primary navigation", () => {
     expect(PRIMARY_NAV.map((item) => item.href)).toEqual([
       "/",
       "/life-map",
+      "/dashboards",
       "/conversation",
       "/projects",
       "/today",
@@ -24,6 +25,7 @@ describe("LifeOS primary navigation", () => {
     expect(MOBILE_NAV.map((item) => item.href)).toEqual(["/", "/conversation", "/projects", "/inbox", "/more"]);
     expect(MORE_PRIMARY_NAV.map((item) => item.href)).toEqual([
       "/life-map",
+      "/dashboards",
       "/today",
       "/journal",
       "/learning",
