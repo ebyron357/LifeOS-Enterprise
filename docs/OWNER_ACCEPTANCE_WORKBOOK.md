@@ -42,7 +42,7 @@ Use one row per test. Record evidence such as a screenshot, short note, deployme
 | A11 | Advanced dashboard retained | Open `/dashboard` from More/advanced tools | Existing widget dashboard remains accessible | ☐ | | |
 | A12 | Browser navigation | Use back/forward through several primary routes | History behaves normally; no forced navigation loop | ☐ | | |
 | A13 | Mobile shell | Repeat core navigation at 390px | Home, Ask LifeOS, Projects, Capture, and More are easy to reach | ☐ | | |
-| A14 | Life Map, Dashboards, and My Life | Open `/life-map` from the top bar, click each tile, then open `/dashboards` and each dashboard. Open **My Life** in the top bar, click one link per column, and press Esc once (manual F18) | Every tile, dashboard, and My Life link opens a real page; Esc closes My Life and keyboard focus returns to the **My Life** button; nothing is written to the vault | ☐ | | |
+| A14 | Life Map, Dashboards, and My Life | Open `/life-map` from the top bar, click each tile, then open `/dashboards` and each dashboard. For each of the seven My Life columns: open **My Life** in the top bar, click one link in that column, and check the page (the panel closes when you navigate). Finally, open **My Life** once more and press Esc (manual F18) | Every tile, dashboard, and My Life link opens a real page; Esc closes My Life and keyboard focus returns to the **My Life** button; nothing is written to the vault | ☐ | | |
 
 ---
 

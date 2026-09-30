@@ -195,9 +195,9 @@ This is agent evidence, not owner acceptance.
 
 ### Last application-code baseline
 
-PR #75 merged the LifeOS closeout at `abf6c8264bed2578382d8eb60adc572762b6ee17` and was observed READY in production at deployment `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` on 2026-09-30.
+PR #78 merged the My Life mega navigation at `d66467e2701e5f11fa12b0b2f60e5257756c988c` and was observed READY in production at deployment `dpl_8TmFFkc8y3bvBzrfZNDR2YCZbnaj` on 2026-09-30.
 
-Before it, PR #73 merged the per-save unique Continuity checkpoint path at `21b921ce8c7acf98132748f3466800468e0664a1` and was observed READY in production at deployment `dpl_CxF6WThSCMDdrftveicnzcN3FCC6` on 2026-09-30.
+Before it, PR #75 merged the LifeOS closeout at `abf6c8264bed2578382d8eb60adc572762b6ee17` and was observed READY in production at deployment `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` on 2026-09-30. Before that, PR #73 merged the per-save unique Continuity checkpoint path at `21b921ce8c7acf98132748f3466800468e0664a1` and was observed READY in production at deployment `dpl_CxF6WThSCMDdrftveicnzcN3FCC6` on 2026-09-30.
 
 ### Prior application-code baselines
 
