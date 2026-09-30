@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { AreaBrief, BusinessBrief, PersonBrief, ProjectBrief } from "@/lib/lifeos/types";
-import { safeWriteStorage, useBrowserStorageError, useBrowserStorageString } from "@/lib/lifeos/use-browser-storage";
+import { safeWriteStorage, useBrowserStorageString } from "@/lib/lifeos/use-browser-storage";
 import {
   ACHIEVEMENTS,
   bossStepsDone,
@@ -117,12 +117,14 @@ export function GameLoopWidget({
     [nowIso, projects, areas, businesses, people],
   );
   const [raw, setRaw, storageError] = useBrowserStorageString(GAME_STATE_STORAGE_KEY, "");
-  const backupError = useBrowserStorageError(GAME_STATE_BACKUP_KEY);
+  // Read back the backup so the UI only claims a save that actually landed in storage.
+  const [backupRaw, , backupError] = useBrowserStorageString(GAME_STATE_BACKUP_KEY, "");
   const repaired = useMemo(() => repairGameState(raw || null, context), [context, raw]);
   const [rewards, setRewards] = useState<string[]>([]);
   const [notice, setNotice] = useState<string | null>(null);
   const state = repaired.state;
   const discardedRaw = Boolean(raw && repaired.diagnostics.discardedRaw);
+  const discardedRawBackedUp = discardedRaw && backupRaw === raw;
   const today = nowIso.slice(0, 10);
   const todayQuests = state.questsByDate[today] ?? [];
   const doneToday = todayQuests.filter((quest) => quest.status === "done").length;
@@ -249,7 +251,7 @@ export function GameLoopWidget({
       {repaired.diagnostics.messages.length ? (
         <p role="alert" className="game-loop-diagnostic">
           {repaired.diagnostics.messages.join(" ")}
-          {discardedRaw ? ` The original data was saved to ${GAME_STATE_BACKUP_KEY} in this browser.` : ""}
+          {discardedRawBackedUp ? ` The original data was saved to ${GAME_STATE_BACKUP_KEY} in this browser.` : ""}
         </p>
       ) : null}
       {storageError ? <p role="alert" className="game-loop-diagnostic">{storageError}</p> : null}

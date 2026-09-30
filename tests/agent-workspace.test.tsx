@@ -1,7 +1,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AgentConversationWorkspace } from "@/components/agent/AgentConversationWorkspace";
-import { resetVoiceSettingsMemoryForTests, VOICE_SETTINGS_KEY } from "@/lib/voice/settings-store";
+import { resetVoiceSettingsMemoryForTests, VOICE_SETTINGS_KEY, VOICE_SETTINGS_NOT_SAVED } from "@/lib/voice/settings-store";
 
 const vault = {
   priorities: [{ name: "LifeOS Enterprise", path: "Projects/LifeOS Enterprise.md", status: "active", priority: "P0", business: "LifeOS", nextAction: "Verify.", reviewDate: "2026-08-26", waitingOn: "", blocker: "" }],
@@ -177,6 +177,29 @@ describe("conversation workspace", () => {
     expect(panel.getByLabelText("Speed")).toHaveValue("1.3");
     expect(await screen.findByRole("alert")).toHaveTextContent(/Unable to load agent session metadata/);
     expect(window.localStorage.getItem(VOICE_SETTINGS_KEY)).toBe(saved);
+  });
+
+  it("warns that voice settings will not survive a reload when storage refuses the save", async () => {
+    const setItem = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("Quota exceeded", "QuotaExceededError");
+    });
+    try {
+      render(<AgentConversationWorkspace vault={vault} />);
+      const panel = settingsPanel();
+      expect(screen.queryByTestId("voice-settings-not-saved")).toBeNull();
+      fireEvent.change(panel.getByLabelText("Response style"), { target: { value: "concise" } });
+      expect(panel.getByLabelText("Response style")).toHaveValue("concise");
+      expect(await screen.findByTestId("voice-settings-not-saved")).toHaveTextContent(VOICE_SETTINGS_NOT_SAVED);
+      expect(window.localStorage.getItem(VOICE_SETTINGS_KEY)).toBeNull();
+
+      // Storage recovers: the next change persists and the warning clears.
+      setItem.mockRestore();
+      fireEvent.change(panel.getByLabelText("Response style"), { target: { value: "coach" } });
+      await waitFor(() => expect(screen.queryByTestId("voice-settings-not-saved")).toBeNull());
+      expect(JSON.parse(window.localStorage.getItem(VOICE_SETTINGS_KEY) ?? "{}")).toMatchObject({ responseStyle: "coach" });
+    } finally {
+      setItem.mockRestore();
+    }
   });
 
   it("clears the error and retries session metadata from Try again without a reload", async () => {

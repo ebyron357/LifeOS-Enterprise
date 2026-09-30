@@ -716,10 +716,10 @@ This is supplemental only. It does **not** replace the complete parallel suite r
   - `npm audit --audit-level=high`: 0 vulnerabilities
   - lint: PASS
   - typecheck: PASS
-  - `npm test`: 72 files, 504 tests, all passing
+  - `npm test`: 72 files, 516 tests, all passing
   - build: PASS
-- `pwsh -NoProfile -File scripts/audit-vault.ps1`: `PASS: canonical vault structure, templates, Bases, metadata, links, and embeds are valid.` (153 notes).
-- Playwright against the production build (Chromium 1440 / 1024 / 390): 160 passed, 5 skipped (expected viewport splits).
+- `pwsh -NoProfile -File scripts/audit-vault.ps1`: `PASS: canonical vault structure, templates, Bases, metadata, links, and embeds are valid.` (162 notes).
+- Playwright against the production build (Chromium 1440 / 1024 / 390): 166 passed, 5 skipped (expected viewport splits).
 - A scan of 17 routes: no console errors, page errors, or HTTP ≥ 400.
 - PR #74 candidate `1ca01b2`: green on every check, then merged to `main` as `62a9df9` on the owner's instruction. After merging `main` into the closeout branch, `validate-maps.ps1` passed there too.
   - Dashboard CI passed on its one re-run after the runner stall.

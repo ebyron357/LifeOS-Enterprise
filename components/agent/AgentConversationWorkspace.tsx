@@ -55,7 +55,9 @@ import {
 } from "@/lib/voice/provider";
 import {
   readServerVoiceSettingsRaw,
+  readServerVoiceSettingsWriteError,
   readStoredVoiceSettingsRaw,
+  readVoiceSettingsWriteError,
   subscribeStoredVoiceSettings,
   writeStoredVoiceSettings,
 } from "@/lib/voice/settings-store";
@@ -158,6 +160,11 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   // Nothing is written until the owner changes a setting, so defaults never overwrite saved values.
   const storedSettingsRaw = useSyncExternalStore(subscribeStoredVoiceSettings, readStoredVoiceSettingsRaw, readServerVoiceSettingsRaw);
   const voiceSettings = useMemo(() => parseVoiceSettings(storedSettingsRaw, localeDefaults), [storedSettingsRaw, localeDefaults]);
+  const voiceSettingsWriteError = useSyncExternalStore(
+    subscribeStoredVoiceSettings,
+    readVoiceSettingsWriteError,
+    readServerVoiceSettingsWriteError,
+  );
   const browserVoices = useSyncExternalStore(subscribeBrowserVoices, getBrowserVoicesSnapshot, getServerBrowserVoicesSnapshot);
   const capabilities = useSyncExternalStore(subscribeVoiceCapabilities, getVoiceCapabilitiesSnapshot, getServerVoiceCapabilitiesSnapshot);
   const capabilitiesRef = useRef(capabilities);
@@ -868,6 +875,9 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
           <button type="button" onClick={() => writeStoredVoiceSettings(DEFAULT_VOICE_SETTINGS)}>Reset to default</button>
         </div>
         <p>Next reply: {nextVoiceLabel}. Fallback: {fallbackProvider}.</p>
+        {voiceSettingsWriteError ? (
+          <p className={styles.warning} role="alert" data-testid="voice-settings-not-saved">{voiceSettingsWriteError}</p>
+        ) : null}
         {voiceSettings.provider === "openai" && nextSpeech.fallbackReason ? (
           <p className={styles.warning} data-testid="openai-fallback-note">{nextSpeech.fallbackReason} Replies use the browser voice until then.</p>
         ) : null}

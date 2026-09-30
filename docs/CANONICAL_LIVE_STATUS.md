@@ -162,10 +162,10 @@ Agent validation on the closeout branch, after all fix sets were merged:
 - `npm ci`: PASS.
 - `npm audit --audit-level=high`: 0 vulnerabilities.
 - `npm run lint`: PASS. `npm run typecheck`: PASS.
-- `npm test`: 72 files, 504 tests, all passing.
+- `npm test`: 72 files, 516 tests, all passing.
 - `npm run build`: PASS.
-- `pwsh -File scripts/audit-vault.ps1`: PASS (153 notes).
-- Playwright against the production build, Chromium desktop 1440 / laptop 1024 / mobile 390: 160 passed, 5 skipped (expected desktop-only and mobile-only splits, plus one pre-existing skip).
+- `pwsh -File scripts/audit-vault.ps1`: PASS (162 notes).
+- Playwright against the production build, Chromium desktop 1440 / laptop 1024 / mobile 390: 166 passed, 5 skipped (expected desktop-only and mobile-only splits, plus one pre-existing skip).
 - A scan of 17 routes found no console errors, page errors, or HTTP ≥ 400.
 - WebKit was not available in the agent container; Dashboard CI runs it on the PR.
 
@@ -198,7 +198,7 @@ PR #70 merged Prompt Intelligence at:
 
 - Git SHA: `df4b182bae4884a482bd2efd652a07783f9b6111`
 - Commit: `feat(prompts): add canonical Prompt Intelligence on existing vault (#70)`
-- 2026-09-25 agent revalidation on this exact SHA: `npm ci` PASS, `npm run lint` PASS, `npm run typecheck` PASS, `npm test` PASS (61 files / 333 tests), `npm run build` PASS (34 static pages), `npm audit --audit-level=high` PASS (0 vulnerabilities), `pwsh -File ./scripts/audit-vault.ps1` PASS (153 notes).
+- 2026-09-25 agent revalidation on this exact SHA: `npm ci` PASS, `npm run lint` PASS, `npm run typecheck` PASS, `npm test` PASS (61 files / 333 tests), `npm run build` PASS (34 static pages), `npm audit --audit-level=high` PASS (0 vulnerabilities), `pwsh -File ./scripts/audit-vault.ps1` PASS (162 notes).
 - Playwright was not rerun in this revalidation.
 
 PR #64 merged application performance/dependency hardening at:

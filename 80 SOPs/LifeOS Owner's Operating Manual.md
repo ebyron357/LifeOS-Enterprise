@@ -386,7 +386,7 @@ All steps are 🌐 Browser steps at `https://lifeos-enterprise.vercel.app/`.
 
 1. Click **Today** (on phone: **More → Today**).
 2. Read today's mission, outcomes, the resume package, and the next action.
-3. The **LifeOS Game** card shows your level, XP, and streak; click **Open game loop** to play (see F14).
+3. The **LifeOS Game** card shows your level, XP, and streak; click **Open game loop** to play (see F15).
 
 ## F6. Journal — `/journal`
 

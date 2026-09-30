@@ -31,7 +31,10 @@ function setStorageError(key: string, message: string | null) {
 /** Reads a raw value without throwing. Returns `fallback` when storage is missing or blocked. */
 export function safeReadStorage(key: string, fallback: string): string {
   try {
-    return window.localStorage.getItem(key) ?? fallback;
+    const value = window.localStorage.getItem(key);
+    // Access recovered: drop a stale read error, but keep a write error until a write succeeds.
+    if (storageErrors.get(key) === STORAGE_READ_ERROR) storageErrors.delete(key);
+    return value ?? fallback;
   } catch {
     // Recorded for the diagnostic snapshot; no event here because reads run during render.
     storageErrors.set(key, STORAGE_READ_ERROR);

@@ -1,8 +1,8 @@
 # LifeOS Voice Architecture (Verbal + Audio V1)
 
 **Status:** Browser speech remains the V1 path. Server OpenAI TTS is optional and owner-authorized. Owner acceptance is still required.  
-**Release:** LifeOS Enterprise v1.0 plus post-#60 voice hardening on a draft corrective PR, plus the issue #58 conversation-voice production polish  
-**Integration branch:** current `main` includes PR #60; paid-TTS and write-auth hardening ride the post-#60 corrective draft PR
+**Release:** LifeOS Enterprise v1.0 voice (PR #60), post-#60 paid-TTS and write-auth hardening, and the issue #58 conversation-voice production polish  
+**Scope:** this document describes the implemented architecture on `main`; live deployment state is tracked in `docs/CANONICAL_LIVE_STATUS.md`
 
 Persistent conversational voice now also lives in `/conversation`. That layer reuses this transport and state machine. See `docs/INTERACTIVE_AGENT_RUNTIME.md`. The Command Center `VoiceConsole` remains the V1 command console.
 
@@ -83,7 +83,7 @@ Locale: utterances are spoken with the selected locale's BCP-47 tag (`en-GB`, `z
 ## Cost
 
 - **Browser speech (recognition and synthesis):** no LifeOS or OpenAI charge.
-- **OpenAI TTS:** billed by OpenAI per character/token of the text sent, according to current OpenAI pricing: <https://openai.com/api/pricing>. LifeOS limits a single request to 2000 characters, rate-limits `/voice/speak`, only calls OpenAI with the owner secret, and aborts in-flight requests on Interrupt/Stop/Mute. The `concise` response style shortens the spoken reply, which also reduces the text sent to OpenAI.
+- **OpenAI TTS:** billed by OpenAI per character/token of the text sent, according to current OpenAI pricing: <https://openai.com/api/pricing>. LifeOS limits a single request to 2000 characters, rate-limits `/voice/speak`, only calls OpenAI with the owner secret, and on Interrupt/Stop/Mute cancels the browser's in-flight request so the clip never plays. That cancellation is client-side: the server does not forward it to OpenAI, so an OpenAI call that has already started can still finish and be billed. The `concise` response style shortens the spoken reply, which also reduces the text sent to OpenAI.
 
 ## Privacy
 

@@ -9,7 +9,7 @@ import {
   levelForXp,
 } from "@/lib/game/state";
 import type { GameState } from "@/lib/game/types";
-import { STORAGE_WRITE_ERROR } from "@/lib/lifeos/use-browser-storage";
+import { STORAGE_READ_ERROR, STORAGE_WRITE_ERROR } from "@/lib/lifeos/use-browser-storage";
 import type { AreaBrief, ProjectBrief } from "@/lib/lifeos/types";
 
 const NOW = "2026-09-03T12:00:00.000Z";
@@ -168,6 +168,20 @@ describe("GameLoopWidget feedback and safety", () => {
     expect(window.localStorage.getItem(GAME_STATE_BACKUP_KEY)).toBe("{corrupt");
   });
 
+  it("does not claim corrupt state was backed up when the backup save fails", () => {
+    window.localStorage.setItem(GAME_STATE_STORAGE_KEY, "{corrupt");
+    const original = Storage.prototype.setItem;
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, key: string, value: string) {
+      if (key === GAME_STATE_BACKUP_KEY) throw new DOMException("Quota exceeded", "QuotaExceededError");
+      return original.call(this, key, value);
+    });
+    render(<GameLoopWidget projects={projects} />);
+    expect(window.localStorage.getItem(GAME_STATE_BACKUP_KEY)).toBeNull();
+    expect(screen.getByText(/Corrupted game state JSON detected and repaired\./)).toBeInTheDocument();
+    expect(screen.queryByText(/original data was saved/)).not.toBeInTheDocument();
+    expect(screen.getByText(`Backup to ${GAME_STATE_BACKUP_KEY} failed: ${STORAGE_WRITE_ERROR}`)).toBeInTheDocument();
+  });
+
   it("surfaces a storage diagnostic instead of throwing when saves fail", () => {
     const original = Storage.prototype.setItem;
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, key: string, value: string) {
@@ -244,6 +258,24 @@ describe("GameProgressCard on /today", () => {
     expect(setItem).not.toHaveBeenCalled();
     expect(window.localStorage.getItem(GAME_STATE_STORAGE_KEY)).toBe(raw);
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
+
+  it("reports unavailable progress instead of a false empty state when storage reads fail", () => {
+    const original = Storage.prototype.getItem;
+    const getItem = vi.spyOn(Storage.prototype, "getItem").mockImplementation(function (this: Storage, key: string) {
+      if (key === GAME_STATE_STORAGE_KEY) throw new DOMException("Blocked", "SecurityError");
+      return original.call(this, key);
+    });
+    const { rerender } = render(<GameProgressCard />);
+    expect(screen.getByRole("alert")).toHaveTextContent(/Game progress is unavailable/);
+    expect(screen.queryByText("Start your first check-in")).not.toBeInTheDocument();
+
+    // Access recovers: the next successful read clears the stale read error.
+    getItem.mockRestore();
+    rerender(<GameProgressCard key="recovered" />);
+    expect(screen.getByText("Start your first check-in")).toBeInTheDocument();
+    expect(screen.queryByText(STORAGE_READ_ERROR)).not.toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("points to repair for unreadable state and leaves it untouched", () => {

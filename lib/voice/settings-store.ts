@@ -27,6 +27,19 @@ export function readServerVoiceSettingsRaw(): string | null {
   return null;
 }
 
+/** Shown when settings could not be written to browser storage. */
+export const VOICE_SETTINGS_NOT_SAVED =
+  "Voice settings could not be saved in this browser (private mode, full, or blocked storage). They apply until you reload or close this page.";
+
+/** Null while persistence is healthy; a warning after the last write failed. */
+export function readVoiceSettingsWriteError(): string | null {
+  return lastWriteFailed ? VOICE_SETTINGS_NOT_SAVED : null;
+}
+
+export function readServerVoiceSettingsWriteError(): string | null {
+  return null;
+}
+
 export function writeStoredVoiceSettings(settings: VoiceSettings): void {
   const raw = JSON.stringify(settings);
   memoryValue = raw;
@@ -34,7 +47,7 @@ export function writeStoredVoiceSettings(settings: VoiceSettings): void {
     window.localStorage.setItem(VOICE_SETTINGS_KEY, raw);
     lastWriteFailed = false;
   } catch {
-    // Storage unavailable: keep the in-memory copy for this page session.
+    // Storage unavailable: keep the in-memory copy for this page session and report it.
     lastWriteFailed = true;
   }
   for (const listener of listeners) listener();
