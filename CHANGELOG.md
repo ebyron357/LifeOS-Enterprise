@@ -2,6 +2,21 @@
 
 All notable changes to LifeOS Enterprise are documented in this file.
 
+## [Unreleased] — 2026-09-30 My Life navigation (PR #78, merged as `d66467e`)
+
+### Added
+
+- A **My Life** control in the top command bar opens a labelled navigation panel with seven color-separated columns (Command, Business & Revenue, AI Workforce, Projects & Clients, Learning & Tools, Personal, Creative & Media) linking to existing routes and vault dashboards. At phone width it replaces the standalone Life Map shortcut.
+
+### Fixed
+
+- Esc closes the panel and returns keyboard focus to **My Life**. The panel uses disclosure semantics (a `<nav>` of links) instead of an ARIA menu.
+- E2E coverage at 1440/1024/390 for destinations, dismissal, focus return, and phone usability.
+
+### Documentation
+
+- Owner manual v2.2: F2 and F18 cover **My Life**, and F18 step 1 routes phones through **My Life** → **Open Life Map**. Workbook A14 covers My Life. Canonical status records #78 and #79 and the PR #76 owner decision.
+
 ## [Unreleased] — 2026-09-30 LifeOS closeout (PR #75, merged as `abf6c82`)
 
 ### Security

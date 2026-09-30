@@ -727,6 +727,7 @@ This is supplemental only. It does **not** replace the complete parallel suite r
   - The other checks: vault audit, MAPS structural validation, and security review.
   - Local `validate-maps.ps1` passed, and every negative fixture was rejected.
 - Production on 2026-09-30 before the closeout: `dpl_CxF6WThSCMDdrftveicnzcN3FCC6` READY at `21b921c` (= `main`), key APIs returned 200, and Vercel reported no runtime errors in 7 days.
+- Production after the PR #78 merge (My Life navigation, with the Escape focus fix, disclosure semantics, and 9 new e2e tests): `dpl_8TmFFkc8y3bvBzrfZNDR2YCZbnaj` READY at `d66467e` (= `main`). The live top bar shows **My Life**, and Vercel reported no runtime errors in 7 days. PR #76 (the command-center redesign) was not merged: it fails a unit test, conflicts with `main`, and drops shared styles. That is an owner decision; see canonical status.
 - Production after the closeout merge: `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` READY at `abf6c82` (= `main`). The session, game, intake, review, checkpoint, and change-plan APIs returned 200 and showed the closeout behavior (intake processor routes and open-draft dedupe, categorized side quests, boss steps). `/today` showed the LifeOS Game card. Governed writes stayed `configured: false`, voice stayed browser-only, and Vercel reported no runtime errors in 7 days.
 
 ### Final pass/fail state
