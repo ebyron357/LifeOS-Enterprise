@@ -194,13 +194,37 @@ function hasSaneGeometry(item: LayoutItem): boolean {
   return item.x >= 0 && item.y >= 0 && item.w >= 1 && item.h >= 1;
 }
 
-/** Snaps an item to whole grid units and fits it inside `cols` columns. */
+function finiteWhole(value: number | undefined): number | undefined {
+  return typeof value === "number" && Number.isFinite(value) ? Math.round(value) : undefined;
+}
+
+/**
+ * Snaps an item to whole grid units, fits it inside `cols` columns, and makes its size
+ * constraints consistent (1 <= minW <= w <= maxW <= cols; 1 <= minH <= h <= maxH).
+ */
 function clampToGrid(item: LayoutItem, cols: number): LayoutItem {
-  const w = Math.min(cols, Math.max(1, Math.round(item.w)));
+  const minWRaw = finiteWhole(item.minW);
+  const maxWRaw = finiteWhole(item.maxW);
+  const minHRaw = finiteWhole(item.minH);
+  const maxHRaw = finiteWhole(item.maxH);
+
+  const minW = minWRaw === undefined ? undefined : Math.min(cols, Math.max(1, minWRaw));
+  const maxW = maxWRaw === undefined ? undefined : Math.min(cols, Math.max(minW ?? 1, maxWRaw));
+  const minH = minHRaw === undefined ? undefined : Math.max(1, minHRaw);
+  const maxH = maxHRaw === undefined ? undefined : Math.max(minH ?? 1, maxHRaw);
+
+  const w = Math.min(maxW ?? cols, Math.max(minW ?? 1, Math.round(item.w)));
+  const h = Math.min(maxH ?? Number.MAX_SAFE_INTEGER, Math.max(minH ?? 1, Math.round(item.h)));
   const x = Math.min(cols - w, Math.max(0, Math.round(item.x)));
   const y = Math.max(0, Math.round(item.y));
-  const h = Math.max(1, Math.round(item.h));
-  return { ...item, x, y, w, h };
+
+  const next: LayoutItem = { i: item.i, x, y, w, h };
+  if (minW !== undefined) next.minW = minW;
+  if (minH !== undefined) next.minH = minH;
+  if (maxW !== undefined) next.maxW = maxW;
+  if (maxH !== undefined) next.maxH = maxH;
+  if (item.static !== undefined) next.static = item.static;
+  return next;
 }
 
 /**
@@ -265,7 +289,9 @@ export function repairWorkspaceLayout(raw: string | null): LayoutRepairResult {
       }
       seen.add(item.i);
       const fitted = clampToGrid(item, WORKSPACE_GRID_COLS[key]);
-      if (fitted.x !== item.x || fitted.y !== item.y || fitted.w !== item.w || fitted.h !== item.h) {
+      const changed = (["x", "y", "w", "h", "minW", "minH", "maxW", "maxH"] as const)
+        .some((field) => fitted[field] !== item[field]);
+      if (changed) {
         clampedItems.push(`${widgetTitle(item.i)} (${key})`);
       }
       items.push(fitted);

@@ -50,8 +50,10 @@ export const DEFAULT_LG_LAYOUT: LayoutItem[] = [
 function stackLayout(source: LayoutItem[], cols: number): LayoutItem[] {
   let y = 0;
   return source.map((entry) => {
-    const w = Math.min(cols, Math.max(entry.minW ?? 1, entry.w > cols ? cols : entry.w));
-    const next = { ...entry, x: 0, y, w, h: entry.h };
+    // Keep the minimum width inside the column count so the default never violates its own grid.
+    const minW = Math.min(cols, entry.minW ?? 1);
+    const w = Math.min(cols, Math.max(minW, entry.w > cols ? cols : entry.w));
+    const next = { ...entry, x: 0, y, w, h: entry.h, minW };
     y += entry.h;
     return next;
   });

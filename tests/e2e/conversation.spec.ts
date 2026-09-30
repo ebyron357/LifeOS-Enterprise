@@ -412,6 +412,47 @@ test.describe("interactive conversation workspace", () => {
     expect(overflow).toBe(false);
   });
 
+  test("Stop while the microphone permission prompt is open never starts listening afterwards", async ({ page }) => {
+    await page.addInitScript(() => {
+      const calls = { start: 0, grant: null as null | (() => void) };
+      (window as Window & { __lifeosRecognition?: typeof calls }).__lifeosRecognition = calls;
+      class FakeRecognition {
+        lang = "";
+        continuous = false;
+        interimResults = false;
+        onresult = null;
+        onerror = null;
+        onend = null;
+        start() { calls.start += 1; }
+        stop() {}
+        abort() {}
+      }
+      Object.defineProperty(window, "SpeechRecognition", { configurable: true, value: FakeRecognition });
+      Object.defineProperty(window, "webkitSpeechRecognition", { configurable: true, value: FakeRecognition });
+      Object.defineProperty(window.navigator, "mediaDevices", {
+        configurable: true,
+        value: {
+          // The permission prompt stays open until the test grants it.
+          getUserMedia: () => new Promise((resolve) => {
+            calls.grant = () => resolve({ getTracks: () => [{ stop() {} }] });
+          }),
+        },
+      });
+    });
+
+    await page.goto("/conversation");
+    await page.getByRole("button", { name: "Start conversation", exact: true }).click();
+    type Calls = { start: number; grant: null | (() => void) };
+    await expect.poll(async () => page.evaluate(() => Boolean((window as Window & { __lifeosRecognition?: Calls }).__lifeosRecognition?.grant))).toBe(true);
+
+    await page.getByRole("button", { name: "Stop conversation", exact: true }).click();
+    await page.evaluate(() => (window as Window & { __lifeosRecognition?: Calls }).__lifeosRecognition?.grant?.());
+    await page.waitForTimeout(500);
+
+    expect(await page.evaluate(() => (window as Window & { __lifeosRecognition?: Calls }).__lifeosRecognition?.start ?? 0)).toBe(0);
+    await expect(page.getByText(/state:\s*listening/i)).toHaveCount(0);
+  });
+
   test.describe("iOS Safari without continuous listening", () => {
     test.use({ userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1" });
 

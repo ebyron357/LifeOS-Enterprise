@@ -140,6 +140,9 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   const transportRef = useRef(createBrowserVoiceTransport());
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const keepListeningRef = useRef(false);
+  // Bumped by Stop, mute, push-to-talk release, errors, recovery, and unmount so a microphone
+  // permission prompt that resolves afterwards can never start listening.
+  const listenGenerationRef = useRef(0);
   const mutedRef = useRef(false);
   const voiceRef = useRef<ConversationVoiceSession>(INITIAL_CONVERSATION_VOICE);
   const restartListeningRef = useRef<((continuous: boolean) => Promise<void>) | null>(null);
@@ -236,6 +239,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
     const speechGate = speechGateRef.current;
     return () => {
       keepListeningRef.current = false;
+      listenGenerationRef.current += 1;
       shareGenerationRef.current += 1;
       turnGate.cancel();
       speechGate.cancel();
@@ -455,6 +459,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
     if (classified.kind === "ignore") return;
     // Stop auto-restart so a persistent failure cannot loop; "Try again" recovers.
     keepListeningRef.current = false;
+    listenGenerationRef.current += 1;
     transportRef.current.stopListening();
     if (classified.kind === "permission") setVoice((current) => denyMicrophone(current));
     else setVoice((current) => failConversation(current, classified.message));
@@ -472,7 +477,11 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
       return;
     }
     keepListeningRef.current = continuous;
+    listenGenerationRef.current += 1;
+    const generation = listenGenerationRef.current;
     const allowed = await transport.requestPermission();
+    // Stop, mute, release, or unmount happened while the permission prompt was open.
+    if (generation !== listenGenerationRef.current) return;
     if (!allowed) {
       keepListeningRef.current = false;
       setVoice((current) => denyMicrophone(current));
@@ -533,6 +542,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
 
   function endVoice() {
     keepListeningRef.current = false;
+    listenGenerationRef.current += 1;
     transportRef.current.disconnect();
     cancelPendingWork();
     setVoice((current) => stopConversation(current));
@@ -546,12 +556,14 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
 
   function endPushToTalk() {
     keepListeningRef.current = false;
+    listenGenerationRef.current += 1;
     transportRef.current.releaseListening();
     setVoice((current) => releasePushToTalk(current));
   }
 
   function muteMic() {
     keepListeningRef.current = false;
+    listenGenerationRef.current += 1;
     mutedRef.current = true;
     transportRef.current.stopListening();
     speechGateRef.current.cancel();
@@ -571,6 +583,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
     setError(null);
     setTurnNotice(null);
     keepListeningRef.current = false;
+    listenGenerationRef.current += 1;
     transportRef.current.stopListening();
     setVoice((current) => recoverConversation(current));
     setActivity((events) => appendActivity(events, createActivityEvent("session-started", "Owner chose Try again; voice recovered without reload.")));

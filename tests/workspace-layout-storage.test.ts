@@ -103,10 +103,33 @@ describe("workspace layout storage", () => {
     const xs = result.state.layouts.xs.find((item) => item.i === layouts.xs[0].i)!;
     const md = result.state.layouts.md.find((item) => item.i === layouts.md[0].i)!;
     expect(lg.x + lg.w).toBeLessThanOrEqual(12);
-    expect(lg).toMatchObject({ x: 8, w: 4 });
+    expect(lg.w).toBeGreaterThanOrEqual(lg.minW ?? 1);
+    expect(lg.x).toBe(12 - lg.w); // moved back inside the right edge
     expect(xs.w).toBe(4);
     expect(Number.isInteger(md.x)).toBe(true);
     expect(result.repairs.join(" ")).toMatch(/Moved or resized to fit the grid: .*\(lg\).*\(md\).*\(xs\)|Moved or resized to fit the grid/);
+    expect(repairWorkspaceLayout(serializeWorkspaceLayout(result.state)).repairs).toEqual([]);
+  });
+
+  it("makes persisted size constraints consistent with the breakpoint grid", () => {
+    const defaults = createDefaultWorkspaceLayout();
+    const layouts = JSON.parse(JSON.stringify(defaults.layouts)) as typeof defaults.layouts;
+    layouts.xs[0] = { ...layouts.xs[0], w: 2, minW: 99 };
+    layouts.lg[0] = { ...layouts.lg[0], w: 6, minW: 2, maxW: 3, minH: 2.4, maxH: 1 };
+
+    const result = repairWorkspaceLayout(JSON.stringify({ ...defaults, layouts }));
+    const xs = result.state.layouts.xs.find((item) => item.i === layouts.xs[0].i)!;
+    const lg = result.state.layouts.lg.find((item) => item.i === layouts.lg[0].i)!;
+    expect(xs.minW).toBe(4);
+    expect(xs.w).toBeGreaterThanOrEqual(xs.minW!);
+    expect(xs.w).toBeLessThanOrEqual(4);
+    expect(lg.maxW).toBe(3);
+    expect(lg.w).toBeLessThanOrEqual(3);
+    expect(lg.minH).toBe(2);
+    expect(lg.maxH).toBeGreaterThanOrEqual(lg.minH!);
+    expect(lg.h).toBeGreaterThanOrEqual(lg.minH!);
+    expect(lg.h).toBeLessThanOrEqual(lg.maxH!);
+    expect(result.repairs.join(" ")).toContain("Moved or resized to fit the grid");
     expect(repairWorkspaceLayout(serializeWorkspaceLayout(result.state)).repairs).toEqual([]);
   });
 
