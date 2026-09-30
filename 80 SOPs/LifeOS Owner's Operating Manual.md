@@ -441,8 +441,10 @@ All steps are 🌐 Browser steps at `https://lifeos-enterprise.vercel.app/`.
 7. To stop the microphone: click **Mute microphone**. To turn it back on: **Unmute microphone**.
 8. If continuous listening is unreliable, press and hold **Push to talk** while speaking and release when done.
 9. To end: click **Stop conversation**.
-10. **Voice settings** panel: choose **Voice**, **Locale**, **Recognition language**, **Response style**, **Speed**, and **Pitch**. Click **Preview voice** to hear it. Click **Reset to default** to undo. Settings are remembered in this browser.
-11. If something goes wrong (for example the microphone is blocked), click **Recover** / **Resume conversation**. You do not need to reload the page.
+10. **Voice settings** panel: choose **Provider**, **Locale**, **Voice**, **Input language**, **Response style** (Balanced, Concise, Teaching coach), **Speed**, and **Pitch**. Click **Preview voice** to hear it. Click **Reset to default** to undo. Settings are remembered in this browser, even after a reload.
+11. The line **Next reply: …** shows which voice will speak. If the better voice is unavailable, a visible note says LifeOS is using the browser voice and why. If your browser has no voice for the chosen locale, a warning says so; LifeOS never switches language silently.
+12. If something goes wrong (for example the microphone is blocked), click **Try again** or **Resume conversation**. You do not need to reload the page.
+13. While LifeOS is still thinking about your last message, a new message is held back with a visible note, and saying the same sentence twice only sends it once.
 
 > [!info] Today only the free **browser voice** is active. The higher-quality OpenAI voice turns on only after the owner adds a paid key and a TTS secret (Part K).
 
@@ -488,7 +490,7 @@ All steps are 🌐 Browser steps at `https://lifeos-enterprise.vercel.app/`.
 | Want default layout | **Restore default layout** → confirm | Your layout only (in this browser) |
 | Game looks wrong | **Repair state** | Nothing you need; fixes broken entries |
 | Start the game over | **Reset game** → confirm | Game progress in this browser (a backup copy is kept in the browser first) |
-| Voice stuck | **Recover** / **Stop conversation** then **Start conversation** | Nothing |
+| Voice stuck | **Try again**, or **Stop conversation** then **Start conversation** | Nothing |
 | Page error box | **Try again** | Nothing |
 | Everything in this browser is weird | Browser settings → clear site data for `lifeos-enterprise.vercel.app` | Browser-only captures, journal drafts, layout, game, voice settings. Official vault notes are **not** affected. |
 
