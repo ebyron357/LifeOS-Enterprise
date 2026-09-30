@@ -7,11 +7,33 @@ import { Command } from "cmdk";
 import { ADVANCED_NAV, MOBILE_NAV, PRIMARY_NAV, isNavActive } from "@/lib/os/nav";
 import { QuickCaptureDock } from "./QuickCaptureDock";
 import { LifeMegaMenu } from "./LifeMegaMenu";
+import styles from "./LegendaryCommandCenter.module.css";
 
 type AppShellProps = {
   children: ReactNode;
   greeting?: string;
 };
+
+const commandNav = [
+  { href: "/", label: "Command Center", icon: "⌂" },
+  { href: "/life-map", label: "My Life", icon: "◉" },
+  { href: "/agents", label: "AI Agents", icon: "✦" },
+  { href: "/conversation", label: "Communications", icon: "●", badge: "3" },
+  { href: "/today", label: "Tasks", icon: "✓" },
+  { href: "/projects", label: "Projects", icon: "▦" },
+  { href: "/businesses", label: "Shopify / E-Commerce", icon: "◆" },
+  { href: "/portfolio", label: "Websites", icon: "▣" },
+  { href: "/growth", label: "Marketing", icon: "↗" },
+  { href: "/resources", label: "Content Studio", icon: "◩" },
+  { href: "/dashboard", label: "Finance", icon: "$" },
+  { href: "/dashboards", label: "Real Estate", icon: "⌂" },
+  { href: "/resources", label: "Veteran Hub", icon: "◈" },
+  { href: "/learning", label: "Learning", icon: "▰" },
+  { href: "/files", label: "Files & Drive", icon: "▱" },
+  { href: "/integrations", label: "Integrations", icon: "⌘" },
+  { href: "/more", label: "Tools & Resources", icon: "✣" },
+  { href: "/settings", label: "Settings", icon: "⚙" },
+];
 
 export function AppShell({ children, greeting }: AppShellProps) {
   const pathname = usePathname() ?? "/";
@@ -40,75 +62,55 @@ export function AppShell({ children, greeting }: AppShellProps) {
   const destinations = [...PRIMARY_NAV, ...ADVANCED_NAV];
 
   return (
-    <div className="os-app">
+    <div className={styles.shell}>
       <a className="os-skip skip-link" href="#main-content">Skip to main content</a>
 
-      <aside className="os-sidebar">
-        <Link className="os-brand" href="/">
-          <span className="brand-mark">L</span>
+      <aside className={styles.sidebar}>
+        <Link className={styles.brand} href="/">
+          <span className={styles.brandMark}>L</span>
           <div>
             <strong>LifeOS</strong>
-            <small>Personal Command System</small>
+            <small>BUILT DIFFERENT</small>
           </div>
         </Link>
 
-        <div className="os-sidebar-label">COMMAND CENTER</div>
-        <nav className="os-rail" aria-label="Primary">
-          {PRIMARY_NAV.map((item, index) => (
-            <Link key={item.href} href={item.href} aria-current={isNavActive(pathname, item.href) ? "page" : undefined}>
-              <span className="os-nav-index">{String(index + 1).padStart(2, "0")}</span>
-              <span className="os-nav-copy">
-                <strong>{item.label}</strong>
-                <span>{item.description}</span>
-              </span>
+        <nav className={styles.nav} aria-label="Primary command center">
+          {commandNav.map((item) => (
+            <Link key={item.label} href={item.href} data-active={isNavActive(pathname, item.href) ? "true" : "false"}>
+              <span className={styles.navIcon} aria-hidden="true">{item.icon}</span>
+              <span>{item.label}</span>
+              {item.badge ? <span className={styles.badge}>{item.badge}</span> : null}
             </Link>
           ))}
-          <Link href="/more" aria-current={isNavActive(pathname, "/more") ? "page" : undefined}>
-            <span className="os-nav-index">{String(PRIMARY_NAV.length + 1).padStart(2, "0")}</span>
-            <span className="os-nav-copy">
-              <strong>More</strong>
-              <span>Settings, vault, systems, and advanced tools.</span>
-            </span>
-          </Link>
         </nav>
 
-        <div className="os-sidebar-footer">
-          <div>
-            <strong>LifeOS navigation</strong>
-            <span>{greeting || "Command Center"}</span>
-          </div>
+        <div className={styles.sidebarFoot}>
+          <strong>Raven · Chief Morale Officer</strong>
+          <span>● Always with you.</span>
+          <p style={{margin:"10px 0 0",fontSize:".68rem",color:"#7f93ab"}}>“Same mission. Bigger possibilities.”</p>
         </div>
       </aside>
 
-      <div className="os-shell">
-        <header className="os-topbar">
-          <div className="os-topbar-identity">
-            <span className="os-topbar-kicker">LIFE OPERATIONS</span>
-            <strong className="os-topbar-title">Command Center</strong>
-          </div>
-
-          <div className="os-command-shortcuts">
+      <div className={styles.mainCol}>
+        <header className={styles.topbar}>
+          <button className={styles.search} type="button" onClick={() => setPaletteOpen(true)} aria-label="Search LifeOS">
+            <span>Search everything… projects, files, messages, tasks, clients, tools, ideas, agents</span>
+            <kbd>Ctrl K</kbd>
+          </button>
+          <div className={styles.topActions}>
             <LifeMegaMenu />
-            <Link className="os-life-map-trigger" href="/life-map">Life Map</Link>
-            <Link className="os-ask" href="/conversation">Ask LifeOS</Link>
-          </div>
-
-          <div className="os-top-actions">
-            <button type="button" className="os-command-trigger" onClick={() => setPaletteOpen(true)} aria-label="Open command palette">
-              <span>Search anything</span>
-              <kbd>Ctrl K</kbd>
-            </button>
-            <button type="button" className="os-icon-btn" onClick={() => setCaptureOpen(true)}>Capture</button>
+            <Link href="/conversation">Ask LifeOS</Link>
+            <button type="button" onClick={() => setCaptureOpen(true)}>Capture</button>
           </div>
         </header>
 
-        <main className="os-main" id="main-content" tabIndex={-1}>{children}</main>
+        <main className={styles.content} id="main-content" tabIndex={-1}>{children}</main>
       </div>
 
-      <nav className="os-dock" aria-label="Mobile">
+      <nav className={styles.dock} aria-label="Mobile">
         {MOBILE_NAV.map((item) => (
           <Link key={item.href} href={item.href} aria-current={isNavActive(pathname, item.href) ? "page" : undefined}>
-            <strong>{item.label}</strong>
+            {item.label}
           </Link>
         ))}
       </nav>
