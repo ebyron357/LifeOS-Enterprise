@@ -357,7 +357,7 @@ All steps are 🌐 Browser steps at `https://lifeos-enterprise.vercel.app/`.
 2. Read **Today**: your primary mission and critical outcomes.
 3. Read **Start here**: the single most important next action.
 4. Read **Where was I**: what you were doing, what is waiting, and what an agent can continue.
-5. Click the **Resume …** button under **Start here** (it names the project) to jump into that work. Below it, the health strip counts active, waiting, blocked, and review-due work, and **Your operating lanes** link to each part of your business.
+5. Click the **Resume …** button under **Start here** (it names the project) to jump into that work. The counts at the top of the page, above **Today**, show active, waiting, blocked, and review-due work. **Your operating lanes**, below **Today**, link to each part of your business.
 6. Optional: under **Where was I**, click **Save this as a checkpoint** to open it, then click **Save checkpoint** to save your place as an official record 🔑 (needs the Owner write secret; switched off until Part K is done).
 
 ## F2. Navigate the major areas

@@ -309,7 +309,7 @@ These are agent validation records, not owner acceptance.
 - Owner commit `fc0729de8475c6c2f6b6343a99d9fac392a5442e` (2026-09-30) added the `/life-map` personal operating map and the `/dashboards` launch hub; a READY production deployment exists for this SHA.
 - PR #75: merged the LifeOS closeout at `abf6c8264bed2578382d8eb60adc572762b6ee17` on 2026-09-30 (final head `c94d360` green on every check); READY in production at `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9`.
 - PR #79: merged the post-closeout status docs and manual F18 at `95e71d19bf5752d1aae81b63175334236098af7e`.
-- PR #82: merged the redesigned command-center shell and home at `0d3ed7018fed006e853c134c17ae930ebecda23f` (final head `5119be9` green on every check; supersedes #76 and #80); READY in production at `dpl_7XfMJ6z5wfFKXJbaZmv1bpEziAnp`.
+- PR #82: merged the redesigned command-center shell and home at `0d3ed7018fed006e853c134c17ae930ebecda23f` (final head `5119be9` green on every check; supersedes #76 and #80, both closed without merge); READY in production at `dpl_7XfMJ6z5wfFKXJbaZmv1bpEziAnp`.
 - PR #81: merged the My Life manual and status docs at `a179a9c714580c590e4661d8efda60735e4f7b5d`.
 - PR #78: merged the "My Life" mega navigation at `d66467e2701e5f11fa12b0b2f60e5257756c988c` (head `830ca40` green on every check, with the Escape focus, disclosure semantics, and e2e coverage fixes). Production deployment identity for this SHA is recorded under the verified release evidence.
 
@@ -327,10 +327,9 @@ Each item is written step-by-step in `80 SOPs/LifeOS Owner's Operating Manual.md
    - for approvals, `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`
 
    As of 2026-09-30, none of the governed write services are configured, so they stay fail-closed.
-5. Close PR #76 (the first command-center redesign attempt). PR #82 merged the redesign on current `main` (`0d3ed70`), with the Hermes honest-status text and shared page styles kept, and #80 is already closed. Closing #76 is left to you because it is your PR.
-6. After step 4, run the Issue #56 acceptance candidate (`vercel-labs/knowledge-agent-template`) through `/inbox` and `/resources/review` (workbook Section I).
-7. Optional paid voice: `OPENAI_API_KEY` plus a TTS/write secret. This is a billing decision.
-8. Complete the local Windows/Obsidian visual checks on the actual workstation.
+5. After step 4, run the Issue #56 acceptance candidate (`vercel-labs/knowledge-agent-template`) through `/inbox` and `/resources/review` (workbook Section I).
+6. Optional paid voice: `OPENAI_API_KEY` plus a TTS/write secret. This is a billing decision.
+7. Complete the local Windows/Obsidian visual checks on the actual workstation.
 
 ## Active platform work after V1 acceptance
 
