@@ -1,4 +1,9 @@
 import { redactSecrets } from "./security";
+import {
+  defaultOpenAiVoiceForStyle,
+  type OpenAiTtsVoice,
+  type ResponseStyle,
+} from "./voice-options";
 
 export type TtsProviderId = "openai" | "browser";
 
@@ -6,7 +11,9 @@ export type TtsSynthesisOptions = {
   text: string;
   locale: string;
   speed: number;
-  style: "balanced" | "concise" | "coach";
+  style: ResponseStyle;
+  /** Owner-chosen OpenAI voice; already validated against OPENAI_TTS_VOICES. */
+  voice?: OpenAiTtsVoice;
 };
 
 export type TtsSynthesisResult =
@@ -22,25 +29,41 @@ export type TtsProvider = {
 
 const OPENAI_ENDPOINT = "https://api.openai.com/v1/audio/speech";
 
+export const OPENAI_KEY_MISSING_REASON = "OPENAI_API_KEY is missing.";
+export const PAID_TTS_SECRET_MISSING_REASON =
+  "Paid TTS authorization secret is not set (LIFEOS_TTS_SECRET or LIFEOS_WRITE_SECRET).";
+
+/**
+ * Paid TTS can only be authorized when an owner secret exists server-side
+ * (see authorizePaidTts). Without one, every /api/lifeos/voice/speak call 503s.
+ */
+export function paidTtsAuthorizationConfigured(env: Record<string, string | undefined> = process.env): boolean {
+  return Boolean(env.LIFEOS_TTS_SECRET || env.LIFEOS_WRITE_SECRET);
+}
+
 function normalizeRate(value: number): number {
   if (!Number.isFinite(value)) return 1;
   return Math.min(2, Math.max(0.5, value));
 }
 
-function resolveOpenAiVoice(style: TtsSynthesisOptions["style"]): string {
-  if (style === "coach") return "sage";
-  if (style === "concise") return "alloy";
-  return "verse";
-}
-
-export function createOpenAiTtsProvider(apiKey: string | undefined = process.env.OPENAI_API_KEY): TtsProvider {
-  const configured = Boolean(apiKey);
+/**
+ * `configured` is only true when OpenAI can actually be used from the
+ * conversation UI: the API key exists AND a paid-TTS authorization secret is
+ * set. Synthesis itself only needs the API key (the route authorizes first).
+ */
+export function createOpenAiTtsProvider(
+  apiKey: string | undefined = process.env.OPENAI_API_KEY,
+  env: Record<string, string | undefined> = process.env,
+): TtsProvider {
+  const hasKey = Boolean(apiKey);
+  const authorizable = paidTtsAuthorizationConfigured(env);
+  const configured = hasKey && authorizable;
   return {
     id: "openai",
     configured,
-    reason: configured ? undefined : "OPENAI_API_KEY is missing.",
+    reason: !hasKey ? OPENAI_KEY_MISSING_REASON : !authorizable ? PAID_TTS_SECRET_MISSING_REASON : undefined,
     async synthesize(options) {
-      if (!apiKey) return { ok: false, provider: "openai", error: "OPENAI_API_KEY is missing." };
+      if (!apiKey) return { ok: false, provider: "openai", error: OPENAI_KEY_MISSING_REASON };
       try {
         const response = await fetch(OPENAI_ENDPOINT, {
           method: "POST",
@@ -50,10 +73,10 @@ export function createOpenAiTtsProvider(apiKey: string | undefined = process.env
           },
           body: JSON.stringify({
             model: "gpt-4o-mini-tts",
-            voice: resolveOpenAiVoice(options.style),
+            voice: options.voice ?? defaultOpenAiVoiceForStyle(options.style),
             input: options.text,
             speed: normalizeRate(options.speed),
-            format: "mp3",
+            response_format: "mp3",
             instructions: `Speak in ${options.locale}.`,
           }),
         });
@@ -88,13 +111,13 @@ export function createBrowserFallbackTtsProvider(): TtsProvider {
 }
 
 export function listTtsProviders(env: Record<string, string | undefined> = process.env) {
-  const openai = createOpenAiTtsProvider(env.OPENAI_API_KEY);
+  const openai = createOpenAiTtsProvider(env.OPENAI_API_KEY, env);
   const browser = createBrowserFallbackTtsProvider();
   return [openai, browser];
 }
 
 export function selectPreferredTtsProvider(env: Record<string, string | undefined> = process.env): TtsProvider {
-  const openai = createOpenAiTtsProvider(env.OPENAI_API_KEY);
+  const openai = createOpenAiTtsProvider(env.OPENAI_API_KEY, env);
   if (openai.configured) return openai;
   return createBrowserFallbackTtsProvider();
 }

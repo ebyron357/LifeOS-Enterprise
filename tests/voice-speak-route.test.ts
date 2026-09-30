@@ -82,6 +82,39 @@ describe("voice speak route", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("rejects voices outside the OpenAI allowlist before spending a provider request", async () => {
+    vi.stubEnv("LIFEOS_TTS_SECRET", "tts-secret");
+    vi.stubEnv("OPENAI_API_KEY", "sk-test");
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    for (const voice of ["evil-voice", "../alloy", 42, { name: "alloy" }]) {
+      const response = await POST(speakRequest({ text: "hello world", provider: "openai", voice }, "tts-secret"));
+      expect(response.status).toBe(400);
+      expect(await response.json()).toMatchObject({ error: expect.stringMatching(/invalid tts voice/i) });
+    }
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("passes an allowlisted voice to OpenAI and defaults to the style mapping when omitted", async () => {
+    vi.stubEnv("LIFEOS_TTS_SECRET", "tts-secret");
+    vi.stubEnv("OPENAI_API_KEY", "sk-test");
+    const fetchMock = vi.fn(async () => new Response(new Uint8Array([7, 7]), {
+      status: 200,
+      headers: { "content-type": "audio/mpeg" },
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const chosen = await POST(speakRequest({ text: "hello world", provider: "openai", voice: "shimmer", style: "coach" }, "tts-secret"));
+    expect(chosen.status).toBe(200);
+    expect(chosen.headers.get("X-LifeOS-TTS-Provider")).toBe("openai");
+    const defaulted = await POST(speakRequest({ text: "hello world", provider: "openai", style: "coach" }, "tts-secret"));
+    expect(defaulted.status).toBe(200);
+
+    const bodies = fetchMock.mock.calls.map((call) => JSON.parse(String((call as unknown as [string, RequestInit])[1].body)));
+    expect(bodies[0]).toMatchObject({ voice: "shimmer", response_format: "mp3" });
+    expect(bodies[1]).toMatchObject({ voice: "sage" });
+  });
+
   it("rejects invalid TTS providers", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
