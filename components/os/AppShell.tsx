@@ -49,7 +49,10 @@ export function AppShell({ children, greeting }: AppShellProps) {
             <small>{greeting || "Command Center"}</small>
           </div>
         </Link>
-        <Link className="os-ask" href="/conversation">Ask LifeOS</Link>
+        <div className="os-command-shortcuts">
+          <Link className="os-life-map-trigger" href="/life-map">Life Map</Link>
+          <Link className="os-ask" href="/conversation">Ask LifeOS</Link>
+        </div>
         <div className="os-top-actions">
           <button type="button" className="os-icon-btn" onClick={() => setPaletteOpen(true)} aria-label="Open command palette">
             Search

@@ -7,6 +7,8 @@ export type OsNavItem = {
 
 export const PRIMARY_NAV: OsNavItem[] = [
   { href: "/", label: "Home", intent: "decide", description: "See what needs you today." },
+  { href: "/life-map", label: "Life Map", intent: "review", description: "Open your personal operating map: identity, people, wealth, business, health, learning, creativity, and systems." },
+  { href: "/dashboards", label: "Dashboards", intent: "review", description: "Launch personal, business, leads, Charlotte, review, and widget dashboards from one place." },
   { href: "/conversation", label: "Ask LifeOS", intent: "ask", description: "Talk or type. Approve before anything writes." },
   { href: "/projects", label: "Projects", intent: "resume", description: "Open a project workspace and resume work." },
   { href: "/today", label: "Today", intent: "do", description: "Today's mission, outcomes, and next action." },
@@ -19,10 +21,10 @@ export const PRIMARY_NAV: OsNavItem[] = [
 ];
 
 export const MOBILE_NAV: OsNavItem[] = [
-  PRIMARY_NAV[0],
-  PRIMARY_NAV[1],
-  PRIMARY_NAV[2],
-  PRIMARY_NAV[4],
+  PRIMARY_NAV.find((item) => item.href === "/")!,
+  PRIMARY_NAV.find((item) => item.href === "/conversation")!,
+  PRIMARY_NAV.find((item) => item.href === "/projects")!,
+  PRIMARY_NAV.find((item) => item.href === "/inbox")!,
   { href: "/more", label: "More", intent: "more", description: "Settings, vault browse, and advanced tools." },
 ];
 
