@@ -6,6 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Command } from "cmdk";
 import { ADVANCED_NAV, MOBILE_NAV, PRIMARY_NAV, isNavActive } from "@/lib/os/nav";
 import { QuickCaptureDock } from "./QuickCaptureDock";
+import { LifeMegaMenu } from "./LifeMegaMenu";
 
 type AppShellProps = {
   children: ReactNode;
@@ -50,6 +51,7 @@ export function AppShell({ children, greeting }: AppShellProps) {
           </div>
         </Link>
         <div className="os-command-shortcuts">
+          <LifeMegaMenu />
           <Link className="os-life-map-trigger" href="/life-map">Life Map</Link>
           <Link className="os-ask" href="/conversation">Ask LifeOS</Link>
         </div>
