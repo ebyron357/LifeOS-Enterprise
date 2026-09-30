@@ -152,7 +152,12 @@ async function tabTo(page: Page, target: Locator, maxPresses = 8) {
   await expect(target).toBeFocused();
 }
 
-function settingsPanel(page: Page) {
+async function settingsPanel(page: Page) {
+  const advanced = page.locator("#advanced-settings");
+  await expect(advanced).toBeVisible();
+  const open = await advanced.evaluate((element) => (element as HTMLDetailsElement).open);
+  if (!open) await advanced.getByText("Voice & accessibility settings", { exact: true }).click();
+  await expect(advanced).toHaveJSProperty("open", true);
   return page.getByRole("region", { name: "Voice settings" });
 }
 
@@ -245,7 +250,7 @@ test.describe("interactive conversation workspace", () => {
   test("restores voice settings controls after reload, even when session metadata fails", async ({ page }) => {
     await installFakeVoice(page, { voices: FAKE_VOICES, voicesDelayMs: 150 });
     await page.goto("/conversation");
-    const settings = settingsPanel(page);
+    const settings = await settingsPanel(page);
     await settings.getByLabel(/^Provider/).selectOption("browser");
     await settings.getByLabel(/^Locale/).selectOption("en-GB");
     const voiceSelect = settings.getByLabel(/^Voice/);
@@ -276,7 +281,7 @@ test.describe("interactive conversation workspace", () => {
   test("previews with the chosen browser voice and warns when a locale has no installed voice", async ({ page }) => {
     await installFakeVoice(page, { voices: FAKE_VOICES, voicesDelayMs: 100 });
     await page.goto("/conversation");
-    const settings = settingsPanel(page);
+    const settings = await settingsPanel(page);
     await settings.getByLabel(/^Locale/).selectOption("en-GB");
     await settings.getByLabel(/^Voice/).selectOption("uk-1");
     await settings.getByRole("button", { name: /preview voice/i }).click();
