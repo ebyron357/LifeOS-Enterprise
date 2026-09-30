@@ -1,4 +1,16 @@
 import { createHash } from "node:crypto";
+import { isGeneratedNextAction, isGeneratedProcessorRoute, resourceProcessorRoute } from "./routing";
+import {
+  EVALUATION_EVIDENCE_LINES,
+  isGeneratedEvaluationEvidence,
+  noteEvidenceRefreshFailure,
+  renderSourceEvidenceSection,
+  sectionBounds,
+  SOURCE_EVIDENCE_HEADING,
+  upsertSourceEvidenceSection,
+  type ResourceEvidenceStatus,
+  type ResourceSourceEvidence,
+} from "./source-evidence";
 
 export type ResourceSourceType =
   | "github"
@@ -257,14 +269,20 @@ export function resourceRecordPath(resource: NormalizedResource): string {
   return `40 Resources/Resource Intelligence/Records/${resource.slug}.md`;
 }
 
+export type ResourceRecordOptions = {
+  /** Source evidence gathered server-side at write time. Omit for sources without an automated processor. */
+  evidence?: ResourceSourceEvidence | null;
+};
+
 function yamlString(value: string | null | undefined): string {
   return JSON.stringify(value ?? "");
 }
 
-function lineValue(markdown: string, key: string): string | null {
-  const match = markdown.match(new RegExp(`^${key}:\\s*(.+)$`, "m"));
-  if (!match) return null;
-  const raw = match[1].trim();
+function singleLine(value: string): string {
+  return value.replace(/[\r\n]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function parseScalar(raw: string): string {
   try {
     const parsed = JSON.parse(raw);
     return typeof parsed === "string" ? parsed : String(parsed);
@@ -273,20 +291,73 @@ function lineValue(markdown: string, key: string): string | null {
   }
 }
 
+function lineValue(markdown: string, key: string): string | null {
+  const match = markdown.match(new RegExp(`^${key}:\\s*(.+)$`, "m"));
+  return match ? parseScalar(match[1].trim()) : null;
+}
+
 function replaceLine(markdown: string, key: string, value: string | number): string {
   const line = `${key}: ${typeof value === "number" ? value : yamlString(value)}`;
   const pattern = new RegExp(`^${key}:.*$`, "m");
-  return pattern.test(markdown) ? markdown.replace(pattern, line) : markdown;
+  return pattern.test(markdown) ? markdown.replace(pattern, () => line) : markdown;
+}
+
+function frontmatterEnd(markdown: string): number {
+  return markdown.startsWith("---\n") ? markdown.indexOf("\n---", 4) : -1;
+}
+
+function frontmatterLineValue(markdown: string, key: string): string | null {
+  const end = frontmatterEnd(markdown);
+  if (end === -1) return null;
+  const match = markdown.slice(4, end).match(new RegExp(`^${key}:[ \\t]*(.*)$`, "m"));
+  return match ? parseScalar(match[1].trim()) : null;
+}
+
+/**
+ * Sets a frontmatter key. A missing key is inserted after the first present key in `afterKeys`,
+ * or at the end of the frontmatter.
+ */
+function upsertFrontmatterLine(markdown: string, key: string, value: string, afterKeys: string[] = []): string {
+  const end = frontmatterEnd(markdown);
+  if (end === -1) return markdown;
+  const block = markdown.slice(4, end);
+  const line = `${key}: ${yamlString(value)}`;
+  const pattern = new RegExp(`^${key}:.*$`, "m");
+  let nextBlock: string;
+  if (pattern.test(block)) {
+    nextBlock = block.replace(pattern, () => line);
+  } else {
+    const anchor = afterKeys
+      .map((afterKey) => new RegExp(`^${afterKey}:.*$`, "m").exec(block))
+      .find((match): match is RegExpExecArray => Boolean(match));
+    const at = anchor ? anchor.index + anchor[0].length : block.length;
+    nextBlock = `${block.slice(0, at)}\n${line}${block.slice(at)}`;
+  }
+  return `---\n${nextBlock}${markdown.slice(end)}`;
+}
+
+function evaluationLineValue(markdown: string, label: string): string | null {
+  const match = markdown.match(new RegExp(`^- ${label}:[ \\t]*(.*)$`, "m"));
+  return match ? match[1].trim() : null;
+}
+
+function replaceEvaluationLine(markdown: string, label: string, value: string): string {
+  const pattern = new RegExp(`^- ${label}:.*$`, "m");
+  return pattern.test(markdown) ? markdown.replace(pattern, () => `- ${label}: ${value}`) : markdown;
 }
 
 export function renderResourceRecord(
   input: ResourceCaptureInput,
   resource: NormalizedResource,
   nowIso: string,
+  options: ResourceRecordOptions = {},
 ): string {
   const date = nowIso.slice(0, 10);
-  const channel = input.captureChannel?.trim() || "lifeos-web";
-  const nextAction = "Review source evidence, architecture classification, disposition, overlap, value, effort, risk, and implementation need.";
+  const channel = singleLine(input.captureChannel?.trim() || "lifeos-web");
+  const route = resourceProcessorRoute(resource.sourceType);
+  const evidence = options.evidence ?? null;
+  const evidenceStatus: ResourceEvidenceStatus = evidence?.status ?? "capture-only";
+  const nextAction = route.nextAction;
 
   return `---
 type: resource
@@ -302,6 +373,9 @@ capture_count: 1
 processing_state: "needs-review"
 architecture_classification: "PENDING"
 disposition: "PENDING"
+processor_route: ${yamlString(route.processorRoute)}
+evidence_status: ${yamlString(evidenceStatus)}
+evidence_inspected_at: ${yamlString(evidence?.inspectedAt)}
 related_project: ${yamlString(input.relatedProject)}
 related_area: ${yamlString(input.relatedArea)}
 owner: ${yamlString(input.owner)}
@@ -316,7 +390,7 @@ tags:
   - resource-intelligence
 ---
 
-# ${resource.title}
+# ${singleLine(resource.title)}
 
 ## Source
 
@@ -328,17 +402,43 @@ tags:
 
 - Architecture classification: **PENDING**
 - Disposition: **PENDING**
-- Evidence: capture only; source inspection has not yet been performed.
+- Evidence: ${EVALUATION_EVIDENCE_LINES[evidenceStatus]}
 - Next action: ${nextAction}
 
-## Capture History
+${evidence ? `${renderSourceEvidenceSection(evidence)}\n` : ""}## Capture History
 
 - ${nowIso} — captured through ${channel}.
 
 ## Governance
 
-This record is canonical for the stable source identity above. Exact duplicates update this record instead of creating a competing record. Strategic classification and disposition require source-grounded review; capture alone does not prove adoption, value, or implementation.
+This record is canonical for the stable source identity above. Exact duplicates update this record instead of creating a competing record. Strategic classification and disposition require source-grounded review; capture alone does not prove adoption, value, or implementation. Source Evidence is provenance from a read-only processor, not a disposition.
 `;
+}
+
+const EVIDENCE_STATUS_ANCHORS = ["processor_route", "disposition"];
+
+function applySourceEvidence(markdown: string, evidence: ResourceSourceEvidence | null): string {
+  const currentStatus = frontmatterLineValue(markdown, "evidence_status");
+
+  if (!evidence) {
+    // No automated processor ran: never downgrade evidence recorded earlier.
+    if (currentStatus) return markdown;
+    const withStatus = upsertFrontmatterLine(markdown, "evidence_status", "capture-only", EVIDENCE_STATUS_ANCHORS);
+    return upsertFrontmatterLine(withStatus, "evidence_inspected_at", "", ["evidence_status"]);
+  }
+
+  if (
+    evidence.status === "evidence-unavailable"
+    && currentStatus === "source-evidence-captured"
+    && sectionBounds(markdown, SOURCE_EVIDENCE_HEADING)
+  ) {
+    // A failed refresh must not erase evidence captured by an earlier successful inspection.
+    return noteEvidenceRefreshFailure(markdown, evidence, frontmatterLineValue(markdown, "evidence_inspected_at"));
+  }
+
+  let updated = upsertSourceEvidenceSection(markdown, renderSourceEvidenceSection(evidence));
+  updated = upsertFrontmatterLine(updated, "evidence_status", evidence.status, EVIDENCE_STATUS_ANCHORS);
+  return upsertFrontmatterLine(updated, "evidence_inspected_at", evidence.inspectedAt, ["evidence_status"]);
 }
 
 export function updateResourceRecord(
@@ -346,6 +446,7 @@ export function updateResourceRecord(
   input: ResourceCaptureInput,
   resource: NormalizedResource,
   nowIso: string,
+  options: ResourceRecordOptions = {},
 ): string {
   const existingIdentity = lineValue(existing, "source_identity");
   if (existingIdentity && existingIdentity !== resource.sourceIdentity) {
@@ -354,7 +455,8 @@ export function updateResourceRecord(
 
   const previousCount = Number(lineValue(existing, "capture_count") || "1");
   const nextCount = Number.isFinite(previousCount) ? previousCount + 1 : 2;
-  const channel = input.captureChannel?.trim() || "lifeos-web";
+  const channel = singleLine(input.captureChannel?.trim() || "lifeos-web");
+  const route = resourceProcessorRoute(resource.sourceType);
 
   let updated = existing;
   updated = replaceLine(updated, "source", (input.source || resource.canonicalSource).trim());
@@ -364,11 +466,37 @@ export function updateResourceRecord(
   updated = replaceLine(updated, "last_captured", nowIso);
   updated = replaceLine(updated, "capture_count", nextCount);
 
+  // Routing follows the source type, but owner edits and review decisions are never overwritten.
+  if (isGeneratedProcessorRoute(frontmatterLineValue(updated, "processor_route"))) {
+    updated = upsertFrontmatterLine(updated, "processor_route", route.processorRoute, ["disposition"]);
+  }
+  if (isGeneratedNextAction(frontmatterLineValue(updated, "next_action"))) {
+    updated = upsertFrontmatterLine(updated, "next_action", route.nextAction);
+  }
+  if (evaluationLineValue(updated, "Next action") !== null && isGeneratedNextAction(evaluationLineValue(updated, "Next action"))) {
+    updated = replaceEvaluationLine(updated, "Next action", route.nextAction);
+  }
+
   const historyLine = `- ${nowIso} — captured again through ${channel}; exact identity dedupe matched the canonical record.`;
-  if (updated.includes("## Capture History")) {
-    updated = updated.replace("## Capture History\n", `## Capture History\n\n${historyLine}\n`);
+  if (updated.includes("## Capture History\n\n")) {
+    updated = updated.replace("## Capture History\n\n", () => `## Capture History\n\n${historyLine}\n`);
+  } else if (updated.includes("## Capture History\n")) {
+    updated = updated.replace("## Capture History\n", () => `## Capture History\n\n${historyLine}\n`);
   } else {
-    updated += `\n## Capture History\n\n${historyLine}\n`;
+    updated = `${updated.replace(/\s*$/, "")}\n\n## Capture History\n\n${historyLine}\n`;
+  }
+
+  updated = applySourceEvidence(updated, options.evidence ?? null);
+
+  const evidenceStatus = frontmatterLineValue(updated, "evidence_status");
+  const currentEvidenceLine = evaluationLineValue(updated, "Evidence");
+  if (
+    evidenceStatus
+    && Object.hasOwn(EVALUATION_EVIDENCE_LINES, evidenceStatus)
+    && currentEvidenceLine !== null
+    && isGeneratedEvaluationEvidence(currentEvidenceLine)
+  ) {
+    updated = replaceEvaluationLine(updated, "Evidence", EVALUATION_EVIDENCE_LINES[evidenceStatus as ResourceEvidenceStatus]);
   }
 
   return updated;
