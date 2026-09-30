@@ -130,8 +130,8 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
             )) : <div className={styles.emptyState}>No urgent items are recorded.</div>}
           </div>
           <div className={styles.needsFooter}>
-            <strong>{vault.activeProjects}</strong><span> active projects</span>
-            <strong>{blocked.length}</strong><span> blocked</span>
+            <div><strong>{vault.activeProjects}</strong><span> active projects</span></div>
+            <div><h3>Blockers</h3><strong>{blocked.length}</strong><span>{blocked.length ? " need attention" : " clear"}</span></div>
           </div>
         </article>
 
@@ -182,7 +182,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
           </article>
 
           <article className={styles.panel}>
-            <div className={styles.panelHead}><h2>Today&apos;s Overview</h2><Link href="/today">Open</Link></div>
+            <div className={styles.panelHead}><div><h2>Today</h2><p>Overview</p></div><Link href="/today">Open</Link></div>
             <div className={styles.metricGrid}>
               <div className={styles.metric}><strong>{vault.activeProjects}</strong><span>Active</span></div>
               <div className={styles.metric}><strong>{waiting.length}</strong><span>Waiting</span></div>
@@ -214,7 +214,8 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
 
       <section className={styles.lowerDeck}>
         <article className={styles.panel}>
-          <div className={styles.panelHead}><h2>Resume Where You Left Off</h2><Link href="/projects">View all</Link></div>
+          <div className={styles.panelHead}><div><h2>Resume Where You Left Off</h2><p>Verified continuity</p></div><Link href="/projects">View all</Link></div>
+          <div className={styles.startHereLine}><h3>Start here</h3><strong>{resumeLabel}</strong><span>{resume.next.detail}</span></div>
           <div className={styles.resumeStrip}>
             {resumeProjects.map((project, index) => (
               <Link key={project.path} href={noteHref(project.path)}>
