@@ -70,7 +70,7 @@ export function AppShell({ children, greeting }: AppShellProps) {
           <span className={styles.brandMark}>L</span>
           <div>
             <strong>LifeOS</strong>
-            <small>BUILT DIFFERENT</small>
+            <small>COMMAND CENTER</small>
           </div>
         </Link>
 
@@ -79,7 +79,6 @@ export function AppShell({ children, greeting }: AppShellProps) {
             <Link key={item.label} href={item.href} data-active={isNavActive(pathname, item.href) ? "true" : "false"} aria-current={isNavActive(pathname, item.href) ? "page" : undefined}>
               <span className={styles.navIcon} aria-hidden="true">{item.icon}</span>
               <span>{item.label}</span>
-              {item.badge ? <span className={styles.badge}>{item.badge}</span> : null}
             </Link>
           ))}
         </nav>
