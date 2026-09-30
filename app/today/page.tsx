@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AppShell } from "@/components/os/AppShell";
 import { ContinuityResume } from "@/components/os/ContinuityResume";
+import { GameProgressCard } from "@/components/widgets/GameProgressCard";
 import { getOsContext } from "@/lib/os/page-data";
 import { noteHref } from "@/lib/vault/slug";
 
@@ -42,6 +43,7 @@ export default async function TodayPage() {
             Continue from the last verified point
           </Link>
         </section>
+        <GameProgressCard />
       </div>
     </AppShell>
   );
