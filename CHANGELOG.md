@@ -2,6 +2,30 @@
 
 All notable changes to LifeOS Enterprise are documented in this file.
 
+## [Unreleased] — 2026-09-30 Final command center UI/UX (PR #82, merged as `0d3ed701`)
+
+### Changed
+
+- Consolidated the premium command rail/dashboard with the merged **My Life** mega navigation, Life Map, and Dashboards.
+- Added a scan-first home dashboard for Today, primary mission, critical outcomes, operating lanes, continuity, blockers/waiting, AI capacity, integrations, and GitHub health.
+- Preserved shared layout helpers used by non-home routes and responsive desktop/tablet/mobile behavior.
+
+### Fixed
+
+- Restored truthful **Hermes is unavailable** state instead of a generic success-like AI status.
+- Bound the primary mission CTA to the displayed mission rather than a different continuity project.
+- Removed an unverified **System online** claim from the shell.
+- Fixed navigation numbering, CSS newline corruption, and inherited control typography.
+- Preserved visible accessible headings used by browser acceptance journeys.
+
+### Validation
+
+- Vault Health: PASS.
+- MAPS Integrity: PASS.
+- Dashboard CI: audit, lint, typecheck, 516 unit tests, production build, and Playwright browser journeys PASS.
+- Vercel preview READY before merge; production deployment `dpl_7XfMJ6z5wfFKXJbaZmv1bpEziAnp` READY at `0d3ed701`.
+- Superseded PR #76 and integration attempt #80 are closed.
+
 ## [Unreleased] — 2026-09-30 My Life navigation (PR #78, merged as `d66467e`)
 
 ### Added
@@ -15,7 +39,7 @@ All notable changes to LifeOS Enterprise are documented in this file.
 
 ### Documentation
 
-- Owner manual v2.2: F2 and F18 cover **My Life**, and F18 step 1 routes phones through **My Life** → **Open Life Map**. Workbook A14 covers My Life. Canonical status records #78 and #79 and the owner decision on the redesign PRs #76 and #80.
+- Owner manual v2.2: F2 and F18 cover **My Life**, and F18 step 1 routes phones through **My Life** → **Open Life Map**. Workbook A14 covers My Life. Canonical status records #78/#79/#81 and the completed final redesign in #82; superseded redesign PRs #76 and #80 are closed.
 
 ## [Unreleased] — 2026-09-30 LifeOS closeout (PR #75, merged as `abf6c82`)
 
