@@ -16,6 +16,7 @@ const zones = [
   { key: "learning", label: "Learning & Skills", detail: "Courses, certifications, research, and the next capability to compound.", href: "/learning", action: "Open learning" },
   { key: "soundtrack", label: "Soundtrack", detail: "Music belongs in the command center too. Connect a real media source here instead of faking playback.", href: "/integrations", action: "Open integrations" },
   { key: "systems", label: "Files, Intel & Memory", detail: "Search the vault, find evidence, inspect intelligence, and recover context fast.", href: "/files", action: "Open files" },
+  { key: "dashboards", label: "Dashboards", detail: "Personal, business, leads, Charlotte, agent work, growth, reviews, and live widgets from one launch deck.", href: "/dashboards", action: "Open dashboards" },
   { key: "mission", label: "Mission Control", detail: "Projects, today, blockers, next actions, and the work that needs you now.", href: "/projects", action: "Open projects" },
 ] as const;
 
