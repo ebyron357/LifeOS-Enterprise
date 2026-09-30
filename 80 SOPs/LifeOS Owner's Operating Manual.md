@@ -19,7 +19,7 @@ aliases:
 
 # LifeOS Owner's Operating Manual
 
-**Version 2.1 • 30 September 2026** (2.1 adds F18, Life Map and Dashboards)
+**Version 2.2 • 30 September 2026** (2.1 added F18, Life Map and Dashboards; 2.2 adds the **My Life** menu)
 **Replaces:** Version 1.0 (August 2026). This page is the one owner/operator manual. Do not start a second one.
 
 > [!info] How to read this manual
@@ -364,6 +364,7 @@ All steps are 🌐 Browser steps at `https://lifeos-enterprise.vercel.app/`.
 
 - Desktop: use the left menu.
 - Phone: use the bottom dock; everything else is under **More**.
+- Top bar: click **My Life** to see every area at once (see F18 step 7).
 - Keyboard: press **Ctrl + K** (or click the search/command button) to open the command palette, type a place such as `journal`, and press **Enter**.
 
 ## F3. Capture — `/inbox`
@@ -497,12 +498,13 @@ All steps are 🌐 Browser steps at `https://lifeos-enterprise.vercel.app/`.
 
 ## F18. Life Map and Dashboards — `/life-map` and `/dashboards`
 
-1. Open **Life Map**: click **Life Map** in the top bar (next to **Ask LifeOS**) or in the left menu. On a phone, tap **Life Map** in the top bar, or **More** → **Life Map**.
+1. Open **Life Map**: click **Life Map** in the top bar (next to **Ask LifeOS**) or in the left menu. On a phone, tap **My Life** → **Open Life Map**, or **More** → **Life Map**.
 2. Each colored tile is one part of your life (for example **Family & People**, **Health & Performance**, **Business Empire**, **Learning & Skills**). Click a tile to open the LifeOS page for it.
 3. Click **Ask LifeOS across everything** to ask a question that spans all areas.
 4. Open **Dashboards**: click the **Dashboards** tile on Life Map, **Dashboards** in the left menu, or **More** → **Dashboards** on a phone.
 5. Click a dashboard to open it (for example **Personal**, **Business**, **Leads**, **Weekly Review**). **Widget Workspace** opens the widget board from F14.
 6. Click **Back to Life Map** to return.
+7. Shortcut from any page: click **My Life** in the top bar. A panel opens with every area in colored columns (Command, Business & Revenue, AI Workforce, Projects & Clients, Learning & Tools, Personal, Creative & Media). Click a link to go there. Press **Esc** or click outside the panel to close it.
 
 Success looks like: every tile opens a page, and nothing on these pages changes your notes. They are shortcuts only.
 

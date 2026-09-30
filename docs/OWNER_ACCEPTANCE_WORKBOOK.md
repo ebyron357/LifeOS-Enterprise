@@ -42,7 +42,7 @@ Use one row per test. Record evidence such as a screenshot, short note, deployme
 | A11 | Advanced dashboard retained | Open `/dashboard` from More/advanced tools | Existing widget dashboard remains accessible | ☐ | | |
 | A12 | Browser navigation | Use back/forward through several primary routes | History behaves normally; no forced navigation loop | ☐ | | |
 | A13 | Mobile shell | Repeat core navigation at 390px | Home, Ask LifeOS, Projects, Capture, and More are easy to reach | ☐ | | |
-| A14 | Life Map and Dashboards | Open `/life-map` from the top bar, click each tile, then open `/dashboards` and each dashboard (manual F18) | Every tile and dashboard opens a real page; nothing is written to the vault | ☐ | | |
+| A14 | Life Map, Dashboards, and My Life | Open `/life-map` from the top bar, click each tile, then open `/dashboards` and each dashboard. For each of the seven My Life columns: open **My Life** in the top bar, click one link in that column, and check the page (the panel closes when you navigate). Finally, open **My Life** once more and press Esc (manual F18) | Every tile, dashboard, and My Life link opens a real page; Esc closes My Life and keyboard focus returns to the **My Life** button; nothing is written to the vault | ☐ | | |
 
 ---
 
@@ -50,7 +50,7 @@ Use one row per test. Record evidence such as a screenshot, short note, deployme
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| B1 | Current main contains merged fixes | Inspect current GitHub main (`https://github.com/ebyron357/LifeOS-Enterprise/commits/main`) | #60–#73 are present, plus #74 (MAPS, `62a9df9`), the Life Map / Dashboards commit `fc0729d`, and the #75 closeout (`abf6c82`: voice #58 polish, widget/game #42 fixes, Resource Intelligence provenance, dependency advisories, owner manual v2.x) | ☐ | | |
+| B1 | Current main contains merged fixes | Inspect current GitHub main (`https://github.com/ebyron357/LifeOS-Enterprise/commits/main`) | #60–#73 are present, plus #74 (MAPS, `62a9df9`), the Life Map / Dashboards commit `fc0729d`, the #75 closeout (`abf6c82`: voice #58 polish, widget/game #42 fixes, Resource Intelligence provenance, dependency advisories, owner manual v2.x), #79 status docs (`95e71d1`), and #78 My Life navigation (`d66467e`) | ☐ | | |
 | B2 | Automated validation record | Review PR #61/#62/#64 evidence | Lint, typecheck, unit, build, audit, vault audit, and CI evidence are recorded; browser-suite limitations are disclosed rather than hidden | ☐ | | |
 | B3 | No secrets in repo | Spot-check `.env.example` and recent diffs | Placeholders only; no live tokens | ☐ | | |
 | B4 | Integration availability truthful | Inspect `/integrations` and `/conversation` Context/tools | Unconfigured tools show unavailable/configured requirements, never invented success | ☐ | | |
