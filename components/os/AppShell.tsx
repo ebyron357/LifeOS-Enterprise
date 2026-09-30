@@ -64,7 +64,7 @@ export function AppShell({ children, greeting }: AppShellProps) {
             </Link>
           ))}
           <Link href="/more" aria-current={isNavActive(pathname, "/more") ? "page" : undefined}>
-            <span className="os-nav-index">11</span>
+            <span className="os-nav-index">{String(PRIMARY_NAV.length + 1).padStart(2, "0")}</span>
             <span className="os-nav-copy">
               <strong>More</strong>
               <span>Settings, vault, systems, and advanced tools.</span>
@@ -73,9 +73,8 @@ export function AppShell({ children, greeting }: AppShellProps) {
         </nav>
 
         <div className="os-sidebar-footer">
-          <span className="os-status-dot" aria-hidden="true" />
           <div>
-            <strong>System online</strong>
+            <strong>LifeOS navigation</strong>
             <span>{greeting || "Command Center"}</span>
           </div>
         </div>
