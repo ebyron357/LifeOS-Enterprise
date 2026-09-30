@@ -25,3 +25,12 @@
 .ownerLaneRow a{flex:0 0 auto;min-height:30px;padding:0 9px;border:1px solid rgba(119,157,202,.18);border-radius:999px;background:#0b131f;color:#a9bfd6;text-decoration:none;font-size:.58rem;font-weight:800;display:inline-flex;align-items:center;transition:.15s ease}
 .ownerLaneRow a:hover,.ownerLaneRow a:focus-visible{color:#fff;border-color:rgba(55,217,255,.42);background:rgba(35,136,255,.12)}
 @media(max-width:980px){.ownerWorld{grid-template-columns:1fr}.ownerLaneRow{padding-bottom:5px}}
+
+.needsFooter{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.needsFooter div{display:flex;align-items:center;gap:4px;min-width:0}
+.needsFooter h3{margin:0 4px 0 0;color:#ff8491;font-size:.62rem}
+.startHereLine{margin:8px;padding:9px 10px;border:1px solid rgba(35,136,255,.18);border-radius:8px;background:rgba(35,136,255,.05);display:grid;grid-template-columns:auto auto 1fr;gap:8px;align-items:center}
+.startHereLine h3{margin:0;color:#6ebcff;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em}
+.startHereLine strong{font-size:.68rem}
+.startHereLine span{min-width:0;color:#8298af;font-size:.6rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:620px){.startHereLine{grid-template-columns:1fr}.startHereLine span{white-space:normal}.needsFooter{align-items:flex-start;flex-direction:column}}
