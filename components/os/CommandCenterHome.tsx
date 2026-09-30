@@ -87,13 +87,21 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
         </div>
       </header>
 
-      <section className="os-focus-grid" aria-label="Focus now">
+      <section className="os-section" aria-labelledby="today-heading">
+        <div className="os-section-heading">
+          <div>
+            <p className="os-kicker">FOCUS NOW</p>
+            <h2 id="today-heading">Today</h2>
+          </div>
+        </div>
+        <div className="os-focus-grid">
         <article className="os-focus-card os-focus-primary">
           <div className="os-card-topline"><span>01</span><span>PRIMARY MISSION</span></div>
+          <h3 className="os-focus-label">Start here</h3>
           <h2>{mission ? mission.name : "Choose today's lead mission"}</h2>
           <p>{mission ? projectLine(mission) : "No active project is marked as the lead mission."}</p>
-          <Link className="os-primary" href={resume.next.href || (mission ? noteHref(mission.path) : "/inbox")}>
-            {resume.next.ownership === "owner" ? "This needs you" : mission ? `Resume ${mission.name}` : "Capture next move"}
+          <Link className="os-primary" href={mission ? noteHref(mission.path) : "/inbox"}>
+            {mission ? `Resume ${mission.name}` : "Capture next move"}
           </Link>
         </article>
 
@@ -110,6 +118,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
             </ol>
           ) : <p>No priority outcomes are in the vault yet.</p>}
         </article>
+        </div>
       </section>
 
       <section className="os-section">
@@ -148,7 +157,8 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
 
       <section className="os-three-grid">
         <article className="os-info-card">
-          <div className="os-card-topline"><span>BLOCKERS</span><strong>{blocked.length}</strong></div>
+          <div className="os-card-topline"><span>ATTENTION</span><strong>{blocked.length}</strong></div>
+          <h2>Blockers</h2>
           {blocked.length ? (
             <ul>{blocked.slice(0, 4).map((item) => <li key={item.path}><strong>{item.name}</strong><span>{item.blocker || "Blocked without a named reason."}</span></li>)}</ul>
           ) : <p>No blocked projects are recorded.</p>}
