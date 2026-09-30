@@ -649,8 +649,9 @@ The full, signable checklist is `docs/OWNER_ACCEPTANCE_WORKBOOK.md`. Use it. The
 5. On desktop, do F14 and F15 (drag, resize, hide/show, repair, complete one real quest, check-in, end day).
 6. On your phone, repeat F1, F3, F12 (steps 3–7), and F14 step 5.
 7. Confirm a write button fails safely while writes are off (Part K not done): it must refuse, not pretend.
-8. If you completed Part K, do workbook Section G (approvals and draft PRs).
-9. Fill in the workbook sign-off and mark **READY TO ACCEPT**, **BLOCKED**, or **NOT READY**.
+8. If you completed Part K, do workbook Section G (approvals and draft PRs) and Section I rows I3–I6 (the Resource Intelligence acceptance candidate `https://github.com/vercel-labs/knowledge-agent-template`).
+9. After PR #74 is merged, do workbook Section J (MAPS daily routine evidence).
+10. Fill in the workbook sign-off (Section K) and mark **READY TO ACCEPT**, **BLOCKED**, or **NOT READY**.
 
 ---
 
