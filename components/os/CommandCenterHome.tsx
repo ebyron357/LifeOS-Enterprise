@@ -81,7 +81,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
     <div className={styles.dashboard}>
       <section className={styles.hero} aria-label="LifeOS command center summary">
         <div className={styles.heroIdentity}>
-          <span className={styles.heroMark}>✦</span>
+          <span className={styles.heroMark}>EAB</span>
           <div>
             <h1>{greeting}</h1>
             <p>Focus. Execute. Build the life you designed.</p>
@@ -148,7 +148,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
                 <Link className={styles.thread} href="/conversation">
                   <span className={styles.avatar}>A</span>
                   <span><strong>ARIA (AI Assistant)</strong><small>Command center conversation</small></span>
-                  <time>now</time>
+                  <span aria-hidden="true" />
                 </Link>
                 {integrationThreads.map((item) => (
                   <Link key={item.id} className={styles.thread} href="/integrations">
@@ -166,7 +166,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
                 <span className={styles.online}>{hermes.state === "unavailable" ? "Hermes is unavailable · LifeOS remains available" : hermes.state}</span>
               </div>
               <div className={styles.bubble}><strong>Command snapshot</strong><br />{vault.activeProjects} active projects · {blocked.length} blocked · {waiting.length} waiting · {vault.reviewsDue} reviews due.</div>
-              <div className={styles.bubbleRight}>Show me what needs my attention and what I should resume next.</div>
+              <div className={styles.bubbleRight}>Open ARIA to ask about priorities, blockers, approvals, or the next verified move.</div>
               <Link href="/conversation" className={styles.composer}>Type a message or open voice command →</Link>
               <div className={styles.commandChips}><span>/tasks</span><span>/projects</span><span>/summarize</span><span>/create</span><span>/research</span></div>
             </div>
