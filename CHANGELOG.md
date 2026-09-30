@@ -2,7 +2,7 @@
 
 All notable changes to LifeOS Enterprise are documented in this file.
 
-## [Unreleased] — 2026-09-30 LifeOS closeout (claude/eager-noether-oacbox)
+## [Unreleased] — 2026-09-30 LifeOS closeout (PR #75, merged as `abf6c82`)
 
 ### Security
 
@@ -14,7 +14,7 @@ All notable changes to LifeOS Enterprise are documented in this file.
 - OpenAI voice is reported configured only when a paid-TTS authorization secret also exists. The client never auto-selects it and only calls it after the owner types the secret.
 - Interrupt, Stop conversation, and newer replies cancel in-flight turn and speech requests, so stale replies never speak and clips never overlap.
 - Added a voice picker (browser voices for the locale; OpenAI allowlist validated server-side), BCP-47 locale speech, and a visible warning instead of silent language switching.
-- Settings load from browser storage independently of the session fetch and are never overwritten by defaults.
+- Settings load from browser storage independently of the session fetch and are never overwritten by defaults. If the browser refuses to save them, Voice settings shows a warning that they will not survive a reload.
 - Fixed a recognition restart loop and the push-to-talk mode reset. Where continuous listening is unsupported (iOS/iPadOS), the recognizer runs single-utterance and LifeOS restarts it after each phrase. The error alert clears on recovery (**Try again**).
 - Duplicate-turn protection (in-flight guard + identical-transcript window). A visible provider/fallback indicator. Capability and privacy notes before the microphone starts.
 - `concise` response style shortens the spoken reply deterministically. Primary voice controls are ≥ 44 px.
@@ -49,12 +49,14 @@ All notable changes to LifeOS Enterprise are documented in this file.
   - the Pulse routine registry
   - `scripts/validate-maps.ps1`
   - the daily MAPS Integrity workflow
+- Owner commit `fc0729d`: the `/life-map` personal operating map and the `/dashboards` launch hub.
 
 ### Documentation
 
 - `80 SOPs/LifeOS Owner's Operating Manual.md` v2.0 is a complete step-by-step owner/operator guide.
 - `docs/OWNER_ACCEPTANCE_WORKBOOK.md` is refreshed for voice, Resource Intelligence, and MAPS.
 - Canonical status, deployment guide, and vault repair report are reconciled.
+- After the merge: the manual gains F18 (Life Map and Dashboards), and the status docs record the `abf6c82` merge and its READY production deployment.
 
 ## [Unreleased] — post-#60 security corrective (draft PR)
 

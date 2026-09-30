@@ -19,7 +19,7 @@ aliases:
 
 # LifeOS Owner's Operating Manual
 
-**Version 2.0 • 30 September 2026**
+**Version 2.1 • 30 September 2026** (2.1 adds F18, Life Map and Dashboards)
 **Replaces:** Version 1.0 (August 2026). This page is the one owner/operator manual. Do not start a second one.
 
 > [!info] How to read this manual
@@ -51,6 +51,7 @@ aliases:
 |---|---|---|
 | See what needs me today | LifeOS website | `https://lifeos-enterprise.vercel.app/` |
 | Talk or type to LifeOS | LifeOS website | **Ask LifeOS** (`/conversation`) |
+| Jump to any part of my life or a dashboard | LifeOS website | **Life Map** (`/life-map`) or **Dashboards** (`/dashboards`) — see F18 |
 | Read or edit a note | Obsidian | Open the `LifeOS-Enterprise` vault |
 | See the official copy / changes / checks | GitHub | `https://github.com/ebyron357/LifeOS-Enterprise` |
 | See if the website is healthy / roll back | Vercel | `https://vercel.com/tradeiq/lifeos-enterprise` |
@@ -494,6 +495,17 @@ All steps are 🌐 Browser steps at `https://lifeos-enterprise.vercel.app/`.
 | Page error box | **Try again** | Nothing |
 | Everything in this browser is weird | Browser settings → clear site data for `lifeos-enterprise.vercel.app` | Browser-only captures, journal drafts, layout, game, voice settings. Official vault notes are **not** affected. |
 
+## F18. Life Map and Dashboards — `/life-map` and `/dashboards`
+
+1. Open **Life Map**: click **Life Map** in the top bar (next to **Ask LifeOS**) or in the left menu. On a phone, tap **Life Map** in the top bar, or **More** → **Life Map**.
+2. Each colored tile is one part of your life (for example **Family & People**, **Health & Performance**, **Business Empire**, **Learning & Skills**). Click a tile to open the LifeOS page for it.
+3. Click **Ask LifeOS across everything** to ask a question that spans all areas.
+4. Open **Dashboards**: click the **Dashboards** tile on Life Map, **Dashboards** in the left menu, or **More** → **Dashboards** on a phone.
+5. Click a dashboard to open it (for example **Personal**, **Business**, **Leads**, **Weekly Review**). **Widget Workspace** opens the widget board from F14.
+6. Click **Back to Life Map** to return.
+
+Success looks like: every tile opens a page, and nothing on these pages changes your notes. They are shortcuts only.
+
 ---
 
 # 8. Part G — Owner / Admin Guide
@@ -643,7 +655,7 @@ The full list is in `docs/DEPLOYMENT.md` and `.env.example`. Rules:
 The full, signable checklist is `docs/OWNER_ACCEPTANCE_WORKBOOK.md`. Use it. The short version:
 
 1. Do G4 and write down the production deployment ID and commit.
-2. On desktop, do F1–F11 and confirm each "Success looks like".
+2. On desktop, do F1–F11 and F18, and confirm each "Success looks like".
 3. On desktop, do F12 with a real microphone: start, speak, interrupt, mute/unmute, change voice + speed, preview, reload and confirm settings stayed.
 4. On desktop, do F13 (share screen, stop sharing, deny once).
 5. On desktop, do F14 and F15 (drag, resize, hide/show, repair, complete one real quest, check-in, end day).
