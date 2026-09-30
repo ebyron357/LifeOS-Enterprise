@@ -58,7 +58,7 @@
 .heroMeta div{border-left:1px solid rgba(255,255,255,.16);padding-left:14px}
 .heroMeta span{display:block;color:#8196ae;font-size:.67rem;text-transform:uppercase;letter-spacing:.09em}
 .heroMeta strong{display:block;margin-top:3px;font-size:1rem}
-.launchStrip{display:grid;grid-template-columns:repeat(9,minmax(100px,1fr));gap:8px;margin-top:10px}
+.launchStrip{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-top:10px}
 .launchTile{min-height:82px;border:1px solid var(--line);border-radius:10px;background:linear-gradient(180deg,#101826,#0a1018);color:#eaf5ff;text-decoration:none;padding:10px;display:flex;flex-direction:column;justify-content:space-between;transition:.16s ease}
 .launchTile:hover,.launchTile:focus-visible{transform:translateY(-2px);border-color:rgba(55,217,255,.5);box-shadow:0 10px 28px rgba(0,0,0,.3)}
 .launchTile span{font-size:.67rem;color:#7d92aa}
@@ -93,10 +93,12 @@
 .rightStack{display:grid;gap:10px}
 .metricGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;padding:10px}
 .metric{border:1px solid var(--line);border-radius:8px;padding:10px;background:#0b121c}.metric strong{font-size:1.25rem}.metric span{display:block;margin-top:2px;color:#87a0b6;font-size:.62rem}
-.projectList{padding:8px;display:grid;gap:7px}.project{display:grid;grid-template-columns:10px 1fr 60px;gap:8px;align-items:center}.projectDot{width:8px;height:8px;border-radius:50%;background:var(--green)}.project strong{font-size:.68rem}.bar{height:6px;border-radius:999px;background:#172235;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#1f8cff,#35d9ff)}
+.projectList{padding:8px;display:grid;gap:7px}.project{display:grid;grid-template-columns:10px 1fr auto;gap:8px;align-items:center}.projectDot{width:8px;height:8px;border-radius:50%;background:var(--green)}.project strong{font-size:.68rem}.projectState{font-size:.58rem;color:#8da4ba;text-transform:uppercase;letter-spacing:.06em}
 .bottomGrid{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:10px;margin-top:10px}
 .agentRow,.systemRow,.quickRow{padding:10px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.agentCard,.systemCard,.quickCard{min-height:64px;border:1px solid var(--line);border-radius:8px;padding:8px;background:#0b121c;text-decoration:none;color:#dcecff;display:flex;flex-direction:column;justify-content:space-between}.agentCard strong,.systemCard strong,.quickCard strong{font-size:.66rem}.agentCard span,.systemCard span,.quickCard span{font-size:.58rem;color:#74dbab}
 .dock{display:none}
 @media(max-width:1180px){.launchStrip{grid-template-columns:repeat(5,1fr)}.grid{grid-template-columns:1fr 1.3fr}.rightStack{grid-column:1/-1;grid-template-columns:repeat(2,1fr)}.bottomGrid{grid-template-columns:1fr}}
 @media(max-width:900px){.shell{grid-template-columns:1fr}.sidebar{display:none}.grid{grid-template-columns:1fr}.rightStack{grid-column:auto;grid-template-columns:1fr}.comms{grid-template-columns:1fr}.threadList{border-right:0;border-bottom:1px solid var(--line)}.launchStrip{grid-template-columns:repeat(3,1fr)}.hero{align-items:flex-start;flex-direction:column}.heroMeta{width:100%}.bottomGrid{grid-template-columns:1fr}.dock{position:fixed;display:grid;grid-template-columns:repeat(5,1fr);left:0;right:0;bottom:0;z-index:50;background:#07101a;border-top:1px solid var(--line)}.dock a{min-height:60px;display:grid;place-items:center;color:#d9e8f8;text-decoration:none;font-size:.68rem}.content{padding-bottom:76px}}
-@media(max-width:620px){.launchStrip{grid-template-columns:repeat(2,1fr)}.topActions a{display:none}.agentRow,.systemRow,.quickRow{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.launchStrip{grid-template-columns:repeat(2,1fr)}.topActions > a{display:none}.agentRow,.systemRow,.quickRow{grid-template-columns:repeat(2,1fr)}}
+
+.continuity{margin-top:10px}.continuity :global(.os-card){border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,rgba(14,22,33,.98),rgba(8,13,21,.98));padding:14px}.continuity :global(.os-grid){display:grid;gap:10px}.continuity :global(.os-grid-2){grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}.continuity :global(.os-primary),.continuity :global(.os-secondary){min-height:40px}
