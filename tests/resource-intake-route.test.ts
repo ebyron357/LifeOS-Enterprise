@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { GET, POST } from "@/app/api/lifeos/resource-intake/route";
-import { resourceIntakeBranchName } from "@/lib/github/draft-pr";
+import { resourceIntakeBranchPrefix } from "@/lib/github/draft-pr";
 import { normalizeResource, resourceRecordPath } from "@/lib/resource-intelligence/model";
 
 const routeSource = readFileSync(path.join(process.cwd(), "app/api/lifeos/resource-intake/route.ts"), "utf8");
@@ -139,11 +139,11 @@ function fakeGitHub(options: { override?: Override; mainFiles?: Record<string, s
     }
 
     if (pathname === `${VAULT}/pulls` && method === "GET") {
-      const head = url.searchParams.get("head") ?? "";
-      const branch = head.replace(/^ebyron357:/, "");
+      const head = url.searchParams.get("head");
+      const branch = head ? head.replace(/^ebyron357:/, "") : null;
       return json(
         pulls
-          .filter((pull) => pull.state === "open" && pull.head === branch)
+          .filter((pull) => pull.state === "open" && (branch === null || pull.head === branch))
           .map((pull) => ({
             number: pull.number,
             html_url: pull.html_url,
@@ -178,6 +178,15 @@ function fakeGitHub(options: { override?: Override; mainFiles?: Record<string, s
     branches,
     pulls,
     calls,
+    /** The one branch this fake holds whose name starts with `prefix` (fails the test if not exactly one). */
+    branchWithPrefix(prefix: string) {
+      const matches = [...branches.keys()].filter((name) => name.startsWith(prefix));
+      if (matches.length !== 1) throw new Error(`Expected one branch with prefix ${prefix}, found ${matches.length}`);
+      return matches[0];
+    },
+    branchNames() {
+      return [...branches.keys()];
+    },
     file(branch: string, filePath: string) {
       return branches.get(branch)?.get(filePath)?.content ?? null;
     },
@@ -189,7 +198,7 @@ function fakeGitHub(options: { override?: Override; mainFiles?: Record<string, s
 
 const candidate = normalizeResource({ source: SOURCE });
 const candidatePath = resourceRecordPath(candidate);
-const candidateBranch = resourceIntakeBranchName(candidate.slug);
+const candidatePrefix = resourceIntakeBranchPrefix(candidate.slug);
 
 describe("Resource Intelligence intake route", () => {
   afterEach(() => {
@@ -281,8 +290,9 @@ describe("Resource Intelligence intake route", () => {
     });
 
     const pullCall = gh.calls.find((call) => call.method === "POST" && call.pathname === `${VAULT}/pulls`);
+    const candidateBranch = gh.branchWithPrefix(candidatePrefix);
     expect(pullCall?.body).toMatchObject({ draft: true, base: "main", head: candidateBranch });
-    expect(candidateBranch).toBe(`lifeos/resource-intake/${candidate.slug}`);
+    expect(candidateBranch).toMatch(new RegExp(`^lifeos/resource-intake/${candidate.slug}--[0-9a-f]{10}$`));
     expect(gh.file("main", candidatePath)).toBeNull();
     expect(gh.file(candidateBranch, candidatePath)).toContain('processor_route: "GitHub evidence processor (LifeOS)"');
   });
@@ -302,7 +312,7 @@ describe("Resource Intelligence intake route", () => {
     expect(result.evidence).toMatchObject({ status: "source-evidence-captured" });
     expect(gh.calls.some((call) => call.pathname === CANDIDATE && call.method === "GET")).toBe(true);
 
-    const record = gh.file(candidateBranch, candidatePath) ?? "";
+    const record = gh.file(gh.branchWithPrefix(candidatePrefix), candidatePath) ?? "";
     expect(record).toContain('evidence_status: "source-evidence-captured"');
     expect(record).toMatch(/evidence_inspected_at: "\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z"/);
     expect(record).toContain("## Source Evidence");
@@ -334,7 +344,7 @@ describe("Resource Intelligence intake route", () => {
       status: "evidence-unavailable",
       error: "GitHub repository metadata request failed (HTTP 401).",
     });
-    const record = gh.file(candidateBranch, candidatePath) ?? "";
+    const record = gh.file(gh.branchWithPrefix(candidatePrefix), candidatePath) ?? "";
     expect(record).toContain('evidence_status: "evidence-unavailable"');
     expect(record).toContain("- Error: GitHub repository metadata request failed (HTTP 401).");
     expect(record).not.toContain(TOKEN);
@@ -362,21 +372,22 @@ describe("Resource Intelligence intake route", () => {
       pullRequest: { number: first.pullRequest.number, url: first.pullRequest.url, reused: true },
       duplicateOf: {
         pullRequest: { number: first.pullRequest.number, url: first.pullRequest.url },
-        branch: candidateBranch,
+        branch: gh.branchWithPrefix(candidatePrefix),
         path: candidatePath,
       },
     });
 
-    const record = gh.file(candidateBranch, candidatePath) ?? "";
+    const record = gh.file(gh.branchWithPrefix(candidatePrefix), candidatePath) ?? "";
     expect(record).toContain("capture_count: 2");
     expect(record.match(/^## Source Evidence$/gm)).toHaveLength(1);
     expect(record).toContain("captured again through test");
     expect(gh.file("main", candidatePath)).toBeNull();
   });
 
-  it("moves a leftover deterministic branch to main when its earlier PR is no longer open", async () => {
+  it("never force-moves an existing branch: a leftover intake branch does not block a new capture", async () => {
     enableWrites();
-    const gh = fakeGitHub({ branches: [candidateBranch] });
+    const leftover = `${candidatePrefix}0123456789`;
+    const gh = fakeGitHub({ branches: [leftover] });
     vi.stubGlobal("fetch", gh.fetchMock);
 
     const response = await POST(request());
@@ -384,10 +395,30 @@ describe("Resource Intelligence intake route", () => {
 
     expect(response.status).toBe(200);
     expect(result.pullRequest).toMatchObject({ reused: false, draft: true });
-    const reset = gh.calls.find((call) => call.method === "PATCH");
-    expect(reset?.pathname).toBe(`${VAULT}/git/refs/heads/${candidateBranch}`);
-    expect(reset?.body).toMatchObject({ sha: "base-sha", force: true });
+    expect(gh.calls.some((call) => call.method === "PATCH")).toBe(false);
+    const created = gh.branchNames().filter((name) => name.startsWith(candidatePrefix) && name !== leftover);
+    expect(created).toHaveLength(1);
+    expect(gh.file(leftover, candidatePath)).toBeNull();
+    expect(gh.file(created[0], candidatePath)).toContain('source_identity: "github:vercel-labs/knowledge-agent-template"');
     expect(gh.pulls).toHaveLength(1);
+  });
+
+  it("keeps simultaneous first captures on separate branches so neither can overwrite the other", async () => {
+    enableWrites();
+    const gh = fakeGitHub();
+    vi.stubGlobal("fetch", gh.fetchMock);
+
+    const responses = await Promise.all([POST(request()), POST(request({ source: "https://github.com/vercel-labs/knowledge-agent-template/" }))]);
+
+    for (const response of responses) expect(response.status).toBe(200);
+    expect(gh.calls.some((call) => call.method === "PATCH")).toBe(false);
+    expect(gh.calls.some((call) => call.method === "DELETE")).toBe(false);
+    const branches = gh.branchNames().filter((name) => name.startsWith(candidatePrefix));
+    expect(branches.length).toBeGreaterThanOrEqual(1);
+    for (const branch of branches) {
+      expect(gh.file(branch, candidatePath)).toContain('source_identity: "github:vercel-labs/knowledge-agent-template"');
+    }
+    expect(gh.file("main", candidatePath)).toBeNull();
   });
 
   it("returns a clean 502 without writing when reading the canonical record fails", async () => {
@@ -450,7 +481,7 @@ describe("Resource Intelligence intake route", () => {
     });
     expect(result.evidence).toEqual({ status: "capture-only", inspectedAt: null });
     expect(gh.calls.some((call) => !call.pathname.startsWith(VAULT))).toBe(false);
-    const record = gh.file(resourceIntakeBranchName(normalizeResource({ source: "https://youtu.be/abc123XYZ" }).slug), result.resource.path) ?? "";
+    const record = gh.file(gh.branchWithPrefix(resourceIntakeBranchPrefix(normalizeResource({ source: "https://youtu.be/abc123XYZ" }).slug)), result.resource.path) ?? "";
     expect(record).toContain('evidence_status: "capture-only"');
     expect(record).not.toContain("## Source Evidence");
   });

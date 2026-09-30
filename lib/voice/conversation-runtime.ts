@@ -284,6 +284,16 @@ export function detectVoiceCapabilities(win: CapabilityWindow | undefined | null
   return { recognition, synthesis, continuous: recognition && !appleMobile };
 }
 
+/**
+ * The `continuous` value handed to the browser recognizer. Where continuous listening is unsupported
+ * (iOS/iPadOS WebKit) the recognizer runs single-utterance and the conversation restarts it after each
+ * phrase, which is the fallback the capability note advertises. Unknown capabilities keep the request.
+ */
+export function recognizerContinuous(requested: boolean, capabilities: VoiceCapabilities | null): boolean {
+  if (!requested) return false;
+  return capabilities ? capabilities.continuous : true;
+}
+
 export function describeCapabilityNotes(capabilities: VoiceCapabilities): string[] {
   const notes: string[] = [];
   if (!capabilities.recognition) {

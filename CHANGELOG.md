@@ -15,16 +15,16 @@ All notable changes to LifeOS Enterprise are documented in this file.
 - Interrupt, Stop conversation, and newer replies cancel in-flight turn and speech requests, so stale replies never speak and clips never overlap.
 - Added a voice picker (browser voices for the locale; OpenAI allowlist validated server-side), BCP-47 locale speech, and a visible warning instead of silent language switching.
 - Settings load from browser storage independently of the session fetch and are never overwritten by defaults.
-- Fixed a recognition restart loop and the push-to-talk mode reset. The error alert clears on recovery (**Try again**).
+- Fixed a recognition restart loop and the push-to-talk mode reset. Where continuous listening is unsupported (iOS/iPadOS), the recognizer runs single-utterance and LifeOS restarts it after each phrase. The error alert clears on recovery (**Try again**).
 - Duplicate-turn protection (in-flight guard + identical-transcript window). A visible provider/fallback indicator. Capability and privacy notes before the microphone starts.
 - `concise` response style shortens the spoken reply deterministically. Primary voice controls are ≥ 44 px.
 
 ### Fixed — widgets and game loop (#42)
 
 - A per-widget error boundary plus `app/error.tsx` and `app/global-error.tsx`, so one failing widget no longer takes down the page. Browser storage failures surface a diagnostic instead of throwing.
-- **Repair layout** now removes unknown/duplicate ids, restores missing widgets, clears stale focus, and lists what it fixed. Mobile reorder skips hidden widgets.
+- **Repair layout** now removes unknown/duplicate ids, restores missing widgets, clears stale focus, and lists what it fixed. If the browser refuses to save, it says so instead of claiming success. Mobile reorder skips hidden widgets.
 - **Reset game** and **Restore default layout** ask first. The game keeps a backup of the previous state.
-- Streak recovery restores the pre-gap streak. Boss battles require every step before they can be claimed.
+- Streak recovery restores the pre-gap streak. Boss battles require every step before they can be claimed. A boss saved without steps is never claimable, and repair rebuilds its steps.
 - Side quests (health, learning, money, relationships, service, personal growth) are derived only from canonical vault records.
 - Reward/level-up/achievement announcements. An end-of-day results panel. A read-only **LifeOS Game** card on `/today`.
 - E2E: real resize, drag-persistence, hide-after-reload, repair, mobile-order, console-error, XP-exactly-once (double-click + reload), level-up, and achievement-once checks.
@@ -33,7 +33,7 @@ All notable changes to LifeOS Enterprise are documented in this file.
 
 - The intake re-fetches GitHub evidence server-side at write time and writes a `## Source Evidence` section plus `evidence_status`/`evidence_inspected_at`.
 - Records get a deterministic `processor_route` per source type, pointing only at existing processors, SOPs, or templates.
-- Repeated captures before merge update the one open draft PR on a deterministic branch instead of opening competing PRs.
+- Repeated captures before merge find the record's open intake draft PR by branch prefix and update it, instead of opening competing PRs. Each request stages on its own branch; no branch is ever force-moved, so simultaneous captures cannot overwrite each other.
 - Upstream read failures return a clean 502. `99 Templates/Resource.md` matches the record contract.
 
 ### Fixed — platform

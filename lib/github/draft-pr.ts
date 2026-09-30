@@ -84,12 +84,18 @@ export function resourceBranchName(prefix: string, slug: string) {
 }
 
 /**
- * Deterministic intake branch for one canonical Resource record path, so repeated captures of the
- * same record before its draft PR merges update one PR instead of opening competing PRs.
+ * Branch prefix shared by every intake branch for one canonical Resource record. Each request stages
+ * on its own branch (`<prefix><nonce>`), so no request ever moves or overwrites another request's
+ * branch; repeated captures find the record's open intake PR by this prefix and update that PR.
  */
-export function resourceIntakeBranchName(recordSlug: string) {
+export function resourceIntakeBranchPrefix(recordSlug: string) {
   const safeSlug = recordSlug.slice(0, 96).replace(/[^a-z0-9-]/gi, "-").replace(/^-+|-+$/g, "") || "resource";
-  return `lifeos/resource-intake/${safeSlug}`;
+  return `lifeos/resource-intake/${safeSlug}--`;
+}
+
+/** A new, unique intake branch for one request. */
+export function resourceIntakeBranchName(recordSlug: string, nonce: string = randomBytes(5).toString("hex")) {
+  return `${resourceIntakeBranchPrefix(recordSlug)}${nonce}`;
 }
 
 export type OpenPullRequest = {
@@ -130,16 +136,35 @@ export async function findOpenPullRequestForBranch(branch: string, token: string
 }
 
 /**
- * Points an existing non-main branch at `sha`. Used only for a deterministic intake branch that no
- * open pull request uses (its earlier PR was merged or closed).
+ * Finds the oldest open pull request into `main` whose head branch starts with `prefix` in the
+ * canonical vault repository (the open intake PR for one Resource record, whatever its nonce).
  */
-export async function resetBranchToCommit(branch: string, sha: string, token: string) {
-  if (!branch || branch === RESOURCE_BASE_BRANCH) throw new Error("Refusing to move the base branch.");
-  await github(
-    `/repos/${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}/git/refs/heads/${encodeRepoPath(branch)}`,
-    token,
-    { method: "PATCH", body: JSON.stringify({ sha, force: true }) },
-  );
+export async function findOpenPullRequestByBranchPrefix(prefix: string, token: string): Promise<OpenPullRequest | null> {
+  const repository = `${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}`.toLowerCase();
+  for (let page = 1; page <= 3; page += 1) {
+    const data: unknown = await github(
+      `/repos/${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}/pulls?state=open&base=${RESOURCE_BASE_BRANCH}&per_page=100&page=${page}`,
+      token,
+    );
+    const list = Array.isArray(data) ? (data as PullPayload[]) : [];
+    const match = list
+      .filter((candidate) =>
+        candidate?.state === "open"
+        && typeof candidate.head?.ref === "string"
+        && candidate.head.ref.startsWith(prefix)
+        && (!candidate.head.repo?.full_name || candidate.head.repo.full_name.toLowerCase() === repository))
+      .sort((a, b) => (a.number ?? Number.MAX_SAFE_INTEGER) - (b.number ?? Number.MAX_SAFE_INTEGER))[0];
+    if (match) {
+      return {
+        number: typeof match.number === "number" ? match.number : null,
+        url: typeof match.html_url === "string" ? match.html_url : null,
+        draft: match.draft !== false,
+        headRef: match.head!.ref!,
+      };
+    }
+    if (list.length < 100) break;
+  }
+  return null;
 }
 
 export type BoundedJsonResult =

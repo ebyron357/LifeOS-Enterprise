@@ -8,6 +8,7 @@ import {
   describeRejectedTurn,
   describeSpeechRuntime,
   detectVoiceCapabilities,
+  recognizerContinuous,
   DUPLICATE_TRANSCRIPT_WINDOW_MS,
   isAbortError,
   normalizeTranscript,
@@ -204,6 +205,15 @@ describe("capability detection", () => {
     });
     expect(desktop).toEqual({ recognition: true, synthesis: true, continuous: true });
     expect(describeCapabilityNotes(desktop)).toEqual([]);
+  });
+});
+
+describe("recognizer continuous flag", () => {
+  it("runs the recognizer single-utterance where continuous listening is unsupported", () => {
+    expect(recognizerContinuous(true, { recognition: true, synthesis: true, continuous: false })).toBe(false);
+    expect(recognizerContinuous(true, { recognition: true, synthesis: true, continuous: true })).toBe(true);
+    expect(recognizerContinuous(true, null)).toBe(true);
+    expect(recognizerContinuous(false, { recognition: true, synthesis: true, continuous: true })).toBe(false);
   });
 });
 

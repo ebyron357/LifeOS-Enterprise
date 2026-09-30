@@ -348,7 +348,12 @@ export function repairWorkspaceLayout(raw: string | null): LayoutRepairResult {
 }
 
 /** One status line describing a repair run, suitable for an aria-live region. */
-export function describeLayoutRepairs(repairs: string[]): string {
+/** Shown when the browser refuses to save a layout change (private mode, storage full, or blocked). */
+export const LAYOUT_SAVE_FAILED_MESSAGE =
+  "This browser blocked saving the layout (private mode, storage full, or storage disabled). Nothing was saved.";
+
+export function describeLayoutRepairs(repairs: string[], saved = true): string {
+  if (!saved) return `Layout repair could not be saved. ${LAYOUT_SAVE_FAILED_MESSAGE}`;
   return repairs.length
     ? `Layout state repaired (${repairs.length} fix${repairs.length === 1 ? "" : "es"}).`
     : "Layout checked: no problems found.";

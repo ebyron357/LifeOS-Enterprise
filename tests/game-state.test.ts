@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  bossStepsDone,
   buildCanonicalSideQuests,
   createInitialGameState,
   describeRewards,
@@ -237,6 +238,27 @@ describe("game state engine", () => {
     expect(won.stats.completedBossBattles).toBe(1);
     expect(won.stats.xp).toBe(boss.xp + 15); // boss XP + Blocker Breaker achievement
     expect(won.achievements.map((item) => item.id)).toContain("boss-1");
+  });
+
+  it("never lets a boss battle without steps be claimed and regenerates steps for legacy saves", () => {
+    expect(bossStepsDone({ kind: "boss", steps: [] })).toBe(false);
+    expect(bossStepsDone({ kind: "boss" })).toBe(false);
+    expect(bossStepsDone({ kind: "main" })).toBe(true);
+
+    const initial = createInitialGameState(context);
+    const today = context.nowIso.slice(0, 10);
+    const legacy = JSON.parse(JSON.stringify(initial)) as GameState;
+    const boss = legacy.questsByDate[today].find((quest) => quest.kind === "boss")!;
+    delete boss.steps;
+
+    const { state, diagnostics } = repairGameState(JSON.stringify(legacy), context);
+    const repairedBoss = state.questsByDate[today].find((quest) => quest.id === boss.id)!;
+    expect(repairedBoss.steps?.length).toBeGreaterThanOrEqual(3);
+    expect(diagnostics.messages.join(" ")).toContain("saved before boss steps existed");
+
+    const early = reduceGameState(state, { type: "complete-quest", questId: boss.id, verification: attest(`${boss.id}-legacy`) }, context);
+    expect(early.lastError).toBe("Finish every boss step before claiming the battle.");
+    expect(early.stats.xp).toBe(0);
   });
 
   it("breaks boss battles into smaller actions without awarding step XP", () => {

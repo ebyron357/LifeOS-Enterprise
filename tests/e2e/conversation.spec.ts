@@ -412,6 +412,56 @@ test.describe("interactive conversation workspace", () => {
     expect(overflow).toBe(false);
   });
 
+  test.describe("iOS Safari without continuous listening", () => {
+    test.use({ userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1" });
+
+    test("runs the recognizer single-utterance and restarts it after each phrase", async ({ page }) => {
+      await page.addInitScript(() => {
+        const calls = { start: 0, continuousValues: [] as boolean[], instances: [] as Array<{ onend: null | (() => void) }> };
+        (window as Window & { __lifeosRecognition?: typeof calls }).__lifeosRecognition = calls;
+        class FakeRecognition {
+          lang = "";
+          continuous = false;
+          interimResults = false;
+          onresult = null;
+          onerror = null;
+          onend: null | (() => void) = null;
+          start() {
+            calls.start += 1;
+            calls.continuousValues.push(this.continuous);
+            calls.instances.push(this);
+          }
+          stop() {}
+          abort() {}
+        }
+        Object.defineProperty(window, "SpeechRecognition", { configurable: true, value: FakeRecognition });
+        Object.defineProperty(window, "webkitSpeechRecognition", { configurable: true, value: FakeRecognition });
+        Object.defineProperty(window.navigator, "mediaDevices", {
+          configurable: true,
+          value: { getUserMedia: async () => ({ getTracks: () => [{ stop() {} }] }) },
+        });
+      });
+
+      await page.goto("/conversation");
+      await page.getByRole("button", { name: "Start conversation", exact: true }).click();
+      type Calls = { start: number; continuousValues: boolean[]; instances: Array<{ onend: null | (() => void) }> };
+      const read = () => page.evaluate(() => {
+        const calls = (window as Window & { __lifeosRecognition?: Calls }).__lifeosRecognition!;
+        return { start: calls.start, continuousValues: calls.continuousValues };
+      });
+      await expect.poll(async () => (await read()).start).toBe(1);
+      expect((await read()).continuousValues).toEqual([false]);
+
+      // The phrase ends; LifeOS restarts listening itself, again single-utterance.
+      await page.evaluate(() => {
+        const calls = (window as Window & { __lifeosRecognition?: Calls }).__lifeosRecognition!;
+        calls.instances.at(-1)?.onend?.();
+      });
+      await expect.poll(async () => (await read()).start).toBeGreaterThanOrEqual(2);
+      expect((await read()).continuousValues.every((value) => value === false)).toBe(true);
+    });
+  });
+
   test("push-to-talk holds to listen and releases to stop", async ({ page }) => {
     await page.addInitScript(() => {
       const calls = { abort: 0, stop: 0, start: 0 };

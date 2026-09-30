@@ -42,6 +42,7 @@ import {
   type SpeechRuntime,
   type TtsProviderStatus,
   type VoiceSettings,
+  recognizerContinuous,
 } from "@/lib/voice/conversation-runtime";
 import {
   createBrowserVoiceTransport,
@@ -156,6 +157,10 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   const voiceSettings = useMemo(() => parseVoiceSettings(storedSettingsRaw, localeDefaults), [storedSettingsRaw, localeDefaults]);
   const browserVoices = useSyncExternalStore(subscribeBrowserVoices, getBrowserVoicesSnapshot, getServerBrowserVoicesSnapshot);
   const capabilities = useSyncExternalStore(subscribeVoiceCapabilities, getVoiceCapabilitiesSnapshot, getServerVoiceCapabilitiesSnapshot);
+  const capabilitiesRef = useRef(capabilities);
+  useEffect(() => {
+    capabilitiesRef.current = capabilities;
+  }, [capabilities]);
 
   const updateVoiceSettings = useCallback((patch: Partial<VoiceSettings>) => {
     const current = parseVoiceSettings(readStoredVoiceSettingsRaw(), localeDefaults);
@@ -480,7 +485,8 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
     setActivity((events) => appendActivity(events, createActivityEvent("session-started", "Voice conversation started.")));
     await transport.startListening({
       lang: voiceSettings.transcriptionLanguage,
-      continuous,
+      // keepListeningRef still restarts after each phrase; the recognizer itself only runs continuous where supported.
+      continuous: recognizerContinuous(continuous, capabilitiesRef.current),
       onInterim: (text) => {
         if (mutedRef.current || voiceRef.current.transcriptPrivacy === "hidden") return;
         setTranscript((entries) => {

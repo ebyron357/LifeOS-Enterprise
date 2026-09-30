@@ -43,8 +43,8 @@ export function WorkspaceWidget({
   if (chrome.hidden) return null;
 
   function repairFromWidget() {
-    const repairs = repairLayout();
-    announceWorkspaceStatus({ message: describeLayoutRepairs(repairs), repairs });
+    const { repairs, saved } = repairLayout();
+    announceWorkspaceStatus({ message: describeLayoutRepairs(repairs, saved), repairs: saved ? repairs : [] });
   }
 
   return (

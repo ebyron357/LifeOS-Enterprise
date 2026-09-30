@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { RESET_LAYOUT_CONFIRMATION, WORKSPACE_STATUS_EVENT, type WorkspaceStatusDetail } from "@/lib/workspace/commands";
-import { describeLayoutRepairs } from "@/lib/workspace/layout-storage";
+import { describeLayoutRepairs, LAYOUT_SAVE_FAILED_MESSAGE } from "@/lib/workspace/layout-storage";
 import { WORKSPACES, workspaceFromPath } from "@/lib/workspace/workspaces";
 import { CommandPalette } from "./CommandPalette";
 import { useWorkspace } from "./WorkspaceProvider";
@@ -38,15 +38,15 @@ export function WorkspaceShell({
       setStatusMessage("Default layout restore cancelled. Nothing changed.");
       return;
     }
-    resetLayout();
+    const saved = resetLayout();
     setRepairReport([]);
-    setStatusMessage("Default layout restored.");
+    setStatusMessage(saved ? "Default layout restored." : `Default layout could not be saved. ${LAYOUT_SAVE_FAILED_MESSAGE}`);
   }
 
   function runLayoutRepair() {
-    const repairs = repairLayout();
-    setRepairReport(repairs);
-    setStatusMessage(describeLayoutRepairs(repairs));
+    const { repairs, saved } = repairLayout();
+    setRepairReport(saved ? repairs : []);
+    setStatusMessage(describeLayoutRepairs(repairs, saved));
   }
 
   useEffect(() => {

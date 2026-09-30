@@ -8,8 +8,9 @@ import {
   github,
   readBoundedJsonObject,
   readCanonicalFile,
-  resetBranchToCommit,
+  findOpenPullRequestByBranchPrefix,
   resourceIntakeBranchName,
+  resourceIntakeBranchPrefix,
   resourceWritesConfigured,
   RESOURCE_BASE_BRANCH,
   RESOURCE_REPO_NAME,
@@ -180,7 +181,9 @@ function success(
 }
 
 /** Updates the record on the branch of an open intake PR for the same path. Never opens another PR. */
-async function stageOnOpenPull(context: IntakeContext, pull: OpenPullRequest) {
+async function stageOnOpenPull(requestContext: IntakeContext, pull: OpenPullRequest) {
+  // Write to the open PR's own branch, not to the unused branch name reserved for this request.
+  const context: IntakeContext = { ...requestContext, branch: pull.headRef };
   let onBranch: CanonicalFile | null;
   try {
     onBranch = await readCanonicalFile(context.path, context.token, pull.headRef);
@@ -268,7 +271,9 @@ export async function POST(request: Request) {
     : null;
 
   const path = resourceRecordPath(resource);
+  // This request's own branch. Another request's branch is never moved or overwritten.
   const branch = resourceIntakeBranchName(resource.slug);
+  const branchPrefix = resourceIntakeBranchPrefix(resource.slug);
   const nowIso = new Date().toISOString();
 
   let onMain: CanonicalFile | null;
@@ -276,7 +281,7 @@ export async function POST(request: Request) {
   let baseSha: string | null = null;
   try {
     onMain = await readCanonicalFile(path, token);
-    openPull = await findOpenPullRequestForBranch(branch, token);
+    openPull = await findOpenPullRequestByBranchPrefix(branchPrefix, token);
     if (!openPull) {
       const ref = await github(`/repos/${OWNER}/${REPO}/git/ref/heads/${BASE}`, token);
       baseSha = (ref.object as { sha?: string } | undefined)?.sha ?? null;
@@ -299,19 +304,10 @@ export async function POST(request: Request) {
 
   let branchPrepared = false;
   try {
-    try {
-      await github(`/repos/${OWNER}/${REPO}/git/refs`, token, {
-        method: "POST",
-        body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: baseSha }),
-      });
-    } catch (error) {
-      if (upstreamStatus(error) !== 422) throw error;
-      // The deterministic branch already exists. Reuse a PR opened concurrently; otherwise the
-      // branch is left over from a merged or closed intake PR and is moved to the current main.
-      const concurrent = await findOpenPullRequestForBranch(branch, token);
-      if (concurrent) return stageOnOpenPull(context, concurrent);
-      await resetBranchToCommit(branch, baseSha, token);
-    }
+    await github(`/repos/${OWNER}/${REPO}/git/refs`, token, {
+      method: "POST",
+      body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: baseSha }),
+    });
     branchPrepared = true;
 
     await putRecord(context, markdown, onMain?.sha, Boolean(onMain));

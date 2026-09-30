@@ -23,9 +23,10 @@ type WorkspaceContextValue = {
   state: WorkspaceLayoutState;
   hydrated: boolean;
   setLayouts: (layouts: BreakpointLayouts) => void;
-  resetLayout: () => void;
-  /** Normalizes the stored layout and returns the list of repairs that were made. */
-  repairLayout: () => string[];
+  /** Restores the default layout. Returns false when the browser refused to save it. */
+  resetLayout: () => boolean;
+  /** Normalizes the stored layout. `saved` is false when the browser refused the write, so callers never claim success. */
+  repairLayout: () => { repairs: string[]; saved: boolean };
   setFocusedWidget: (id: string | null) => void;
   focusNextWidget: () => void;
   toggleMinimized: (id: string) => void;
@@ -48,14 +49,17 @@ function readRaw() {
   }
 }
 
-function writeRaw(value: string) {
+/** Returns false when the browser refused the write (quota, private mode, or storage disabled). */
+function writeRaw(value: string): boolean {
+  let saved = true;
   try {
     window.localStorage.setItem(LAYOUT_STORAGE_KEY, value);
     window.localStorage.setItem("lifeos-workspace-os-v1-last-workspace", parseWorkspaceLayout(value).workspaceId);
   } catch {
-    // Ignore quota / private-mode write failures.
+    saved = false;
   }
   window.dispatchEvent(new CustomEvent(STORAGE_EVENT));
+  return saved;
 }
 
 function updateState(updater: (current: WorkspaceLayoutState) => WorkspaceLayoutState) {
@@ -89,14 +93,12 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     updateState((current) => ({ ...current, layouts }));
   }, []);
 
-  const resetLayout = useCallback(() => {
-    writeRaw(defaultRaw);
-  }, []);
+  const resetLayout = useCallback(() => writeRaw(defaultRaw), []);
 
   const repairLayout = useCallback(() => {
     const result = repairWorkspaceLayout(readRaw());
-    writeRaw(serializeWorkspaceLayout(result.state));
-    return result.repairs;
+    const saved = writeRaw(serializeWorkspaceLayout(result.state));
+    return { repairs: result.repairs, saved };
   }, []);
 
   const setFocusedWidget = useCallback((id: string | null) => {

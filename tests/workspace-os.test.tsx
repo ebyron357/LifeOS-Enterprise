@@ -179,6 +179,27 @@ describe("Workspace OS Command Center", () => {
     expect(stored.layouts.lg.map((item) => item.i).sort()).toEqual([...defaults.widgetOrder].sort());
   });
 
+  it("reports a storage failure instead of claiming the layout was repaired or restored", async () => {
+    render(<CommandCenterWorkspace data={data} github={github} />);
+    const repair = await screen.findByRole("button", { name: /^repair layout$/i });
+    const setItem = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("Quota exceeded", "QuotaExceededError");
+    });
+    try {
+      fireEvent.click(repair);
+      expect(screen.getByText(/layout repair could not be saved/i)).toBeInTheDocument();
+      expect(screen.queryByText(/layout state repaired|no problems found/i)).not.toBeInTheDocument();
+
+      const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
+      fireEvent.click(screen.getByRole("button", { name: /^restore default layout$/i }));
+      expect(screen.getByText(/default layout could not be saved/i)).toBeInTheDocument();
+      expect(screen.queryByText(/^default layout restored\.$/i)).not.toBeInTheDocument();
+      confirm.mockRestore();
+    } finally {
+      setItem.mockRestore();
+    }
+  });
+
   it("minimizes and restores a widget", async () => {
     render(<CommandCenterWorkspace data={data} github={github} />);
     const widget = await screen.findByLabelText("Decision queue");

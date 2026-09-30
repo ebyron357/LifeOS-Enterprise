@@ -399,10 +399,31 @@ function completeQuest(
   return refreshAchievements(next, context.nowIso);
 }
 
-/** Boss battles can be claimed only after every smaller step is marked done. */
+/**
+ * Boss battles can be claimed only after every smaller step is marked done. A boss with no steps
+ * (for example one saved before steps existed) is never claimable; repair regenerates its steps.
+ */
 export function bossStepsDone(quest: Pick<Quest, "kind" | "steps">): boolean {
   if (quest.kind !== "boss") return true;
-  return (quest.steps ?? []).every((step) => step.status === "done");
+  const steps = quest.steps ?? [];
+  return steps.length > 0 && steps.every((step) => step.status === "done");
+}
+
+/** Rebuilds the smaller steps for an open boss battle saved without them. */
+function legacyBossSteps(quest: Pick<Quest, "title" | "sourceProjectPath">, context: GameContext): NonNullable<Quest["steps"]> {
+  const project = context.projects.find((item) => item.path === quest.sourceProjectPath);
+  if (project) return breakBlockerIntoSteps(project);
+  return breakBlockerIntoSteps({
+    name: quest.title.replace(/^Boss battle:\s*/i, "") || "this project",
+    path: quest.sourceProjectPath ?? "",
+    status: "blocked",
+    priority: "",
+    business: "",
+    nextAction: "",
+    reviewDate: "",
+    waitingOn: "",
+    blocker: "",
+  });
 }
 
 function runCheckIn(state: GameState, context: GameContext): GameState {
@@ -705,7 +726,7 @@ function parseQuestState(
               status: step.status === "done" ? "done" as const : "todo" as const,
             }))
           : undefined;
-        return {
+        const quest = {
           id: String(entry.id),
           kind: entry.kind === "main" || entry.kind === "side" || entry.kind === "boss" ? entry.kind : "daily",
           title: typeof entry.title === "string" ? entry.title : "Quest",
@@ -716,6 +737,11 @@ function parseQuestState(
           ...(isSideQuestCategory(entry.category) ? { category: entry.category } : {}),
           ...(steps?.length ? { steps } : {}),
         } satisfies Quest;
+        if (quest.kind === "boss" && quest.status !== "done" && !steps?.length) {
+          repaired.push(`Added smaller steps to "${quest.title}", which was saved before boss steps existed.`);
+          return { ...quest, steps: legacyBossSteps(quest, context) };
+        }
+        return quest;
       });
     return [date, quests.length ? quests : buildDailyQuests(date, context)] as const;
   });

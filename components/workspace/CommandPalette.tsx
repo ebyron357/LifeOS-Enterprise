@@ -9,7 +9,7 @@ import {
   RESET_LAYOUT_CONFIRMATION,
   type WorkspaceCommandId,
 } from "@/lib/workspace/commands";
-import { describeLayoutRepairs } from "@/lib/workspace/layout-storage";
+import { describeLayoutRepairs, LAYOUT_SAVE_FAILED_MESSAGE } from "@/lib/workspace/layout-storage";
 import { getWorkspace } from "@/lib/workspace/workspaces";
 import { useWorkspace } from "./WorkspaceProvider";
 
@@ -46,12 +46,14 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           announceWorkspaceStatus("Default layout restore cancelled. Nothing changed.");
           break;
         }
-        resetLayout();
-        announceWorkspaceStatus({ message: "Default layout restored.", repairs: [] });
+        announceWorkspaceStatus({
+          message: resetLayout() ? "Default layout restored." : `Default layout could not be saved. ${LAYOUT_SAVE_FAILED_MESSAGE}`,
+          repairs: [],
+        });
         break;
       case "repair-layout": {
-        const repairs = repairLayout();
-        announceWorkspaceStatus({ message: describeLayoutRepairs(repairs), repairs });
+        const { repairs, saved } = repairLayout();
+        announceWorkspaceStatus({ message: describeLayoutRepairs(repairs, saved), repairs: saved ? repairs : [] });
         break;
       }
       case "focus-next-widget":
