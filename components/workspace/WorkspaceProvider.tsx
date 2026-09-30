@@ -10,7 +10,13 @@ import {
   type ReactNode,
 } from "react";
 import { COMMAND_CENTER_WIDGET_IDS, createDefaultWorkspaceLayout, LAYOUT_STORAGE_KEY } from "@/lib/workspace/default-layout";
-import { parseWorkspaceLayout, parseWorkspaceLayoutWithDiagnostics, serializeWorkspaceLayout, swapLayoutItemPositions } from "@/lib/workspace/layout-storage";
+import {
+  moveWidgetInLayout,
+  parseWorkspaceLayout,
+  parseWorkspaceLayoutWithDiagnostics,
+  repairWorkspaceLayout,
+  serializeWorkspaceLayout,
+} from "@/lib/workspace/layout-storage";
 import type { BreakpointLayouts, WorkspaceLayoutState } from "@/lib/workspace/types";
 
 type WorkspaceContextValue = {
@@ -18,12 +24,13 @@ type WorkspaceContextValue = {
   hydrated: boolean;
   setLayouts: (layouts: BreakpointLayouts) => void;
   resetLayout: () => void;
-  repairLayout: () => void;
+  /** Normalizes the stored layout and returns the list of repairs that were made. */
+  repairLayout: () => string[];
   setFocusedWidget: (id: string | null) => void;
   focusNextWidget: () => void;
   toggleMinimized: (id: string) => void;
   setWidgetHidden: (id: string, hidden: boolean) => void;
-  moveWidget: (id: string, direction: "up" | "down") => void;
+  moveWidget: (id: string, direction: "up" | "down", options?: { visibleOnly?: boolean }) => void;
   diagnostics: string[];
   setReducedMotion: (value: boolean) => void;
   toggleReducedMotion: () => void;
@@ -87,8 +94,9 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const repairLayout = useCallback(() => {
-    const parsed = parseWorkspaceLayout(readRaw());
-    writeRaw(serializeWorkspaceLayout(parsed));
+    const result = repairWorkspaceLayout(readRaw());
+    writeRaw(serializeWorkspaceLayout(result.state));
+    return result.repairs;
   }, []);
 
   const setFocusedWidget = useCallback((id: string | null) => {
@@ -139,21 +147,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const moveWidget = useCallback((id: string, direction: "up" | "down") => {
-    updateState((current) => {
-      const order = [...current.widgetOrder];
-      const index = order.indexOf(id as (typeof COMMAND_CENTER_WIDGET_IDS)[number]);
-      if (index === -1) return current;
-      const nextIndex = direction === "up" ? Math.max(0, index - 1) : Math.min(order.length - 1, index + 1);
-      if (nextIndex === index) return current;
-      const [entry] = order.splice(index, 1);
-      order.splice(nextIndex, 0, entry);
-      return {
-        ...current,
-        widgetOrder: order,
-        layouts: swapLayoutItemPositions(current.layouts, id, current.widgetOrder[nextIndex]),
-      };
-    });
+  const moveWidget = useCallback((id: string, direction: "up" | "down", options?: { visibleOnly?: boolean }) => {
+    updateState((current) => moveWidgetInLayout(current, id, direction, options));
   }, []);
 
   const diagnostics = useMemo(() => {

@@ -112,7 +112,12 @@ export function CommandCenterWorkspace({ data, github, revenue }: CommandCenterW
       id: "game-loop" as const,
       node: (
         <WorkspaceWidget id="game-loop" status="active">
-          <GameLoopWidget projects={data.projects} />
+          <GameLoopWidget
+            projects={data.projects}
+            areas={data.areas}
+            businesses={data.businesses}
+            people={data.people}
+          />
         </WorkspaceWidget>
       ),
     },

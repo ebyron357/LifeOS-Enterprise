@@ -1,18 +1,31 @@
-import type { ProjectBrief } from "@/lib/lifeos/types";
+import type { AreaBrief, ProjectBrief } from "@/lib/lifeos/types";
 import type {
   Achievement,
   AchievementId,
+  EndOfDayAchievementResult,
+  EndOfDayQuestResult,
   EndOfDayResult,
   GameAction,
   GameContext,
   GameDiagnostics,
   GameState,
   Quest,
+  SideQuestCategory,
+  StreakRecovery,
 } from "./types";
 
 const MAX_EVENT_IDS = 400;
 const XP_PER_LEVEL = 250;
 const GAME_VERSION = 1 as const;
+const MAX_DAILY_QUESTS = 12;
+const CANONICAL_SIDE_QUEST_XP = 25;
+const ACHIEVEMENT_XP = 15;
+const RECOVERY_XP = 10;
+
+/** Browser-local key for game progress. Game state is never canonical vault truth. */
+export const GAME_STATE_STORAGE_KEY = "lifeos-game-state-v1";
+/** Previous raw state is copied here before a reset or a lossy repair replaces it. */
+export const GAME_STATE_BACKUP_KEY = `${GAME_STATE_STORAGE_KEY}.backup`;
 
 function isoDate(nowIso: string): string {
   return nowIso.slice(0, 10);
@@ -24,7 +37,7 @@ function daysBetween(a: string, b: string): number {
   return Math.floor((right - left) / 86_400_000);
 }
 
-function toLevel(xp: number) {
+export function levelForXp(xp: number) {
   const safeXp = Math.max(0, Math.floor(xp));
   const level = Math.floor(safeXp / XP_PER_LEVEL) + 1;
   const xpIntoLevel = safeXp % XP_PER_LEVEL;
@@ -79,8 +92,98 @@ function breakBlockerIntoSteps(project: ProjectBrief): NonNullable<Quest["steps"
   ];
 }
 
-function buildDailyQuests(date: string, projects: ProjectBrief[]): Quest[] {
-  const ranked = sortProjects(projects);
+export const SIDE_QUEST_CATEGORIES: readonly SideQuestCategory[] = [
+  "health",
+  "learning",
+  "money",
+  "relationships",
+  "service",
+  "personal-growth",
+];
+
+const SIDE_QUEST_LABEL: Record<SideQuestCategory, string> = {
+  health: "Health",
+  learning: "Learning",
+  money: "Money",
+  relationships: "Relationships",
+  service: "Service",
+  "personal-growth": "Personal growth",
+};
+
+const AREA_TAGS: Record<Exclude<SideQuestCategory, "relationships">, readonly string[]> = {
+  health: ["health"],
+  learning: ["learning"],
+  "personal-growth": ["personal-growth"],
+  money: ["career", "ai-consulting", "revenue"],
+  service: ["service", "community", "nonprofit"],
+};
+
+type CanonicalSource = { path: string; detail: string };
+
+function byNameThenPath<T extends { name: string; path: string }>(a: T, b: T): number {
+  return a.name.localeCompare(b.name) || a.path.localeCompare(b.path);
+}
+
+function areaWithTag(areas: AreaBrief[] | undefined, tags: readonly string[]): CanonicalSource | null {
+  const area = [...(areas ?? [])].sort(byNameThenPath).find((entry) => (
+    entry.status.toLowerCase() === "active"
+    && entry.tags.some((tag) => tags.includes(tag.toLowerCase().replace(/^#/, "")))
+  ));
+  if (!area) return null;
+  const detail = area.standard.trim() || area.purpose.trim() || `Take one small action in ${area.name}.`;
+  return { path: area.path, detail };
+}
+
+/**
+ * Finds the canonical vault record behind a life category. A category without a
+ * matching record returns null: the game never invents a source.
+ */
+function canonicalSideQuestSource(category: SideQuestCategory, context: GameContext): CanonicalSource | null {
+  if (category === "relationships") {
+    const person = [...(context.people ?? [])].sort(byNameThenPath)[0];
+    if (!person) return null;
+    const who = person.role ? `${person.name} (${person.role})` : person.name;
+    return { path: person.path, detail: `One small follow-up with ${who}.` };
+  }
+  if (category === "money") {
+    const business = [...(context.businesses ?? [])]
+      .filter((entry) => entry.status.toLowerCase() === "active")
+      .sort(byNameThenPath)[0];
+    if (business) {
+      return {
+        path: business.path,
+        detail: business.kpiFocus ? `${business.name}: ${business.kpiFocus}` : `${business.name}: one small revenue action.`,
+      };
+    }
+  }
+  return areaWithTag(context.areas, AREA_TAGS[category]);
+}
+
+/** Life categories that have no canonical vault record, so no side quest is generated for them. */
+export function missingSideQuestCategories(context: GameContext): SideQuestCategory[] {
+  return SIDE_QUEST_CATEGORIES.filter((category) => !canonicalSideQuestSource(category, context));
+}
+
+/** At most one side quest per life category, each backed by a real vault record. */
+export function buildCanonicalSideQuests(context: GameContext): Quest[] {
+  return SIDE_QUEST_CATEGORIES.flatMap((category) => {
+    const source = canonicalSideQuestSource(category, context);
+    if (!source) return [];
+    return [{
+      id: `side-${category}-${normalizeQuestId(source.path)}`,
+      kind: "side" as const,
+      category,
+      title: `${SIDE_QUEST_LABEL[category]}: one small action`,
+      detail: source.detail,
+      xp: CANONICAL_SIDE_QUEST_XP,
+      status: "todo" as const,
+      sourceProjectPath: source.path,
+    }];
+  });
+}
+
+function buildDailyQuests(date: string, context: GameContext): Quest[] {
+  const ranked = sortProjects(context.projects);
   const active = ranked.filter((project) => project.status === "active").slice(0, 2);
   const waiting = ranked.filter((project) => project.status === "waiting" || Boolean(project.waitingOn)).slice(0, 1);
   const blocked = ranked.filter((project) => project.status === "blocked" || Boolean(project.blocker)).slice(0, 2);
@@ -116,6 +219,7 @@ function buildDailyQuests(date: string, projects: ProjectBrief[]): Quest[] {
       status: "todo" as const,
       sourceProjectPath: project.path,
     })),
+    ...buildCanonicalSideQuests(context),
     ...blocked.map((project, index) => ({
       id: `boss-${index + 1}-${normalizeQuestId(project.path)}`,
       kind: "boss" as const,
@@ -128,7 +232,7 @@ function buildDailyQuests(date: string, projects: ProjectBrief[]): Quest[] {
     })),
   ];
 
-  return quests.slice(0, 8);
+  return quests.slice(0, MAX_DAILY_QUESTS);
 }
 
 export function createInitialGameState(context: GameContext): GameState {
@@ -140,14 +244,14 @@ export function createInitialGameState(context: GameContext): GameState {
       avatar: "🧠",
     },
     stats: {
-      ...toLevel(0),
+      ...levelForXp(0),
       completedQuests: 0,
       completedBossBattles: 0,
       currentStreak: 0,
       longestStreak: 0,
       lastCheckInDate: null,
     },
-    questsByDate: { [date]: buildDailyQuests(date, context.projects) },
+    questsByDate: { [date]: buildDailyQuests(date, context) },
     grantedEventIds: [],
     achievements: [],
     badges: [],
@@ -155,6 +259,7 @@ export function createInitialGameState(context: GameContext): GameState {
       missedDate: null,
       availableUntil: null,
       used: false,
+      streakBeforeGap: null,
     },
     endOfDay: {},
     lastError: null,
@@ -172,7 +277,7 @@ function ensureTodayQuests(state: GameState, context: GameContext): GameState {
     ...state,
     questsByDate: {
       ...state.questsByDate,
-      [date]: buildDailyQuests(date, context.projects),
+      [date]: buildDailyQuests(date, context),
     },
   };
 }
@@ -183,7 +288,7 @@ function addXp(
   xp: number,
 ): { state: GameState; granted: boolean } {
   if (state.grantedEventIds.includes(eventId)) return { state, granted: false };
-  const leveled = toLevel(state.stats.xp + xp);
+  const leveled = levelForXp(state.stats.xp + xp);
   return {
     granted: true,
     state: {
@@ -198,7 +303,7 @@ function addXp(
   };
 }
 
-const ACHIEVEMENTS: Record<AchievementId, { title: string; description: string; badge: string }> = {
+export const ACHIEVEMENTS: Record<AchievementId, { title: string; description: string; badge: string }> = {
   "first-check-in": { title: "System Online", description: "Completed your first daily check-in.", badge: "🛰️" },
   "streak-3": { title: "Momentum", description: "Reached a 3-day streak.", badge: "🔥" },
   "streak-7": { title: "Consistency Engine", description: "Reached a 7-day streak.", badge: "🏁" },
@@ -216,7 +321,7 @@ function unlockAchievement(state: GameState, id: AchievementId, nowIso: string):
     achievements: [...state.achievements, base],
     badges: [...state.badges, ACHIEVEMENTS[id].badge],
   };
-  const reward = addXp(withAchievement, `achievement:${id}`, 15);
+  const reward = addXp(withAchievement, `achievement:${id}`, ACHIEVEMENT_XP);
   return reward.state;
 }
 
@@ -256,6 +361,9 @@ function completeQuest(
   if (!verification.attestationId.trim()) {
     return { ...state, lastError: "Quest attestation id is required. XP was not granted." };
   }
+  if (!bossStepsDone(quest)) {
+    return { ...state, lastError: "Finish every boss step before claiming the battle." };
+  }
 
   if (quest.id === `daily-checkin-${date}`) {
     return runCheckIn(state, context);
@@ -291,6 +399,12 @@ function completeQuest(
   return refreshAchievements(next, context.nowIso);
 }
 
+/** Boss battles can be claimed only after every smaller step is marked done. */
+export function bossStepsDone(quest: Pick<Quest, "kind" | "steps">): boolean {
+  if (quest.kind !== "boss") return true;
+  return (quest.steps ?? []).every((step) => step.status === "done");
+}
+
 function runCheckIn(state: GameState, context: GameContext): GameState {
   const date = isoDate(context.nowIso);
   const last = state.stats.lastCheckInDate;
@@ -310,6 +424,7 @@ function runCheckIn(state: GameState, context: GameContext): GameState {
         missedDate: gap === 2 ? dateFromOffset(date, -1) : null,
         availableUntil: gap === 2 ? date : null,
         used: false,
+        streakBeforeGap: gap === 2 ? state.stats.currentStreak : null,
       };
     }
   }
@@ -384,18 +499,23 @@ function recoverStreak(state: GameState, context: GameContext): GameState {
   if (date > recovery.availableUntil) {
     return {
       ...state,
-      streakRecovery: { missedDate: null, availableUntil: null, used: false },
+      streakRecovery: { missedDate: null, availableUntil: null, used: false, streakBeforeGap: null },
       lastError: "Streak recovery window expired.",
     };
   }
 
-  const xp = addXp(state, `recovery:${recovery.missedDate}`, 10);
+  const xp = addXp(state, `recovery:${recovery.missedDate}`, RECOVERY_XP);
+  // Restore the pre-gap streak plus the missed day and today. Legacy state without
+  // streakBeforeGap keeps the previous +1 behavior.
+  const restoredStreak = recovery.streakBeforeGap !== null
+    ? Math.max(xp.state.stats.currentStreak, recovery.streakBeforeGap + 2)
+    : xp.state.stats.currentStreak + 1;
   const next: GameState = {
     ...xp.state,
     stats: {
       ...xp.state.stats,
-      currentStreak: xp.state.stats.currentStreak + 1,
-      longestStreak: Math.max(xp.state.stats.longestStreak, xp.state.stats.currentStreak + 1),
+      currentStreak: restoredStreak,
+      longestStreak: Math.max(xp.state.stats.longestStreak, restoredStreak),
     },
     streakRecovery: {
       ...recovery,
@@ -414,6 +534,17 @@ function endDay(state: GameState, context: GameContext): GameState {
   const checkInAlreadyInQuests = completed.some((item) => item.id === `daily-checkin-${date}`);
   const checkInOnly = !checkInAlreadyInQuests && state.grantedEventIds.includes(`checkin:${date}`);
   const xpEarned = questXp + (checkInOnly ? 20 : 0);
+  const completedQuests: EndOfDayQuestResult[] = [
+    ...completed.map((item) => ({ id: item.id, title: item.title, xp: item.xp })),
+    ...(checkInOnly ? [{ id: `checkin-${date}`, title: "Daily check-in", xp: 20 }] : []),
+  ];
+  const achievementsUnlocked: EndOfDayAchievementResult[] = state.achievements
+    .filter((item) => item.unlockedAt.slice(0, 10) === date)
+    .map((item) => ({ id: item.id, title: item.title, badge: ACHIEVEMENTS[item.id]?.badge ?? "" }));
+  const recoveredToday = state.streakRecovery.used
+    && state.streakRecovery.availableUntil === date
+    && state.grantedEventIds.includes(`recovery:${state.streakRecovery.missedDate}`);
+  const bonusXp = achievementsUnlocked.length * ACHIEVEMENT_XP + (recoveredToday ? RECOVERY_XP : 0);
   const summary = completed.length
     ? `Completed ${completed.length} quests and earned ${xpEarned} XP today.`
     : "No quests were completed today. Keep momentum with one small action tomorrow.";
@@ -423,6 +554,11 @@ function endDay(state: GameState, context: GameContext): GameState {
     xpEarned,
     streakAfterReview: state.stats.currentStreak,
     summary,
+    completedQuests,
+    bonusXp,
+    totalXpEarned: xpEarned + bonusXp,
+    levelAfterReview: state.stats.level,
+    achievementsUnlocked,
   };
   return {
     ...state,
@@ -467,10 +603,10 @@ export function repairGameState(raw: string | null, context: GameContext): { sta
   }
   try {
     const parsed = JSON.parse(raw) as Record<string, unknown>;
-    if (parsed.version !== GAME_VERSION) {
+    if (!parsed || typeof parsed !== "object" || parsed.version !== GAME_VERSION) {
       return {
         state: base,
-        diagnostics: { repaired: true, messages: ["Unsupported game state version. Reset to defaults."] },
+        diagnostics: { repaired: true, discardedRaw: true, messages: ["Unsupported game state version. Reset to defaults."] },
       };
     }
 
@@ -490,7 +626,7 @@ export function repairGameState(raw: string | null, context: GameContext): { sta
         avatar: typeof profile?.avatar === "string" ? profile.avatar : base.profile.avatar,
       },
       stats: {
-        ...toLevel(typeof stats?.xp === "number" ? stats.xp : 0),
+        ...levelForXp(typeof stats?.xp === "number" ? stats.xp : 0),
         completedQuests: typeof stats?.completedQuests === "number" ? Math.max(0, Math.floor(stats.completedQuests)) : 0,
         completedBossBattles: typeof stats?.completedBossBattles === "number" ? Math.max(0, Math.floor(stats.completedBossBattles)) : 0,
         currentStreak: typeof stats?.currentStreak === "number" ? Math.max(0, Math.floor(stats.currentStreak)) : 0,
@@ -511,11 +647,7 @@ export function repairGameState(raw: string | null, context: GameContext): { sta
           unlockedAt: entry.unlockedAt as string,
         })),
       badges: Array.isArray(parsed.badges) ? parsed.badges.filter((item): item is string => typeof item === "string") : [],
-      streakRecovery: {
-        missedDate: typeof streakRecovery?.missedDate === "string" ? streakRecovery.missedDate : null,
-        availableUntil: typeof streakRecovery?.availableUntil === "string" ? streakRecovery.availableUntil : null,
-        used: Boolean(streakRecovery?.used),
-      },
+      streakRecovery: parseStreakRecovery(streakRecovery),
       endOfDay: parseEndOfDay(endOfDay),
       lastError: typeof parsed.lastError === "string" ? parsed.lastError : null,
     };
@@ -524,15 +656,26 @@ export function repairGameState(raw: string | null, context: GameContext): { sta
       state: refreshAchievements(ensureTodayQuests(next, context), context.nowIso),
       diagnostics: {
         repaired: repaired.length > 0,
+        discardedRaw: repaired.length > 0,
         messages: repaired,
       },
     };
   } catch {
     return {
       state: base,
-      diagnostics: { repaired: true, messages: ["Corrupted game state JSON detected and repaired."] },
+      diagnostics: { repaired: true, discardedRaw: true, messages: ["Corrupted game state JSON detected and repaired."] },
     };
   }
+}
+
+function parseStreakRecovery(value: Record<string, unknown> | null): StreakRecovery {
+  const before = value?.streakBeforeGap;
+  return {
+    missedDate: typeof value?.missedDate === "string" ? value.missedDate : null,
+    availableUntil: typeof value?.availableUntil === "string" ? value.availableUntil : null,
+    used: Boolean(value?.used),
+    streakBeforeGap: typeof before === "number" && Number.isFinite(before) ? Math.max(0, Math.floor(before)) : null,
+  };
 }
 
 function parseQuestState(
@@ -545,7 +688,7 @@ function parseQuestState(
   const entries = Object.entries(value).map(([date, raw]) => {
     if (!Array.isArray(raw)) {
       repaired.push(`Removed invalid quest list for ${date}.`);
-      return [date, buildDailyQuests(date, context.projects)] as const;
+      return [date, buildDailyQuests(date, context)] as const;
     }
     const quests = raw
       .map((entry) => asObject(entry))
@@ -570,12 +713,21 @@ function parseQuestState(
           xp: typeof entry.xp === "number" ? Math.max(0, Math.floor(entry.xp)) : 0,
           status: entry.status === "done" ? "done" : "todo",
           sourceProjectPath: typeof entry.sourceProjectPath === "string" ? entry.sourceProjectPath : null,
+          ...(isSideQuestCategory(entry.category) ? { category: entry.category } : {}),
           ...(steps?.length ? { steps } : {}),
         } satisfies Quest;
       });
-    return [date, quests.length ? quests : buildDailyQuests(date, context.projects)] as const;
+    return [date, quests.length ? quests : buildDailyQuests(date, context)] as const;
   });
   return Object.fromEntries(entries);
+}
+
+function isSideQuestCategory(value: unknown): value is SideQuestCategory {
+  return typeof value === "string" && (SIDE_QUEST_CATEGORIES as readonly string[]).includes(value);
+}
+
+function nonNegativeInt(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.floor(value)) : undefined;
 }
 
 function parseEndOfDay(value: Record<string, unknown> | null): Record<string, EndOfDayResult> {
@@ -592,8 +744,84 @@ function parseEndOfDay(value: Record<string, unknown> | null): Record<string, En
         xpEarned: typeof parsed.xpEarned === "number" ? Math.max(0, Math.floor(parsed.xpEarned)) : 0,
         streakAfterReview: typeof parsed.streakAfterReview === "number" ? Math.max(0, Math.floor(parsed.streakAfterReview)) : 0,
         summary: typeof parsed.summary === "string" ? parsed.summary : "",
+        ...parseEndOfDayDetails(parsed),
       } satisfies EndOfDayResult] as const;
     })
     .filter((entry): entry is readonly [string, EndOfDayResult] => Boolean(entry));
   return Object.fromEntries(entries);
+}
+
+function parseEndOfDayDetails(parsed: Record<string, unknown>): Partial<EndOfDayResult> {
+  const details: Partial<EndOfDayResult> = {};
+  if (Array.isArray(parsed.completedQuests)) {
+    details.completedQuests = parsed.completedQuests
+      .map((entry) => asObject(entry))
+      .filter((entry): entry is Record<string, unknown> => Boolean(entry && typeof entry.id === "string"))
+      .map((entry) => ({
+        id: String(entry.id),
+        title: typeof entry.title === "string" ? entry.title : "Quest",
+        xp: nonNegativeInt(entry.xp) ?? 0,
+      }));
+  }
+  if (Array.isArray(parsed.achievementsUnlocked)) {
+    details.achievementsUnlocked = parsed.achievementsUnlocked
+      .map((entry) => asObject(entry))
+      .filter((entry): entry is Record<string, unknown> => Boolean(entry && typeof entry.id === "string" && entry.id in ACHIEVEMENTS))
+      .map((entry) => {
+        const id = entry.id as AchievementId;
+        return {
+          id,
+          title: typeof entry.title === "string" ? entry.title : ACHIEVEMENTS[id].title,
+          badge: typeof entry.badge === "string" ? entry.badge : ACHIEVEMENTS[id].badge,
+        };
+      });
+  }
+  const bonusXp = nonNegativeInt(parsed.bonusXp);
+  if (bonusXp !== undefined) details.bonusXp = bonusXp;
+  const totalXpEarned = nonNegativeInt(parsed.totalXpEarned);
+  if (totalXpEarned !== undefined) details.totalXpEarned = totalXpEarned;
+  const levelAfterReview = nonNegativeInt(parsed.levelAfterReview);
+  if (levelAfterReview !== undefined) details.levelAfterReview = levelAfterReview;
+  return details;
+}
+
+/** Event id recorded in grantedEventIds when a quest's XP is awarded. */
+function questEventId(date: string, questId: string): string {
+  return questId === `daily-checkin-${date}` ? `checkin:${date}` : `quest:${date}:${questId}`;
+}
+
+/**
+ * Describes what a transition actually awarded, for celebration feedback. Derived only
+ * from the difference between two states, so it never reports XP that was not granted.
+ */
+export function describeRewards(previous: GameState, next: GameState, nowIso: string): string[] {
+  const date = isoDate(nowIso);
+  const messages: string[] = [];
+  const before = new Map((previous.questsByDate[date] ?? []).map((quest) => [quest.id, quest]));
+  const newlyGranted = new Set(next.grantedEventIds.filter((id) => !previous.grantedEventIds.includes(id)));
+
+  for (const quest of next.questsByDate[date] ?? []) {
+    const earlier = before.get(quest.id);
+    if (quest.status !== "done" || earlier?.status === "done") continue;
+    if (newlyGranted.has(questEventId(date, quest.id))) {
+      messages.push(`+${quest.xp} XP — Quest complete: ${quest.title}`);
+    }
+  }
+
+  if (next.streakRecovery.used && !previous.streakRecovery.used && newlyGranted.has(`recovery:${next.streakRecovery.missedDate}`)) {
+    messages.push(`+${RECOVERY_XP} XP — Streak recovered: ${next.stats.currentStreak} days`);
+  }
+
+  if (next.stats.level > previous.stats.level) {
+    messages.push(`Level up! You reached level ${next.stats.level}`);
+  }
+
+  const known = new Set(previous.achievements.map((item) => item.id));
+  for (const achievement of next.achievements) {
+    if (known.has(achievement.id)) continue;
+    const badge = ACHIEVEMENTS[achievement.id]?.badge ?? "";
+    messages.push(`Achievement unlocked: ${achievement.title}${badge ? ` ${badge}` : ""}`);
+  }
+
+  return messages;
 }

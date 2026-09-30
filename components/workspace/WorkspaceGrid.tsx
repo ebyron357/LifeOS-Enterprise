@@ -87,12 +87,12 @@ export function WorkspaceGrid({ widgets }: WorkspaceGridProps) {
         {visibleWidgets.map(({ id, node }, index) => (
           <div key={id} className="workspace-grid-item workspace-grid-item--mobile" data-grid-id={id}>
             <div className="workspace-mobile-chrome" role="toolbar" aria-label={`${id} mobile controls`}>
-              <button type="button" onClick={() => moveWidget(id, "up")} disabled={index === 0}>
+              <button type="button" onClick={() => moveWidget(id, "up", { visibleOnly: true })} disabled={index === 0}>
                 Move up
               </button>
               <button
                 type="button"
-                onClick={() => moveWidget(id, "down")}
+                onClick={() => moveWidget(id, "down", { visibleOnly: true })}
                 disabled={index === visibleWidgets.length - 1}
               >
                 Move down

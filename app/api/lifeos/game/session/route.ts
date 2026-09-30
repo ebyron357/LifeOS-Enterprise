@@ -18,7 +18,13 @@ export async function GET(request: Request) {
   }
   const data = await getVaultDashboardData();
   const nowIso = new Date().toISOString();
-  const seed = createInitialGameState({ nowIso, projects: data.projects });
+  const seed = createInitialGameState({
+    nowIso,
+    projects: data.projects,
+    areas: data.areas,
+    businesses: data.businesses,
+    people: data.people,
+  });
   return NextResponse.json({
     ok: true,
     seed,
@@ -41,7 +47,7 @@ export async function POST(request: Request) {
 
   const data = await getVaultDashboardData();
   const nowIso = new Date().toISOString();
-  const context = { nowIso, projects: data.projects };
+  const context = { nowIso, projects: data.projects, areas: data.areas, businesses: data.businesses, people: data.people };
   const repaired = repairGameState(body.rawState ?? null, context);
   const action = body.action ?? { type: "repair-state" };
   const next = reduceGameState(repaired.state, action, context);

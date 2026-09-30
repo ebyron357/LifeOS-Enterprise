@@ -1,6 +1,15 @@
-import type { ProjectBrief } from "@/lib/lifeos/types";
+import type { AreaBrief, BusinessBrief, PersonBrief, ProjectBrief } from "@/lib/lifeos/types";
 
 export type QuestKind = "daily" | "main" | "side" | "boss";
+
+/** Life categories for canonical side quests. Each one needs a real vault record as its source. */
+export type SideQuestCategory =
+  | "health"
+  | "learning"
+  | "money"
+  | "relationships"
+  | "service"
+  | "personal-growth";
 
 export type QuestStatus = "todo" | "done";
 
@@ -19,6 +28,8 @@ export type Quest = {
   xp: number;
   status: QuestStatus;
   sourceProjectPath: string | null;
+  /** Canonical side quests only: which life category the source vault record covers. */
+  category?: SideQuestCategory;
   /** Boss battles only: smaller real actions. Completing steps does not award XP. */
   steps?: QuestStep[];
 };
@@ -39,18 +50,39 @@ export type Achievement = {
   unlockedAt: string;
 };
 
+export type EndOfDayQuestResult = {
+  id: string;
+  title: string;
+  xp: number;
+};
+
+export type EndOfDayAchievementResult = {
+  id: AchievementId;
+  title: string;
+  badge: string;
+};
+
 export type EndOfDayResult = {
   date: string;
   completedQuestIds: string[];
+  /** Quest XP earned today (check-in included once). Achievement/recovery bonuses are in bonusXp. */
   xpEarned: number;
   streakAfterReview: number;
   summary: string;
+  /** Optional since v1 results recorded before the results panel existed. */
+  completedQuests?: EndOfDayQuestResult[];
+  bonusXp?: number;
+  totalXpEarned?: number;
+  levelAfterReview?: number;
+  achievementsUnlocked?: EndOfDayAchievementResult[];
 };
 
 export type StreakRecovery = {
   missedDate: string | null;
   availableUntil: string | null;
   used: boolean;
+  /** Streak recorded before the single missed day, so recovery can restore it. Null for legacy state. */
+  streakBeforeGap: number | null;
 };
 
 export type GameProfile = {
@@ -86,6 +118,8 @@ export type GameState = {
 export type GameDiagnostics = {
   repaired: boolean;
   messages: string[];
+  /** True when stored data could not be used as-is (corrupt JSON, unsupported version, or dropped fields). */
+  discardedRaw?: boolean;
 };
 
 export type QuestVerification = {
@@ -108,4 +142,8 @@ export type GameAction =
 export type GameContext = {
   nowIso: string;
   projects: ProjectBrief[];
+  /** Canonical vault records used for life-category side quests. Optional for backward compatibility. */
+  areas?: AreaBrief[];
+  businesses?: BusinessBrief[];
+  people?: PersonBrief[];
 };
