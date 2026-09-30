@@ -7,6 +7,7 @@ export type OsNavItem = {
 
 export const PRIMARY_NAV: OsNavItem[] = [
   { href: "/", label: "Home", intent: "decide", description: "See what needs you today." },
+  { href: "/life-map", label: "Life Map", intent: "review", description: "Open your personal operating map: identity, people, wealth, business, health, learning, creativity, and systems." },
   { href: "/conversation", label: "Ask LifeOS", intent: "ask", description: "Talk or type. Approve before anything writes." },
   { href: "/projects", label: "Projects", intent: "resume", description: "Open a project workspace and resume work." },
   { href: "/today", label: "Today", intent: "do", description: "Today's mission, outcomes, and next action." },
