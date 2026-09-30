@@ -2,6 +2,22 @@
 
 All notable changes to LifeOS Enterprise are documented in this file.
 
+## [Unreleased] — 2026-09-30 Redesigned command center (PR #82, merged as `0d3ed70`)
+
+### Changed
+
+- The command-center shell and home were redesigned:
+  - a numbered left menu
+  - a top bar with **My Life**, **Life Map**, **Ask LifeOS**, **Search anything** (Ctrl K), and **Capture**
+  - a health strip
+  - **Today**, with **Start here** and a **Resume …** button naming the lead project
+  - operating lanes, continuity, blockers and waiting, AI capacity (Hermes honestly unavailable), and system health
+- PR #82 supersedes #76 and #80.
+
+### Documentation
+
+- Owner manual v2.3 matches the new home: the **Resume …** button under **Start here**, the numbered menu including Life Map and Dashboards, **Search anything**, and F4's **Resume work** on project cards. Canonical status records #81 and #82 and their production deployment.
+
 ## [Unreleased] — 2026-09-30 My Life navigation (PR #78, merged as `d66467e`)
 
 ### Added
