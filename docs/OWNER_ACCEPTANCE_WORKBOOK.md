@@ -50,8 +50,8 @@ Use one row per test. Record evidence such as a screenshot, short note, deployme
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| B1 | Current main contains merged fixes | Inspect current GitHub main (`https://github.com/ebyron357/LifeOS-Enterprise/commits/main`) | #60–#73 are present, plus #74 (MAPS, `62a9df9`), the Life Map / Dashboards commit `fc0729d`, the #75 closeout (`abf6c82`: voice #58 polish, widget/game #42 fixes, Resource Intelligence provenance, dependency advisories, owner manual v2.x), #79 status docs (`95e71d1`), and #78 My Life navigation (`d66467e`) | ☐ | | |
-| B2 | Automated validation record | Review PR #61/#62/#64 evidence | Lint, typecheck, unit, build, audit, vault audit, and CI evidence are recorded; browser-suite limitations are disclosed rather than hidden | ☐ | | |
+| B1 | Current main contains merged fixes | Inspect current GitHub main (`https://github.com/ebyron357/LifeOS-Enterprise/commits/main`) | #60–#73 are present, plus #74 (MAPS, `62a9df9`), the Life Map / Dashboards commit `fc0729d`, the #75 closeout (`abf6c82`: voice #58 polish, widget/game #42 fixes, Resource Intelligence provenance, dependency advisories, owner manual v2.x), #79 status docs (`95e71d1`), #78 My Life navigation (`d66467e`), #81 My Life/status documentation (`a179a9c`), and #82 final command center UI/UX (`0d3ed701`) | ☐ | | |
+| B2 | Automated validation record | Review PR #82 and current Actions evidence | Vault Health, MAPS Integrity, audit, lint, typecheck, 516 unit tests, production build, Playwright browser journeys, and Vercel deployment evidence are recorded; owner-only acceptance is still separate | ☐ | | |
 | B3 | No secrets in repo | Spot-check `.env.example` and recent diffs | Placeholders only; no live tokens | ☐ | | |
 | B4 | Integration availability truthful | Inspect `/integrations` and `/conversation` Context/tools | Unconfigured tools show unavailable/configured requirements, never invented success | ☐ | | |
 | B5 | Stale PR cleanup | Inspect open PR list | Superseded PR #55 is closed; no competing conversation-runtime PR remains active | ☐ | | |
