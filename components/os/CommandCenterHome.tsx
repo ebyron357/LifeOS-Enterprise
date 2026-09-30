@@ -5,6 +5,7 @@ import type { IntegrationStatus } from "@/lib/os/integrations";
 import type { HermesContract } from "@/lib/os/hermes";
 import type { ProjectBrief, VaultDashboardData } from "@/lib/lifeos/types";
 import { noteHref } from "@/lib/vault/slug";
+import { ContinuityResume } from "./ContinuityResume";
 import styles from "./LegendaryCommandCenter.module.css";
 
 type CommandCenterHomeProps = {
@@ -43,7 +44,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
   const liveProjects = vault.projects.slice(0, 5);
   const visibleIntegrations = integrations.slice(0, 8);
   const integrationThreads = integrations.filter((item) => ["github", "clickup.create_task", "slack.send_message", "vercel.deploy_production", "google-workspace"].includes(item.id));
-  const resumeLabel = mission ? mission.name : "No lead mission selected";
+  const resumeLabel = resume.focus?.name || mission?.name || "No lead mission selected";
 
   return (
     <div>
@@ -131,7 +132,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
               <div className={styles.chatHead}>
                 <span className={styles.avatar}>A</span>
                 <div><strong>ARIA</strong><div style={{fontSize:".62rem",color:"#7f93ab"}}>Your AI command assistant</div></div>
-                <span className={styles.online}>{hermes.state === "unavailable" ? "LifeOS available · Hermes unavailable" : hermes.state}</span>
+                <span className={styles.online}>{hermes.state === "unavailable" ? "Hermes is unavailable · LifeOS remains available" : hermes.state}</span>
               </div>
 
               <div className={styles.bubble}>
@@ -163,16 +164,13 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
           <article className={styles.panel}>
             <div className={styles.panelHead}><h2>Live Projects</h2><Link href="/projects">View all</Link></div>
             <div className={styles.projectList}>
-              {liveProjects.map((project, index) => {
-                const widths = [88,72,63,48,35];
-                return (
-                  <Link key={project.path} className={styles.project} href={noteHref(project.path)} style={{textDecoration:"none",color:"inherit"}}>
-                    <span className={styles.projectDot} style={{background: project.blocker ? "#ff586c" : project.waitingOn ? "#ffb44b" : "#36e39a"}} />
-                    <strong>{project.name}</strong>
-                    <span className={styles.bar}><i style={{width:`${widths[index] ?? 40}%`}} /></span>
-                  </Link>
-                );
-              })}
+              {liveProjects.map((project) => (
+                <Link key={project.path} className={styles.project} href={noteHref(project.path)} style={{textDecoration:"none",color:"inherit"}}>
+                  <span className={styles.projectDot} style={{background: project.blocker ? "#ff586c" : project.waitingOn ? "#ffb44b" : "#36e39a"}} />
+                  <strong>{project.name}</strong>
+                  <span className={styles.projectState}>{project.blocker ? "blocked" : project.waitingOn ? "waiting" : project.status}</span>
+                </Link>
+              ))}
             </div>
           </article>
 
@@ -181,9 +179,9 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
             <div style={{padding:12}}>
               <strong style={{display:"block",fontSize:".8rem"}}>{resumeLabel}</strong>
               <p style={{margin:"6px 0 12px",fontSize:".68rem",color:"#7f93ab"}}>
-                {mission ? projectLine(mission) : "Use Projects or Today to select the next verified action."}
+                {resume.next.detail || (mission ? projectLine(mission) : "Use Projects or Today to select the next verified action.")}
               </p>
-              <Link href={mission ? noteHref(mission.path) : "/projects"} style={{fontSize:".7rem",fontWeight:800,color:"#49a9ff"}}>Resume work →</Link>
+              <Link href={resume.next.href || (mission ? noteHref(mission.path) : "/projects")} style={{fontSize:".7rem",fontWeight:800,color:"#49a9ff"}}>Resume work →</Link>
             </div>
           </article>
         </div>
@@ -225,6 +223,10 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
             <Link className={styles.quickCard} href="/more"><strong>More</strong><span>All systems</span></Link>
           </div>
         </article>
+      </section>
+
+      <section className={styles.continuity} aria-label="Verified continuity">
+        <ContinuityResume resume={resume} />
       </section>
 
       <footer style={{marginTop:10,padding:"12px 4px",display:"flex",justifyContent:"space-between",gap:12,color:"#6f849b",fontSize:".65rem"}}>
