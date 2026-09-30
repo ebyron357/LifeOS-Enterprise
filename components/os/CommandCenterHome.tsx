@@ -22,6 +22,49 @@ function projectLine(project: ProjectBrief): string {
   return project.nextAction || project.blocker || project.waitingOn || "Open this project to choose the next move.";
 }
 
+const lifeLanes = [
+  {
+    label: "BUILD & SELL",
+    title: "Digital Products",
+    description: "Websites, templates, white-label systems, product launches, and marketplace listings.",
+    links: [
+      { label: "Website builds", href: "/projects" },
+      { label: "Portfolio", href: "/portfolio" },
+      { label: "Product launch stack", href: "/resources" },
+    ],
+  },
+  {
+    label: "COMMERCE",
+    title: "Shopify & Brands",
+    description: "Storefronts, products, packaging, content, and revenue operations.",
+    links: [
+      { label: "Business systems", href: "/businesses" },
+      { label: "Projects", href: "/projects" },
+      { label: "Automations", href: "/automations" },
+    ],
+  },
+  {
+    label: "AI WORKFORCE",
+    title: "Agents & Automation",
+    description: "Agent roles, delegated work, n8n workflows, approvals, and execution status.",
+    links: [
+      { label: "Agents", href: "/agents" },
+      { label: "Automations", href: "/automations" },
+      { label: "Integrations", href: "/integrations" },
+    ],
+  },
+  {
+    label: "LEARNING & ACCESS",
+    title: "Adobe · IBM · AMP",
+    description: "Training, partner platforms, benefits, certifications, and capability-building.",
+    links: [
+      { label: "Learning", href: "/learning" },
+      { label: "Resources", href: "/resources" },
+      { label: "Files", href: "/files" },
+    ],
+  },
+];
+
 export function CommandCenterHome({ greeting, dateLabel, vault, integrations, hermes, github, resume }: CommandCenterHomeProps) {
   const mission = vault.priorities[0] ?? vault.projects[0] ?? null;
   const outcomes = vault.priorities.slice(0, 3);
@@ -29,81 +72,121 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
   const waiting = vault.projects.filter((project) => project.status === "waiting" || project.waitingOn);
 
   return (
-    <div className="os-grid">
-      <header className="os-page-header">
-        <p className="widget-eyebrow">{dateLabel}</p>
-        <h1>{greeting}</h1>
-        <p>Here is what needs you. Do not hunt. Start with one action.</p>
+    <div className="os-dashboard">
+      <header className="os-hero">
+        <div>
+          <p className="os-kicker">{dateLabel}</p>
+          <h1>{greeting}</h1>
+          <p className="os-hero-copy">One screen for what matters now, what is blocked, and where every part of your life and business lives.</p>
+        </div>
+        <div className="os-health-strip" aria-label="System summary">
+          <div><span>ACTIVE</span><strong>{vault.activeProjects}</strong></div>
+          <div><span>WAITING</span><strong>{vault.waitingOn}</strong></div>
+          <div><span>BLOCKED</span><strong>{blocked.length}</strong></div>
+          <div><span>REVIEWS</span><strong>{vault.reviewsDue}</strong></div>
+        </div>
       </header>
 
-      <section className="os-card" aria-labelledby="today-heading">
-        <h2 id="today-heading">Today</h2>
-        <p className="widget-eyebrow">Primary mission</p>
-        <p><strong>{mission ? mission.name : "No active project is marked as the lead mission."}</strong></p>
-        <p className="widget-eyebrow">Critical outcomes</p>
-        {outcomes.length ? (
-          <ol>
-            {outcomes.map((item) => <li key={item.path}>{item.name}: {item.nextAction || "Choose the next verified action."}</li>)}
-          </ol>
-        ) : <p>No priority outcomes are in the vault yet.</p>}
+      <section className="os-section" aria-labelledby="today-heading">
+        <div className="os-section-heading">
+          <div>
+            <p className="os-kicker">FOCUS NOW</p>
+            <h2 id="today-heading">Today</h2>
+          </div>
+        </div>
+        <div className="os-focus-grid">
+        <article className="os-focus-card os-focus-primary">
+          <div className="os-card-topline"><span>01</span><span>PRIMARY MISSION</span></div>
+          <h3 className="os-focus-label">Start here</h3>
+          <h2>{mission ? mission.name : "Choose today's lead mission"}</h2>
+          <p>{mission ? projectLine(mission) : "No active project is marked as the lead mission."}</p>
+          <Link className="os-primary" href={mission ? noteHref(mission.path) : "/inbox"}>
+            {mission ? `Resume ${mission.name}` : "Capture next move"}
+          </Link>
+        </article>
+
+        <article className="os-focus-card">
+          <div className="os-card-topline"><span>02</span><span>CRITICAL OUTCOMES</span></div>
+          {outcomes.length ? (
+            <ol className="os-outcomes">
+              {outcomes.map((item) => (
+                <li key={item.path}>
+                  <strong>{item.name}</strong>
+                  <span>{item.nextAction || "Choose the next verified action."}</span>
+                </li>
+              ))}
+            </ol>
+          ) : <p>No priority outcomes are in the vault yet.</p>}
+        </article>
+        </div>
       </section>
 
-      <ContinuityResume resume={resume} />
+      <section className="os-section">
+        <div className="os-section-heading">
+          <div>
+            <p className="os-kicker">YOUR OPERATING LANES</p>
+            <h2>Everything has a home.</h2>
+          </div>
+          <Link href="/more">Open all systems</Link>
+        </div>
 
-      <section className="os-card" aria-labelledby="start-heading">
-        <h2 id="start-heading">Start here</h2>
-        <p>{resume.next.detail || (mission ? projectLine(mission) : "Capture what is on your mind, or ask LifeOS what needs attention.")}</p>
-        <Link className="os-primary" href={resume.next.href || (mission ? noteHref(mission.path) : "/inbox")}>
-          {resume.next.ownership === "owner" ? "This needs you" : mission ? `Resume ${mission.name}` : "Capture something"}
-        </Link>
+        <div className="os-lane-grid">
+          {lifeLanes.map((lane, index) => (
+            <article className="os-lane-card" key={lane.title}>
+              <div className="os-lane-number">{String(index + 1).padStart(2, "0")}</div>
+              <p className="os-kicker">{lane.label}</p>
+              <h3>{lane.title}</h3>
+              <p>{lane.description}</p>
+              <div className="os-lane-links">
+                {lane.links.map((link) => <Link key={link.href + link.label} href={link.href}>{link.label}<span>→</span></Link>)}
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
-      <div className="os-grid os-grid-2">
-        <section className="os-card" aria-labelledby="blockers-heading">
-          <h2 id="blockers-heading">Blockers</h2>
+      <section className="os-section">
+        <div className="os-section-heading">
+          <div>
+            <p className="os-kicker">CONTINUITY</p>
+            <h2>Pick up exactly where you left off.</h2>
+          </div>
+        </div>
+        <ContinuityResume resume={resume} />
+      </section>
+
+      <section className="os-three-grid">
+        <article className="os-info-card">
+          <div className="os-card-topline"><span>ATTENTION</span><strong>{blocked.length}</strong></div>
+          <h2>Blockers</h2>
           {blocked.length ? (
-            <ul>
-              {blocked.slice(0, 5).map((item) => (
-                <li key={item.path}><strong>{item.name}</strong> — {item.blocker || "Blocked without a named reason."}</li>
-              ))}
-            </ul>
+            <ul>{blocked.slice(0, 4).map((item) => <li key={item.path}><strong>{item.name}</strong><span>{item.blocker || "Blocked without a named reason."}</span></li>)}</ul>
           ) : <p>No blocked projects are recorded.</p>}
-        </section>
-        <section className="os-card" aria-labelledby="waiting-heading">
-          <h2 id="waiting-heading">Waiting on</h2>
+        </article>
+
+        <article className="os-info-card">
+          <div className="os-card-topline"><span>WAITING ON</span><strong>{waiting.length}</strong></div>
           {waiting.length ? (
-            <ul>
-              {waiting.slice(0, 5).map((item) => (
-                <li key={item.path}><strong>{item.name}</strong> — {item.waitingOn || item.status}</li>
-              ))}
-            </ul>
+            <ul>{waiting.slice(0, 4).map((item) => <li key={item.path}><strong>{item.name}</strong><span>{item.waitingOn || item.status}</span></li>)}</ul>
           ) : <p>Nothing is marked waiting.</p>}
-        </section>
-      </div>
+        </article>
 
-      <section className="os-card" aria-labelledby="health-heading">
-        <h2 id="health-heading">Project health</h2>
-        <p>Active {vault.activeProjects}. Waiting {vault.waitingOn}. Reviews due {vault.reviewsDue}. Blocked {blocked.length}.</p>
-        <Link className="os-secondary" href="/projects">Open projects</Link>
+        <article className="os-info-card">
+          <div className="os-card-topline"><span>AI CAPACITY</span><strong>{hermes.state}</strong></div>
+          <p>{hermes.state === "unavailable" ? "Hermes is unavailable. LifeOS can still inspect vault attention and GitHub health." : "LifeOS can inspect vault attention, GitHub health, and propose governed actions."}</p>
+          <Link className="os-secondary" href="/conversation">Open AI workspace</Link>
+        </article>
       </section>
 
-      <section className="os-card" aria-labelledby="changed-heading">
-        <h2 id="changed-heading">What changed</h2>
-        <p>GitHub last verified: {github.updatedAt || "unavailable"}. Open PRs: {github.connected ? github.openPullRequests : "not verified"}.</p>
-        <p>Reviews due in the vault: {vault.reviewsDue}. Slack, ClickUp, and agent runs are not invented here.</p>
-        <Link className="os-secondary" href="/integrations">Inspect integration health</Link>
-      </section>
-
-      <section className="os-card" aria-labelledby="agent-heading">
-        <h2 id="agent-heading">What AI can handle</h2>
-        <p>Ask LifeOS can read vault attention, inspect GitHub health, and propose writes. Hermes is {hermes.state}. Nothing writes without your approval and the owner write secret.</p>
-        <p>{hermes.limitation}</p>
-        <Link className="os-secondary" href="/conversation">Ask or approve in conversation</Link>
-      </section>
-
-      <section aria-labelledby="integrations-heading">
-        <h2 id="integrations-heading">Integration health</h2>
-        <div className="os-grid os-grid-2">
+      <section className="os-section">
+        <div className="os-section-heading">
+          <div>
+            <p className="os-kicker">SYSTEM HEALTH</p>
+            <h2>Connections and execution signals.</h2>
+          </div>
+          <span className="os-github-line">GitHub: {github.connected ? `${github.openPullRequests} open PR${github.openPullRequests === 1 ? "" : "s"}` : "not verified"}</span>
+        </div>
+        <div className="os-integration-grid">
           {integrations.map((item) => <IntegrationBadge key={item.id} item={item} />)}
         </div>
       </section>
