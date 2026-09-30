@@ -47,27 +47,6 @@ function firstSentence(text: string) {
   return (match ? match[0] : trimmed).trim();
 }
 
-/**
- * The shared vault parser keeps inline `[a, b]` lists only, so YAML block lists
- * (`tags:` followed by `- item` lines) arrive empty. Read them from the raw note.
- */
-function blockListTags(source: string): string[] {
-  const text = normalizeNewlines(source);
-  if (!text.startsWith("---\n")) return [];
-  const end = text.indexOf("\n---", 4);
-  if (end === -1) return [];
-  const lines = text.slice(4, end).split("\n");
-  const start = lines.findIndex((line) => /^tags:\s*$/.test(line));
-  if (start === -1) return [];
-  const tags: string[] = [];
-  for (const line of lines.slice(start + 1)) {
-    const match = line.match(/^\s*-\s+(.+)$/);
-    if (!match) break;
-    tags.push(match[1].trim().replace(/^['"]|['"]$/g, ""));
-  }
-  return tags;
-}
-
 function normalizeTags(tags: string[]): string[] {
   return tags.map((tag) => tag.trim().replace(/^#/, "").toLowerCase()).filter(Boolean);
 }
@@ -159,15 +138,15 @@ export async function getVaultDashboardData(now = new Date()): Promise<VaultDash
   // The index already drops excluded paths and private frontmatter, so only public area notes appear here.
   const areaNotes = index.notes
     .filter((note) => note.type === "area" && (note.status ?? "").toLowerCase() === "active" && !isTemplateOrPlaceholder(note));
-  const areas: AreaBrief[] = await Promise.all(areaNotes.map(async (note) => ({
+  const areas: AreaBrief[] = areaNotes.map((note) => ({
     name: note.title,
     path: note.path,
     status: note.status ?? "active",
-    tags: normalizeTags(note.tags.length ? note.tags : blockListTags(await optionalMarkdown(note.path))),
+    tags: normalizeTags(note.tags),
     standard: typeof note.frontmatter.standard === "string" ? note.frontmatter.standard.trim() : "",
     purpose: firstSentence(section(note.body, "Purpose")),
     reviewDate: note.reviewDate ?? "",
-  })));
+  }));
 
   const growthArea = parseFrontmatter(growthAreaSource);
   const growthGoal = parseFrontmatter(growthGoalSource);
