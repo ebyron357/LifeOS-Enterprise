@@ -5,6 +5,8 @@
 - [People](../50%20People): people records.
 
 ## State
+- [Learning](../Learning): learning records surfaced by the web Learning view.
+- [Learning and Knowledge area](../20%20Areas/Learning%20and%20Knowledge.md): learning standards and review cadence.
 - [Reviews](../60%20Reviews): review records.
 - [Archive](../90%20Archive): inactive/cold records.
 

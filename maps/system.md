@@ -12,6 +12,7 @@
 ## Skills
 - [Integrations](../integrations): integration definitions.
 - [Scripts](../scripts): maintenance and validation scripts.
+- [Tests](../tests): unit tests and Playwright browser journeys (`tests/e2e`).
 
 ## Memory
 - [Master map](../MAPS.md): top-level router.

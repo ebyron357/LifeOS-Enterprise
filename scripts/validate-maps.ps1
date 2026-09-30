@@ -57,8 +57,12 @@ function Test-MapRoutes([string]$relativeMapPath) {
     $rootResolved = (Resolve-Path $root).Path.TrimEnd('\', '/')
     foreach ($legacy in $legacyRoutes.Keys) {
       $legacyResolved = (Join-Path $rootResolved $legacy).TrimEnd('\', '/')
-      if ($resolved -eq $legacyResolved) {
-        Fail "Stale route in ${relativeMapPath}: $target is a legacy folder; route to '$($legacyRoutes[$legacy])' instead"
+      # Match the legacy folder itself or anything beneath it (for example ../SOPs/README.md).
+      $isLegacy = $resolved -eq $legacyResolved -or
+        $resolved.StartsWith($legacyResolved + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase) -or
+        $resolved.StartsWith($legacyResolved + '/', [System.StringComparison]::OrdinalIgnoreCase)
+      if ($isLegacy) {
+        Fail "Stale route in ${relativeMapPath}: $target is in a legacy folder; route to '$($legacyRoutes[$legacy])' instead"
       }
     }
   }
@@ -133,9 +137,23 @@ if (-not [string]::IsNullOrWhiteSpace($EvidenceDirectory)) {
     commit       = [string]$commit
     failures     = @($failures)
   }
-  $stamp = [DateTime]::UtcNow.ToString("yyyyMMddTHHmmssZ")
-  $recordPath = Join-Path $evidenceRoot "run-$stamp.json"
-  $record | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $recordPath -Encoding UTF8
+  # Millisecond timestamp plus a random nonce, and never overwrite: concurrent runs each keep their own record.
+  $recordPath = $null
+  for ($attempt = 0; $attempt -lt 5 -and $null -eq $recordPath; $attempt++) {
+    $stamp = [DateTime]::UtcNow.ToString("yyyyMMddTHHmmssfffZ")
+    $nonce = [guid]::NewGuid().ToString("N").Substring(0, 8)
+    $candidatePath = Join-Path $evidenceRoot "run-$stamp-$nonce.json"
+    if (-not (Test-Path -LiteralPath $candidatePath)) { $recordPath = $candidatePath }
+  }
+  if ($null -eq $recordPath) { throw "Could not reserve a unique evidence file name in $evidenceRoot" }
+  $json = $record | ConvertTo-Json -Depth 4
+  $stream = [System.IO.File]::Open($recordPath, [System.IO.FileMode]::CreateNew, [System.IO.FileAccess]::Write)
+  try {
+    $writer = New-Object System.IO.StreamWriter($stream, (New-Object System.Text.UTF8Encoding($false)))
+    $writer.Write($json)
+    $writer.Flush()
+  }
+  finally { $stream.Dispose() }
   Write-Host "Evidence written: $recordPath"
 }
 
