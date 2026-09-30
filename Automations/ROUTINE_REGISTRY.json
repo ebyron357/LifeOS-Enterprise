@@ -6,13 +6,15 @@
       "id": "maps-integrity-check",
       "name": "MAPS Integrity Check",
       "enabled": true,
-      "schedule": "daily",
-      "machine": "github-actions-or-approved-runner",
-      "command": "powershell -ExecutionPolicy Bypass -File ./scripts/validate-maps.ps1",
+      "schedule": "daily 06:17 UTC",
+      "machine": "github-actions:windows-latest",
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/validate-maps.ps1 -EvidenceDirectory Automations/runs/maps-integrity-check",
+      "workflow": ".github/workflows/maps-integrity.yml",
       "owner": "LifeOS",
       "timeout_minutes": 10,
       "failure_cap": 3,
-      "evidence_path": "Automations/runs/maps-integrity-check/"
+      "evidence_path": "Automations/runs/maps-integrity-check/",
+      "evidence_artifact": "maps-integrity-check-evidence (GitHub Actions artifact, 90-day retention)"
     }
   ]
 }

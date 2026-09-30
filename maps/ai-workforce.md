@@ -10,7 +10,7 @@
 
 ## Skills
 - [Tools](../Tools): tool and platform records.
-- [SOPs](../SOPs): reusable operating procedures.
+- [SOPs](../80%20SOPs): canonical reusable operating procedures.
 
 ## Memory
 - [Master map](../MAPS.md): top-level router.

@@ -9,7 +9,7 @@
 - [Run evidence](../Automations/runs): evidence emitted by routines.
 
 ## Skills
-- [SOPs](../SOPs): operating procedures.
+- [SOPs](../80%20SOPs): canonical operating procedures.
 - [Scripts](../scripts): local validation and support scripts.
 
 ## Memory
@@ -17,6 +17,7 @@
 - [MAPS operating model](../architecture/MAPS_OPERATING_MODEL.md): governance.
 
 ## Routines
+- [MAPS Integrity workflow](../.github/workflows/maps-integrity.yml): scheduled runner for `maps-integrity-check`.
 - Every unattended recurring routine must be registered.
 - Every completed run must leave inspectable evidence.
 
