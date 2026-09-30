@@ -163,7 +163,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
 
         <article className="os-info-card">
           <div className="os-card-topline"><span>AI CAPACITY</span><strong>{hermes.state}</strong></div>
-          <p>LifeOS can inspect vault attention, GitHub health, and propose governed actions.</p>
+          <p>{hermes.state === "unavailable" ? "Hermes is unavailable. LifeOS can still inspect vault attention and GitHub health." : "LifeOS can inspect vault attention, GitHub health, and propose governed actions."}</p>
           <Link className="os-secondary" href="/conversation">Open AI workspace</Link>
         </article>
       </section>
