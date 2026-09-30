@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { ActivityEvent, AgentTurnResult, ApprovalRequest, ScreenAwarenessSnapshot, TeachingPlan, ToolDefinition } from "@/lib/agent/types";
 import type { VaultDashboardData } from "@/lib/lifeos/types";
 import { appendActivity, createActivityEvent } from "@/lib/agent/activity";
@@ -13,20 +13,61 @@ import {
   formatDuration,
   INITIAL_CONVERSATION_VOICE,
   interruptSpeech,
+  listeningModeAfterUnmute,
   markSpeaking,
   markThinking,
   muteConversation,
+  recoverConversation,
+  recoveryPlan,
   resumeConversation,
   setTranscriptPrivacy,
+  settleAfterReply,
   startConversation,
   stopConversation,
   tickDuration,
   unmuteConversation,
   type ConversationVoiceSession,
 } from "@/lib/voice/conversation";
-import { createBrowserVoiceTransport } from "@/lib/voice/provider";
+import {
+  classifyRecognitionError,
+  createRequestGate,
+  createTurnGuard,
+  DEFAULT_VOICE_SETTINGS,
+  describeCapabilityNotes,
+  describeRejectedTurn,
+  describeSpeechRuntime,
+  isAbortError,
+  parseVoiceSettings,
+  resolveSpeechProvider,
+  type SpeechRuntime,
+  type TtsProviderStatus,
+  type VoiceSettings,
+} from "@/lib/voice/conversation-runtime";
+import {
+  createBrowserVoiceTransport,
+  getBrowserVoicesSnapshot,
+  getServerBrowserVoicesSnapshot,
+  getServerVoiceCapabilitiesSnapshot,
+  getVoiceCapabilitiesSnapshot,
+  subscribeBrowserVoices,
+  subscribeVoiceCapabilities,
+} from "@/lib/voice/provider";
+import {
+  readServerVoiceSettingsRaw,
+  readStoredVoiceSettingsRaw,
+  subscribeStoredVoiceSettings,
+  writeStoredVoiceSettings,
+} from "@/lib/voice/settings-store";
 import type { TranscriptEntry } from "@/lib/voice/types";
 import { createTranscriptEntry } from "@/lib/voice/transcript";
+import {
+  defaultOpenAiVoiceForStyle,
+  filterVoicesForLocale,
+  isOpenAiTtsVoice,
+  isResponseStyle,
+  OPENAI_TTS_VOICES,
+  toSpeechLang,
+} from "@/lib/voice/voice-options";
 import {
   pauseScreenAnalysis,
   requestDisplayMedia,
@@ -43,49 +84,16 @@ type AgentConversationWorkspaceProps = {
 };
 
 const SESSION_KEY = "lifeos-agent-session-id";
-const VOICE_SETTINGS_KEY = "lifeos-conversation-voice-settings-v1";
+const SESSION_LOAD_ERROR = "Unable to load agent session metadata.";
 
-type ResponseStyle = "balanced" | "concise" | "coach";
-type VoiceSettings = {
-  provider: TtsProviderId;
-  locale: string;
-  transcriptionLanguage: string;
-  speechRate: number;
-  pitch: number;
-  responseStyle: ResponseStyle;
-};
+const LOCALE_OPTIONS = [
+  { value: "en-US", label: "English (US)" },
+  { value: "en-GB", label: "English (UK)" },
+  { value: "zh-TW", label: "中文（台灣）" },
+  { value: "fr-FR", label: "Français" },
+];
 
-const DEFAULT_VOICE_SETTINGS: VoiceSettings = {
-  provider: "browser",
-  locale: "en-US",
-  transcriptionLanguage: "en-US",
-  speechRate: 1,
-  pitch: 1,
-  responseStyle: "balanced",
-};
-
-function parseVoiceSettings(raw: string | null): VoiceSettings {
-  if (!raw) return DEFAULT_VOICE_SETTINGS;
-  try {
-    const parsed = JSON.parse(raw) as Partial<VoiceSettings>;
-    return {
-      provider: parsed.provider === "openai" ? "openai" : "browser",
-      locale: typeof parsed.locale === "string" && parsed.locale.trim() ? parsed.locale : "en-US",
-      transcriptionLanguage: typeof parsed.transcriptionLanguage === "string" && parsed.transcriptionLanguage.trim()
-        ? parsed.transcriptionLanguage
-        : "en-US",
-      speechRate: typeof parsed.speechRate === "number" && Number.isFinite(parsed.speechRate)
-        ? Math.max(0.5, Math.min(2, parsed.speechRate))
-        : 1,
-      pitch: typeof parsed.pitch === "number" && Number.isFinite(parsed.pitch)
-        ? Math.max(0.5, Math.min(2, parsed.pitch))
-        : 1,
-      responseStyle: parsed.responseStyle === "concise" || parsed.responseStyle === "coach" ? parsed.responseStyle : "balanced",
-    };
-  } catch {
-    return DEFAULT_VOICE_SETTINGS;
-  }
-}
+type LocaleDefaults = { locale: string | null; transcriptionLanguage: string | null };
 
 function sessionId(): string {
   if (typeof window === "undefined") return "ssr";
@@ -94,6 +102,12 @@ function sessionId(): string {
   const next = `sess-${crypto.randomUUID()}`;
   window.sessionStorage.setItem(SESSION_KEY, next);
   return next;
+}
+
+function localeOptionsWith(value: string) {
+  return LOCALE_OPTIONS.some((option) => option.value === value)
+    ? LOCALE_OPTIONS
+    : [...LOCALE_OPTIONS, { value, label: value }];
 }
 
 export function AgentConversationWorkspace({ vault }: AgentConversationWorkspaceProps) {
@@ -110,10 +124,14 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   const [paused, setPaused] = useState(false);
   const [teaching, setTeaching] = useState<TeachingPlan | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [voiceSettings, setVoiceSettings] = useState<VoiceSettings>(DEFAULT_VOICE_SETTINGS);
-  const [availableProviders, setAvailableProviders] = useState<Array<{ id: TtsProviderId; configured: boolean; reason: string | null }>>([]);
-  const [activeProvider, setActiveProvider] = useState<TtsProviderId>("browser");
+  const [turnNotice, setTurnNotice] = useState<string | null>(null);
+  const [speechRuntime, setSpeechRuntime] = useState<SpeechRuntime | null>(null);
+  const [micEverStarted, setMicEverStarted] = useState(false);
+  const [availableProviders, setAvailableProviders] = useState<TtsProviderStatus[]>([]);
   const [fallbackProvider, setFallbackProvider] = useState<TtsProviderId>("browser");
+  const [localeDefaults, setLocaleDefaults] = useState<LocaleDefaults | null>(null);
+  const [sessionAttempt, setSessionAttempt] = useState(0);
+  const [sessionLoadFailed, setSessionLoadFailed] = useState(false);
   const [nowMs, setNowMs] = useState(() => Date.now());
   const streamRef = useRef<MediaStream | null>(null);
   const shareGenerationRef = useRef(0);
@@ -122,11 +140,37 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const keepListeningRef = useRef(false);
   const mutedRef = useRef(false);
+  const voiceRef = useRef<ConversationVoiceSession>(INITIAL_CONVERSATION_VOICE);
   const restartListeningRef = useRef<((continuous: boolean) => Promise<void>) | null>(null);
-  const lastSubmissionRef = useRef<string>("");
-  const skipFirstVoicePersistRef = useRef(true);
+  const submitTurnRef = useRef<((text: string, channel: "text" | "voice") => boolean) | null>(null);
+  /** Cancels in-flight /api/lifeos/agent/turn requests (Interrupt, Stop). */
+  const turnGateRef = useRef(createRequestGate());
+  /** Cancels in-flight /api/lifeos/voice/speak requests and stale speech (Interrupt, Stop, Mute, newer reply). */
+  const speechGateRef = useRef(createRequestGate());
+  /** One turn at a time + duplicate transcript suppression. */
+  const turnGuardRef = useRef(createTurnGuard());
+
+  // Persisted settings hydrate from localStorage on mount, independent of the session fetch.
+  // Nothing is written until the owner changes a setting, so defaults never overwrite saved values.
+  const storedSettingsRaw = useSyncExternalStore(subscribeStoredVoiceSettings, readStoredVoiceSettingsRaw, readServerVoiceSettingsRaw);
+  const voiceSettings = useMemo(() => parseVoiceSettings(storedSettingsRaw, localeDefaults), [storedSettingsRaw, localeDefaults]);
+  const browserVoices = useSyncExternalStore(subscribeBrowserVoices, getBrowserVoicesSnapshot, getServerBrowserVoicesSnapshot);
+  const capabilities = useSyncExternalStore(subscribeVoiceCapabilities, getVoiceCapabilitiesSnapshot, getServerVoiceCapabilitiesSnapshot);
+
+  const updateVoiceSettings = useCallback((patch: Partial<VoiceSettings>) => {
+    const current = parseVoiceSettings(readStoredVoiceSettingsRaw(), localeDefaults);
+    writeStoredVoiceSettings({ ...current, ...patch });
+  }, [localeDefaults]);
 
   const awareness: ScreenAwarenessSnapshot = useMemo(() => toAwarenessSnapshot(screen, nowMs), [screen, nowMs]);
+  const openaiStatus = useMemo(() => availableProviders.find((provider) => provider.id === "openai") ?? null, [availableProviders]);
+  const nextSpeech = useMemo(() => resolveSpeechProvider({
+    selected: voiceSettings.provider,
+    openai: openaiStatus,
+    ownerSecretPresent: writeSecret.trim().length > 0,
+  }), [openaiStatus, voiceSettings.provider, writeSecret]);
+  const localeVoices = useMemo(() => filterVoicesForLocale(browserVoices.voices, voiceSettings.locale), [browserVoices.voices, voiceSettings.locale]);
+  const selectedBrowserVoice = localeVoices.find((item) => item.voiceURI === voiceSettings.browserVoiceURI) ?? null;
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -145,7 +189,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         setTools(Array.isArray(payload.tools) ? payload.tools : []);
         setToken(typeof payload.sessionToken === "string" ? payload.sessionToken : null);
         const tts = payload.tts && typeof payload.tts === "object" ? payload.tts : null;
-        const providers: Array<{ id: TtsProviderId; configured: boolean; reason: string | null }> = Array.isArray(tts?.providers)
+        const providers: TtsProviderStatus[] = Array.isArray(tts?.providers)
           ? tts.providers
               .map((provider: { id?: string; configured?: boolean; reason?: string | null }) => ({
                 id: provider?.id === "openai" ? "openai" : "browser",
@@ -154,32 +198,23 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
               }))
           : [];
         setAvailableProviders(providers);
-        setActiveProvider(tts?.activeProvider === "openai" ? "openai" : "browser");
         setFallbackProvider(tts?.fallbackProvider === "openai" ? "openai" : "browser");
-        setVoiceSettings((current) => {
-          const storedRaw = typeof window === "undefined" ? null : window.localStorage.getItem(VOICE_SETTINGS_KEY);
-          const stored = parseVoiceSettings(storedRaw);
-          const supported = providers.filter((provider) => provider.configured).map((provider) => provider.id);
-          const provider = supported.includes(stored.provider) ? stored.provider : (tts?.activeProvider === "openai" ? "openai" : "browser");
-          const next = {
-            ...current,
-            ...stored,
-            provider,
-            locale: storedRaw ? stored.locale : payload?.localeDefaults?.locale || current.locale,
-            transcriptionLanguage: storedRaw
-              ? stored.transcriptionLanguage
-              : payload?.localeDefaults?.transcriptionLanguage || current.transcriptionLanguage,
-          };
-          return next;
+        const defaults = payload?.localeDefaults;
+        setLocaleDefaults({
+          locale: typeof defaults?.locale === "string" ? defaults.locale : null,
+          transcriptionLanguage: typeof defaults?.transcriptionLanguage === "string" ? defaults.transcriptionLanguage : null,
         });
+        setSessionLoadFailed(false);
       })
       .catch(() => {
-        if (!cancelled) setError("Unable to load agent session metadata.");
+        if (cancelled) return;
+        setSessionLoadFailed(true);
+        setError(SESSION_LOAD_ERROR);
       });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [sessionAttempt]);
 
   useEffect(() => {
     if (videoRef.current) videoRef.current.srcObject = streamRef.current;
@@ -187,13 +222,18 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
 
   useEffect(() => {
     mutedRef.current = voice.muted;
-  }, [voice.muted]);
+    voiceRef.current = voice;
+  }, [voice]);
 
   useEffect(() => {
     const transport = transportRef.current;
+    const turnGate = turnGateRef.current;
+    const speechGate = speechGateRef.current;
     return () => {
       keepListeningRef.current = false;
       shareGenerationRef.current += 1;
+      turnGate.cancel();
+      speechGate.cancel();
       transport.disconnect();
       streamRef.current?.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
@@ -204,14 +244,6 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
       }
     };
   }, []);
-
-  useEffect(() => {
-    if (skipFirstVoicePersistRef.current) {
-      skipFirstVoicePersistRef.current = false;
-      return;
-    }
-    window.localStorage.setItem(VOICE_SETTINGS_KEY, JSON.stringify(voiceSettings));
-  }, [voiceSettings]);
 
   const appendLine = useCallback((role: TranscriptEntry["role"], text: string) => {
     setTranscript((entries) => [...entries, createTranscriptEntry(role, text, { temporary: true })].slice(-80));
@@ -229,57 +261,15 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
     return next;
   }, [writeSecret]);
 
-  const speakReply = useCallback(async (text: string) => {
-    if (!text.trim()) return;
-    const selected = voiceSettings.provider;
-    if (selected === "openai") {
-      try {
-        const response = await fetch("/api/lifeos/voice/speak", {
-          method: "POST",
-          headers: writeHeaders(),
-          body: JSON.stringify({
-            text,
-            locale: voiceSettings.locale,
-            speed: voiceSettings.speechRate,
-            style: voiceSettings.responseStyle,
-            provider: "openai",
-          }),
-        });
-        if (response.ok) {
-          const blob = await response.blob();
-          if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current.src = "";
-          }
-          const url = URL.createObjectURL(blob);
-          const audio = new Audio(url);
-          audioRef.current = audio;
-          audio.onended = () => {
-            URL.revokeObjectURL(url);
-            setVoice((current) => (current.muted ? muteConversation(current) : { ...current, speaking: false, processing: false, state: keepListeningRef.current ? "listening" : current.state }));
-          };
-          audio.onerror = () => {
-            URL.revokeObjectURL(url);
-            setVoice((current) => failConversation(current, "Server-side TTS playback failed."));
-          };
-          await audio.play();
-          return;
-        }
-      } catch {
-        // Fall through to browser synthesis.
-      }
-    }
+  const micIsLive = useCallback(
+    () => !mutedRef.current && (keepListeningRef.current || transportRef.current.isListening()),
+    [],
+  );
 
-    transportRef.current.speak(text, {
-      rate: voiceSettings.speechRate,
-      pitch: voiceSettings.pitch,
-      lang: voiceSettings.locale,
-      onEnd: () => {
-        setVoice((current) => (current.muted ? muteConversation(current) : { ...current, speaking: false, processing: false, state: keepListeningRef.current ? "listening" : current.state }));
-      },
-      onError: (message) => setVoice((current) => failConversation(current, message)),
-    });
-  }, [writeHeaders, voiceSettings]);
+  const settleVoice = useCallback(() => {
+    const listening = micIsLive();
+    setVoice((current) => settleAfterReply(current, listening));
+  }, [micIsLive]);
 
   const stopPlayback = useCallback(() => {
     transportRef.current.stopSpeaking();
@@ -291,20 +281,113 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
     }
   }, []);
 
-  const sendTurn = useCallback(async (text: string, channel: "text" | "voice") => {
-    if (mutedRef.current && channel === "voice") return;
+  /**
+   * Speaks one reply. Every call starts a new speech generation, so an older
+   * pending OpenAI clip or browser utterance can never play over it, and
+   * Interrupt/Stop/Mute cancel the in-flight /voice/speak request.
+   */
+  const speakReply = useCallback(async (text: string) => {
+    const spoken = text.trim();
+    if (!spoken) return;
+    const speechGate = speechGateRef.current;
+    const generation = speechGate.advance();
     stopPlayback();
-    const normalized = text.trim().toLowerCase();
-    const dedupeKey = `${channel}:${normalized}`;
-    if (!normalized || lastSubmissionRef.current === dedupeKey) return;
-    lastSubmissionRef.current = dedupeKey;
-    if (voice.transcriptPrivacy !== "hidden") appendLine("user", text);
+    const settings = voiceSettings;
+    const decision = resolveSpeechProvider({
+      selected: settings.provider,
+      openai: openaiStatus,
+      ownerSecretPresent: writeSecret.trim().length > 0,
+    });
+    let fallbackReason = decision.fallbackReason;
+
+    if (decision.provider === "openai") {
+      const openaiVoice = settings.openaiVoice || defaultOpenAiVoiceForStyle(settings.responseStyle);
+      let objectUrl: string | null = null;
+      try {
+        const response = await fetch("/api/lifeos/voice/speak", {
+          method: "POST",
+          headers: writeHeaders(),
+          signal: speechGate.signalFor(generation),
+          body: JSON.stringify({
+            text: spoken,
+            locale: toSpeechLang(settings.locale),
+            speed: settings.speechRate,
+            style: settings.responseStyle,
+            provider: "openai",
+            ...(settings.openaiVoice ? { voice: settings.openaiVoice } : {}),
+          }),
+        });
+        if (!speechGate.isCurrent(generation)) return;
+        if (response.ok) {
+          const blob = await response.blob();
+          if (!speechGate.isCurrent(generation)) return;
+          const url = URL.createObjectURL(blob);
+          objectUrl = url;
+          const audio = new Audio(url);
+          audioRef.current = audio;
+          audio.onended = () => {
+            URL.revokeObjectURL(url);
+            if (speechGate.isCurrent(generation)) settleVoice();
+          };
+          audio.onerror = () => {
+            URL.revokeObjectURL(url);
+            if (speechGate.isCurrent(generation)) setVoice((current) => failConversation(current, "Server-side TTS playback failed."));
+          };
+          await audio.play();
+          if (!speechGate.isCurrent(generation)) return;
+          setSpeechRuntime({ provider: "openai", voice: openaiVoice, fallbackReason: null });
+          return;
+        }
+        const payload = await response.json().catch(() => null) as { error?: string } | null;
+        fallbackReason = `OpenAI unavailable: ${payload?.error || `the server returned ${response.status}.`}`;
+      } catch (caught) {
+        if (isAbortError(caught) || !speechGate.isCurrent(generation)) return;
+        if (objectUrl) URL.revokeObjectURL(objectUrl);
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current = null;
+        }
+        fallbackReason = `OpenAI unavailable: ${caught instanceof Error && caught.message ? caught.message : "the request failed."}`;
+      }
+    }
+
+    if (!speechGate.isCurrent(generation)) return;
+    const outcome = transportRef.current.speak(spoken, {
+      rate: settings.speechRate,
+      pitch: settings.pitch,
+      lang: settings.locale,
+      voiceURI: settings.browserVoiceURI || undefined,
+      onEnd: () => {
+        if (speechGate.isCurrent(generation)) settleVoice();
+      },
+      onError: (message) => {
+        if (speechGate.isCurrent(generation)) setVoice((current) => failConversation(current, message));
+      },
+    });
+    if (outcome.started) {
+      setSpeechRuntime({ provider: "browser", voice: outcome.voiceName, fallbackReason });
+    } else {
+      setSpeechRuntime({ provider: "none", voice: null, fallbackReason: outcome.error ?? "speech synthesis is unavailable." });
+      settleVoice();
+    }
+  }, [openaiStatus, settleVoice, stopPlayback, voiceSettings, writeHeaders, writeSecret]);
+
+  const runTurn = useCallback(async (text: string, channel: "text" | "voice", turnId: number) => {
+    const guard = turnGuardRef.current;
+    const turnGate = turnGateRef.current;
+    const generation = turnGate.advance();
+    speechGateRef.current.cancel();
+    stopPlayback();
+    setTurnNotice(null);
+    const privacy = voiceRef.current.transcriptPrivacy;
+    if (privacy !== "hidden") appendLine("user", text);
     setVoice((current) => markThinking(current));
     setActivity((events) => appendActivity(events, createActivityEvent("mission-started", "Sending owner request.")));
     try {
       const response = await fetch("/api/lifeos/agent/turn", {
         method: "POST",
         headers: headers(),
+        signal: turnGate.signalFor(generation),
         body: JSON.stringify({
           sessionId: sessionId(),
           text,
@@ -312,79 +395,140 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
           screen: awareness,
           paused,
           pendingApprovals: approvals,
-          transcriptPrivacy: voice.transcriptPrivacy,
+          transcriptPrivacy: privacy,
+          responseStyle: voiceSettings.responseStyle,
         }),
       });
       const payload = await response.json();
+      // Interrupt / Stop cancelled this turn: never apply or speak a stale reply.
+      if (!turnGate.isCurrent(generation)) return;
+      guard.finish(turnId, Date.now());
       if (!response.ok || !payload.ok) throw new Error(payload.error || "Agent turn failed.");
       const next = payload.result as AgentTurnResult;
       setResult(next);
       setApprovals(next.approvals);
       setTeaching(next.teaching);
       setActivity((events) => [...events, ...next.activity].slice(-80));
-      if (voice.transcriptPrivacy !== "hidden") appendLine("lifeos", next.reply);
-      if (mutedRef.current || voice.muted || !voice.startedAt) {
-        setVoice((current) => ({ ...current, processing: false, state: current.muted ? "muted" : current.state === "stopped" ? "stopped" : "listening" }));
+      setError(null);
+      if (voiceRef.current.transcriptPrivacy !== "hidden") appendLine("lifeos", next.reply);
+      const session = voiceRef.current;
+      const speakAloud = !mutedRef.current && !session.muted && Boolean(session.startedAt) && session.state !== "stopped";
+      if (!speakAloud) {
+        settleVoice();
         return;
       }
       setVoice((current) => markSpeaking(current));
       await speakReply(next.spokenReply);
     } catch (caught) {
+      if (isAbortError(caught) || !turnGate.isCurrent(generation)) return;
+      guard.finish(turnId, Date.now());
       const message = caught instanceof Error ? caught.message : "Agent turn failed.";
       setError(message);
       setVoice((current) => failConversation(current, message));
       appendLine("error", message);
-    } finally {
-      window.setTimeout(() => {
-        if (lastSubmissionRef.current === dedupeKey) lastSubmissionRef.current = "";
-      }, 1200);
     }
-  }, [appendLine, approvals, awareness, headers, paused, speakReply, stopPlayback, voice.muted, voice.startedAt, voice.transcriptPrivacy]);
+  }, [appendLine, approvals, awareness, headers, paused, settleVoice, speakReply, stopPlayback, voiceSettings.responseStyle]);
+
+  /** Returns false when the transcript was not sent (turn in flight, duplicate, muted, empty). */
+  const submitTurn = useCallback((text: string, channel: "text" | "voice"): boolean => {
+    if (mutedRef.current && channel === "voice") return false;
+    const decision = turnGuardRef.current.tryBegin(text, Date.now());
+    if (!decision.accepted) {
+      if (decision.reason !== "empty") setTurnNotice(describeRejectedTurn(decision.reason, text));
+      return false;
+    }
+    void runTurn(text, channel, decision.id);
+    return true;
+  }, [runTurn]);
+
+  useEffect(() => {
+    submitTurnRef.current = submitTurn;
+  }, [submitTurn]);
+
+  const handleRecognitionError = useCallback((code: string) => {
+    const classified = classifyRecognitionError(code);
+    if (classified.kind === "ignore") return;
+    // Stop auto-restart so a persistent failure cannot loop; "Try again" recovers.
+    keepListeningRef.current = false;
+    transportRef.current.stopListening();
+    if (classified.kind === "permission") setVoice((current) => denyMicrophone(current));
+    else setVoice((current) => failConversation(current, classified.message));
+    setActivity((events) => appendActivity(events, createActivityEvent("recoverable-error", classified.message)));
+  }, []);
 
   const beginListening = useCallback(async (continuous: boolean) => {
     if (mutedRef.current) return;
+    const transport = transportRef.current;
+    const mode = continuous ? "conversation" : "push-to-talk";
+    if (transport.isListening() && keepListeningRef.current === continuous) {
+      // Start/Resume while already listening is a no-op: no abort, no restart cycle.
+      const busy = (state: ConversationVoiceSession["state"]) => state === "listening" || state === "thinking" || state === "speaking";
+      setVoice((current) => (busy(current.state) ? current : startConversation(current, new Date().toISOString(), mode)));
+      return;
+    }
     keepListeningRef.current = continuous;
-    const allowed = await transportRef.current.requestPermission();
+    const allowed = await transport.requestPermission();
     if (!allowed) {
+      keepListeningRef.current = false;
       setVoice((current) => denyMicrophone(current));
       return;
     }
-    setVoice((current) => startConversation(current, new Date().toISOString()));
+    if (mutedRef.current) return;
+    setError(null);
+    setMicEverStarted(true);
+    setVoice((current) => startConversation(current, new Date().toISOString(), mode));
     setActivity((events) => appendActivity(events, createActivityEvent("session-started", "Voice conversation started.")));
-    await transportRef.current.startListening({
+    await transport.startListening({
       lang: voiceSettings.transcriptionLanguage,
       continuous,
       onInterim: (text) => {
-        if (mutedRef.current || voice.transcriptPrivacy === "hidden") return;
+        if (mutedRef.current || voiceRef.current.transcriptPrivacy === "hidden") return;
         setTranscript((entries) => {
           const without = entries.filter((entry) => !(entry.role === "user" && entry.interim));
           return [...without, createTranscriptEntry("user", text, { interim: true, temporary: true })];
         });
       },
       onFinal: (text) => {
-        if (mutedRef.current) return;
-        if (text) {
-          stopPlayback();
-          void sendTurn(text, "voice");
-        }
+        if (mutedRef.current || !text) return;
+        submitTurnRef.current?.(text, "voice");
       },
-      onError: (message) => setVoice((current) => failConversation(current, message)),
+      onError: handleRecognitionError,
       onEnd: () => {
         if (keepListeningRef.current && !mutedRef.current) {
           void restartListeningRef.current?.(true);
         }
       },
     });
-  }, [sendTurn, stopPlayback, voice.transcriptPrivacy, voiceSettings.transcriptionLanguage]);
+  }, [handleRecognitionError, voiceSettings.transcriptionLanguage]);
 
   useEffect(() => {
     restartListeningRef.current = beginListening;
   }, [beginListening]);
 
+  /** Cancels the in-flight turn, any pending server speech, and current playback. */
+  function cancelPendingWork(): boolean {
+    const hadPendingTurn = turnGuardRef.current.inFlight;
+    turnGateRef.current.cancel();
+    speechGateRef.current.cancel();
+    turnGuardRef.current.cancel();
+    stopPlayback();
+    return hadPendingTurn;
+  }
+
+  function interruptAssistant() {
+    const hadPendingTurn = cancelPendingWork();
+    const listening = micIsLive();
+    setVoice((current) => interruptSpeech(current, listening));
+    if (hadPendingTurn) {
+      setTurnNotice("Interrupted. The pending reply was cancelled and will not be spoken.");
+      setActivity((events) => appendActivity(events, createActivityEvent("agent-stopped", "Owner interrupted; pending reply cancelled.")));
+    }
+  }
+
   function endVoice() {
     keepListeningRef.current = false;
     transportRef.current.disconnect();
-    stopPlayback();
+    cancelPendingWork();
     setVoice((current) => stopConversation(current));
     setActivity((events) => appendActivity(events, createActivityEvent("session-stopped", "Voice conversation stopped.")));
   }
@@ -404,17 +548,29 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
     keepListeningRef.current = false;
     mutedRef.current = true;
     transportRef.current.stopListening();
+    speechGateRef.current.cancel();
     stopPlayback();
     setVoice((current) => muteConversation(current));
   }
 
   function unmuteMic() {
     mutedRef.current = false;
-    const continuous = voice.mode !== "push-to-talk";
+    const resume = listeningModeAfterUnmute(voice);
     setVoice((current) => unmuteConversation(current));
-    if (voice.state !== "stopped" && voice.startedAt) {
-      void beginListening(continuous);
-    }
+    if (resume === "continuous") void beginListening(true);
+  }
+
+  function recoverVoice() {
+    const plan = recoveryPlan(voice);
+    setError(null);
+    setTurnNotice(null);
+    keepListeningRef.current = false;
+    transportRef.current.stopListening();
+    setVoice((current) => recoverConversation(current));
+    setActivity((events) => appendActivity(events, createActivityEvent("session-started", "Owner chose Try again; voice recovered without reload.")));
+    // Re-request session metadata (tools, provider status) if it failed to load.
+    if (sessionLoadFailed) setSessionAttempt((attempt) => attempt + 1);
+    if (plan === "listen") void beginListening(true);
   }
 
   async function shareScreen() {
@@ -483,11 +639,21 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   const visibleTranscript = voice.transcriptPrivacy === "hidden" ? [] : transcript;
   const voiceLabel = describeConversationVoice(voice);
   const screenLabel = describeScreenShare(screen, nowMs);
+  const alertMessage = error ?? (voice.state === "error" || voice.state === "permission-denied" ? voiceLabel : null);
+  const capabilityNotes = capabilities ? describeCapabilityNotes(capabilities) : [];
+  const unavailableProviders = availableProviders.filter((provider) => !provider.configured);
+  const openaiSelectable = Boolean(openaiStatus?.configured);
+  const speechLocale = toSpeechLang(voiceSettings.locale);
+  const showNoVoiceWarning = nextSpeech.provider === "browser" && browserVoices.loaded && localeVoices.length === 0;
+  const voiceSelectValue = voiceSettings.provider === "openai" ? voiceSettings.openaiVoice : (selectedBrowserVoice?.voiceURI ?? "");
+  const nextVoiceLabel = nextSpeech.provider === "openai"
+    ? `OpenAI voice (${voiceSettings.openaiVoice || defaultOpenAiVoiceForStyle(voiceSettings.responseStyle)})`
+    : `Browser voice (${selectedBrowserVoice?.name ?? "system default"})`;
 
   return (
     <div className={styles.workspace}>
       <section className={styles.panel} aria-label="Conversation">
-        <h2>Conversation</h2>
+        <h2 id="conversation-heading" tabIndex={-1}>Conversation</h2>
         <div className={styles.statusRow} aria-live="polite">
           <span className={styles.badge} data-tone={voice.microphoneOpen ? "ok" : "warn"}>{voiceLabel}</span>
           <span className={styles.badge} data-voice-state={voice.state}>State: {voice.state}</span>
@@ -495,13 +661,26 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
           <span className={styles.badge}>Duration {formatDuration(voice.durationMs)}</span>
           <span className={styles.badge}>Audio recording off</span>
         </div>
-        <div className={styles.toolbar} role="toolbar" aria-label="Voice controls">
+        <p className={styles.runtime} role="status" aria-live="polite" data-testid="speech-runtime">
+          {describeSpeechRuntime(speechRuntime)}
+        </p>
+        {!micEverStarted ? (
+          <p className={styles.note} data-testid="voice-privacy-note">
+            Privacy: when you start the microphone, speech recognition audio is processed by your browser or operating
+            system&apos;s speech service. When OpenAI voice is used, the reply text is sent to OpenAI to create audio.
+            Nothing is recorded or stored by LifeOS.
+          </p>
+        ) : null}
+        {capabilityNotes.map((note) => (
+          <p key={note} className={styles.note} data-testid="voice-capability-note">{note}</p>
+        ))}
+        <div className={`${styles.toolbar} ${styles.voiceControls}`} role="toolbar" aria-label="Voice controls">
           <button type="button" onClick={() => void beginListening(true)}>Start conversation</button>
           <button type="button" onClick={endVoice}>Stop conversation</button>
           <button type="button" onClick={muteMic} disabled={voice.muted}>Mute microphone</button>
           <button type="button" onClick={unmuteMic} disabled={!voice.muted}>Unmute microphone</button>
-          <button type="button" onClick={() => { stopPlayback(); setVoice((current) => interruptSpeech(current)); }}>Interrupt assistant</button>
-          <button type="button" onClick={() => { setVoice((current) => resumeConversation(current)); void beginListening(true); }}>Resume conversation</button>
+          <button type="button" onClick={interruptAssistant}>Interrupt assistant</button>
+          <button type="button" onClick={() => { setError(null); setVoice((current) => resumeConversation(current)); void beginListening(true); }}>Resume conversation</button>
           <button
             type="button"
             aria-label="Push to talk"
@@ -538,6 +717,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
             Transcript {voice.transcriptPrivacy === "hidden" ? "hidden" : "visible"}
           </button>
         </div>
+        {turnNotice ? <p className={styles.note} role="status" data-testid="turn-notice">{turnNotice}</p> : null}
         <div className={styles.transcript} aria-label="Transcript">
           {!visibleTranscript.length ? <p>Transcript is empty or hidden. Nothing is stored as a permanent recording.</p> : null}
           {visibleTranscript.map((entry) => (
@@ -550,8 +730,8 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
             event.preventDefault();
             const text = draft.trim();
             if (!text) return;
-            setDraft("");
-            void sendTurn(text, "text");
+            // Keep the draft when the turn was not sent (another turn in flight or a duplicate).
+            if (submitTurn(text, "text")) setDraft("");
           }}
         >
           <label>
@@ -560,7 +740,12 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
           </label>
           <button type="submit">Send</button>
         </form>
-        {error ? <p role="alert">{error}</p> : null}
+        {alertMessage ? (
+          <div className={styles.alert}>
+            <p role="alert">{alertMessage}</p>
+            <button type="button" onClick={recoverVoice}>Try again</button>
+          </div>
+        ) : null}
       </section>
 
       <section className={styles.panel} aria-label="Voice settings">
@@ -570,43 +755,68 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
             Provider
             <select
               value={voiceSettings.provider}
-              onChange={(event) => setVoiceSettings((current) => ({ ...current, provider: event.target.value === "openai" ? "openai" : "browser" }))}
+              onChange={(event) => updateVoiceSettings({ provider: event.target.value === "openai" ? "openai" : "browser" })}
             >
-              {availableProviders.filter((provider) => provider.configured).map((provider) => (
-                <option key={provider.id} value={provider.id}>{provider.id}</option>
-              ))}
-              {!availableProviders.some((provider) => provider.configured) ? <option value="browser">browser</option> : null}
+              <option value="browser">Browser voice (free, on this device)</option>
+              <option value="openai" disabled={!openaiSelectable}>
+                {openaiSelectable ? "OpenAI voice (owner secret required)" : "OpenAI voice (unavailable)"}
+              </option>
             </select>
           </label>
           <label>
             Locale
             <select
               value={voiceSettings.locale}
-              onChange={(event) => setVoiceSettings((current) => ({ ...current, locale: event.target.value }))}
+              onChange={(event) => updateVoiceSettings({ locale: event.target.value, browserVoiceURI: "" })}
             >
-              <option value="en-US">English (US)</option>
-              <option value="en-GB">English (UK)</option>
-              <option value="zh-TW">中文（台灣）</option>
-              <option value="fr-FR">Français</option>
+              {localeOptionsWith(voiceSettings.locale).map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Voice
+            <select
+              value={voiceSelectValue}
+              onChange={(event) => {
+                const value = event.target.value;
+                if (voiceSettings.provider === "openai") updateVoiceSettings({ openaiVoice: isOpenAiTtsVoice(value) ? value : "" });
+                else updateVoiceSettings({ browserVoiceURI: value });
+              }}
+            >
+              {voiceSettings.provider === "openai" ? (
+                <>
+                  <option value="">Style default ({defaultOpenAiVoiceForStyle(voiceSettings.responseStyle)})</option>
+                  {OPENAI_TTS_VOICES.map((item) => (
+                    <option key={item} value={item}>{item}</option>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <option value="">System default</option>
+                  {localeVoices.map((item) => (
+                    <option key={item.voiceURI} value={item.voiceURI}>{item.name}</option>
+                  ))}
+                </>
+              )}
             </select>
           </label>
           <label>
             Input language
             <select
               value={voiceSettings.transcriptionLanguage}
-              onChange={(event) => setVoiceSettings((current) => ({ ...current, transcriptionLanguage: event.target.value }))}
+              onChange={(event) => updateVoiceSettings({ transcriptionLanguage: event.target.value })}
             >
-              <option value="en-US">English (US)</option>
-              <option value="en-GB">English (UK)</option>
-              <option value="zh-TW">中文（台灣）</option>
-              <option value="fr-FR">Français</option>
+              {localeOptionsWith(voiceSettings.transcriptionLanguage).map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
             </select>
           </label>
           <label>
             Response style
             <select
               value={voiceSettings.responseStyle}
-              onChange={(event) => setVoiceSettings((current) => ({ ...current, responseStyle: event.target.value as ResponseStyle }))}
+              onChange={(event) => updateVoiceSettings({ responseStyle: isResponseStyle(event.target.value) ? event.target.value : "balanced" })}
             >
               <option value="balanced">Balanced</option>
               <option value="concise">Concise</option>
@@ -621,7 +831,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
               max={2}
               step={0.1}
               value={voiceSettings.speechRate}
-              onChange={(event) => setVoiceSettings((current) => ({ ...current, speechRate: Number(event.target.value) }))}
+              onChange={(event) => updateVoiceSettings({ speechRate: Number(event.target.value) })}
             />
           </label>
           <label>
@@ -632,14 +842,24 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
               max={2}
               step={0.1}
               value={voiceSettings.pitch}
-              onChange={(event) => setVoiceSettings((current) => ({ ...current, pitch: Number(event.target.value) }))}
+              onChange={(event) => updateVoiceSettings({ pitch: Number(event.target.value) })}
             />
           </label>
           <button type="button" onClick={() => void speakReply("This is your current LifeOS voice preview.")}>Preview voice</button>
-          <button type="button" onClick={() => setVoiceSettings(DEFAULT_VOICE_SETTINGS)}>Reset to default</button>
+          <button type="button" onClick={() => writeStoredVoiceSettings(DEFAULT_VOICE_SETTINGS)}>Reset to default</button>
         </div>
-        <p>Active provider: {activeProvider}. Fallback: {fallbackProvider}.</p>
-        {availableProviders.filter((provider) => !provider.configured).map((provider) => (
+        <p>Next reply: {nextVoiceLabel}. Fallback: {fallbackProvider}.</p>
+        {voiceSettings.provider === "openai" && nextSpeech.fallbackReason ? (
+          <p className={styles.warning} data-testid="openai-fallback-note">{nextSpeech.fallbackReason} Replies use the browser voice until then.</p>
+        ) : null}
+        {showNoVoiceWarning ? (
+          <p className={styles.warning} role="status" data-testid="no-voice-warning">
+            No installed browser voice matches {speechLocale}. LifeOS will not switch languages: replies stay in {speechLocale}, but
+            your browser may read them with its default voice or stay silent. Install a voice for {speechLocale} in your
+            operating system settings, or choose OpenAI voice.
+          </p>
+        ) : null}
+        {unavailableProviders.map((provider) => (
           <p key={provider.id}>{provider.id} unavailable: {provider.reason}</p>
         ))}
       </section>
@@ -683,7 +903,10 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
               aria-describedby="approval-write-secret-help"
             />
           </label>
-          <p id="approval-write-secret-help">Required to approve or reject writes. Voice session tokens cannot authorize Slack, ClickUp, n8n, Vercel, or other external actions. This value is not stored.</p>
+          <p id="approval-write-secret-help">
+            Required to approve or reject writes, and to authorize OpenAI voice (enter LIFEOS_TTS_SECRET or LIFEOS_WRITE_SECRET).
+            Voice session tokens cannot authorize Slack, ClickUp, n8n, Vercel, or other external actions. This value is not stored.
+          </p>
           <ul className={styles.list} aria-label="Approvals">
             {approvals.filter((item) => item.decision === "pending").map((item) => (
               <li key={item.id}>

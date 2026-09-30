@@ -66,6 +66,61 @@
   cursor: not-allowed;
 }
 
+/* Primary voice controls: 44px touch targets and readable (>= 0.95rem) labels. */
+.voiceControls button,
+.alert button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 10px 14px;
+  font: 700 0.95rem Arial, Helvetica, sans-serif;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.alert button {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.alert button:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.alert button:focus-visible,
+.panel select:focus-visible,
+.panel h2:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel .runtime,
+.panel .note,
+.panel .warning {
+  font-size: 0.85rem;
+}
+
+.panel .warning {
+  padding-left: 8px;
+  border-left: 3px solid var(--amber);
+}
+
+.panel select {
+  max-width: 100%;
+  min-width: 0;
+}
+
 .toolbar button:focus-visible,
 .composer button:focus-visible,
 .composer textarea:focus-visible,
@@ -146,6 +201,8 @@
 .panel label {
   display: grid;
   gap: 4px;
+  min-width: 0;
+  max-width: 100%;
   font-size: 0.78rem;
 }
 
@@ -183,5 +240,6 @@
   .toolbar button,
   .composer button {
     flex: 1 1 calc(50% - 8px);
+    min-width: 0;
   }
 }
