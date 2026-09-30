@@ -733,7 +733,7 @@ This is supplemental only. It does **not** replace the complete parallel suite r
 
 ### Remaining credential-only or local-UI-only actions
 
-1. On the owner's instruction, PR #74 was merged (`62a9df9`), and the closeout PR #75 was merged once green. Confirm the production deployment is READY before acceptance.
+1. On the owner's instruction, PR #74 was merged (`62a9df9`). The closeout PR #75, which carries this report, is to be merged once green. Its merge SHA and production deployment are recorded in a post-merge status update. Confirm the production deployment is READY before acceptance.
 2. Configure the governed write credentials (`LIFEOS_WRITE_SECRET`, `LIFEOS_GITHUB_TOKEN`, `LIFEOS_ALLOWED_ORIGIN`) and, for approvals, Upstash Redis. Only if writes are intended.
 3. Optional paid voice: `OPENAI_API_KEY` (billing decision).
 4. Owner-only live checks:

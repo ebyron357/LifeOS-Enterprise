@@ -90,6 +90,37 @@ describe("workspace layout storage", () => {
     expect(describeLayoutRepairs(result.repairs)).toBe("Layout checked: no problems found.");
   });
 
+  it("fits off-grid, oversized, and fractional items to each breakpoint's columns", () => {
+    const defaults = createDefaultWorkspaceLayout();
+    const layouts = JSON.parse(JSON.stringify(defaults.layouts)) as typeof defaults.layouts;
+    layouts.lg[0] = { ...layouts.lg[0], x: 12, w: 4 };
+    layouts.xs[0] = { ...layouts.xs[0], w: 99 };
+    layouts.md[0] = { ...layouts.md[0], x: 1.5 };
+    const raw = JSON.stringify({ ...defaults, layouts });
+
+    const result = repairWorkspaceLayout(raw);
+    const lg = result.state.layouts.lg.find((item) => item.i === layouts.lg[0].i)!;
+    const xs = result.state.layouts.xs.find((item) => item.i === layouts.xs[0].i)!;
+    const md = result.state.layouts.md.find((item) => item.i === layouts.md[0].i)!;
+    expect(lg.x + lg.w).toBeLessThanOrEqual(12);
+    expect(lg).toMatchObject({ x: 8, w: 4 });
+    expect(xs.w).toBe(4);
+    expect(Number.isInteger(md.x)).toBe(true);
+    expect(result.repairs.join(" ")).toMatch(/Moved or resized to fit the grid: .*\(lg\).*\(md\).*\(xs\)|Moved or resized to fit the grid/);
+    expect(repairWorkspaceLayout(serializeWorkspaceLayout(result.state)).repairs).toEqual([]);
+  });
+
+  it("reports missing widget settings and order as repairs", () => {
+    const defaults = createDefaultWorkspaceLayout();
+    const { widgets: _widgets, widgetOrder: _order, ...rest } = defaults;
+    void _widgets;
+    void _order;
+    const result = repairWorkspaceLayout(JSON.stringify(rest));
+    expect(result.repairs).toContain("Widget show/hide settings were missing and were rebuilt from defaults.");
+    expect(result.repairs).toContain("Widget order was missing and was rebuilt from the default order.");
+    expect(describeLayoutRepairs(result.repairs)).not.toBe("Layout checked: no problems found.");
+  });
+
   it("normalizes a deliberately corrupted stored layout and lists each repair", () => {
     const defaults = createDefaultWorkspaceLayout();
     const corrupted = {

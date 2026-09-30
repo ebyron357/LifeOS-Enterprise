@@ -55,7 +55,7 @@ const README = [
 ].join("\n");
 
 /** In-memory GitHub: the vault repository (branches, files, pull requests) plus a public candidate repository. */
-function fakeGitHub(options: { override?: Override; mainFiles?: Record<string, string>; branches?: string[] } = {}) {
+function fakeGitHub(options: { override?: Override; mainFiles?: Record<string, string>; branches?: string[]; openPulls?: FakePull[] } = {}) {
   let shaCounter = 0;
   let pullCounter = 100;
   const branches = new Map<string, Map<string, StoredFile>>();
@@ -65,7 +65,7 @@ function fakeGitHub(options: { override?: Override; mainFiles?: Record<string, s
   }
   branches.set("main", main);
   for (const branch of options.branches ?? []) branches.set(branch, new Map(main));
-  const pulls: FakePull[] = [];
+  const pulls: FakePull[] = [...(options.openPulls ?? [])];
   const calls: Array<{ method: string; pathname: string; body: Record<string, unknown> | null }> = [];
 
   const fetchMock = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
@@ -401,6 +401,25 @@ describe("Resource Intelligence intake route", () => {
     expect(gh.file(leftover, candidatePath)).toBeNull();
     expect(gh.file(created[0], candidatePath)).toContain('source_identity: "github:vercel-labs/knowledge-agent-template"');
     expect(gh.pulls).toHaveLength(1);
+  });
+
+  it("never reuses an intake PR the owner marked ready for review; it opens a new draft instead", async () => {
+    enableWrites();
+    const readyBranch = `${candidatePrefix}aaaaaaaaaa`;
+    const gh = fakeGitHub({
+      branches: [readyBranch],
+      openPulls: [{ number: 90, state: "open", draft: false, head: readyBranch, html_url: "https://github.com/ebyron357/LifeOS-Enterprise/pull/90" }],
+    });
+    vi.stubGlobal("fetch", gh.fetchMock);
+
+    const response = await POST(request());
+    const result = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(result.pullRequest).toMatchObject({ reused: false, draft: true });
+    expect(result.pullRequest.number).not.toBe(90);
+    expect(gh.file(readyBranch, candidatePath)).toBeNull();
+    expect(gh.calls.some((call) => call.method === "PUT" && call.body?.branch === readyBranch)).toBe(false);
   });
 
   it("keeps simultaneous first captures on separate branches so neither can overwrite the other", async () => {

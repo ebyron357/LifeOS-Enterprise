@@ -146,7 +146,7 @@ A re-capture refreshes `processor_route` and `next_action` only while they still
 
 Exact identity dedupe reads `main`. To stop repeated captures of the same resource from opening competing draft PRs before the first one merges, every intake branch for one record shares a prefix: `lifeos/resource-intake/<record slug>--`. Each request stages on its **own** new branch, `<prefix><10-hex nonce>`.
 
-- Before opening a PR, intake looks for an **open** pull request into `main` whose head branch starts with that prefix.
+- Before opening a PR, intake looks for an open **draft** pull request into `main` whose head branch starts with that prefix. A PR the owner has marked ready for review is never modified; a later capture opens a new draft instead.
 - If one exists, intake reads the record from that PR's branch and applies the normal duplicate update (capture count, Capture History, Source Evidence). It commits to that branch and returns the existing PR with `duplicateOf` and `dedupe: open-draft-pr`. No new PR is opened.
 - Otherwise intake creates its own branch from the current `main`, writes the record there, and opens a new draft PR.
 - **No branch is ever force-moved or reset.** A leftover branch from a merged or closed intake PR is simply ignored. Because each request uses its own branch, two simultaneous captures can never overwrite or delete each other's work. In the worst case, two captures submitted within the same second both open a draft PR, and the owner closes the extra one.

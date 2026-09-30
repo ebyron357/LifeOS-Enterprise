@@ -22,7 +22,7 @@ All notable changes to LifeOS Enterprise are documented in this file.
 ### Fixed — widgets and game loop (#42)
 
 - A per-widget error boundary plus `app/error.tsx` and `app/global-error.tsx`, so one failing widget no longer takes down the page. Browser storage failures surface a diagnostic instead of throwing.
-- **Repair layout** now removes unknown/duplicate ids, restores missing widgets, clears stale focus, and lists what it fixed. If the browser refuses to save, it says so instead of claiming success. Mobile reorder skips hidden widgets.
+- **Repair layout** now removes unknown/duplicate ids, restores missing widgets, fits off-grid or oversized items to each breakpoint's columns, reports missing settings, clears stale focus, and lists what it fixed. If the browser refuses to save, it says so instead of claiming success. Mobile reorder skips hidden widgets.
 - **Reset game** and **Restore default layout** ask first. The game keeps a backup of the previous state.
 - Streak recovery restores the pre-gap streak. Boss battles require every step before they can be claimed. A boss saved without steps is never claimable, and repair rebuilds its steps.
 - Side quests (health, learning, money, relationships, service, personal growth) are derived only from canonical vault records.

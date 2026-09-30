@@ -136,8 +136,8 @@ export async function findOpenPullRequestForBranch(branch: string, token: string
 }
 
 /**
- * Finds the oldest open pull request into `main` whose head branch starts with `prefix` in the
- * canonical vault repository (the open intake PR for one Resource record, whatever its nonce).
+ * Finds the oldest open **draft** pull request into `main` whose head branch starts with `prefix` in
+ * the canonical vault repository (the open intake PR for one Resource record, whatever its nonce).
  */
 export async function findOpenPullRequestByBranchPrefix(prefix: string, token: string): Promise<OpenPullRequest | null> {
   const repository = `${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}`.toLowerCase();
@@ -150,6 +150,9 @@ export async function findOpenPullRequestByBranchPrefix(prefix: string, token: s
     const match = list
       .filter((candidate) =>
         candidate?.state === "open"
+        // Only draft PRs are reused: once the owner marks an intake PR ready for review, its
+        // content is frozen and a later capture opens a new draft instead.
+        && candidate.draft !== false
         && typeof candidate.head?.ref === "string"
         && candidate.head.ref.startsWith(prefix)
         && (!candidate.head.repo?.full_name || candidate.head.repo.full_name.toLowerCase() === repository))

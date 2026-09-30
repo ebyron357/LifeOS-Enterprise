@@ -2,6 +2,7 @@ import {
   COMMAND_CENTER_WIDGET_IDS,
   COMMAND_CENTER_WIDGET_META,
   createDefaultWorkspaceLayout,
+  WORKSPACE_GRID_COLS,
   WORKSPACE_LAYOUT_VERSION,
 } from "./default-layout";
 import type { BreakpointLayouts, CommandCenterWidgetId, LayoutItem, WorkspaceId, WorkspaceLayoutState } from "./types";
@@ -193,6 +194,15 @@ function hasSaneGeometry(item: LayoutItem): boolean {
   return item.x >= 0 && item.y >= 0 && item.w >= 1 && item.h >= 1;
 }
 
+/** Snaps an item to whole grid units and fits it inside `cols` columns. */
+function clampToGrid(item: LayoutItem, cols: number): LayoutItem {
+  const w = Math.min(cols, Math.max(1, Math.round(item.w)));
+  const x = Math.min(cols - w, Math.max(0, Math.round(item.x)));
+  const y = Math.max(0, Math.round(item.y));
+  const h = Math.max(1, Math.round(item.h));
+  return { ...item, x, y, w, h };
+}
+
 /**
  * Normalizes a stored layout instead of only re-parsing it: drops unknown or duplicate
  * widgets, restores missing default items, fixes invalid chrome values, and clears a stale
@@ -225,6 +235,7 @@ export function repairWorkspaceLayout(raw: string | null): LayoutRepairResult {
   const duplicateIds = new Set<string>();
   const restoredIds = new Set<string>();
   const rebuiltBreakpoints: string[] = [];
+  const clampedItems: string[] = [];
   let invalidItems = 0;
 
   const rawLayouts = asRecord(input.layouts);
@@ -253,7 +264,11 @@ export function repairWorkspaceLayout(raw: string | null): LayoutRepairResult {
         continue;
       }
       seen.add(item.i);
-      items.push(item);
+      const fitted = clampToGrid(item, WORKSPACE_GRID_COLS[key]);
+      if (fitted.x !== item.x || fitted.y !== item.y || fitted.w !== item.w || fitted.h !== item.h) {
+        clampedItems.push(`${widgetTitle(item.i)} (${key})`);
+      }
+      items.push(fitted);
     }
     for (const fallbackItem of defaults.layouts[key]) {
       if (seen.has(fallbackItem.i)) continue;
@@ -264,7 +279,8 @@ export function repairWorkspaceLayout(raw: string | null): LayoutRepairResult {
   }
 
   const rawWidgets = asRecord(input.widgets);
-  if (input.widgets !== undefined && !rawWidgets) repairs.push("Widget show/hide settings were invalid and were reset.");
+  if (input.widgets === undefined) repairs.push("Widget show/hide settings were missing and were rebuilt from defaults.");
+  else if (!rawWidgets) repairs.push("Widget show/hide settings were invalid and were reset.");
   for (const key of Object.keys(rawWidgets ?? {})) {
     if (!known.has(key)) unknownIds.add(key);
   }
@@ -303,7 +319,9 @@ export function repairWorkspaceLayout(raw: string | null): LayoutRepairResult {
     const missing = defaults.widgetOrder.filter((id) => !seen.has(id));
     if (missing.length) repairs.push(`Added missing widgets back to the order: ${missing.map(widgetTitle).join(", ")}.`);
     widgetOrder = [...order, ...missing];
-  } else if (input.widgetOrder !== undefined) {
+  } else if (input.widgetOrder === undefined) {
+    repairs.push("Widget order was missing and was rebuilt from the default order.");
+  } else {
     repairs.push("Widget order was invalid and was reset to the default order.");
   }
 
@@ -312,6 +330,7 @@ export function repairWorkspaceLayout(raw: string | null): LayoutRepairResult {
   if (invalidItems) repairs.push(`Dropped ${invalidItems} layout item${invalidItems === 1 ? "" : "s"} with invalid geometry.`);
   if (rebuiltBreakpoints.length) repairs.push(`Rebuilt the ${rebuiltBreakpoints.join(", ")} layout from defaults.`);
   if (restoredIds.size) repairs.push(`Restored default positions for: ${[...restoredIds].map(widgetTitle).join(", ")}.`);
+  if (clampedItems.length) repairs.push(`Moved or resized to fit the grid: ${clampedItems.join(", ")}.`);
   if (fixedChrome.length) repairs.push(`Fixed invalid show/hide or minimize values for: ${fixedChrome.join(", ")}.`);
 
   let focusedWidgetId: string | null = null;

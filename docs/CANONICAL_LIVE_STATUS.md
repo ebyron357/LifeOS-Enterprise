@@ -283,7 +283,7 @@ These are agent validation records, not owner acceptance.
 
 Each item is written step-by-step in `80 SOPs/LifeOS Owner's Operating Manual.md` (Part K for credentials, Part J and `docs/OWNER_ACCEPTANCE_WORKBOOK.md` for acceptance).
 
-1. PR #74 (MAPS) and the 2026-09-30 closeout PR #75 were merged on the owner's instruction on 2026-09-30. Confirm the resulting production deployment is READY (step 2) before starting acceptance.
+1. PR #74 (MAPS) was merged on the owner's instruction on 2026-09-30 (`62a9df9`). The closeout PR #75, which carries this edition, is to be merged once green, with its merge SHA recorded in a post-merge status update. Confirm the resulting production deployment is READY (step 2) before starting acceptance.
 2. At the start of the acceptance session, query Vercel and record the exact READY production deployment ID + SHA in the workbook.
 3. Complete the workbook's live checks on desktop and phone: navigation journeys, widgets and game, and voice with a real microphone and speakers (voice choice, preview, interrupt, mute, recovery, persistence). Also check screen share request, deny, and stop.
 4. Decide whether to enable governed writes, and only then configure the credentials together:

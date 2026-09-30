@@ -49,14 +49,21 @@ function readRaw() {
   }
 }
 
-/** Returns false when the browser refused the write (quota, private mode, or storage disabled). */
+/** Returns false when the browser refused the layout write (quota, private mode, or storage disabled). */
 function writeRaw(value: string): boolean {
   let saved = true;
   try {
     window.localStorage.setItem(LAYOUT_STORAGE_KEY, value);
-    window.localStorage.setItem("lifeos-workspace-os-v1-last-workspace", parseWorkspaceLayout(value).workspaceId);
   } catch {
     saved = false;
+  }
+  if (saved) {
+    try {
+      // Convenience hint only; failing to store it does not undo the saved layout.
+      window.localStorage.setItem("lifeos-workspace-os-v1-last-workspace", parseWorkspaceLayout(value).workspaceId);
+    } catch {
+      // Ignore: the layout itself is saved.
+    }
   }
   window.dispatchEvent(new CustomEvent(STORAGE_EVENT));
   return saved;

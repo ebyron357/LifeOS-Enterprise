@@ -179,6 +179,23 @@ describe("Workspace OS Command Center", () => {
     expect(stored.layouts.lg.map((item) => item.i).sort()).toEqual([...defaults.widgetOrder].sort());
   });
 
+  it("treats the layout as saved when only the last-workspace hint fails to store", async () => {
+    render(<CommandCenterWorkspace data={data} github={github} />);
+    const repair = await screen.findByRole("button", { name: /^repair layout$/i });
+    const original = Storage.prototype.setItem;
+    const setItem = vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, key: string, value: string) {
+      if (key === "lifeos-workspace-os-v1-last-workspace") throw new DOMException("Quota exceeded", "QuotaExceededError");
+      return original.call(this, key, value);
+    });
+    try {
+      fireEvent.click(repair);
+      expect(screen.queryByText(/could not be saved/i)).not.toBeInTheDocument();
+      expect(screen.getByText(/layout checked: no problems found|layout state repaired/i)).toBeInTheDocument();
+    } finally {
+      setItem.mockRestore();
+    }
+  });
+
   it("reports a storage failure instead of claiming the layout was repaired or restored", async () => {
     render(<CommandCenterWorkspace data={data} github={github} />);
     const repair = await screen.findByRole("button", { name: /^repair layout$/i });
