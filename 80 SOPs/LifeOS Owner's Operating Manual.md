@@ -111,7 +111,7 @@ GitHub holds the official copy of every LifeOS file, every change request ("pull
 2. The checks you care about:
    - **Dashboard CI → Next.js dashboard validation**: lint, typecheck, unit tests, build, browser tests.
    - **Vault Health → PowerShell vault audit**: vault structure, templates, links, metadata.
-   - **MAPS Integrity → MAPS structural validation**: map routes and the routine registry (after PR #74 is merged; also runs every day at 06:17 UTC).
+   - **MAPS Integrity → MAPS structural validation**: map routes and the routine registry (on every pull request, every push to `main`, and every day at 06:17 UTC).
 3. Click a run → click the job name → read the red step if it failed.
 
 ## B4. Merge an approved change (owner only) 🔑
@@ -289,7 +289,7 @@ cd "C:\Users\Admin\Desktop\LifeOS-Enterprise"
 - **Failure means:** an `Errors:` list appears (for example a broken `[[link]]` or a project missing `next_action`).
 - **Next:** fix each listed item in Obsidian, save, and run the command again until it passes.
 
-## E10. MAPS validation — `validate-maps.ps1` (after PR #74 merges)
+## E10. MAPS validation — `validate-maps.ps1`
 
 - **What it does:** checks `MAPS.md`, the seven `maps/` signposts, and the routine registry `Automations/ROUTINE_REGISTRY.json`.
 - **Command:**
@@ -650,7 +650,7 @@ The full, signable checklist is `docs/OWNER_ACCEPTANCE_WORKBOOK.md`. Use it. The
 6. On your phone, repeat F1, F3, F12 (steps 3–7), and F14 step 5.
 7. Confirm a write button fails safely while writes are off (Part K not done): it must refuse, not pretend.
 8. If you completed Part K, do workbook Section G (approvals and draft PRs) and Section I rows I3–I6 (the Resource Intelligence acceptance candidate `https://github.com/vercel-labs/knowledge-agent-template`).
-9. After PR #74 is merged, do workbook Section J (MAPS daily routine evidence).
+9. Do workbook Section J (MAPS daily routine evidence): the first scheduled run is the day after 30 September 2026.
 10. Fill in the workbook sign-off (Section K) and mark **READY TO ACCEPT**, **BLOCKED**, or **NOT READY**.
 
 ---

@@ -115,7 +115,7 @@ npm run typecheck
 npm test
 npm run build
 pwsh -NoProfile -File ./scripts/audit-vault.ps1
-pwsh -NoProfile -File ./scripts/validate-maps.ps1   # after PR #74 (MAPS) merges
+pwsh -NoProfile -File ./scripts/validate-maps.ps1
 npm audit --audit-level=high
 npx playwright install --with-deps chromium webkit
 npm run test:e2e

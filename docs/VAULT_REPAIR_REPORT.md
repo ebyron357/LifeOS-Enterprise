@@ -721,7 +721,7 @@ This is supplemental only. It does **not** replace the complete parallel suite r
 - `pwsh -NoProfile -File scripts/audit-vault.ps1`: `PASS: canonical vault structure, templates, Bases, metadata, links, and embeds are valid.` (153 notes).
 - Playwright against the production build (Chromium 1440 / 1024 / 390): 160 passed, 5 skipped (expected viewport splits).
 - A scan of 17 routes: no console errors, page errors, or HTTP ≥ 400.
-- PR #74 candidate `1ca01b2`: green on every check.
+- PR #74 candidate `1ca01b2`: green on every check, then merged to `main` as `62a9df9` on the owner's instruction. After merging `main` into the closeout branch, `validate-maps.ps1` passed there too.
   - Dashboard CI passed on its one re-run after the runner stall.
   - The other checks: vault audit, MAPS structural validation, and security review.
   - Local `validate-maps.ps1` passed, and every negative fixture was rejected.
@@ -733,7 +733,7 @@ This is supplemental only. It does **not** replace the complete parallel suite r
 
 ### Remaining credential-only or local-UI-only actions
 
-1. Merge PR #74 and the closeout PR (owner approval).
+1. On the owner's instruction, PR #74 was merged (`62a9df9`), and the closeout PR #75 was merged once green. Confirm the production deployment is READY before acceptance.
 2. Configure the governed write credentials (`LIFEOS_WRITE_SECRET`, `LIFEOS_GITHUB_TOKEN`, `LIFEOS_ALLOWED_ORIGIN`) and, for approvals, Upstash Redis. Only if writes are intended.
 3. Optional paid voice: `OPENAI_API_KEY` (billing decision).
 4. Owner-only live checks:

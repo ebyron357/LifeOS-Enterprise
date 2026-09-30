@@ -77,13 +77,13 @@ This edition is written for the change set in the closeout pull request from `cl
   - `next@16.3.8`, plus `brace-expansion` advisory fixes.
 - **Documentation.** Owner manual v2.0, refreshed owner acceptance workbook, and this reconciliation.
 
-**PR #74 — MAPS operating layer.** This PR is reviewed separately and was open when this edition was written. Its candidate `1ca01b2f7624b22cde8ea002822e5e61747825ae` was green on every check:
+**PR #74 — MAPS operating layer.** This PR was reviewed separately and merged to `main` on 2026-09-30 as `62a9df908608bf2c584f17be82d7f3754a582065`. Before merge, its candidate `1ca01b2f7624b22cde8ea002822e5e61747825ae` was green on every check:
 - Dashboard CI, including WebKit
 - Vault audit
 - MAPS structural validation
 - Security review
 
-It had no unresolved review threads. After it merges, `.github/workflows/maps-integrity.yml` runs `scripts/validate-maps.ps1` daily at 06:17 UTC and keeps the run record as the `maps-integrity-check-evidence` artifact.
+It had no unresolved review threads. `.github/workflows/maps-integrity.yml` now runs `scripts/validate-maps.ps1` daily at 06:17 UTC and keeps the run record as the `maps-integrity-check-evidence` artifact.
 
 ## Current production capabilities
 
@@ -276,14 +276,14 @@ These are agent validation records, not owner acceptance.
 - PR #71: merged Resource Intelligence owner review/disposition at `6bf7e2aff9920ba868de7381e0e68ae75d9866c7`; a READY production deployment exists for this SHA.
 - PR #72: merged Continuity checkpoint writes at `03657b621c2956c095c2e168f11ff159c3449651`; a READY production deployment exists for this SHA. It merged before its review fix landed; the per-save path nonce followed in PR #73.
 - PR #73: merged per-save unique checkpoint paths at `21b921ce8c7acf98132748f3466800468e0664a1`, the current application-code baseline; READY in production on 2026-09-30.
-- PR #74: MAPS operating layer; open and green at `1ca01b2` when this edition was written.
+- PR #74: merged MAPS operating layer at `62a9df908608bf2c584f17be82d7f3754a582065` on 2026-09-30 (candidate `1ca01b2` green on every check). Mostly governance, routing, and CI; its only runtime change is the `next@16.3.8` security patch.
 - The 2026-09-30 closeout PR carries this edition (see the closeout edition section).
 
 ## Remaining owner work
 
 Each item is written step-by-step in `80 SOPs/LifeOS Owner's Operating Manual.md` (Part K for credentials, Part J and `docs/OWNER_ACCEPTANCE_WORKBOOK.md` for acceptance).
 
-1. Review and merge PR #74 (MAPS) and the 2026-09-30 closeout PR. A merge is the owner approval.
+1. PR #74 (MAPS) and the 2026-09-30 closeout PR #75 were merged on the owner's instruction on 2026-09-30. Confirm the resulting production deployment is READY (step 2) before starting acceptance.
 2. At the start of the acceptance session, query Vercel and record the exact READY production deployment ID + SHA in the workbook.
 3. Complete the workbook's live checks on desktop and phone: navigation journeys, widgets and game, and voice with a real microphone and speakers (voice choice, preview, interrupt, mute, recovery, persistence). Also check screen share request, deny, and stop.
 4. Decide whether to enable governed writes, and only then configure the credentials together:

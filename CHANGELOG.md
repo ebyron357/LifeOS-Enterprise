@@ -42,6 +42,14 @@ All notable changes to LifeOS Enterprise are documented in this file.
 - Added `app/icon.svg`: the first page load no longer logs a favicon 404 console error.
 - Dashboard CI job and browser steps have timeouts, so a hung browser download fails fast.
 
+### Included from `main`
+
+- PR #74 (MAPS operating layer) merged first as `62a9df9`:
+  - the master router and seven signposts
+  - the Pulse routine registry
+  - `scripts/validate-maps.ps1`
+  - the daily MAPS Integrity workflow
+
 ### Documentation
 
 - `80 SOPs/LifeOS Owner's Operating Manual.md` v2.0 is a complete step-by-step owner/operator guide.

@@ -191,7 +191,7 @@ Capture is still browser-local. Promoting a resource to the canonical vault uses
 
 ---
 
-## Section J — MAPS and Pulse routine (after PR #74 merges)
+## Section J — MAPS and Pulse routine (PR #74, merged 2026-09-30)
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
