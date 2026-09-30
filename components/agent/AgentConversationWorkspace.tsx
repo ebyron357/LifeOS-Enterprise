@@ -686,7 +686,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         </div>
         <div className={styles.commsStatus}>
           <span data-tone={voice.microphoneOpen ? "ok" : "warn"}>{voiceLabel}</span>
-          <span data-tone={screen.state === "active" ? "ok" : "neutral"}>{screen.state === "active" ? "Screen shared" : "Screen off"}</span>
+          <span data-tone={screen.state === "sharing" ? "ok" : "neutral"}>{screen.state === "sharing" ? "Screen shared" : "Screen off"}</span>
           <span data-tone={paused ? "warn" : "ok"}>{paused ? "Agent paused" : "Agent ready"}</span>
         </div>
       </header>
