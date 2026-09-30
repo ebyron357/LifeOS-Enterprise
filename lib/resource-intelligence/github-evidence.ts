@@ -1,5 +1,6 @@
 import { Buffer } from "node:buffer";
 import { normalizeResource } from "./model";
+import { safeEvidenceError, type ResourceSourceEvidence } from "./source-evidence";
 
 export type GitHubEvidenceItem = {
   source: "repository" | "README.md" | "root" | "commits";
@@ -15,6 +16,8 @@ export type GitHubRepositoryEvidence = {
   archived: boolean;
   visibility: string;
   license: string | null;
+  /** SPDX identifier reported by GitHub, or null when none (or NOASSERTION) is reported. */
+  licenseSpdxId: string | null;
   stars: number;
   forks: number;
   openIssues: number;
@@ -152,9 +155,8 @@ export async function inspectGitHubRepository(
   const readmeLower = readme.toLowerCase();
   const latest = commits[0];
   const latestCommitAt = latest?.commit?.committer?.date || latest?.commit?.author?.date || null;
-  const license = repo.license?.spdx_id && repo.license.spdx_id !== "NOASSERTION"
-    ? repo.license.spdx_id
-    : repo.license?.name || null;
+  const licenseSpdxId = repo.license?.spdx_id && repo.license.spdx_id !== "NOASSERTION" ? repo.license.spdx_id : null;
+  const license = licenseSpdxId || repo.license?.name || null;
 
   const evidence: GitHubEvidenceItem[] = [
     { source: "repository", claim: "Canonical repository", value: repo.full_name || repository },
@@ -183,6 +185,7 @@ export async function inspectGitHubRepository(
     archived: Boolean(repo.archived),
     visibility: repo.visibility || "unknown",
     license,
+    licenseSpdxId,
     stars: Number(repo.stargazers_count || 0),
     forks: Number(repo.forks_count || 0),
     openIssues: Number(repo.open_issues_count || 0),
@@ -204,4 +207,44 @@ export async function inspectGitHubRepository(
     dispositionSuggestion: "PENDING",
     evidence,
   };
+}
+
+const DEFAULT_EVIDENCE_TIMEOUT_MS = 10_000;
+
+/**
+ * Server-side, write-time GitHub evidence for a canonical Resource record. Never throws: a failed
+ * inspection returns `evidence-unavailable` with a safe summary so the record is still written.
+ * Callers pass only the normalized source; evidence supplied by a client is never used.
+ */
+export async function collectGitHubSourceEvidence(
+  source: string,
+  options: { fetcher?: FetchLike; token?: string; now?: () => Date; timeoutMs?: number } = {},
+): Promise<ResourceSourceEvidence> {
+  const inspectedAt = (options.now ?? (() => new Date()))().toISOString();
+  const baseFetcher = options.fetcher ?? fetch;
+  const timeoutMs = options.timeoutMs ?? DEFAULT_EVIDENCE_TIMEOUT_MS;
+  const fetcher: FetchLike = (input, init) => baseFetcher(input, { ...init, signal: AbortSignal.timeout(timeoutMs) });
+
+  try {
+    const evidence = await inspectGitHubRepository(source, { fetcher, token: options.token });
+    return {
+      status: "source-evidence-captured",
+      inspectedAt,
+      processor: "github",
+      github: {
+        repository: evidence.repository,
+        defaultBranch: evidence.defaultBranch,
+        latestCommitSha: evidence.latestCommitSha,
+        latestCommitAt: evidence.latestCommitAt,
+        license: evidence.licenseSpdxId ?? (evidence.license ? `${evidence.license} (no SPDX id)` : null),
+        stars: Number.isFinite(evidence.stars) ? evidence.stars : null,
+        forks: Number.isFinite(evidence.forks) ? evidence.forks : null,
+        archived: evidence.archived,
+        pushedAt: evidence.pushedAt,
+        architectureSuggestion: evidence.architectureSuggestion,
+      },
+    };
+  } catch (error) {
+    return { status: "evidence-unavailable", inspectedAt, processor: "github", error: safeEvidenceError(error) };
+  }
 }

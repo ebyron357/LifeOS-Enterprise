@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { validOrigin } from "@/lib/agent/http";
 import { authorizePaidTts, rateLimit, redactSecrets, trustedClientIdentity } from "@/lib/voice/security";
 import { createOpenAiTtsProvider, type TtsProviderId } from "@/lib/voice/tts-providers";
+import { isOpenAiTtsVoice, isResponseStyle } from "@/lib/voice/voice-options";
 
 export const runtime = "nodejs";
 
@@ -13,6 +14,8 @@ type SpeakBody = {
   speed?: number;
   style?: "balanced" | "concise" | "coach";
   provider?: TtsProviderId | string;
+  /** Optional OpenAI voice. Must be in OPENAI_TTS_VOICES; omitted → style default. */
+  voice?: unknown;
 };
 
 function browserFallback(status: number, error: string) {
@@ -48,6 +51,12 @@ export async function POST(request: Request) {
     return browserFallback(503, "Browser speech was requested. Server TTS was not used.");
   }
 
+  const requestedVoice = typeof body.voice === "string" ? body.voice.trim() : body.voice;
+  const voiceOmitted = requestedVoice === undefined || requestedVoice === null || requestedVoice === "";
+  if (!voiceOmitted && !isOpenAiTtsVoice(requestedVoice)) {
+    return NextResponse.json({ ok: false, error: "Invalid TTS voice." }, { status: 400 });
+  }
+
   const text = body.text?.trim();
   if (!text) return NextResponse.json({ ok: false, error: "text is required." }, { status: 400 });
   if (text.length > MAX_TTS_CHARS) {
@@ -59,7 +68,8 @@ export async function POST(request: Request) {
 
   const locale = body.locale?.trim() || "en-US";
   const speed = Number.isFinite(body.speed) ? Number(body.speed) : 1;
-  const style = body.style ?? "balanced";
+  const style = isResponseStyle(body.style) ? body.style : "balanced";
+  const voice = isOpenAiTtsVoice(requestedVoice) ? requestedVoice : undefined;
   const provider = createOpenAiTtsProvider();
 
   if (!provider.configured) {
@@ -67,11 +77,13 @@ export async function POST(request: Request) {
       ok: false,
       provider: "openai",
       fallbackToBrowser: true,
-      error: "Server-side TTS is unavailable. Use browser fallback.",
+      error: provider.reason
+        ? `Server-side TTS is unavailable: ${provider.reason} Use browser fallback.`
+        : "Server-side TTS is unavailable. Use browser fallback.",
     }, { status: 502 });
   }
 
-  const result = await provider.synthesize({ text, locale, speed, style });
+  const result = await provider.synthesize({ text, locale, speed, style, voice });
   if (!result.ok) {
     return NextResponse.json({
       ok: false,

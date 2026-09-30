@@ -3,7 +3,7 @@ import "server-only";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { getVaultIndex } from "@/lib/vault/index";
-import type { AgentBrief, BusinessBrief, GrowthBrief, PersonBrief, ProjectBrief, VaultDashboardData } from "./types";
+import type { AgentBrief, AreaBrief, BusinessBrief, GrowthBrief, PersonBrief, ProjectBrief, VaultDashboardData } from "./types";
 
 type Frontmatter = Record<string, string>;
 
@@ -39,6 +39,25 @@ async function optionalMarkdown(file: string) {
   } catch {
     return "";
   }
+}
+
+function firstSentence(text: string) {
+  const trimmed = text.trim();
+  const match = trimmed.match(/^.*?[.!?](?=\s|$)/);
+  return (match ? match[0] : trimmed).trim();
+}
+
+function normalizeTags(tags: string[]): string[] {
+  return tags.map((tag) => tag.trim().replace(/^#/, "").toLowerCase()).filter(Boolean);
+}
+
+function isTemplateOrPlaceholder(note: { title: string; path: string; section?: string | null }) {
+  const normalizedPath = note.path.toLowerCase();
+  return note.section === "templates"
+    || normalizedPath.includes("/templates/")
+    || normalizedPath.startsWith("templates/")
+    || normalizedPath.startsWith("99 templates/")
+    || /\{\{[^}]+\}\}/.test(note.title);
 }
 
 const priorityRank: Record<string, number> = { P0: 0, P1: 1, P2: 2, P3: 3 };
@@ -92,11 +111,15 @@ export async function getVaultDashboardData(now = new Date()): Promise<VaultDash
       const isTemplate = note.section === "templates" || path.includes("/templates/") || path.startsWith("templates/") || path.startsWith("99 templates/");
       return (note.type === "business" || note.section === "businesses") && !isTemplate && !/\{\{[^}]+\}\}/.test(note.title);
     })
-    .map((note) => ({
-      name: note.title,
-      path: note.path,
-      status: note.status ?? "unknown",
-    }));
+    .map((note) => {
+      const kpiFocus = typeof note.frontmatter.kpi_focus === "string" ? note.frontmatter.kpi_focus.trim() : "";
+      return {
+        name: note.title,
+        path: note.path,
+        status: note.status ?? "unknown",
+        ...(kpiFocus ? { kpiFocus } : {}),
+      };
+    });
 
   const people: PersonBrief[] = (index.bySection.people ?? [])
     .filter((note) => {
@@ -111,6 +134,19 @@ export async function getVaultDashboardData(now = new Date()): Promise<VaultDash
       organization: note.organization ?? "",
       role: note.role ?? "",
     }));
+
+  // The index already drops excluded paths and private frontmatter, so only public area notes appear here.
+  const areaNotes = index.notes
+    .filter((note) => note.type === "area" && (note.status ?? "").toLowerCase() === "active" && !isTemplateOrPlaceholder(note));
+  const areas: AreaBrief[] = areaNotes.map((note) => ({
+    name: note.title,
+    path: note.path,
+    status: note.status ?? "active",
+    tags: normalizeTags(note.tags),
+    standard: typeof note.frontmatter.standard === "string" ? note.frontmatter.standard.trim() : "",
+    purpose: firstSentence(section(note.body, "Purpose")),
+    reviewDate: note.reviewDate ?? "",
+  }));
 
   const growthArea = parseFrontmatter(growthAreaSource);
   const growthGoal = parseFrontmatter(growthGoalSource);
@@ -135,6 +171,7 @@ export async function getVaultDashboardData(now = new Date()): Promise<VaultDash
     agents: agents.sort((a, b) => a.name.localeCompare(b.name)),
     businesses: businesses.sort((a, b) => a.name.localeCompare(b.name)),
     people: people.sort((a, b) => a.name.localeCompare(b.name)),
+    areas: areas.sort((a, b) => a.name.localeCompare(b.name) || a.path.localeCompare(b.path)),
     growth,
   };
 }

@@ -32,11 +32,30 @@ export function parseFrontmatter(source: string): { frontmatter: Record<string, 
   const frontmatter: Record<string, unknown> = {};
   const block = text.slice(4, end);
 
-  for (const line of block.split("\n")) {
-    const match = line.match(/^([a-zA-Z0-9_]+):\s*(.*)$/);
+  const lines = block.split("\n");
+  for (let index = 0; index < lines.length; index += 1) {
+    const match = lines[index].match(/^([a-zA-Z0-9_]+):\s*(.*)$/);
     if (!match) continue;
 
     const key = match[1];
+
+    // YAML block sequence: `key:` followed by `- item` lines (indented or not).
+    if (match[2].trim() === "") {
+      const items: string[] = [];
+      let next = index + 1;
+      for (; next < lines.length; next += 1) {
+        const item = lines[next].match(/^\s*-\s+(.*)$/);
+        if (!item) break;
+        const decoded = decodeScalar(item[1].trim());
+        if (decoded) items.push(decoded);
+      }
+      if (next > index + 1) {
+        frontmatter[key] = items;
+        index = next - 1;
+        continue;
+      }
+    }
+
     let value: unknown = decodeScalar(match[2].trim());
 
     if (value === "true") value = true;

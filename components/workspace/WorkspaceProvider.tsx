@@ -10,20 +10,28 @@ import {
   type ReactNode,
 } from "react";
 import { COMMAND_CENTER_WIDGET_IDS, createDefaultWorkspaceLayout, LAYOUT_STORAGE_KEY } from "@/lib/workspace/default-layout";
-import { parseWorkspaceLayout, parseWorkspaceLayoutWithDiagnostics, serializeWorkspaceLayout, swapLayoutItemPositions } from "@/lib/workspace/layout-storage";
+import {
+  moveWidgetInLayout,
+  parseWorkspaceLayout,
+  parseWorkspaceLayoutWithDiagnostics,
+  repairWorkspaceLayout,
+  serializeWorkspaceLayout,
+} from "@/lib/workspace/layout-storage";
 import type { BreakpointLayouts, WorkspaceLayoutState } from "@/lib/workspace/types";
 
 type WorkspaceContextValue = {
   state: WorkspaceLayoutState;
   hydrated: boolean;
   setLayouts: (layouts: BreakpointLayouts) => void;
-  resetLayout: () => void;
-  repairLayout: () => void;
+  /** Restores the default layout. Returns false when the browser refused to save it. */
+  resetLayout: () => boolean;
+  /** Normalizes the stored layout. `saved` is false when the browser refused the write, so callers never claim success. */
+  repairLayout: () => { repairs: string[]; saved: boolean };
   setFocusedWidget: (id: string | null) => void;
   focusNextWidget: () => void;
   toggleMinimized: (id: string) => void;
   setWidgetHidden: (id: string, hidden: boolean) => void;
-  moveWidget: (id: string, direction: "up" | "down") => void;
+  moveWidget: (id: string, direction: "up" | "down", options?: { visibleOnly?: boolean }) => void;
   diagnostics: string[];
   setReducedMotion: (value: boolean) => void;
   toggleReducedMotion: () => void;
@@ -41,14 +49,24 @@ function readRaw() {
   }
 }
 
-function writeRaw(value: string) {
+/** Returns false when the browser refused the layout write (quota, private mode, or storage disabled). */
+function writeRaw(value: string): boolean {
+  let saved = true;
   try {
     window.localStorage.setItem(LAYOUT_STORAGE_KEY, value);
-    window.localStorage.setItem("lifeos-workspace-os-v1-last-workspace", parseWorkspaceLayout(value).workspaceId);
   } catch {
-    // Ignore quota / private-mode write failures.
+    saved = false;
+  }
+  if (saved) {
+    try {
+      // Convenience hint only; failing to store it does not undo the saved layout.
+      window.localStorage.setItem("lifeos-workspace-os-v1-last-workspace", parseWorkspaceLayout(value).workspaceId);
+    } catch {
+      // Ignore: the layout itself is saved.
+    }
   }
   window.dispatchEvent(new CustomEvent(STORAGE_EVENT));
+  return saved;
 }
 
 function updateState(updater: (current: WorkspaceLayoutState) => WorkspaceLayoutState) {
@@ -82,13 +100,12 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     updateState((current) => ({ ...current, layouts }));
   }, []);
 
-  const resetLayout = useCallback(() => {
-    writeRaw(defaultRaw);
-  }, []);
+  const resetLayout = useCallback(() => writeRaw(defaultRaw), []);
 
   const repairLayout = useCallback(() => {
-    const parsed = parseWorkspaceLayout(readRaw());
-    writeRaw(serializeWorkspaceLayout(parsed));
+    const result = repairWorkspaceLayout(readRaw());
+    const saved = writeRaw(serializeWorkspaceLayout(result.state));
+    return { repairs: result.repairs, saved };
   }, []);
 
   const setFocusedWidget = useCallback((id: string | null) => {
@@ -139,21 +156,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const moveWidget = useCallback((id: string, direction: "up" | "down") => {
-    updateState((current) => {
-      const order = [...current.widgetOrder];
-      const index = order.indexOf(id as (typeof COMMAND_CENTER_WIDGET_IDS)[number]);
-      if (index === -1) return current;
-      const nextIndex = direction === "up" ? Math.max(0, index - 1) : Math.min(order.length - 1, index + 1);
-      if (nextIndex === index) return current;
-      const [entry] = order.splice(index, 1);
-      order.splice(nextIndex, 0, entry);
-      return {
-        ...current,
-        widgetOrder: order,
-        layouts: swapLayoutItemPositions(current.layouts, id, current.widgetOrder[nextIndex]),
-      };
-    });
+  const moveWidget = useCallback((id: string, direction: "up" | "down", options?: { visibleOnly?: boolean }) => {
+    updateState((current) => moveWidgetInLayout(current, id, direction, options));
   }, []);
 
   const diagnostics = useMemo(() => {

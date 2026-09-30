@@ -3,7 +3,8 @@ type: sop
 status: active
 area: LifeOS
 created: 2026-08-11
-updated: 2026-08-26
+updated: 2026-09-30
+review_date: 2026-10-31
 tags:
   - life-os
   - operating-manual
@@ -13,390 +14,704 @@ tags:
 aliases:
   - LifeOS Owner's Operating Manual
   - LifeOS Guidebook
+  - LifeOS Operator Manual
 ---
 
 # LifeOS Owner's Operating Manual
 
-**Obsidian • ClickUp • GitHub • n8n • Vercel • Supabase**
+**Version 2.0 • 30 September 2026**
+**Replaces:** Version 1.0 (August 2026). This page is the one owner/operator manual. Do not start a second one.
 
-> [!info] Built for how you actually work
-> Short instructions. One decision at a time. Large type. Clear tool boundaries. No guessing. No unnecessary nesting. This manual is designed to reduce cognitive load and make it easy to recover when you lose your place.
+> [!info] How to read this manual
+> - Every numbered step is **one action**. Do the step, then read the next one.
+> - 🌐 **Browser** means: do this in Chrome, Edge, or Safari.
+> - 🪟 **PowerShell** means: do this in Windows PowerShell on your computer.
+> - 🗂️ **Obsidian** means: do this in the Obsidian app.
+> - 🔑 **Owner credential** means: only you can do this, because it needs your password, secret, or account.
+> - "Success looks like" tells you what you should see. If you see something else, stop and use Part H (Troubleshooting).
 
-Version 1.0 • August 2026
+---
 
 # 1. If You Forget Everything Else
 
 > [!tip] THE ONE RULE
-> Obsidian tells you WHAT matters and WHY. ClickUp tells you WHAT TO DO NEXT. GitHub holds the technical truth. n8n moves information between systems.
+> **LifeOS (the website) tells you what needs you.** Obsidian is where you read and edit notes. GitHub keeps the permanent, official copy of everything. Nothing becomes official until it is merged on GitHub.
 
-## Your normal daily flow
+## Your normal day in 5 steps
 
-1. Open Obsidian → 00 Home → Life OS.
-2. Look at the current context: projects, reviews, notes, decisions, and what matters.
-3. Open ClickUp → LIFE-OS-OPERATIONS → Today or Executive Overview.
-4. Work the highest-priority real task. Do not create a new task unless the current work truly requires one.
-5. When technical work changes, use GitHub. When automation is needed, use n8n.
-6. Record evidence in ClickUp before marking work Complete.
+1. 🌐 Open `https://lifeos-enterprise.vercel.app/`.
+2. Read the **Today** card and the **Start here** card.
+3. Click **Resume work** (or **Resume this project**) and do the one next action you see.
+4. If a thought pops up, click **Capture**, type it, and click **Save to inbox**.
+5. At the end of the day, open **Journal**, write two sentences, and click **Save**.
 
-> [!tip] IF YOU GET LOST
-> Ask only three questions:
-> 1. What am I trying to finish?
-> 2. Which tool owns that kind of information?
-> 3. What is the ONE next action?
+## Where things live
 
-## Tool map
+| I want to… | Go to | Where exactly |
+|---|---|---|
+| See what needs me today | LifeOS website | `https://lifeos-enterprise.vercel.app/` |
+| Talk or type to LifeOS | LifeOS website | **Ask LifeOS** (`/conversation`) |
+| Read or edit a note | Obsidian | Open the `LifeOS-Enterprise` vault |
+| See the official copy / changes / checks | GitHub | `https://github.com/ebyron357/LifeOS-Enterprise` |
+| See if the website is healthy / roll back | Vercel | `https://vercel.com/tradeiq/lifeos-enterprise` |
+| Work a task board (optional) | ClickUp | Space **LIFE-OS-OPERATIONS** |
 
-| Tool | Use it for | Do NOT use it for |
-| --- | --- | --- |
-| Obsidian | Context, notes, reviews, project intent | Daily task-status tracking |
-| ClickUp | Tasks, priority, blockers, next actions, evidence | Long-form knowledge or source code |
-| GitHub | Code, PRs, commits, CI, technical evidence | Personal planning or daily task lists |
-| n8n | Automation and orchestration | Replacing human approval or business rules |
-| Vercel | Deployment, environment variables, production runtime | Project planning |
-| Supabase | Database, migrations, backend data | Task tracking or documentation |
+---
 
-# 2. Your LifeOS System in Plain English
+# 2. Part A — Get to LifeOS in a Browser
 
-> [!info] SYSTEM MODEL
-> LifeOS Enterprise is the control plane. Obsidian is the human-facing brain. ClickUp is the execution board. GitHub is technical truth. n8n is the automation engine.
+## A1. Open LifeOS (desktop)
 
-Think of the system like this:
+1. 🌐 Open your web browser (Chrome, Edge, or Safari).
+2. Click the address bar at the top.
+3. Type exactly: `https://lifeos-enterprise.vercel.app/`
+4. Press **Enter**.
 
-```text
-OBSIDIAN
-Context / Decisions / Reviews
-          ↓
-CLICKUP
-Tasks / Priority / Blockers / Evidence
-          ↓
-GITHUB  ↔  n8n
-Code        Automation
-          ↓
-VERCEL / SUPABASE
-Production / Data
+**Success looks like:** a page titled **LifeOS** with a greeting, a **Today** card, a **Start here** card, and a left menu with **Home, Ask LifeOS, Projects, Today, Capture, Journal, Learning, Files, Automations, Integrations**.
+
+5. Press **Ctrl + D** (Windows) or **Cmd + D** (Mac) to bookmark it. Name the bookmark `LifeOS`.
+
+## A2. Open LifeOS on your phone
+
+1. 🌐 Open Safari (iPhone) or Chrome (Android).
+2. Type `https://lifeos-enterprise.vercel.app/` and tap **Go**.
+3. At the bottom you will see a dock with **Home, Ask LifeOS, Projects, Capture, More**.
+4. Everything not on the dock (Today, Journal, Learning, Files, Automations, Integrations, Settings) is under **More**.
+5. Optional: tap the **Share** button → **Add to Home Screen** → **Add**, so LifeOS opens like an app.
+
+## A3. Do I need to log in?
+
+- **No.** LifeOS has no user accounts and no login page. Anyone who has the web address can **read** the pages (private notes are hidden; see Part G2).
+- **Changing official records** (saving a checkpoint, promoting a resource, recording a review decision, approving an agent action) asks for the **Owner write secret** 🔑 each time. That secret is never stored in the browser.
+- As of 30 September 2026 those write buttons are **switched off on purpose** because the owner secret and storage are not configured yet (see Part K). Reading, capturing, journaling, voice, widgets, and the game all work without it.
+
+---
+
+# 3. Part B — Get to the Project on GitHub
+
+GitHub holds the official copy of every LifeOS file, every change request ("pull request"), and every automatic check.
+
+## B1. Open the repository
+
+1. 🌐 Go to `https://github.com/login` and sign in as **ebyron357** 🔑.
+2. Go to `https://github.com/ebyron357/LifeOS-Enterprise`.
+3. Near the top-left, find the branch button. It must say **main**. If it says something else, click it and choose **main**.
+
+**Success looks like:** a file list that includes `00 Home`, `app`, `docs`, `scripts`, `README.md`, and `AGENTS.md`.
+
+## B2. See change requests (pull requests)
+
+1. Click the **Pull requests** tab near the top.
+2. Each row is one proposed change. Green check ✓ = automatic checks passed. Red ✗ = something failed.
+3. Click a row to open it. Click **Files changed** to see exactly what would change.
+
+## B3. See the automatic checks (GitHub Actions)
+
+1. Click the **Actions** tab (or go to `https://github.com/ebyron357/LifeOS-Enterprise/actions`).
+2. The checks you care about:
+   - **Dashboard CI → Next.js dashboard validation**: lint, typecheck, unit tests, build, browser tests.
+   - **Vault Health → PowerShell vault audit**: vault structure, templates, links, metadata.
+   - **MAPS Integrity → MAPS structural validation**: map routes and the routine registry (on every pull request, every push to `main`, and every day at 06:17 UTC).
+3. Click a run → click the job name → read the red step if it failed.
+
+## B4. Merge an approved change (owner only) 🔑
+
+1. Open the pull request.
+2. Scroll to the bottom. Confirm every check shows a green ✓.
+3. Click **Files changed** and read the changes.
+4. Go back to **Conversation**. Click **Merge pull request** → **Confirm merge**.
+5. Vercel then publishes the new version to production automatically (1–5 minutes). Check it with Part G4.
+
+> [!warning] A merge is your approval. Agents never merge for you.
+
+---
+
+# 4. Part C — Open the Project on Your Windows Computer
+
+You only need this if you want to run LifeOS locally, run the checks yourself, or edit the vault in Obsidian.
+
+## C1. One-time check: do you have the tools?
+
+1. 🪟 Click **Start**, type `PowerShell`, and click **Windows PowerShell**.
+2. Type `git --version` and press **Enter**.
+   - **Success:** `git version 2.x.x`. 
+   - **If you see** `'git' is not recognized`: install Git from `https://git-scm.com/download/win`, click **Next** on every screen, then close and reopen PowerShell.
+3. Type `node --version` and press **Enter**.
+   - **Success:** `v22.x.x` (v20 or newer works; CI uses v22).
+   - **If you see** `'node' is not recognized` or a version below v20: install the **LTS** version from `https://nodejs.org/`, then close and reopen PowerShell.
+
+## C2. Get the project folder
+
+The official local copy is recorded in `docs/DEPLOYMENT.md` as `C:\Users\Admin\Desktop\LifeOS-Enterprise`.
+
+1. 🪟 In PowerShell, type this and press **Enter**:
+   ```powershell
+   Test-Path "C:\Users\Admin\Desktop\LifeOS-Enterprise\.git"
+   ```
+2. If it prints **True**, the folder already exists. Go to step 4.
+3. If it prints **False**, type this and press **Enter** (one time only):
+   ```powershell
+   git clone https://github.com/ebyron357/LifeOS-Enterprise.git "C:\Users\Admin\Desktop\LifeOS-Enterprise"
+   ```
+   **Success:** the last line says `Resolving deltas: 100%` (or similar) with no `fatal:` line.
+4. Move into the folder:
+   ```powershell
+   cd "C:\Users\Admin\Desktop\LifeOS-Enterprise"
+   ```
+5. Make sure you are on `main` and up to date:
+   ```powershell
+   git checkout main
+   git pull --ff-only origin main
+   ```
+   **Success:** `Already up to date.` or a list of updated files.
+
+> [!warning] Do **not** use a folder named `LifeOS-Enterprise-main` from a ZIP download. It is not connected to GitHub and is not the official copy.
+
+## C3. Install and start LifeOS locally
+
+1. 🪟 In PowerShell, inside `C:\Users\Admin\Desktop\LifeOS-Enterprise`, run:
+   ```powershell
+   npm ci
+   ```
+   **Success:** ends with `added ### packages` and `found 0 vulnerabilities`. Takes 1–3 minutes.
+2. Start the development server:
+   ```powershell
+   npm run dev
+   ```
+   **Success:** you see `Local: http://localhost:3000` and `✓ Ready`.
+3. 🌐 Open `http://localhost:3000` in your browser. You see the same LifeOS Command Center as production.
+4. To stop the server: click the PowerShell window and press **Ctrl + C**. If asked `Terminate batch job (Y/N)?`, type `Y` and press **Enter**.
+
+> [!info] Optional local settings
+> To try the voice console or other optional features locally, copy `.env.example` to `.env.local` (`Copy-Item .env.example .env.local`) and edit only the lines you need. Never put real secrets into any file that is committed to GitHub.
+
+---
+
+# 5. Part D — Open the Vault in Obsidian
+
+1. 🪟 In PowerShell, inside the project folder, run:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\scripts\setup-obsidian.ps1
+   ```
+   **Success:** ends with `Setup complete.` and `Success target: 00 Home\Life OS.md`.
+2. 🗂️ Open Obsidian.
+3. On the vault picker, click **Open folder as vault**.
+4. Choose `C:\Users\Admin\Desktop\LifeOS-Enterprise` and click **Select Folder** / **Open**.
+5. In the left file list, open `00 Home` → `Life OS`.
+6. Click **Settings** (gear, bottom-left) → **Core plugins** → turn on **Templates, Daily notes, Properties view, Bases, Bookmarks, Canvas**.
+7. Full detail and screenshots of each setting: `docs/OBSIDIAN_SETUP.md`.
+
+**Success looks like:** `Life OS` shows navigation links and tables (Bases) instead of raw text.
+
+---
+
+# 6. Part E — Command Guide
+
+Every command below is run in 🪟 **PowerShell**, inside the project folder. First run:
+
+```powershell
+cd "C:\Users\Admin\Desktop\LifeOS-Enterprise"
 ```
 
-## Verified working parts
+## E1. Install dependencies — `npm ci`
+
+- **What it does:** installs the exact library versions listed in `package-lock.json`.
+- **Command:** `npm ci`
+- **Success:** `added ### packages` … `found 0 vulnerabilities`.
+- **Failure means:** Node/npm missing, no internet, or the lockfile is out of date.
+- **Next:** run `node --version` (Part C1). If Node is fine, run `git pull --ff-only origin main` and try again.
+
+## E2. Start locally for development — `npm run dev`
+
+- **What it does:** runs LifeOS on your computer with live reload.
+- **Command:** `npm run dev`
+- **Success:** `Local: http://localhost:3000` and `✓ Ready`. Open that address in the browser.
+- **Failure means:** port 3000 is busy, or `npm ci` was not run.
+- **Next:** close other PowerShell windows running LifeOS, or run `npm run dev -- -p 3001` and open `http://localhost:3001`.
+
+## E3. Production build — `npm run build`, then `npm run start`
+
+- **What it does:** builds the same optimized version Vercel builds, then serves it.
+- **Commands:** `npm run build` then `npm run start`
+- **Success:** build prints a route table (`/`, `/conversation`, `/dashboard`, …) with no `Error`; start prints `Local: http://localhost:3000`.
+- **Failure means:** a code error that would also fail on Vercel.
+- **Next:** read the first red `Error:` line. Do not merge anything until this passes.
+
+## E4. Code style check — `npm run lint`
+
+- **What it does:** checks the code for mistakes and style problems.
+- **Command:** `npm run lint`
+- **Success:** only the header line `> eslint . --max-warnings=0` and no other output.
+- **Failure means:** a file breaks a lint rule. The output names the file and line.
+- **Next:** fix that line, or ask an agent: "Fix the lint error in <file>:<line>. Do not change anything else."
+
+## E5. Type check — `npm run typecheck`
+
+- **What it does:** confirms the TypeScript types fit together.
+- **Command:** `npm run typecheck`
+- **Success:** only the header line `> tsc --noEmit` and no other output.
+- **Failure means:** a type error. The output shows `file(line,col): error TS…`.
+- **Next:** fix the named line or ask an agent to fix exactly that error.
 
-- [x] LifeOS core dashboards visually verified in Obsidian.
-- [x] LIFE-OS-OPERATIONS structure created in ClickUp.
-- [x] Evidence-backed tasks loaded into ClickUp.
-- [x] GitHub → n8n → ClickUp automation proof passed.
-- [x] n8n updated the existing ClickUp proof task and moved it to Review.
-- [x] ClientVerse production Supabase project created and production configuration work started.
+## E6. Unit tests — `npm test`
+
+- **What it does:** runs all automated unit tests (Vitest).
+- **Command:** `npm test`
+- **Success:** `Test Files  NN passed (NN)` and `Tests  NNN passed (NNN)` with **no** `failed`.
+- **Failure means:** a behavior changed or broke. The output names the failing test.
+- **Next:** read the first `FAIL` block. Do not merge until every test passes.
+
+## E7. Browser tests — `npm run test:e2e`
+
+- **What it does:** opens real browsers (Chromium and WebKit) at 1440, 1024, and 390 pixels and clicks through LifeOS.
+- **One-time setup:** `npx playwright install chromium webkit`
+- **Command:** `npm run test:e2e` (it builds and starts LifeOS by itself on port 4173).
+- **Success:** ends with `NNN passed` and no `failed`.
+- **Failure means:** a page or control does not behave as expected. A report is saved in `playwright-report\index.html`.
+- **Next:** open the report: `npx playwright show-report`. Click the failed test to see the screenshot and trace.
 
-> [!warning] IMPORTANT AUTOMATION NOTE
-> The GitHub → n8n → ClickUp proof worked, but the proof comment ran multiple times. The automation path is connected; duplicate-run/idempotency protection still needs hardening before broad production automation.
+## E8. Dependency security check — `npm audit --audit-level=high`
+
+- **What it does:** checks installed libraries against known security advisories.
+- **Command:** `npm audit --audit-level=high`
+- **Success:** `found 0 vulnerabilities`.
+- **Failure means:** a library has a high or critical advisory. CI will be red until fixed.
+- **Next:** ask an agent: "Patch the npm audit high/critical advisories with the smallest version bump and prove CI passes."
 
-# 3. Obsidian: Your Brain and Control Plane
+## E9. Vault audit — `audit-vault.ps1`
 
-> [!info] WHEN TO OPEN OBSIDIAN
-> Open Obsidian when you need context, direction, memory, reviews, project intent, or a place to capture information.
+- **What it does:** checks the Obsidian vault: required folders, templates, Bases, project/business metadata, and every internal link.
+- **Command:**
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File .\scripts\audit-vault.ps1
+  ```
+- **Success:** last line `PASS: canonical vault structure, templates, Bases, metadata, links, and embeds are valid.`
+- **Failure means:** an `Errors:` list appears (for example a broken `[[link]]` or a project missing `next_action`).
+- **Next:** fix each listed item in Obsidian, save, and run the command again until it passes.
 
-## Start here every time
+## E10. MAPS validation — `validate-maps.ps1`
 
-1. Open the LifeOS-Enterprise vault.
-2. In the left sidebar open 00 Home.
-3. Open Life OS.
-4. Read the Start Here section.
-5. If you need today's work, open today's Daily Note or go to ClickUp for execution.
+- **What it does:** checks `MAPS.md`, the seven `maps/` signposts, and the routine registry `Automations/ROUTINE_REGISTRY.json`.
+- **Command:**
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File .\scripts\validate-maps.ps1
+  ```
+- **Success:** `MAPS VALIDATION: PASSED`.
+- **Failure means:** `MAPS VALIDATION: FAILED` followed by lines such as `Broken route in maps/…` or `Routine missing required field …`.
+- **Next:** fix the named file or link and run again. To save a run record, add `-EvidenceDirectory Automations/runs/maps-integrity-check`.
 
-## The five core dashboards
+## E11. Obsidian setup — `setup-obsidian.ps1`
 
-| Dashboard | What it is for |
-| --- | --- |
-| 00 Home/Life OS.md | Main home page and navigation. |
-| Command Center/Daily Command Center.md | Daily execution context. |
-| Dashboards/Weekly Review.md | Weekly reset and review. |
-| Dashboards/Monthly Review.md | Monthly direction and pattern review. |
-| 00 Home/Personal Growth Dashboard.md | Personal growth focus and evidence. |
+- **What it does:** creates missing vault folders and installs shared Obsidian defaults **without overwriting your settings**.
+- **Command:** `powershell -ExecutionPolicy Bypass -File .\scripts\setup-obsidian.ps1`
+- **Success:** `Setup complete.`
+- **Failure means:** the folder is not a Git clone (`is not a Git repository`).
+- **Next:** use the official folder from Part C2. Only add `-Force` if you intentionally want to replace your local shared settings.
 
-## Capture something without thinking too hard
+## E12. Repair a broken local vault — `repair-local-vault.ps1`
 
-1. If you do not know where something belongs, put it in 01 Inbox.
-2. Do not stop to perfectly categorize it.
-3. Process the Inbox during your daily or weekly review.
-4. Move it only after you know what it is.
+- **What it does:** backs up your `.obsidian` settings to `.local-backups\`, pulls the latest `main` safely, and re-applies the shared defaults.
+- **Command:** `powershell -ExecutionPolicy Bypass -File .\scripts\repair-local-vault.ps1`
+- **Success:** `Repair complete.` and `Then open: 00 Home\Life OS.md`.
+- **Failure means:** `Git pull failed` — you have local edits that conflict with GitHub.
+- **Next:** run `git status`. Copy any notes you care about to a safe folder, then ask an agent to reconcile them. Your backup path is printed on screen.
 
-## Daily Notes
+## E13. Portfolio sync dry-run — `npm run portfolio:sync`
 
-- Location: 70 Journal/Daily
-- Template: 99 Templates/Daily Note
-- Use the daily note for what happened, what matters, decisions, and observations.
-- Do not turn the Daily Note into a second ClickUp task list.
+- **What it does:** shows (dry-run) how vault projects would map to the GitHub Project board. It does not change anything by default.
+- **Command:** `npm run portfolio:sync`
+- **Success:** a printed plan with no error.
+- **Live mode:** needs a GitHub token with `project` scope 🔑 and `--live --project-id <id>`. Only add `--apply` when you intend to change the board.
 
-## Projects in Obsidian
+## E14. Get the latest official version — `git pull`
 
-- A project note explains the outcome, why it matters, important context, related areas/goals, and evidence.
-- The active work itself should be operationalized in ClickUp.
-- Use Obsidian to remember the story; use ClickUp to move the work.
+- **Command:** `git checkout main` then `git pull --ff-only origin main`
+- **Success:** `Already up to date.` or a list of updated files.
+- **Failure:** `Not possible to fast-forward` → you have local edits. Run `git status` and ask an agent to reconcile.
 
-## Weekly review
+## E15. The full pre-merge checklist (run all, in order)
 
-- [ ] Open Dashboards/Weekly Review.md.
-- [ ] Review Inbox.
-- [ ] Review active projects.
-- [ ] Review blocked and waiting items.
-- [ ] Record decisions.
-- [ ] Confirm ClickUp reflects the real next actions.
+```powershell
+npm ci
+npm audit --audit-level=high
+npm run lint
+npm run typecheck
+npm test
+npm run build
+powershell -ExecutionPolicy Bypass -File .\scripts\audit-vault.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\validate-maps.ps1
+```
 
-> [!tip] DO NOT DELETE LEGACY FOLDERS YET
-> The numbered PARA structure is the standard going forward. Legacy flat folders should be reviewed and archived safely, not deleted blindly.
+**Success:** every command succeeds as described above. GitHub runs the same checks on every pull request.
 
-# 4. ClickUp: Your Execution Layer
+---
 
-> [!info] WHEN TO OPEN CLICKUP
-> Open ClickUp when you are ready to DO something: start work, see priority, record a blocker, update status, or prove completion.
+# 7. Part F — How to Use LifeOS (Everyday User Guide)
 
-## Your Space
+All steps are 🌐 Browser steps at `https://lifeos-enterprise.vercel.app/`.
 
-**LIFE-OS-OPERATIONS**
+## F1. Home (Command Center) — `/`
 
-- Core Systems
-- Client Delivery
-- Product Systems
-- Automation
-- Portfolio Cleanup
+1. Open LifeOS.
+2. Read **Today**: your primary mission and critical outcomes.
+3. Read **Start here**: the single most important next action.
+4. Read **Where was I**: what you were doing, what is waiting, and what an agent can continue.
+5. Click **Resume work** to jump into that work.
+6. Optional: under **Where was I**, click **Save this as a checkpoint** to open it, then click **Save checkpoint** to save your place as an official record 🔑 (needs the Owner write secret; switched off until Part K is done).
 
-## Your task statuses
+## F2. Navigate the major areas
 
-| Status | Meaning |
-| --- | --- |
-| Not Started | The task exists but is not ready to work. |
-| Ready | You can work it now. |
-| In Progress | You are actively working it. |
-| Blocked | Something prevents progress. |
-| Waiting | You need another person/system/event. |
-| Review | Work is done; evidence needs checking. |
-| Complete | Evidence is accepted. Stop working it. |
+- Desktop: use the left menu.
+- Phone: use the bottom dock; everything else is under **More**.
+- Keyboard: press **Ctrl + K** (or click the search/command button) to open the command palette, type a place such as `journal`, and press **Enter**.
 
-## Priority
+## F3. Capture — `/inbox`
 
-- Urgent = P0 Critical
-- High = P1 High
-- Normal = P2 Medium
-- Low = P3 Low
+1. Click **Capture** (menu) or the capture button.
+2. In **Capture type**, pick Note, Task, Idea, Reminder, or Resource.
+3. Type your thought.
+4. Click **Save to inbox**.
 
-## How to work a task
+**Success:** the item appears in the **Saved from you** list.
+> [!warning] Captures are saved **only in this browser**. To make one permanent, copy it into Obsidian `01 Inbox`, or (for links/resources) use **Promote a resource to the canonical vault** on the same page 🔑.
 
-1. Open the task.
-2. Read Objective.
-3. Read Current State.
-4. Read Blocker and Waiting On.
-5. Read Next Action.
-6. Do only that next action.
-7. Add evidence.
-8. Move to Review.
-9. After evidence is checked, move to Complete.
+## F4. Projects — `/projects`
 
-> [!warning] THE MOST IMPORTANT CLICKUP RULE
-> Do not mark Complete because you are tired of the task. Mark Complete only when the evidence proves the success criteria.
+1. Click **Projects**.
+2. Each card shows status, priority, next action, and blockers from the official project note.
+3. Click **Resume this project** to open its workspace.
+4. To change a project's status or next action, use the **Command Board** on **More → Widget workspace**. Changes are *staged* in the browser, then packaged for approval; they only become official through a draft pull request that you merge.
 
-## What counts as evidence
+## F5. Today — `/today`
 
-- A GitHub PR or commit.
-- A successful CI check.
-- A screenshot of the working result.
-- A verified deployment.
-- A database record.
-- A ClickUp verification note.
-- A linked source file or runbook.
+1. Click **Today** (on phone: **More → Today**).
+2. Read today's mission, outcomes, the resume package, and the next action.
+3. The **LifeOS Game** card shows your level, XP, and streak; click **Open game loop** to play (see F15).
 
-## If ClickUp is stale
+## F6. Journal — `/journal`
 
-1. Do not trust an old blocker if you know the situation changed.
-2. Update the existing task with verified facts.
-3. Clear resolved blockers.
-4. Set one new Next Action.
-5. Do not create a duplicate task.
+1. Click **Journal**.
+2. Under **Quick entry**, type in **Today's journal entry**.
+3. Click **Save**.
+4. See earlier entries under **Recent entries**.
+> Journal drafts saved here stay in this browser. Your permanent journal is `70 Journal/Daily` in Obsidian.
 
-# 5. GitHub: Technical Source of Truth
+## F7. Learning — `/learning`
 
-> [!info] WHEN TO OPEN GITHUB
-> Use GitHub when the work involves code, files, repositories, branches, pull requests, CI checks, or technical evidence.
+1. Click **Learning**.
+2. Under **Continue learning**, click **Resume this topic** on the topic you want.
+3. To add a topic: type it in **Add a learning topic** and click **Add to my queue**.
 
-## Normal code-change flow
+## F8. Files and resources — `/files`
 
-1. Work on a branch, not directly on main.
-2. Make the change.
-3. Run the relevant checks.
-4. Open a pull request.
-5. Read the diff.
-6. Wait for required checks to go green.
-7. Merge into main.
-8. Use the merged result as evidence in ClickUp.
+1. Click **Files**.
+2. Type a word into **Find something** and press **Enter** or click **Search**.
+3. Click a result to read the note.
+4. For a deeper search: **More → Search vault**.
+5. To review captured resources: **More → Resource review** (`/resources/review`). Each resource shows its lane (for example Needs decision, Watch, Completed). Recording a decision uses **Stage review decision PR** 🔑.
 
-## If a file is 'missing'
+## F9. Automations — `/automations`
 
-1. Check whether you are looking at main.
-2. Check whether the file exists on another branch.
-3. Do not assume a 404 means the file never existed.
-4. Merge the approved branch to main before another system depends on the file.
+1. Click **Automations**.
+2. Read which automations are configured and which are not. LifeOS never shows a fake "connected" state.
+3. Registered recurring routines live in `Automations/ROUTINE_REGISTRY.json`; their run evidence is in GitHub **Actions** (Part B3).
 
-## Repository rule
+## F10. Integrations — `/integrations`
 
-> [!tip] ONE ACTIVE REPO PER PROJECT
-> Do not let duplicate repositories become duplicate projects. Archive or consolidate only after unique assets and dependencies are reviewed.
+1. Click **Integrations**.
+2. Read each service: **Available/Connected** (working) or **Unavailable** with the exact missing setting.
+3. As of 30 Sep 2026: LifeOS vault and GitHub health are working; ClickUp, Slack, n8n, Vercel actions, Hermes, Google, and paid voice are not configured (Part K).
 
-## What NOT to do
+## F11. Ask LifeOS (conversation) — `/conversation`
 
-- Do not merge because a branch 'looks fine.' Check status and diff.
-- Do not create a second repo because you cannot find the first one.
-- Do not treat an open PR as implemented capability.
-- Do not delete legacy repos without unique-asset verification.
+1. Click **Ask LifeOS**.
+2. Type a question in the message box, for example `What needs attention?`, and click **Send**.
+3. Watch **Agent activity** for what LifeOS is doing. Read-only work runs immediately.
+4. If LifeOS proposes a change, you will see **Approve** and **Reject**. Approving requires the Owner write secret 🔑 and is switched off until Part K is done.
+5. To stop the agent: click **Pause agent** or **Stop task**.
 
-# 6. n8n: Your Automation Engine
+## F12. Voice controls — on `/conversation`
 
-> [!info] WHEN TO OPEN n8n
-> Use n8n when the same information needs to move between tools automatically, or when a repeatable workflow should run without manual copying.
+1. Open **Ask LifeOS**.
+2. Read the privacy note: your speech is turned into text by your browser's speech service; LifeOS does not record audio.
+3. Click **Start conversation**. When your browser asks for the microphone, click **Allow**.
+4. The state label shows **Listening**, **Thinking**, **Speaking**, **Muted**, or **Error** in words.
+5. Speak normally. Your words appear in the transcript.
+6. To make LifeOS stop talking right away: click **Interrupt assistant**.
+7. To stop the microphone: click **Mute microphone**. To turn it back on: **Unmute microphone**.
+8. If continuous listening is unreliable, press and hold **Push to talk** while speaking and release when done.
+9. To end: click **Stop conversation**.
+10. **Voice settings** panel: choose **Provider**, **Locale**, **Voice**, **Input language**, **Response style** (Balanced, Concise, Teaching coach), **Speed**, and **Pitch**. Click **Preview voice** to hear it. Click **Reset to default** to undo. Settings are remembered in this browser, even after a reload.
+11. The line **Next reply: …** shows which voice will speak. If the better voice is unavailable, a visible note says LifeOS is using the browser voice and why. If your browser has no voice for the chosen locale, a warning says so; LifeOS never switches language silently.
+12. If something goes wrong (for example the microphone is blocked), click **Try again** or **Resume conversation**. You do not need to reload the page.
+13. While LifeOS is still thinking about your last message, a new message is held back with a visible note, and saying the same sentence twice only sends it once.
 
-## Your proven automation path
+> [!info] Today only the free **browser voice** is active. The higher-quality OpenAI voice turns on only after the owner adds a paid key and a TTS secret (Part K).
 
-**GitHub Issue → n8n → ClickUp Task Update**
+## F13. Share your screen — on `/conversation`
 
-- GitHub issue #50 was used as the controlled proof event.
-- n8n read the issue and validated a proof token.
-- n8n updated an existing ClickUp task.
-- n8n added the GitHub source URL and proof token.
-- n8n changed the ClickUp task status to Review.
+1. Click **Share screen**.
+2. Pick the window or tab in your browser's picker and click **Share**. LifeOS never starts sharing by itself.
+3. To stop: click **Stop sharing** (or your browser's **Stop sharing** bar).
 
-## How to read an n8n workflow
+## F14. Widgets and customization — **More → Widget workspace** (`/dashboard`)
 
-1. Start at the leftmost trigger node.
-2. Follow the arrows left to right.
-3. Green check = that node succeeded.
-4. Red node = stop there and read the exact error.
-5. Do not fix downstream nodes until the first failure is understood.
+1. Open **More** → **Widget workspace**.
+2. Desktop: drag a widget by its handle to move it; drag the bottom-right corner to resize it.
+3. Click the minimize control on a widget to shrink it; click it again to restore it.
+4. Click **Widget Library / Customize** to **Show** / **Hide**, **Add widget** / **Remove widget**, or reorder widgets. Click **Close** when done.
+5. Phone: widgets become compact cards with **Move up** / **Move down** buttons; use **Widget Library / Customize** to show or hide.
+6. If the layout looks wrong: click **Repair layout**. It fixes broken entries and tells you what it repaired.
+7. To start over: click **Restore default layout** and confirm.
+8. If one widget crashes, only that widget shows an error box with **Retry widget** and **Repair layout**; the rest of the page keeps working.
 
-## How to test safely
+## F15. Game and progression — **LifeOS Game Loop** widget on `/dashboard`
 
-1. Use a controlled test event.
-2. Use a unique proof token.
-3. Target an existing test task.
-4. Prevent production actions.
-5. Verify the destination actually changed.
-6. Only then call the automation connected.
+1. Set your **Alias** and pick an **avatar**.
+2. Click **Daily check-in (+20 XP)** once per day to build your streak.
+3. Each quest comes from real LifeOS records: main quests from active projects, side quests from your areas (health, learning, growth, money, relationships, service) when a matching note exists, and boss battles from blocked projects.
+4. Finish the real work first. Then click **Complete (attest)** and confirm. XP is added **once**; clicking again or refreshing never adds it twice.
+5. Boss battles: click **Mark step** on each smaller step. When all steps are done, click **Complete (attest)**.
+6. Missed exactly one day? Click **Recover streak (+10 XP)** on the next day to restore it.
+7. Click **End day results** to see what you finished, XP earned, streak, level, and achievements.
+8. The bar shows progress to the next level (250 XP per level). Messages announce **+XP**, **Level up!**, and **Achievement unlocked**.
 
-> [!warning] CURRENT HARDENING ITEM
-> The proof comment was written multiple times. Before broad automation, add an idempotency guard so the same source event cannot update the same destination repeatedly.
+## F16. Prompt library — **More → Prompt Intelligence** (`/prompts`)
 
-## Credential rule
+1. Type what you are trying to do into **Find a prompt**.
+2. Click **Open prompt** and copy it.
+3. Official prompts live in `40 Resources/Prompts/`. Edit them in Obsidian.
 
-- Use secure credential cards/stores.
-- Never paste API keys or tokens into AI chat.
-- If there are two credentials with similar names, test access instead of guessing.
-- If a credential fails, stop and identify exactly which connection is missing.
+## F17. Recovery and reset (what is safe)
 
-# 7. Vercel and Supabase: Production Tools
+| Problem | Safe fix | What it deletes |
+|---|---|---|
+| Widget layout messy | **Repair layout** | Nothing you need; fixes broken entries |
+| Want default layout | **Restore default layout** → confirm | Your layout only (in this browser) |
+| Game looks wrong | **Repair state** | Nothing you need; fixes broken entries |
+| Start the game over | **Reset game** → confirm | Game progress in this browser (a backup copy is kept in the browser first) |
+| Voice stuck | **Try again**, or **Stop conversation** then **Start conversation** | Nothing |
+| Page error box | **Try again** | Nothing |
+| Everything in this browser is weird | Browser settings → clear site data for `lifeos-enterprise.vercel.app` | Browser-only captures, journal drafts, layout, game, voice settings. Official vault notes are **not** affected. |
 
-> [!tip] ONLY OPEN THESE WHEN A TASK SENDS YOU THERE
-> Vercel and Supabase are technical production tools. They are not where you plan your day.
+---
 
-## Vercel
+# 8. Part G — Owner / Admin Guide
 
-- Purpose: deploy websites/apps and hold production environment variables.
-- After adding or changing environment variables, redeploy so the deployment picks them up.
-- Environment variables are secrets/configuration; do not paste secret values into chat.
-- Use Production scope for production-only credentials unless the runbook explicitly says otherwise.
+## G1. Admin places (bookmark these)
 
-## Supabase
+| Place | URL | Needs |
+|---|---|---|
+| Production website | `https://lifeos-enterprise.vercel.app/` | Nothing |
+| GitHub repository | `https://github.com/ebyron357/LifeOS-Enterprise` | GitHub account **ebyron357** 🔑 |
+| GitHub checks | `https://github.com/ebyron357/LifeOS-Enterprise/actions` | same |
+| Vercel project | `https://vercel.com/tradeiq/lifeos-enterprise` | Vercel team **tradeiq** member 🔑 |
+| Vercel deployments | `https://vercel.com/tradeiq/lifeos-enterprise/deployments` | same |
+| Vercel environment variables | `https://vercel.com/tradeiq/lifeos-enterprise/settings/environment-variables` | same |
+| Vercel logs | `https://vercel.com/tradeiq/lifeos-enterprise/logs` | same |
 
-- Purpose: database/backend.
-- Keep unrelated systems in separate projects when possible.
-- Do not reuse a database just because a Supabase project already exists.
-- Run repository migrations against the correct project before testing application features.
+## G2. Roles and access
 
-## ClientVerse example
+| Role | Who | Can do | How they get in |
+|---|---|---|---|
+| Viewer | Anyone with the URL | Read non-private vault pages; use browser-only capture, journal drafts, widgets, game, voice | Open the URL. No login. |
+| Owner (web) | You | Everything a viewer can, plus approve writes and stage draft PRs | Type the **Owner write secret** 🔑 into the write form each time |
+| Repository owner | GitHub **ebyron357** | Merge pull requests (= final approval), change GitHub settings | GitHub login 🔑 |
+| Deployment admin | Vercel team **tradeiq** | Redeploy, roll back, change environment variables, read logs | Vercel login 🔑 |
+
+**Privacy:** notes with `private: true`, `publish: false`, or `web_visibility: private`, and folders named `private`, are never shown on the website. Code folders and secrets files are never shown. Full rules: `lib/vault/exclusions.ts` and `docs/WEB_VAULT_PORTAL.md`.
+**If you want the whole website private:** that is an owner decision. Vercel offers Deployment Protection (password / Vercel login) under **Settings → Deployment Protection**; some options are paid plans. LifeOS works either way.
 
-1. A dedicated Supabase project named clientverse-production was created.
-2. The unrelated cv-engine project was not reused.
-3. The ClientVerse lead-gateway SQL migration was run against the new project.
-4. Vercel received the required production configuration.
-5. The remaining closeout step is a live lead-form smoke test plus database verification.
+## G3. Login and password recovery
 
-> [!warning] SECRET SAFETY
-> Do not put service-role keys, API tokens, salts, cron secrets, passwords, or private integration tokens into chat messages, screenshots, docs, or ClickUp comments.
-
-# 8. Where Do I Go? Decision Page
-
-| If I need to… | Go to… | Then… |
-| --- | --- | --- |
-| Remember what a project is for | Obsidian | Open the project/business note. |
-| Know what to work on next | ClickUp | Open Today / highest priority task. |
-| Record a blocker | ClickUp | Update Blocker + Next Action. |
-| Capture a random thought | Obsidian | Put it in 01 Inbox. |
-| Change code | GitHub | Branch → PR → checks → merge. |
-| See why CI failed | GitHub | Open the failing check/log. |
-| Automate repeated work | n8n | Build/test a controlled workflow. |
-| Change production env vars | Vercel | Settings → Environment Variables. |
-| Change database schema | Supabase | Run the approved migration. |
-| Prove work is finished | ClickUp | Attach/link evidence, move to Review/Complete. |
-
-# 9. When Something Is Not Working
-
-> [!warning] NO-GUESSING RECOVERY PROTOCOL
-> If the screen does not match the instruction, STOP. Do not click around hoping. Use the exact screen in front of you.
-
-## Do this in order
-
-1. State the exact tool you are in.
-2. State the exact page/screen name.
-3. Read the exact error text or send a screenshot.
-4. Identify the first failed step.
-5. Fix only that step.
-6. Re-run once.
-7. Record the result.
-
-## Common problems
-
-| Problem | What it usually means | What to do |
-| --- | --- | --- |
-| 404 / file not found | Wrong branch, private access, or wrong path | Verify repo + branch + permissions before rebuilding. |
-| n8n red node | First real workflow failure | Read that node's exact error; do not guess downstream. |
-| ClickUp task is wrong/stale | Reality changed after task creation | Update the existing task; do not duplicate. |
-| Credential unauthorized | Wrong token/type/user/permissions | Verify credential type and access; do not keep generating tokens blindly. |
-| Vercel change not visible | Deployment did not pick up new config | Redeploy production. |
-| Supabase has wrong tables | Wrong project | Stop. Identify or create the correct project. |
-
-# 10. Daily and Weekly Operating Cards
-
-## Daily Start - 5 minutes
-
-- [ ] Open Obsidian → 00 Home → Life OS.
-- [ ] Read what matters today.
-- [ ] Open ClickUp → LIFE-OS-OPERATIONS.
-- [ ] Pick ONE Ready / In Progress P0 or P1 task.
-- [ ] Do the Next Action only.
+- **LifeOS website:** no passwords. Nothing to recover.
+- **Owner write secret lost or leaked** 🔑:
+  1. Make a new long random secret (for example in PowerShell: `[guid]::NewGuid().ToString("N") + [guid]::NewGuid().ToString("N")`).
+  2. Vercel → **Settings → Environment Variables** → find `LIFEOS_WRITE_SECRET` → **Edit** → paste the new value → **Save**.
+  3. Redeploy (G5). The old secret stops working immediately after the new deployment is live.
+- **GitHub password:** `https://github.com/password_reset`.
+- **Vercel login:** `https://vercel.com/login` (use the same method you signed up with; GitHub or email).
+
+## G4. Verify what is live (do this at the start of every check)
+
+1. 🌐 Open `https://vercel.com/tradeiq/lifeos-enterprise/deployments`.
+2. Find the row marked **Production** and **Ready** at the top.
+3. Click it. Write down the **Deployment ID** (starts with `dpl_`) and the **commit** (7+ characters).
+4. 🌐 Open `https://github.com/ebyron357/LifeOS-Enterprise/commits/main`. The top commit should match the Production commit. If not, a deployment is still building or failed — wait 5 minutes and check again.
+5. 🌐 Open these health addresses. Each must show `"ok":true`:
+   - `https://lifeos-enterprise.vercel.app/api/lifeos/agent/session` — lists every tool and says which are available
+   - `https://lifeos-enterprise.vercel.app/api/lifeos/voice/session` — shows the active voice provider
+   - `https://lifeos-enterprise.vercel.app/api/lifeos/resource-intake` — `"configured":true` only after Part K step 1
+   - `https://lifeos-enterprise.vercel.app/api/lifeos/continuity/checkpoint` — same
+   - `https://lifeos-enterprise.vercel.app/api/lifeos/change-plan` — `"directMainWrites":false` must always be false
+
+Evidence recorded on 30 Sep 2026: production deployment `dpl_CxF6WThSCMDdrftveicnzcN3FCC6` was **Ready** at commit `21b921c` (same as `main`); the health addresses above returned 200; Vercel reported **no runtime errors in the previous 7 days**.
+
+## G5. Restart / redeploy safely
+
+LifeOS runs on Vercel serverless. There is no server to "restart". A redeploy is the restart.
+
+1. Open Vercel **Deployments**.
+2. On the current **Production** row, click **⋯** (three dots).
+3. Click **Redeploy** → leave **Use existing Build Cache** as is → click **Redeploy**.
+4. Wait until the new row says **Ready** (1–5 minutes).
+5. Repeat G4 steps 4–5.
+
+You must redeploy after changing any environment variable.
+
+## G6. Roll back
+
+1. Open Vercel **Deployments**.
+2. Find the last deployment that you know worked (marked **Ready**, target **Production**).
+3. Click **⋯** → **Instant Rollback** (may be labelled **Rollback** or **Promote to Production**).
+4. Confirm.
+5. Check G4 again and write the deployment ID in your notes.
+6. Then fix the cause with a normal pull request (a "revert" PR). Never rewrite `main` history.
+
+## G7. Check logs and failure state
+
+1. Vercel project → **Logs** tab. Filter **Level: Error** and time **Last 24 hours**.
+2. Vercel project → **Observability** (or **Runtime errors**) for grouped errors.
+3. GitHub → **Actions** for failed checks (Part B3).
+4. Website → **Integrations** for which services are missing settings.
+
+## G8. Validate integrations
+
+1. Open `/integrations`. Each unconfigured service lists the exact missing setting.
+2. Open `https://lifeos-enterprise.vercel.app/api/lifeos/agent/session`. Each tool shows `"availability":"available"` or `"unavailable"` with `missingRequirements`.
+3. After adding settings (Part K), redeploy (G5), then reload both pages. A service only counts as connected when it shows available here **and** a real test action succeeds.
+
+## G9. Backup, export, and recovery
+
+- **The vault is backed up by Git.** Every clone (your computer, GitHub) is a full copy with history.
+- **Export everything:** GitHub → **Code** (green button) → **Download ZIP**, or `git clone` (Part C2).
+- **Recover a deleted or changed note:** GitHub → open the file → **History** → pick the old version → copy it back through a pull request, or in PowerShell: `git log -- "<path>"` then `git checkout <commit> -- "<path>"`.
+- **Browser-only data is NOT backed up**: Capture items, journal drafts, widget layout, game progress, voice settings. Copy anything important into Obsidian.
+- **Local Obsidian settings** are backed up by `repair-local-vault.ps1` into `.local-backups\`.
+
+## G10. Environment settings reference
+
+The full list is in `docs/DEPLOYMENT.md` and `.env.example`. Rules:
+- Put secrets only in Vercel → **Settings → Environment Variables** (Production), never in files or chat.
+- After any change, redeploy (G5).
+- Leave `LIFEOS_APPROVAL_STORE` empty in production.
+
+---
+
+# 9. Part H — Troubleshooting
+
+| Symptom | Likely cause | Look here | Fix |
+|---|---|---|---|
+| Website does not load | Failed or building deployment | Vercel **Deployments** | Wait 5 min; if last deploy **Error**, roll back (G6) |
+| Page shows an error box | A page crashed in the browser | The error text on screen | Click **Try again**; if it repeats, note the text and check Vercel **Logs** |
+| One widget shows an error box | That widget crashed | Widget error text | Click **Retry widget**, then **Repair layout** |
+| Widgets overlap / missing | Old or broken layout saved in the browser | Widget workspace | **Repair layout**, then **Restore default layout** if needed |
+| XP did not go up | Quest not attested, or already counted | Game widget message | Click **Complete (attest)** and confirm; XP never counts twice by design |
+| Streak reset | Missed more than one day | Game widget | Streak recovery only covers a single missed day |
+| Microphone does nothing | Permission blocked, or browser has no speech recognition (Firefox) | Browser address-bar lock icon → Site settings | Allow microphone; use Chrome/Edge/Safari; click **Recover** |
+| LifeOS voice sounds robotic | Browser voice fallback in use | Voice settings provider line | Expected until paid TTS is configured (Part K) |
+| "Owner write secret" button disabled | Writes not configured | `/api/lifeos/resource-intake` shows `"configured":false` | Complete Part K step 1 |
+| Approve fails with "unavailable" | Durable approval storage missing | `/api/lifeos/agent/session` → `missingRequirements` | Complete Part K step 2 |
+| Integration says unavailable | Its credentials are missing | `/integrations` | Add the named settings (Part K), redeploy |
+| GitHub check red on a PR | A test, lint, audit, or build failed | PR → **Checks** → failed step | Fix the first error; never merge red |
+| `npm audit` fails in CI | New security advisory in a library | Actions log `npm audit` step | Patch version bump (E8) |
+| Vault audit fails | Broken link or missing metadata | Output `Errors:` list | Fix the note; rerun E9 |
+| `git pull` refuses | Local edits conflict | `git status` | Save your notes elsewhere; ask an agent to reconcile |
+| Obsidian shows raw code instead of tables | Bases plugin off | Obsidian **Settings → Core plugins** | Turn on **Bases** |
+
+---
+
+# 10. Part I — Ownership and Dependency Register
+
+| Dependency | What LifeOS uses it for | Owner | Status (30 Sep 2026) | If it fails |
+|---|---|---|---|---|
+| GitHub repo `ebyron357/LifeOS-Enterprise` | Official copy, PRs, checks | Owner (ebyron357) | Working | Nothing official can change; website keeps running |
+| GitHub Actions | CI checks and the daily MAPS routine | Owner | Working | PRs cannot be verified |
+| Vercel project `tradeiq/lifeos-enterprise` | Hosting production website | Owner (Vercel team tradeiq) | Working, Ready | Roll back (G6) |
+| Obsidian (local app) | Reading/editing the vault | Owner | Local only | Website still works |
+| Browser speech (Web Speech API) | Free voice in/out | Browser vendor | Working (browser-dependent) | Type instead of speaking |
+| OpenAI TTS | Higher-quality voice | Owner 🔑 (paid) | Not configured | Browser voice is used |
+| Upstash Redis | Durable approval storage | Owner 🔑 | Not configured | All approvals/writes fail closed (safe) |
+| GitHub fine-grained token | Draft-PR writes from the website | Owner 🔑 | Not configured | Writes fail closed (safe) |
+| ClickUp / Slack / n8n / Google / Hermes | Optional actions | Owner 🔑 | Not configured | Shown as unavailable |
+| ClickUp space LIFE-OS-OPERATIONS | Your optional task board | Owner | Used directly by you | Use LifeOS Home instead |
+
+---
+
+# 11. Part J — Final Acceptance
+
+The full, signable checklist is `docs/OWNER_ACCEPTANCE_WORKBOOK.md`. Use it. The short version:
+
+1. Do G4 and write down the production deployment ID and commit.
+2. On desktop, do F1–F11 and confirm each "Success looks like".
+3. On desktop, do F12 with a real microphone: start, speak, interrupt, mute/unmute, change voice + speed, preview, reload and confirm settings stayed.
+4. On desktop, do F13 (share screen, stop sharing, deny once).
+5. On desktop, do F14 and F15 (drag, resize, hide/show, repair, complete one real quest, check-in, end day).
+6. On your phone, repeat F1, F3, F12 (steps 3–7), and F14 step 5.
+7. Confirm a write button fails safely while writes are off (Part K not done): it must refuse, not pretend.
+8. If you completed Part K, do workbook Section G (approvals and draft PRs) and Section I rows I3–I6 (the Resource Intelligence acceptance candidate `https://github.com/vercel-labs/knowledge-agent-template`).
+9. Do workbook Section J (MAPS daily routine evidence): the first scheduled run is the day after 30 September 2026.
+10. Fill in the workbook sign-off (Section K) and mark **READY TO ACCEPT**, **BLOCKED**, or **NOT READY**.
+
+---
+
+# 12. Part K — Owner-Only Setup (credentials) 🔑
+
+Only you can do these. LifeOS is safe and usable without them; they switch on optional capabilities.
+
+**Step 1 — Turn on governed writes (checkpoints, resource intake, review decisions, change plans)**
+1. 🌐 Create a GitHub fine-grained token: `https://github.com/settings/personal-access-tokens/new` → **Repository access: Only select repositories → LifeOS-Enterprise** → **Permissions: Contents: Read and write; Pull requests: Read and write** → **Generate token**. Copy it.
+2. 🌐 Vercel → **Settings → Environment Variables** → **Add** (Production):
+   - `LIFEOS_GITHUB_TOKEN` = the token
+   - `LIFEOS_WRITE_SECRET` = a new long random secret (G3 step 1). Save it in your password manager.
+   - `LIFEOS_ALLOWED_ORIGIN` = `https://lifeos-enterprise.vercel.app`
+   - Confirm `LIFEOS_WRITE_ENABLED` = `true`
+3. Redeploy (G5).
+4. **Success:** `https://lifeos-enterprise.vercel.app/api/lifeos/resource-intake` shows `"configured":true`.
+
+**Step 2 — Turn on durable approvals (agent approvals, ClickUp/Slack/n8n/Vercel actions)**
+1. 🌐 Create a free or paid Upstash Redis database at `https://console.upstash.com/` → **Create Database** → open it → copy **REST URL** and **REST Token**.
+2. Vercel → add `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (Production).
+3. Redeploy (G5).
+4. **Success:** `/api/lifeos/agent/session` no longer lists `UPSTASH_REDIS_REST_URL` under `missingRequirements`.
+
+**Step 3 — Optional paid voice (OpenAI)**
+1. 🌐 Create an API key at `https://platform.openai.com/api-keys` (billing decision 🔑).
+2. Vercel → add `OPENAI_API_KEY` and `LIFEOS_TTS_SECRET` (or rely on `LIFEOS_WRITE_SECRET`).
+3. Redeploy. **Success:** `/api/lifeos/voice/session` shows OpenAI `"configured":true`.
+
+**Step 4 — Optional tools** (only if you want them): `CLICKUP_API_TOKEN` + `CLICKUP_LIST_ID`; `SLACK_BOT_TOKEN` + `SLACK_DEFAULT_CHANNEL`; `N8N_WEBHOOK_URL`; `VERCEL_TOKEN` + `VERCEL_PROJECT_ID`. Redeploy after adding.
+
+---
+
+# 13. Daily and Weekly Operating Cards
+
+## Daily start — 5 minutes
+- [ ] Open LifeOS Home.
+- [ ] Read **Start here**.
+- [ ] Click **Resume work**.
+- [ ] Do the one next action.
+- [ ] Optional: **Daily check-in** in the game.
 
 ## During work
-
-- [ ] If blocked, write the blocker immediately.
-- [ ] If waiting, say who/what you are waiting on.
-- [ ] If technical work changed, link GitHub evidence.
-- [ ] If you discover a new idea, capture it; do not derail the current task.
+- [ ] If blocked, write the blocker in the project note (Obsidian) or ask LifeOS to stage it.
+- [ ] New idea? **Capture** it; do not switch tasks.
 
 ## Daily close
-
-- [ ] Update the current task status.
-- [ ] Add evidence or a short progress note.
-- [ ] Set the next action.
-- [ ] Capture loose thoughts in Obsidian Inbox.
-- [ ] Stop. Do not create a giant tomorrow list.
+- [ ] Journal: two sentences → **Save**.
+- [ ] Game: **End day results** (optional).
+- [ ] Copy any important browser captures into Obsidian `01 Inbox`.
 
 ## Weekly reset
+- [ ] Obsidian → `Dashboards/Weekly Review.md`.
+- [ ] Process `01 Inbox`.
+- [ ] Review blocked and waiting projects on `/projects`.
+- [ ] Review open pull requests on GitHub; merge only green, understood ones.
+- [ ] Check GitHub **Actions** for any red daily MAPS run.
 
-- [ ] Open Weekly Review in Obsidian.
-- [ ] Process Inbox.
-- [ ] Review ClickUp Blocked / Waiting.
-- [ ] Close completed work with evidence.
-- [ ] Check P0/P1 priorities.
-- [ ] Confirm no duplicate projects/tasks were created.
-- [ ] Review automation failures or repeated runs.
+---
 
-# 11. Prompt Library
-
-> [!info] WHY THESE PROMPTS ARE SHORT
-> Your best prompts should tell the agent: exact target, exact allowed action, exact prohibited action, and exact proof of success.
+# 14. Prompt Library
 
 Canonical Prompt Intelligence records live under `40 Resources/Prompts/`:
 
@@ -405,9 +720,20 @@ Canonical Prompt Intelligence records live under `40 Resources/Prompts/`:
 - [[GitHub Read-Only Audit]]
 - [[Vercel Production Closeout]]
 
-The copy blocks below remain in this SOP for operator use. They are not a second prompt system.
+The copy blocks below remain for operator use. They are not a second prompt system.
 
-## ClickUp - update one task
+## Ask an agent to fix one failing check
+
+```text
+Repository: ebyron357/LifeOS-Enterprise. Branch: <branch>.
+The check "<check name>" failed on commit <sha>.
+Reproduce it locally, fix the root cause with the smallest change,
+rerun lint, typecheck, tests, build, vault audit, and MAPS validation,
+push to the same branch, and report the new commit SHA and results.
+Do not skip or disable tests. Do not merge.
+```
+
+## ClickUp — update one task
 
 ```text
 Update the existing task: [TASK NAME]
@@ -419,20 +745,7 @@ Add evidence: [LINK/RESULT]
 Do not change any other task or structure.
 ```
 
-## n8n - test one automation
-
-```text
-Build a controlled proof only.
-Source: [EVENT]
-Target: [EXISTING OBJECT ID]
-Validate: [TOKEN / SOURCE]
-Action: [ONE UPDATE]
-Do not create duplicates.
-Do not touch production.
-Do not claim success unless the target actually changed.
-```
-
-## GitHub Copilot - inspect before changing
+## Read-only audit
 
 ```text
 Perform a READ-ONLY audit.
@@ -443,88 +756,65 @@ Do not guess.
 Give me one next action.
 ```
 
-# 12. Keep the System Clean
+---
 
-- Do not create a new repository unless there is a clear unique purpose.
-- Do not create a new ClickUp List for every repo.
-- Do not create one List per AI agent.
+# 15. Keep the System Clean
+
+- One LifeOS, one Command Center (`/`), one manual (this page), one status document (`docs/CANONICAL_LIVE_STATUS.md`).
+- Do not create a new repository, dashboard, or command center to solve a navigation problem.
+- Do not treat an open pull request as finished work.
 - Do not automate an unstable workflow.
-- Do not archive/delete until unique assets and dependencies are checked.
-- Do not let open PRs become fake 'progress.'
-- Do not maintain two command centers. LifeOS is the control plane.
+- Do not delete legacy folders until their notes are reviewed.
+- Never paste secrets into chat, notes, screenshots, or ClickUp.
 
-## Monthly maintenance
+---
 
-- [ ] Review ClickUp Portfolio Cleanup.
-- [ ] Review stale PRs.
-- [ ] Review archive candidates.
-- [ ] Review Technology and Repository Registry.
-- [ ] Review n8n duplicate-run/errors.
-- [ ] Confirm Obsidian dashboards still render.
-- [ ] Confirm ClickUp tasks still map to real outcomes.
+# 16. Plain-English Glossary
 
-# 13. Plain-English Glossary
+| Term | Meaning |
+|---|---|
+| Vault | Your Obsidian notes folder. It is also the GitHub repository. |
+| Repository (repo) | The GitHub project that holds all files and history. |
+| Branch | A safe copy for making changes before they join `main`. |
+| `main` | The official version. |
+| Pull request (PR) | A request to add a branch's changes to `main`. Merging it is approval. |
+| Draft PR | A pull request that is not ready to merge yet; LifeOS writes only these. |
+| CI / checks | Automatic tests that run on every PR. |
+| Deployment | A published version of the website on Vercel. |
+| Rollback | Switching the website back to an earlier deployment. |
+| Environment variable | A setting (often a secret) stored in Vercel, not in files. |
+| Fail closed | When a setting is missing, the action is refused instead of guessed. |
+| Attest | You confirm you really did the work before XP is given. |
+| Browser-local | Saved only in this browser on this device. |
 
-| Term | Plain-English meaning |
-| --- | --- |
-| Vault | Your Obsidian folder/system of notes. |
-| Repo / Repository | A GitHub project containing code/files/history. |
-| Branch | A safe work lane for changes before main. |
-| Pull Request (PR) | A review package asking to merge branch changes. |
-| CI | Automated checks that test code/change quality. |
-| Environment Variable | A configuration value kept outside the code. |
-| Migration | A controlled database/schema change. |
-| Webhook / Trigger | An event that starts an automation. |
-| Idempotency | Protection that prevents the same event from being processed twice. |
-| Control Plane | The system that tells everything else how work is organized. |
-| Source of Truth | The place you trust for the authoritative version. |
-| Evidence | Proof that a task/result actually happened. |
+---
 
-# 14. One-Page Emergency Quick Card
+# 17. One-Page Emergency Card
 
 > [!tip] I AM OVERLOADED. WHAT DO I DO?
 > 1. Stop clicking.
-> 2. Open ClickUp.
-> 3. Find the current task.
-> 4. Read Next Action.
-> 5. Do only that.
-> 6. If the task is unclear, open Obsidian for context.
-> 7. If code is involved, open GitHub.
-> 8. If automation is involved, open n8n.
-> 9. If production config/data is involved, use Vercel/Supabase.
-> 10. Record evidence and stop.
+> 2. Open `https://lifeos-enterprise.vercel.app/`.
+> 3. Read **Start here**.
+> 4. Do only that one action.
+> 5. If the website is broken: Vercel → Deployments → roll back (G6).
+> 6. If you are lost: open this manual, Part H.
 
 ## The reset phrase
 
-> **“What is the ONE next action?”**
+> **"What is the ONE next action?"**
 
-> [!info] FINAL RULE
-> No guessing. No duplicate work. No building a new system because the current screen is confusing. Verify first, then act.
+---
 
-# How to Use Interactive LifeOS
+# 18. Source Notes and Canonical References
 
-Use the Conversation workspace when you want to talk to LifeOS, share a screen, or watch the agent work. This does not replace Obsidian, ClickUp, or the Command Board.
+- Governing status: `docs/CANONICAL_LIVE_STATUS.md`
+- Owner acceptance workbook: `docs/OWNER_ACCEPTANCE_WORKBOOK.md`
+- Deployment and environment: `docs/DEPLOYMENT.md`, `.env.example`
+- Obsidian setup: `docs/OBSIDIAN_SETUP.md`
+- Voice: `docs/VOICE_ARCHITECTURE.md`
+- Resource Intelligence: `docs/RESOURCE_INTELLIGENCE.md`
+- Web portal and privacy: `docs/WEB_VAULT_PORTAL.md`
+- Platform blueprint: `docs/MASTER_PLATFORM_OPERATING_BLUEPRINT.md`
+- Agent rules: `AGENTS.md`
 
-1. Start LifeOS — open the dashboard, then open **Conversation**.
-2. Start voice — click **Start conversation**. LifeOS should say it can hear you. Use **Push to talk** if continuous listening is unreliable.
-3. Share screen — click **Share Screen** and pick a window. LifeOS will not start capture by itself.
-4. Ask LifeOS for help — type or speak. Example: “What needs attention?” or “Walk me through this screen.”
-5. Let the agent inspect — watch Agent Activity for the current task and tool. Read-only work can run immediately.
-6. Approve an action — if LifeOS asks, click **Approve** or **Reject**. High-risk work never runs silently.
-7. Stop the agent — click **Pause Agent** or **Stop Task**.
-8. Stop screen sharing — click **Stop Sharing**, or use the browser’s stop-share control.
-9. End the session — click **Stop conversation**. Transcripts stay temporary unless you hide them. Nothing is written to `main` from this screen.
-
-> [!warning] Screen capture in automated tests
-> Browsers block Playwright from granting screen-share permission. Verify Share Screen once yourself in the preview.
-
-# 15. Source Notes and Canonical References
-
-- LifeOS repository: ebyron357/LifeOS-Enterprise
-- Obsidian setup: docs/OBSIDIAN_SETUP.md
-- Canonical ClickUp migration plan: docs/CLICKUP_MIGRATION_PREVIEW.md
-- ClickUp Space: LIFE-OS-OPERATIONS
-- Verified ClickUp LifeOS task: Verify core dashboards in Obsidian
-- Verified automation proof: GitHub issue #50 → n8n → ClickUp task 86e2re8eg
-
-This manual is an owner-facing operating guide, not a replacement for repository runbooks. When a technical runbook and this guide differ on implementation details, use the current canonical repository/runbook for the technical step.
+When a technical runbook and this manual differ on implementation detail, the runbook wins for the technical step, and this manual must be updated.

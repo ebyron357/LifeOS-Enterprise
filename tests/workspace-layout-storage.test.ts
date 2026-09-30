@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { createDefaultWorkspaceLayout, WORKSPACE_LAYOUT_VERSION } from "@/lib/workspace/default-layout";
-import { parseWorkspaceLayout, serializeWorkspaceLayout, swapLayoutItemPositions } from "@/lib/workspace/layout-storage";
+import {
+  describeLayoutRepairs,
+  moveWidgetInLayout,
+  parseWorkspaceLayout,
+  repairWorkspaceLayout,
+  serializeWorkspaceLayout,
+  swapLayoutItemPositions,
+} from "@/lib/workspace/layout-storage";
 
 describe("workspace layout storage", () => {
   it("returns default layout for invalid stored JSON", () => {
@@ -73,5 +80,159 @@ describe("workspace layout storage", () => {
     expect(nextSecond?.x).toBe(first.x);
     expect(nextSecond?.y).toBe(first.y);
     expect(swapped.md.find((item) => item.i === first.i)?.y).toBe(original.layouts.md.find((item) => item.i === second.i)?.y);
+  });
+
+  it("reports nothing to repair for a healthy layout", () => {
+    const healthy = createDefaultWorkspaceLayout();
+    const result = repairWorkspaceLayout(serializeWorkspaceLayout(healthy));
+    expect(result.repairs).toEqual([]);
+    expect(result.state).toEqual(healthy);
+    expect(describeLayoutRepairs(result.repairs)).toBe("Layout checked: no problems found.");
+  });
+
+  it("fits off-grid, oversized, and fractional items to each breakpoint's columns", () => {
+    const defaults = createDefaultWorkspaceLayout();
+    const layouts = JSON.parse(JSON.stringify(defaults.layouts)) as typeof defaults.layouts;
+    layouts.lg[0] = { ...layouts.lg[0], x: 12, w: 4 };
+    layouts.xs[0] = { ...layouts.xs[0], w: 99 };
+    layouts.md[0] = { ...layouts.md[0], x: 1.5 };
+    const raw = JSON.stringify({ ...defaults, layouts });
+
+    const result = repairWorkspaceLayout(raw);
+    const lg = result.state.layouts.lg.find((item) => item.i === layouts.lg[0].i)!;
+    const xs = result.state.layouts.xs.find((item) => item.i === layouts.xs[0].i)!;
+    const md = result.state.layouts.md.find((item) => item.i === layouts.md[0].i)!;
+    expect(lg.x + lg.w).toBeLessThanOrEqual(12);
+    expect(lg.w).toBeGreaterThanOrEqual(lg.minW ?? 1);
+    expect(lg.x).toBe(12 - lg.w); // moved back inside the right edge
+    expect(xs.w).toBe(4);
+    expect(Number.isInteger(md.x)).toBe(true);
+    expect(result.repairs.join(" ")).toMatch(/Moved or resized to fit the grid: .*\(lg\).*\(md\).*\(xs\)|Moved or resized to fit the grid/);
+    expect(repairWorkspaceLayout(serializeWorkspaceLayout(result.state)).repairs).toEqual([]);
+  });
+
+  it("makes persisted size constraints consistent with the breakpoint grid", () => {
+    const defaults = createDefaultWorkspaceLayout();
+    const layouts = JSON.parse(JSON.stringify(defaults.layouts)) as typeof defaults.layouts;
+    layouts.xs[0] = { ...layouts.xs[0], w: 2, minW: 99 };
+    layouts.lg[0] = { ...layouts.lg[0], w: 6, minW: 2, maxW: 3, minH: 2.4, maxH: 1 };
+
+    const result = repairWorkspaceLayout(JSON.stringify({ ...defaults, layouts }));
+    const xs = result.state.layouts.xs.find((item) => item.i === layouts.xs[0].i)!;
+    const lg = result.state.layouts.lg.find((item) => item.i === layouts.lg[0].i)!;
+    expect(xs.minW).toBe(4);
+    expect(xs.w).toBeGreaterThanOrEqual(xs.minW!);
+    expect(xs.w).toBeLessThanOrEqual(4);
+    expect(lg.maxW).toBe(3);
+    expect(lg.w).toBeLessThanOrEqual(3);
+    expect(lg.minH).toBe(2);
+    expect(lg.maxH).toBeGreaterThanOrEqual(lg.minH!);
+    expect(lg.h).toBeGreaterThanOrEqual(lg.minH!);
+    expect(lg.h).toBeLessThanOrEqual(lg.maxH!);
+    expect(result.repairs.join(" ")).toContain("Moved or resized to fit the grid");
+    expect(repairWorkspaceLayout(serializeWorkspaceLayout(result.state)).repairs).toEqual([]);
+  });
+
+  it("reports missing widget settings and order as repairs", () => {
+    const defaults = createDefaultWorkspaceLayout();
+    const { widgets: _widgets, widgetOrder: _order, ...rest } = defaults;
+    void _widgets;
+    void _order;
+    const result = repairWorkspaceLayout(JSON.stringify(rest));
+    expect(result.repairs).toContain("Widget show/hide settings were missing and were rebuilt from defaults.");
+    expect(result.repairs).toContain("Widget order was missing and was rebuilt from the default order.");
+    expect(describeLayoutRepairs(result.repairs)).not.toBe("Layout checked: no problems found.");
+  });
+
+  it("normalizes a deliberately corrupted stored layout and lists each repair", () => {
+    const defaults = createDefaultWorkspaceLayout();
+    const corrupted = {
+      version: WORKSPACE_LAYOUT_VERSION,
+      workspaceId: "not-a-workspace",
+      layouts: {
+        lg: [
+          // prayer is missing; decision-queue only has an entry with invalid geometry.
+          ...defaults.layouts.lg.filter((item) => item.i !== "prayer" && item.i !== "decision-queue"),
+          { i: "mission-status", x: 3, y: 3, w: 3, h: 3 },
+          { i: "legacy-widget", x: 0, y: 80, w: 3, h: 3 },
+          { i: "decision-queue", x: 0, y: 0, w: "wide", h: 3 },
+        ],
+        md: defaults.layouts.md,
+        sm: "broken",
+        xs: defaults.layouts.xs,
+      },
+      widgets: {
+        ...defaults.widgets,
+        "morning-brief": { minimized: "nope", hidden: false },
+        "github-health": { minimized: false, hidden: 1 },
+        "legacy-widget": { minimized: false, hidden: false },
+      },
+      widgetOrder: ["legacy-widget", "mission-status", "mission-status", ...defaults.widgetOrder.filter((id) => id !== "ai-workforce"), 42],
+      focusedWidgetId: "legacy-widget",
+      reducedMotion: "sometimes",
+    };
+
+    const result = repairWorkspaceLayout(JSON.stringify(corrupted));
+
+    expect(result.repairs).toEqual([
+      "Added missing widgets back to the order: AI workforce.",
+      "Removed unknown widget ids: legacy-widget, 42.",
+      "Removed duplicate entries for: Mission status.",
+      "Dropped 1 layout item with invalid geometry.",
+      "Rebuilt the sm layout from defaults.",
+      "Restored default positions for: Decision queue, Prayer.",
+      "Fixed invalid show/hide or minimize values for: Morning brief, GitHub health.",
+      'Cleared stale focus on "legacy-widget".',
+      "Reset an invalid reduced-motion preference.",
+      "Reset an unknown workspace id.",
+    ]);
+    expect(describeLayoutRepairs(result.repairs)).toBe("Layout state repaired (10 fixes).");
+
+    const state = result.state;
+    expect(state.workspaceId).toBe("command-center");
+    expect(state.focusedWidgetId).toBeNull();
+    expect(state.reducedMotion).toBe(false);
+    expect(state.widgetOrder).toEqual(defaults.widgetOrder);
+    expect(state.widgets["morning-brief"]).toEqual({ minimized: false, hidden: false });
+    expect(state.widgets["github-health"]).toEqual({ minimized: false, hidden: false });
+    expect(state.widgets).not.toHaveProperty("legacy-widget");
+    for (const key of ["lg", "md", "sm", "xs"] as const) {
+      const ids = state.layouts[key].map((item) => item.i);
+      expect(new Set(ids).size).toBe(ids.length);
+      expect([...ids].sort()).toEqual([...defaults.widgetOrder].sort());
+    }
+    // Healthy entries keep their saved geometry; the first mission-status entry wins.
+    expect(state.layouts.lg.find((item) => item.i === "mission-status")).toMatchObject({ x: 0, y: 0, w: 12, h: 3 });
+    expect(state.layouts.sm).toEqual(defaults.layouts.sm);
+
+    // Repair is idempotent: a second run finds nothing left to fix.
+    expect(repairWorkspaceLayout(serializeWorkspaceLayout(state)).repairs).toEqual([]);
+  });
+
+  it("replaces unreadable layout JSON with defaults and says so", () => {
+    const result = repairWorkspaceLayout("{not-json");
+    expect(result.state).toEqual(createDefaultWorkspaceLayout());
+    expect(result.repairs).toEqual(["Unreadable layout JSON replaced with the default layout."]);
+  });
+
+  it("moves past hidden widgets when reordering visible widgets only", () => {
+    const layout = createDefaultWorkspaceLayout();
+    layout.widgetOrder = ["mission-status", "cognitive-support", "project-command-board", ...layout.widgetOrder.slice(3)];
+    layout.widgets["cognitive-support"] = { minimized: false, hidden: true };
+    const visible = (state: typeof layout) => state.widgetOrder.filter((id) => !state.widgets[id]?.hidden);
+
+    // Full-order move swaps with the hidden neighbor: the visible order does not change.
+    const fullOrder = moveWidgetInLayout(layout, "project-command-board", "up");
+    expect(visible(fullOrder).slice(0, 2)).toEqual(["mission-status", "project-command-board"]);
+
+    const moved = moveWidgetInLayout(layout, "project-command-board", "up", { visibleOnly: true });
+    expect(visible(moved).slice(0, 2)).toEqual(["project-command-board", "mission-status"]);
+    expect(moved.widgetOrder.slice(0, 3)).toEqual(["project-command-board", "cognitive-support", "mission-status"]);
+    const originalMission = layout.layouts.lg.find((item) => item.i === "mission-status");
+    expect(moved.layouts.lg.find((item) => item.i === "project-command-board")).toMatchObject({ x: originalMission?.x, y: originalMission?.y });
+
+    const back = moveWidgetInLayout(moved, "project-command-board", "down", { visibleOnly: true });
+    expect(back.widgetOrder).toEqual(layout.widgetOrder);
+    expect(moveWidgetInLayout(layout, "mission-status", "up", { visibleOnly: true })).toBe(layout);
   });
 });

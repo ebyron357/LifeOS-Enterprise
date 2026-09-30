@@ -3,7 +3,13 @@
 import { Command } from "cmdk";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { filterCommands, type WorkspaceCommandId } from "@/lib/workspace/commands";
+import {
+  announceWorkspaceStatus,
+  filterCommands,
+  RESET_LAYOUT_CONFIRMATION,
+  type WorkspaceCommandId,
+} from "@/lib/workspace/commands";
+import { describeLayoutRepairs, LAYOUT_SAVE_FAILED_MESSAGE } from "@/lib/workspace/layout-storage";
 import { getWorkspace } from "@/lib/workspace/workspaces";
 import { useWorkspace } from "./WorkspaceProvider";
 
@@ -36,13 +42,20 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         window.dispatchEvent(new CustomEvent("lifeos-open-quick-capture"));
         break;
       case "reset-layout":
-        resetLayout();
-        window.dispatchEvent(new CustomEvent("lifeos-workspace-status", { detail: "Default layout restored." }));
+        if (!window.confirm(RESET_LAYOUT_CONFIRMATION)) {
+          announceWorkspaceStatus("Default layout restore cancelled. Nothing changed.");
+          break;
+        }
+        announceWorkspaceStatus({
+          message: resetLayout() ? "Default layout restored." : `Default layout could not be saved. ${LAYOUT_SAVE_FAILED_MESSAGE}`,
+          repairs: [],
+        });
         break;
-      case "repair-layout":
-        repairLayout();
-        window.dispatchEvent(new CustomEvent("lifeos-workspace-status", { detail: "Layout state repaired." }));
+      case "repair-layout": {
+        const { repairs, saved } = repairLayout();
+        announceWorkspaceStatus({ message: describeLayoutRepairs(repairs, saved), repairs: saved ? repairs : [] });
         break;
+      }
       case "focus-next-widget":
         focusNextWidget();
         window.dispatchEvent(new CustomEvent("lifeos-workspace-status", { detail: "Focused next widget." }));

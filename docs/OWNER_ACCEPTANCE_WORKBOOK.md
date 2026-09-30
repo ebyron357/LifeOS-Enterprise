@@ -2,7 +2,8 @@
 
 **Document type:** Printable owner acceptance workbook  
 **Repository:** `ebyron357/LifeOS-Enterprise`  
-**Last application-code baseline:** `7982c92a7080f60f9fb70e7c66c5220b8178bc35` (PR #64)  
+**Last application-code baseline:** read it from `docs/CANONICAL_LIVE_STATUS.md` at the start of the session (this workbook no longer hard-codes it, because it goes stale on every merge)  
+**Step-by-step owner manual:** `80 SOPs/LifeOS Owner's Operating Manual.md` (Part J is the short version of this workbook)  
 **Acceptance candidate deployment ID:** ____________________  
 **Acceptance candidate Git SHA:** ____________________  
 **Production URL:** `https://lifeos-enterprise.vercel.app/`  
@@ -48,7 +49,7 @@ Use one row per test. Record evidence such as a screenshot, short note, deployme
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| B1 | Current main contains merged fixes | Inspect current GitHub main | #60 operational closeout, #61 security/write corrective, #62 Command Center rebuild, #63 governance reconciliation, and #64 performance/dependency hardening are present | ☐ | | |
+| B1 | Current main contains merged fixes | Inspect current GitHub main (`https://github.com/ebyron357/LifeOS-Enterprise/commits/main`) | #60–#73 are present, plus #74 (MAPS) and the 2026-09-30 closeout PR (voice #58 polish, widget/game #42 fixes, Resource Intelligence provenance, dependency advisories, owner manual v2.0) once merged | ☐ | | |
 | B2 | Automated validation record | Review PR #61/#62/#64 evidence | Lint, typecheck, unit, build, audit, vault audit, and CI evidence are recorded; browser-suite limitations are disclosed rather than hidden | ☐ | | |
 | B3 | No secrets in repo | Spot-check `.env.example` and recent diffs | Placeholders only; no live tokens | ☐ | | |
 | B4 | Integration availability truthful | Inspect `/integrations` and `/conversation` Context/tools | Unconfigured tools show unavailable/configured requirements, never invented success | ☐ | | |
@@ -95,19 +96,22 @@ Use one row per test. Record evidence such as a screenshot, short note, deployme
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| E1 | Voice settings | Open `/conversation` Voice settings | Provider, locale, input language, style, speed, pitch visible | ☐ | | |
-| E2 | Preview / reset | Preview voice; reset defaults | Audible preview; defaults restore | ☐ | | |
-| E3 | Persist prefs | Change settings; refresh | Settings restore safely | ☐ | | |
-| E4 | Provider truth | With/without `OPENAI_API_KEY` | Unconfigured OpenAI is not shown as available | ☐ | | |
-| E5 | Start / stop | Start then stop conversation | Listening starts/stops; no leftover capture | ☐ | | |
-| E6 | Mute stops mic | Start conversation; mute | Mic capture stops; transcripts stop submitting | ☐ | | |
-| E7 | Unmute | Unmute | Listening resumes only after explicit unmute/restart behavior | ☐ | | |
-| E8 | Interrupt | Interrupt while assistant speaks | Speech stops promptly; no overlapping assistant speech | ☐ | | |
-| E9 | Push-to-talk | Hold push-to-talk then release | Listening follows the intended hold/release interaction | ☐ | | |
-| E10 | States visible | Observe full flow | listening / thinking / speaking / muted / stopped / error states are clear | ☐ | | |
-| E11 | Mobile voice | Repeat core voice checks at 390px | Controls remain usable | ☐ | | |
-| E12 | Browser provider | Select Browser provider and speak | Browser speech is used; server OpenAI TTS is not called | ☐ | | |
-| E13 | Paid TTS auth | If intentionally configured, omit owner TTS/write secret | Paid server TTS is rejected/falls back; public session token cannot spend the key | ☐ | | |
+| E1 | Voice settings visible | Open `/conversation` → **Voice settings** | **Provider, Locale, Voice, Input language, Response style, Speed, Pitch** controls are visible; controls are large enough to tap | ☐ | | |
+| E2 | Privacy + capability notes | Before clicking Start, read the notes | A privacy note explains speech is processed by the browser speech service and nothing is recorded by LifeOS; unsupported recognition/synthesis/continuous listening is stated up front | ☐ | | |
+| E3 | Choose a voice | Pick a non-default **Voice**, click **Preview voice** | Preview is audible in the chosen voice | ☐ | | |
+| E4 | Speed audible | Change **Speed**, preview again | Audible speed difference | ☐ | | |
+| E5 | Persist prefs | Change voice/speed/style, reload the page | The same controls show your saved values | ☐ | | |
+| E6 | Reset | Click **Reset to default** | Defaults restore | ☐ | | |
+| E7 | Locale honesty | Pick a locale your browser has no voice for | A visible warning appears; speech never silently switches language | ☐ | | |
+| E8 | Start / stop | **Start conversation** → allow mic → speak → **Stop conversation** | Transcript appears; state label shows Listening / Thinking / Speaking; stop leaves no active mic indicator | ☐ | | |
+| E9 | Interrupt | While LifeOS is speaking, click **Interrupt assistant** | Speech stops at once; a reply that was still loading does not start speaking afterwards | ☐ | | |
+| E10 | Mute / unmute | **Mute microphone**, speak, then **Unmute microphone** | Nothing is submitted while muted; listening resumes only after unmute | ☐ | | |
+| E11 | Push-to-talk | Hold **Push to talk**, speak, release | Listens only while held | ☐ | | |
+| E12 | Duplicate protection | Say the same sentence twice quickly | Only one turn is sent | ☐ | | |
+| E13 | Recovery | Block the mic in site settings, click Start, then allow it and click **Try again** | Error is shown, then clears and listening works without a page reload | ☐ | | |
+| E14 | Provider truth / fallback | With OpenAI not configured, read the **Next reply** line and speak | Browser voice is used and labelled; OpenAI shows unavailable with the reason | ☐ | | |
+| E15 | Mobile voice | Repeat E1, E3, E8, E9, E10 at 390px / phone | Controls usable; behavior matches desktop as far as the phone browser allows | ☐ | | |
+| E16 | Paid TTS auth (only if intentionally configured) | Configure `OPENAI_API_KEY` + TTS/write secret; speak without, then with, the owner secret | Without the secret, browser voice is used; with it, OpenAI voice plays; public session tokens cannot spend the key | ☐ | | |
 
 ---
 
@@ -172,26 +176,39 @@ These checks are required only when the owner intentionally enables the relevant
 
 ---
 
-## Section I — Resource Intelligence boundary
+## Section I — Resource Intelligence
 
-The current `/inbox` Capture surface is **not yet** the full Universal Resource Intelligence system. Do not mark resource intake complete merely because browser-local capture works.
+Capture is still browser-local. Promoting a resource to the canonical vault uses the governed draft-PR intake. It needs the owner write secret and GitHub token (Manual Part K, step 1). Asset factory, the implementation router, automated YouTube/web/PDF processors, semantic dedupe, and the staleness monitor are **not** implemented. They are post-V1 platform work (see `docs/CANONICAL_LIVE_STATUS.md`).
 
 | # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
 |---|---|---|---|---|---|---|
-| I1 | Browser-local disclosure | Capture a harmless note | UI explicitly says the item is stored in this browser only | ☐ | | |
-| I2 | No false processor claim | Submit no external resource processor action | LifeOS does not pretend it classified/analyzed/stored a GitHub/YouTube/PDF resource when no processor exists | ☐ | | |
-| I3 | Future acceptance gate | After Resource Intelligence is implemented, submit one controlled external repo | The end-to-end intake/classify/disposition/asset/store/verify flow must pass before this lane is marked mature | ☐ | | Future platform phase |
+| I1 | Browser-local disclosure | Capture a harmless note | UI says the item is stored in this browser only | ☐ | | |
+| I2 | Write path fails closed | Without Part K step 1, open `/inbox` → **Promote a resource to the canonical vault** | Staging is disabled or refused with a clear reason; nothing pretends to be saved | ☐ | | |
+| I3 | Controlled candidate (after Part K step 1) | In `/inbox`, paste `https://github.com/vercel-labs/knowledge-agent-template`, click **Inspect GitHub evidence**, type the owner write secret, click **Stage canonical Resource PR** | A **draft** PR opens with one record under `40 Resources/Resource Intelligence/Records/` containing a `## Source Evidence` section (license, latest commit, inspected time) and `processor_route` | ☐ | | |
+| I4 | No duplicate on resubmission | Submit the same URL again (or a URL variant) before merging | The **same** draft PR is updated ("Open draft PR updated"); `capture_count` becomes 2; no second PR | ☐ | | |
+| I5 | Owner disposition | Merge the PR; after deploy open `/resources/review`, choose architecture + disposition (expected: TEMPLATE / ADAPT), add rationale, secret, **Stage review decision PR** | A draft PR records the decision; merge it | ☐ | | |
+| I6 | Searchable / resumable | After merge + deploy, search the resource name in `/files` | The record is found | ☐ | | |
 
 ---
 
-## Section J — Owner sign-off
+## Section J — MAPS and Pulse routine (PR #74, merged 2026-09-30)
+
+| # | Check | Exact owner action | Expected result | Pass/Fail | Evidence | Notes |
+|---|---|---|---|---|---|---|
+| J1 | Local validation | 🪟 `powershell -ExecutionPolicy Bypass -File .\scripts\validate-maps.ps1` | `MAPS VALIDATION: PASSED` | ☐ | | |
+| J2 | Daily routine ran | Next day, open GitHub **Actions → MAPS Integrity** | A scheduled run around 06:17 UTC is green | ☐ | | |
+| J3 | Routine evidence | Open that run → **Artifacts** | `maps-integrity-check-evidence` artifact contains a `run-*.json` with `"result": "PASSED"` | ☐ | | |
+
+---
+
+## Section K — Owner sign-off
 
 | Field | Value |
 |---|---|
 | Production URL | `https://lifeos-enterprise.vercel.app/` |
 | Acceptance candidate deployment ID | |
 | Acceptance candidate Git SHA | |
-| Last application-code baseline | `7982c92a7080f60f9fb70e7c66c5220b8178bc35` |
+| Last application-code baseline | (copy from `docs/CANONICAL_LIVE_STATUS.md`) |
 | Owner name | |
 | Date | |
 | Overall result | ☐ READY TO ACCEPT · ☐ BLOCKED · ☐ NOT READY |
