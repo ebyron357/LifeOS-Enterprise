@@ -313,7 +313,12 @@ Each item is written step-by-step in `80 SOPs/LifeOS Owner's Operating Manual.md
    - for approvals, `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`
 
    As of 2026-09-30, none of the governed write services are configured, so they stay fail-closed.
-5. Decide on PR #76 (premium command-center redesign). As of 2026-09-30 it is not mergeable: its unit test `answers what to do next without inventing agent work` fails because the redesign removed the "Hermes is unavailable" honest-status text, it conflicts with `main` in `components/os/AppShell.tsx` and `app/os.css` (Life Map and PR #78), and it drops `.os-page-header`, `.os-grid`, and `.os-grid-2` styles that other pages still use. Either rework it on current `main` or close it.
+5. Decide on the command-center redesign: PR #76, and PR #80, which consolidates #76 with the merged My Life menu. As of 2026-09-30 about 21:15 UTC, neither is mergeable:
+   - Both fail the unit test `answers what to do next without inventing agent work`. The redesigned home no longer shows the "Hermes is unavailable" honest-status text that the test enforces.
+   - Both conflict with `main` in `components/os/AppShell.tsx` and `app/os.css`.
+   - #76 also drops the `.os-page-header`, `.os-grid`, and `.os-grid-2` styles that other pages still use; #80 keeps them.
+
+   Keep one of them: restore the honest Hermes status and bring it up to date with current `main`. Close the other.
 6. After step 4, run the Issue #56 acceptance candidate (`vercel-labs/knowledge-agent-template`) through `/inbox` and `/resources/review` (workbook Section I).
 7. Optional paid voice: `OPENAI_API_KEY` plus a TTS/write secret. This is a billing decision.
 8. Complete the local Windows/Obsidian visual checks on the actual workstation.

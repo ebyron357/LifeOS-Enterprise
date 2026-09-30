@@ -15,7 +15,7 @@ All notable changes to LifeOS Enterprise are documented in this file.
 
 ### Documentation
 
-- Owner manual v2.2: F2 and F18 cover **My Life**, and F18 step 1 routes phones through **My Life** → **Open Life Map**. Workbook A14 covers My Life. Canonical status records #78 and #79 and the PR #76 owner decision.
+- Owner manual v2.2: F2 and F18 cover **My Life**, and F18 step 1 routes phones through **My Life** → **Open Life Map**. Workbook A14 covers My Life. Canonical status records #78 and #79 and the owner decision on the redesign PRs #76 and #80.
 
 ## [Unreleased] — 2026-09-30 LifeOS closeout (PR #75, merged as `abf6c82`)
 
