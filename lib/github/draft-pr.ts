@@ -41,10 +41,15 @@ export function encodeRepoPath(path: string) {
   return path.split("/").map(encodeURIComponent).join("/");
 }
 
-export async function readCanonicalFile(path: string, token: string): Promise<{ sha: string; source: string } | null> {
+/** Reads a file from `main` (default) or from another branch. Returns null when the file does not exist there. */
+export async function readCanonicalFile(
+  path: string,
+  token: string,
+  ref: string = RESOURCE_BASE_BRANCH,
+): Promise<{ sha: string; source: string } | null> {
   try {
     const data = await github(
-      `/repos/${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}/contents/${encodeRepoPath(path)}?ref=${RESOURCE_BASE_BRANCH}`,
+      `/repos/${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}/contents/${encodeRepoPath(path)}?ref=${encodeURIComponent(ref)}`,
       token,
     );
     const content = typeof data.content === "string" ? data.content : "";
@@ -76,6 +81,65 @@ export function resourceBranchName(prefix: string, slug: string) {
   const safeSlug = slug.slice(0, 42).replace(/[^a-z0-9-]/gi, "-");
   const unique = `${Date.now().toString(36)}-${randomBytes(4).toString("hex")}`;
   return `lifeos/${prefix}-${safeSlug}-${unique}`;
+}
+
+/**
+ * Deterministic intake branch for one canonical Resource record path, so repeated captures of the
+ * same record before its draft PR merges update one PR instead of opening competing PRs.
+ */
+export function resourceIntakeBranchName(recordSlug: string) {
+  const safeSlug = recordSlug.slice(0, 96).replace(/[^a-z0-9-]/gi, "-").replace(/^-+|-+$/g, "") || "resource";
+  return `lifeos/resource-intake/${safeSlug}`;
+}
+
+export type OpenPullRequest = {
+  number: number | null;
+  url: string | null;
+  draft: boolean;
+  headRef: string;
+};
+
+type PullPayload = {
+  number?: number;
+  html_url?: string;
+  draft?: boolean;
+  state?: string;
+  head?: { ref?: string; repo?: { full_name?: string } | null };
+};
+
+/** Finds an open pull request into `main` whose head is `branch` in the canonical vault repository. */
+export async function findOpenPullRequestForBranch(branch: string, token: string): Promise<OpenPullRequest | null> {
+  const head = encodeURIComponent(`${RESOURCE_REPO_OWNER}:${branch}`);
+  const data: unknown = await github(
+    `/repos/${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}/pulls?state=open&base=${RESOURCE_BASE_BRANCH}&head=${head}&per_page=10`,
+    token,
+  );
+  const repository = `${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}`.toLowerCase();
+  const pull = (Array.isArray(data) ? (data as PullPayload[]) : []).find((candidate) =>
+    candidate?.state === "open"
+    && candidate.head?.ref === branch
+    && (!candidate.head.repo?.full_name || candidate.head.repo.full_name.toLowerCase() === repository),
+  );
+  if (!pull) return null;
+  return {
+    number: typeof pull.number === "number" ? pull.number : null,
+    url: typeof pull.html_url === "string" ? pull.html_url : null,
+    draft: pull.draft !== false,
+    headRef: branch,
+  };
+}
+
+/**
+ * Points an existing non-main branch at `sha`. Used only for a deterministic intake branch that no
+ * open pull request uses (its earlier PR was merged or closed).
+ */
+export async function resetBranchToCommit(branch: string, sha: string, token: string) {
+  if (!branch || branch === RESOURCE_BASE_BRANCH) throw new Error("Refusing to move the base branch.");
+  await github(
+    `/repos/${RESOURCE_REPO_OWNER}/${RESOURCE_REPO_NAME}/git/refs/heads/${encodeRepoPath(branch)}`,
+    token,
+    { method: "PATCH", body: JSON.stringify({ sha, force: true }) },
+  );
 }
 
 export type BoundedJsonResult =

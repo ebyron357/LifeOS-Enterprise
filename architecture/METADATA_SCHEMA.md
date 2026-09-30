@@ -277,6 +277,9 @@ capture_count: 1
 processing_state: needs-review
 architecture_classification: PENDING
 disposition: PENDING
+processor_route:
+evidence_status: capture-only
+evidence_inspected_at:
 related_project:
 related_area:
 owner:
@@ -341,6 +344,23 @@ ARCHIVE
 REJECT
 ```
 
+`evidence_status`:
+
+```text
+source-evidence-captured
+capture-only
+evidence-unavailable
+```
+
+`processor_route` (deterministic per `source_type`; see `docs/RESOURCE_INTELLIGENCE.md`):
+
+```text
+GitHub evidence processor (LifeOS)
+80 SOPs/Process YouTube Video into LifeOS Knowledge.md
+99 Templates/Technology or Repository Review.md
+owner-review
+```
+
 #### Resource Intelligence validation rules
 
 1. `source_identity` is the stable duplicate key. GitHub repository identity, YouTube video ID, canonical URL, or supplied file hash takes precedence over display title.
@@ -348,7 +368,8 @@ REJECT
 3. `architecture_classification` and `disposition` remain `PENDING` at capture time unless source-grounded review has actually occurred.
 4. Capture evidence alone must never be represented as proof that a resource was adopted, implemented, licensed, secure, valuable, or production-ready.
 5. File intake may persist metadata and a hash without persisting file bytes. A hash is evidence of identity, not evidence of content quality.
-6. Semantic duplicate detection, source processors, asset generation, and implementation routing require their own verified evidence before being reported as active capabilities.
+6. Semantic duplicate detection, source processors, asset generation, and implementation routing require their own verified evidence before being reported as active capabilities. Only the read-only GitHub evidence processor runs automatically; other `processor_route` values name manual SOPs, templates, or owner review.
+7. `evidence_status: source-evidence-captured` means a read-only processor recorded a `## Source Evidence` section at `evidence_inspected_at`. Source evidence is provenance, not a classification or disposition.
 
 ### SOP
 
