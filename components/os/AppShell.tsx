@@ -18,7 +18,7 @@ const commandNav = [
   { href: "/", label: "Command Center", icon: "⌂" },
   { href: "/life-map", label: "My Life", icon: "◉" },
   { href: "/agents", label: "AI Agents", icon: "✦" },
-  { href: "/conversation", label: "Communications", icon: "●", badge: "3" },
+  { href: "/conversation", label: "Communications", icon: "●" },
   { href: "/today", label: "Tasks", icon: "✓" },
   { href: "/projects", label: "Projects", icon: "▦" },
   { href: "/businesses", label: "Shopify / E-Commerce", icon: "◆" },
@@ -27,7 +27,7 @@ const commandNav = [
   { href: "/resources", label: "Content Studio", icon: "◩" },
   { href: "/dashboard", label: "Finance", icon: "$" },
   { href: "/dashboards", label: "Real Estate", icon: "⌂" },
-  { href: "/resources", label: "Veteran Hub", icon: "◈" },
+  { href: "/search", label: "Veteran Hub", icon: "◈" },
   { href: "/learning", label: "Learning", icon: "▰" },
   { href: "/files", label: "Files & Drive", icon: "▱" },
   { href: "/integrations", label: "Integrations", icon: "⌘" },
@@ -76,7 +76,7 @@ export function AppShell({ children, greeting }: AppShellProps) {
 
         <nav className={styles.nav} aria-label="Primary command center">
           {commandNav.map((item) => (
-            <Link key={item.label} href={item.href} data-active={isNavActive(pathname, item.href) ? "true" : "false"}>
+            <Link key={item.label} href={item.href} data-active={isNavActive(pathname, item.href) ? "true" : "false"} aria-current={isNavActive(pathname, item.href) ? "page" : undefined}>
               <span className={styles.navIcon} aria-hidden="true">{item.icon}</span>
               <span>{item.label}</span>
               {item.badge ? <span className={styles.badge}>{item.badge}</span> : null}
@@ -87,7 +87,7 @@ export function AppShell({ children, greeting }: AppShellProps) {
         <div className={styles.sidebarFoot}>
           <strong>Raven · Chief Morale Officer</strong>
           <span>● Always with you.</span>
-          <p style={{margin:"10px 0 0",fontSize:".68rem",color:"#7f93ab"}}>“Same mission. Bigger possibilities.”</p>
+          <p style={{margin:"10px 0 0",fontSize:".68rem",color:"#7f93ab"}}>{greeting || "Same mission. Bigger possibilities."}</p>
         </div>
       </aside>
 
