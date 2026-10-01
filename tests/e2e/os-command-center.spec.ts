@@ -59,7 +59,7 @@ test.describe("unified command center journeys", () => {
     await page.goto("/prompts");
     await expect(page.getByRole("heading", { name: "Prompt Intelligence" })).toBeVisible();
     await page.getByLabel("Search prompts").fill("YouTube Transcript");
-    await page.getByRole("button", { name: "Search" }).click();
+    await page.getByRole("button", { name: "Search", exact: true }).click();
     await expect(page.getByRole("link", { name: /YouTube Transcript Knowledge Extraction/i })).toBeVisible();
     await page.goto("/prompts?task=vercel+production+closeout&project=D%27Affordable+Homes");
     await expect(page.getByRole("heading", { name: /you already have a prompt for this/i })).toBeVisible();
