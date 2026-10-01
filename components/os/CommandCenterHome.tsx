@@ -117,7 +117,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
       <section className={styles.cockpit}>
         <article className={styles.panel}>
           <div className={styles.panelHead}>
-            <h2>◎ What Needs You Now</h2>
+            <div><span className={styles.panelKicker}>WHAT NEEDS YOU NOW</span><h2>Attention</h2></div>
             <Link href="/today">View all</Link>
           </div>
           <div className={styles.focusList}>
