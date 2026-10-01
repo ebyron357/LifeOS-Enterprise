@@ -16,11 +16,11 @@ function ItemList({ items, empty }: { items: ResumeItem[]; empty: string }) {
   );
 }
 
-export function ContinuityResume({ resume }: { resume: ResumePackage }) {
+export function ContinuityResume({ resume, heading = "Where was I" }: { resume: ResumePackage; heading?: string }) {
   const prompt = resume.relevantPrompts[0];
   return (
     <section className="os-card" aria-labelledby="resume-heading">
-      <h2 id="resume-heading">Where was I</h2>
+      <h2 id="resume-heading">{heading}</h2>
       <p className="widget-eyebrow">{resume.source === "checkpoint+derived" ? "Checkpoint plus live vault/GitHub" : "Derived from live vault and GitHub"}</p>
       <p><strong>{resume.whereWasI}</strong></p>
       <p>{resume.whatWasIDoing}</p>
