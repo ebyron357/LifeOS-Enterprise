@@ -724,7 +724,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         </p>
         {!micEverStarted ? (
           <p className={styles.privacyNote} data-testid="voice-privacy-note">
-            Privacy: microphone audio is processed by your browser or operating system speech service. OpenAI voice sends reply text to OpenAI only when selected. LifeOS does not keep an audio recording.
+            Privacy: microphone audio is processed by your browser or operating system's speech service. When OpenAI voice is selected, reply text is sent to OpenAI to create audio. LifeOS does not keep an audio recording.
           </p>
         ) : null}
         {capabilityNotes.map((note) => (
