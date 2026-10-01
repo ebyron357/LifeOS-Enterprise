@@ -638,6 +638,11 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   }
 
   const currentProject = vault.priorities[0] ?? vault.projects[0] ?? null;
+  const channelState = (category: ToolDefinition["category"]) => {
+    const match = tools.find((tool) => tool.category === category);
+    if (!match) return sessionLoadFailed ? "unavailable" : "loading";
+    return match.availability;
+  };
 
   async function decide(approval: ApprovalRequest, decision: "approved" | "rejected") {
     const response = await fetch("/api/lifeos/agent/approval", {
@@ -697,6 +702,10 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
 
       <nav className={styles.channelBar} aria-label="Communication modes">
         <a href="#conversation-heading">ARIA Chat</a>
+        <a href="/integrations">Email <small>{channelState("email")}</small></a>
+        <a href="/integrations">Slack <small>{channelState("slack")}</small></a>
+        <a href="/integrations">ClickUp <small>{channelState("clickup")}</small></a>
+        <a href="/today">Calendar <small>{channelState("calendar")}</small></a>
         <a href="#agent-activity">Approvals</a>
         <a href="#screen-share">Screen</a>
         <a href="#context-panel">Context</a>
