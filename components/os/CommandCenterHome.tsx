@@ -169,7 +169,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
               <div className={styles.chatHead}>
                 <span className={styles.avatar}>A</span>
                 <div><strong>ARIA</strong><small>Your AI Command Assistant</small></div>
-                <span className={styles.online}>{hermes.state === "unavailable" ? "Hermes is unavailable · LifeOS remains available" : hermes.state}</span>
+                <span className={styles.online} data-tone={hermes.state === "unavailable" ? "warn" : "ok"}>{hermes.state === "unavailable" ? "Hermes is unavailable · LifeOS remains available" : hermes.state}</span>
               </div>
               <div className={styles.bubble}><strong>Command snapshot</strong><br />{vault.activeProjects} active projects · {blocked.length} blocked · {waiting.length} waiting · {vault.reviewsDue} reviews due.</div>
               <div className={styles.bubbleRight}>Open ARIA to ask about priorities, blockers, approvals, or the next verified move.</div>
