@@ -5,10 +5,10 @@ test.describe("unified command center journeys", () => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Today" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Where was I" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Resume Where You Left Off" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Start here" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Needs you" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Agents can continue" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Owner attention" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Agent continuation" })).toBeVisible();
     await expect(page.getByRole("link", { name: /ask lifeos/i }).first()).toBeVisible();
     const overflow = await page.locator("#main-content").evaluate((node) => node.scrollWidth > node.clientWidth + 1);
     expect(overflow).toBe(false);
@@ -65,7 +65,7 @@ test.describe("unified command center journeys", () => {
     await expect(page.getByRole("heading", { name: /you already have a prompt for this/i })).toBeVisible();
     await expect(page.getByText(/Vercel Production Closeout/i).first()).toBeVisible();
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: "Where was I" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Resume Where You Left Off" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Today" })).toBeVisible();
   });
 
