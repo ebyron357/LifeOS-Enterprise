@@ -98,13 +98,13 @@ describe("command center and rebuilt surfaces", () => {
       />,
     );
     expect(screen.getByRole("heading", { name: "Good afternoon" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Where was I" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Resume Where You Left Off" })).toBeInTheDocument();
     expect(screen.getAllByText("D'Affordable Homes").length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Call the inspector/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Missing credential/).length).toBeGreaterThan(0);
     expect(screen.getByText(/Hermes is unavailable/)).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Needs you" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Agents can continue" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Owner attention" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Agent continuation" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /this needs you|resume /i })).toBeInTheDocument();
     expect(screen.queryByText(/\{\{/)).not.toBeInTheDocument();
   });
@@ -137,7 +137,7 @@ describe("command center and rebuilt surfaces", () => {
         resume={withPrompt}
       />,
     );
-    expect(screen.getByRole("heading", { name: "Where was I" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Resume Where You Left Off" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Prompt for this work" })).toBeInTheDocument();
     expect(screen.getAllByText(/You already have a prompt for this/).length).toBeGreaterThan(0);
     expect(screen.getByRole("link", { name: "Prompt library" })).toHaveAttribute("href", "/prompts");
