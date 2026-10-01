@@ -155,6 +155,8 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   const speechGateRef = useRef(createRequestGate());
   /** One turn at a time + duplicate transcript suppression. */
   const turnGuardRef = useRef(createTurnGuard());
+  /** Explicit owner-cancellation epoch. WebKit may resolve an aborted fetch, so stale work also checks this epoch. */
+  const ownerCancelEpochRef = useRef(0);
 
   // Persisted settings hydrate from localStorage on mount, independent of the session fetch.
   // Nothing is written until the owner changes a setting, so defaults never overwrite saved values.
@@ -390,6 +392,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
 
   const runTurn = useCallback(async (text: string, channel: "text" | "voice", turnId: number) => {
     const guard = turnGuardRef.current;
+    const ownerCancelEpoch = ownerCancelEpochRef.current;
     const turnGate = turnGateRef.current;
     const generation = turnGate.advance();
     speechGateRef.current.cancel();
@@ -417,7 +420,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
       });
       const payload = await response.json();
       // Interrupt / Stop cancelled this turn: never apply or speak a stale reply.
-      if (!turnGate.isCurrent(generation)) return;
+      if (!turnGate.isCurrent(generation) || ownerCancelEpoch !== ownerCancelEpochRef.current) return;
       guard.finish(turnId, Date.now());
       if (!response.ok || !payload.ok) throw new Error(payload.error || "Agent turn failed.");
       const next = payload.result as AgentTurnResult;
@@ -530,6 +533,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   /** Cancels the in-flight turn, any pending server speech, and current playback. */
   function cancelPendingWork(): boolean {
     const hadPendingTurn = turnGuardRef.current.inFlight;
+    ownerCancelEpochRef.current += 1;
     turnGateRef.current.cancel();
     speechGateRef.current.cancel();
     turnGuardRef.current.cancel();
