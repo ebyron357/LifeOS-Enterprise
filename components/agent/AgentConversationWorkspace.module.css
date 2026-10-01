@@ -301,3 +301,6 @@
 .sessionDetails > summary{cursor:pointer;padding:9px 11px;color:#90a7bd;font-size:.62rem;font-weight:800}
 .sessionDetailBody{display:grid;gap:8px;padding:10px 11px;border-top:1px solid rgba(90,150,220,.12)}
 .sessionDetailBody p{color:#8198ae;font-size:.68rem}
+
+.privacyNote,.capabilityNote{margin:0;border-left:2px solid rgba(75,169,255,.45);padding:7px 9px;border-radius:0 7px 7px 0;background:rgba(35,136,255,.05);color:#8299af;font-size:.68rem;line-height:1.45}
+.capabilityNote{border-left-color:rgba(255,180,75,.45);background:rgba(255,180,75,.035)}
