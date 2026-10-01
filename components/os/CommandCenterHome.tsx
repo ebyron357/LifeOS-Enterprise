@@ -279,7 +279,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
         <div className={styles.continuityLead}>
           <div>
             <span className={styles.panelKicker}>CONTINUITY</span>
-            <h2>Resume Where You Left Off</h2>
+            <h2>Continuity</h2>
             <strong>{resume.whereWasI}</strong>
             <p>{resume.whatWasIDoing}</p>
           </div>
