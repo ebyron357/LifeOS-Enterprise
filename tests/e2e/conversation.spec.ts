@@ -262,19 +262,21 @@ test.describe("interactive conversation workspace", () => {
     const saved = await page.evaluate(() => window.localStorage.getItem("lifeos-conversation-voice-settings-v1"));
 
     await page.reload();
-    await expect(settings.getByLabel(/^Locale/)).toHaveValue("en-GB");
-    await expect(settings.getByLabel(/^Voice/)).toHaveValue("uk-1");
-    await expect(settings.getByLabel(/^Input language/)).toHaveValue("fr-FR");
-    await expect(settings.getByLabel(/^Response style/)).toHaveValue("coach");
-    await expect(settings.getByLabel(/^Provider/)).toHaveValue("browser");
+    const reloadedSettings = await settingsPanel(page);
+    await expect(reloadedSettings.getByLabel(/^Locale/)).toHaveValue("en-GB");
+    await expect(reloadedSettings.getByLabel(/^Voice/)).toHaveValue("uk-1");
+    await expect(reloadedSettings.getByLabel(/^Input language/)).toHaveValue("fr-FR");
+    await expect(reloadedSettings.getByLabel(/^Response style/)).toHaveValue("coach");
+    await expect(reloadedSettings.getByLabel(/^Provider/)).toHaveValue("browser");
 
     // Session metadata failure must not reset or overwrite saved settings.
     await page.route("**/api/lifeos/agent/session", (route) => route.abort());
     await page.reload();
     await expect(conversationAlert(page)).toContainText(/Unable to load agent session metadata/);
-    await expect(settings.getByLabel(/^Locale/)).toHaveValue("en-GB");
-    await expect(settings.getByLabel(/^Voice/)).toHaveValue("uk-1");
-    await expect(settings.getByLabel(/^Response style/)).toHaveValue("coach");
+    const failedSessionSettings = await settingsPanel(page);
+    await expect(failedSessionSettings.getByLabel(/^Locale/)).toHaveValue("en-GB");
+    await expect(failedSessionSettings.getByLabel(/^Voice/)).toHaveValue("uk-1");
+    await expect(failedSessionSettings.getByLabel(/^Response style/)).toHaveValue("coach");
     expect(await page.evaluate(() => window.localStorage.getItem("lifeos-conversation-voice-settings-v1"))).toBe(saved);
   });
 
