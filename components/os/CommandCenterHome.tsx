@@ -275,7 +275,31 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
         </div>
       </section>
 
-      <section className={styles.continuity} aria-label="Verified continuity"><ContinuityResume resume={resume} /></section>
+      <section className={styles.continuityCompact} aria-label="Verified continuity">
+        <div className={styles.continuityLead}>
+          <div>
+            <span className={styles.panelKicker}>CONTINUITY</span>
+            <h2>Where was I</h2>
+            <strong>{resume.whereWasI}</strong>
+            <p>{resume.whatWasIDoing}</p>
+          </div>
+          <Link href={resume.next.href}>Continue →</Link>
+        </div>
+        <div className={styles.continuitySignals}>
+          <div>
+            <h3>Needs you</h3>
+            <p>{resume.needsOwner[0]?.title || "Nothing currently requires your judgment."}</p>
+          </div>
+          <div>
+            <h3>Agents can continue</h3>
+            <p>{resume.agentCanContinue[0]?.title || "No agent-doable continuation is recorded."}</p>
+          </div>
+        </div>
+        <details className={styles.continuityDetails}>
+          <summary>Open full continuity evidence</summary>
+          <ContinuityResume resume={resume} />
+        </details>
+      </section>
 
       <footer className={styles.footer}>
         <span>{github.connected ? "GitHub connected · " + github.openPullRequests + " open PR" + (github.openPullRequests === 1 ? "" : "s") : "GitHub not verified"}</span>
