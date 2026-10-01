@@ -279,7 +279,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
         <div className={styles.continuityLead}>
           <div>
             <span className={styles.panelKicker}>CONTINUITY</span>
-            <h2>Where was I</h2>
+            <h2>Resume Where You Left Off</h2>
             <strong>{resume.whereWasI}</strong>
             <p>{resume.whatWasIDoing}</p>
           </div>
@@ -287,11 +287,11 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
         </div>
         <div className={styles.continuitySignals}>
           <div>
-            <h3>Needs you</h3>
+            <h3>Owner attention</h3>
             <p>{resume.needsOwner[0]?.title || "Nothing currently requires your judgment."}</p>
           </div>
           <div>
-            <h3>Agents can continue</h3>
+            <h3>Agent continuation</h3>
             <p>{resume.agentCanContinue[0]?.title || "No agent-doable continuation is recorded."}</p>
           </div>
         </div>
