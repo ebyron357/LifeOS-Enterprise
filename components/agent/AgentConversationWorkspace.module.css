@@ -260,7 +260,7 @@
 .commsStatus span[data-tone="ok"]{color:#67e4af;border-color:rgba(54,227,154,.32)}
 .commsStatus span[data-tone="warn"]{color:#ffc06a;border-color:rgba(255,180,75,.32)}
 .channelBar{display:flex;gap:7px;overflow:auto;padding:8px;border:1px solid rgba(90,150,220,.16);border-radius:10px;background:#08111c}
-.channelBar a{flex:0 0 auto;min-height:34px;padding:0 11px;border-radius:8px;color:#9db4cb;text-decoration:none;font-size:.62rem;font-weight:800;display:inline-flex;align-items:center}
+.channelBar a{flex:0 0 auto;min-height:34px;padding:0 11px;border-radius:8px;color:#9db4cb;text-decoration:none;font-size:.62rem;font-weight:800;display:inline-flex;align-items:center;gap:5px}.channelBar a small{font-size:.5rem;color:#6f879e;text-transform:uppercase;letter-spacing:.05em}
 .channelBar a:first-child{background:linear-gradient(135deg,#126ce9,#248cff);color:#fff}
 .channelBar a:hover,.channelBar a:focus-visible{background:rgba(35,136,255,.12);color:#fff}
 .conversationPanel{
