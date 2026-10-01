@@ -681,7 +681,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
       <header className={styles.commsHero}>
         <div>
           <span className={styles.eyebrow}>COMMUNICATIONS COMMAND</span>
-          <h1>ARIA Communications Hub</h1>
+          <h2>ARIA Communications Hub</h2>
           <p>Talk, type, share your screen, review approvals, and keep the mission moving from one place.</p>
         </div>
         <div className={styles.commsStatus}>
@@ -703,24 +703,8 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         <h2 id="conversation-heading" tabIndex={-1}>Conversation</h2>
         <div className={styles.statusRow} aria-live="polite">
           <span className={styles.badge} data-tone={voice.microphoneOpen ? "ok" : "warn"}>{voiceLabel}</span>
-          <span className={styles.badge} data-voice-state={voice.state}>State: {voice.state}</span>
           <span className={styles.badge}>{voice.connection}</span>
-          <span className={styles.badge}>Duration {formatDuration(voice.durationMs)}</span>
-          <span className={styles.badge}>Audio recording off</span>
         </div>
-        <p className={styles.runtime} role="status" aria-live="polite" data-testid="speech-runtime">
-          {describeSpeechRuntime(speechRuntime)}
-        </p>
-        {!micEverStarted ? (
-          <p className={styles.note} data-testid="voice-privacy-note">
-            Privacy: when you start the microphone, speech recognition audio is processed by your browser or operating
-            system&apos;s speech service. When OpenAI voice is used, the reply text is sent to OpenAI to create audio.
-            Nothing is recorded or stored by LifeOS.
-          </p>
-        ) : null}
-        {capabilityNotes.map((note) => (
-          <p key={note} className={styles.note} data-testid="voice-capability-note">{note}</p>
-        ))}
         <div className={`${styles.toolbar} ${styles.voiceControls}`} role="toolbar" aria-label="Voice controls">
           <button type="button" onClick={() => void beginListening(true)}>Start conversation</button>
           <button type="button" onClick={endVoice}>Stop conversation</button>
@@ -759,11 +743,32 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
           >
             Push to talk
           </button>
-          <button type="button" onClick={() => setTranscript([])}>Clear transcript</button>
-          <button type="button" onClick={() => setVoice((current) => setTranscriptPrivacy(current, current.transcriptPrivacy === "hidden" ? "ephemeral" : "hidden"))}>
-            Transcript {voice.transcriptPrivacy === "hidden" ? "hidden" : "visible"}
-          </button>
         </div>
+        <details className={styles.sessionDetails}>
+          <summary>Session details & privacy</summary>
+          <div className={styles.sessionDetailBody}>
+            <p className={styles.runtime} role="status" aria-live="polite" data-testid="speech-runtime">
+              {describeSpeechRuntime(speechRuntime)}
+            </p>
+            <p>State: {voice.state} · Duration {formatDuration(voice.durationMs)} · Audio recording off</p>
+            {!micEverStarted ? (
+              <p className={styles.note} data-testid="voice-privacy-note">
+                Privacy: when you start the microphone, speech recognition audio is processed by your browser or operating
+                system&apos;s speech service. When OpenAI voice is used, the reply text is sent to OpenAI to create audio.
+                Nothing is recorded or stored by LifeOS.
+              </p>
+            ) : null}
+            {capabilityNotes.map((note) => (
+              <p key={note} className={styles.note} data-testid="voice-capability-note">{note}</p>
+            ))}
+            <div className={styles.toolbar}>
+              <button type="button" onClick={() => setTranscript([])}>Clear transcript</button>
+              <button type="button" onClick={() => setVoice((current) => setTranscriptPrivacy(current, current.transcriptPrivacy === "hidden" ? "ephemeral" : "hidden"))}>
+                Transcript {voice.transcriptPrivacy === "hidden" ? "hidden" : "visible"}
+              </button>
+            </div>
+          </div>
+        </details>
         {turnNotice ? <p className={styles.note} role="status" data-testid="turn-notice">{turnNotice}</p> : null}
         <div className={styles.transcript} aria-label="Transcript">
           {!visibleTranscript.length ? <p>Transcript is empty or hidden. Nothing is stored as a permanent recording.</p> : null}
