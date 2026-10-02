@@ -18,11 +18,14 @@ test("keeps the sticky search header compact and usable at phone widths", async 
     await expect(settings).toHaveJSProperty("open", true);
     await settings.scrollIntoViewIfNeeded();
     await expect.poll(async () => header.evaluate((node) => node.getBoundingClientRect().height)).toBeLessThanOrEqual(72);
+    if (width === 390) {
+      await page.screenshot({ path: `artifacts/os-rebuild/mobile-header-${testInfo.project.name}.png` });
+    }
 
+    // cmdk labels its input through the command root's "LifeOS commands" label.
     // Exercise the real entry point, rather than calling a DOM click handler directly.
     if (testInfo.project.use.hasTouch) await search.tap();
     else await search.click();
-    await expect(page.getByRole("combobox", { name: "Search LifeOS destinations" })).toBeVisible();
+    await expect(page.getByRole("combobox", { name: "LifeOS commands", exact: true })).toBeVisible();
   }
-  await page.screenshot({ path: testInfo.outputPath("mobile-search-header.png") });
 });
