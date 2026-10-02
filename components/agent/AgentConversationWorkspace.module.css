@@ -1,9 +1,22 @@
+/* Control activation must not race the legacy global smooth scroll. On mobile
+   WebKit, the preview target moved behind the fixed dock/header between pointer
+   placement and dispatch. Scope instant, inset viewport scrolling to this
+   workspace; ordinary user scrolling and other routes remain unchanged. */
+:global(html):has(.workspace) {
+  scroll-behavior: auto;
+  scroll-padding-block: 80px;
+}
+
 .workspace {
   display: grid;
   gap: 16px;
   margin: 12px 0 32px;
   max-width: 100%;
   overflow-x: hidden;
+}
+
+.workspace :is(button, input, select, textarea, summary) {
+  scroll-margin-block: 12px;
 }
 
 .grid {
