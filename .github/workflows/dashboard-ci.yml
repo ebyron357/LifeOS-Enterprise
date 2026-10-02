@@ -50,6 +50,9 @@ jobs:
         timeout-minutes: 15
         run: npx playwright install --with-deps chromium webkit
 
+      - name: Clear inherited visual evidence
+        run: rm -rf artifacts/os-rebuild test-results
+
       - name: Run browser journeys
         timeout-minutes: 20
         run: npm run test:e2e
