@@ -5,6 +5,8 @@ test("keeps the sticky search header compact and usable at phone widths", async 
   for (const width of [320, 390, 414]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto("/conversation");
+    // Control placement must settle before activation, rather than animate under fixed chrome.
+    await expect.poll(async () => page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe("auto");
     const search = page.getByRole("button", { name: "Search LifeOS", exact: true });
     const header = page.locator("header").filter({ has: search });
     await expect(search).toBeVisible();
