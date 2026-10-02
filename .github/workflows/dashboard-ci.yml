@@ -22,6 +22,9 @@ jobs:
         with:
           show-progress: false
 
+      - name: Clear inherited visual evidence
+        run: rm -rf artifacts/os-rebuild test-results
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -49,9 +52,6 @@ jobs:
       - name: Install Playwright browsers
         timeout-minutes: 15
         run: npx playwright install --with-deps chromium webkit
-
-      - name: Clear inherited visual evidence
-        run: rm -rf artifacts/os-rebuild test-results
 
       - name: Run browser journeys
         timeout-minutes: 20
