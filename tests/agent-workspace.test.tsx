@@ -325,7 +325,7 @@ describe("conversation workspace", () => {
     render(<AgentConversationWorkspace vault={vault} />);
     expect(screen.getByTestId("voice-privacy-note")).toHaveTextContent(/processed by your browser or operating system's speech service/);
     expect(screen.getByTestId("voice-privacy-note")).toHaveTextContent(/reply text is sent to OpenAI/);
-    expect(screen.getByTestId("voice-privacy-note")).toHaveTextContent(/Nothing is recorded or stored by LifeOS/);
+    expect(screen.getByTestId("voice-privacy-note")).toHaveTextContent(/LifeOS does not keep an audio recording/);
     // jsdom has no SpeechRecognition / speechSynthesis.
     const notes = screen.getAllByTestId("voice-capability-note").map((note) => note.textContent).join(" ");
     expect(notes).toMatch(/Speech recognition isn't supported/);
