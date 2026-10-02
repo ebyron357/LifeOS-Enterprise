@@ -130,10 +130,11 @@ async function emitFinal(page: Page, text: string) {
   }, text);
 }
 
-async function mockTurn(page: Page, options: { delayMs?: number } = {}) {
+async function mockTurn(page: Page, options: { delayMs?: number; beforeReply?: Promise<void> } = {}) {
   const calls: string[] = [];
   await page.route("**/api/lifeos/agent/turn", async (route) => {
     calls.push(route.request().postData() ?? "");
+    if (options.beforeReply) await options.beforeReply;
     if (options.delayMs) await new Promise((resolve) => setTimeout(resolve, options.delayMs));
     try {
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true, result: TURN_RESULT }) });
@@ -306,7 +307,9 @@ test.describe("interactive conversation workspace", () => {
   for (const control of ["Interrupt assistant", "Stop conversation"] as const) {
     test(`${control} cancels an in-flight turn so no speech starts afterward`, async ({ page }) => {
       await installFakeVoice(page, { voices: FAKE_VOICES });
-      const calls = await mockTurn(page, { delayMs: 1500 });
+      let releaseReply!: () => void;
+      const beforeReply = new Promise<void>((resolve) => { releaseReply = resolve; });
+      const calls = await mockTurn(page, { beforeReply });
       await page.goto("/conversation");
       await page.getByRole("button", { name: /start conversation/i }).click();
       await expect(page.getByText(/state:\s*listening/i)).toBeVisible();
@@ -316,7 +319,9 @@ test.describe("interactive conversation workspace", () => {
       expect(calls).toHaveLength(1);
       await page.getByRole("button", { name: control, exact: true }).click();
       await expect(page.getByText(control === "Interrupt assistant" ? /state:\s*listening/i : /state:\s*stopped/i)).toBeVisible();
-      // Let the delayed (mocked) reply arrive; it must never be spoken or applied.
+      // Release the reply only after cancellation, even on a slow CI runner.
+      // It must never be spoken or applied.
+      releaseReply();
       await page.waitForTimeout(2200);
       expect((await voiceState(page)).spoken).toEqual([]);
       await expect(page.getByText(/Answer from LifeOS context/i)).toHaveCount(0);
