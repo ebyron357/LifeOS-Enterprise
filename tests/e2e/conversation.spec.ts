@@ -130,10 +130,11 @@ async function emitFinal(page: Page, text: string) {
   }, text);
 }
 
-async function mockTurn(page: Page, options: { delayMs?: number } = {}) {
+async function mockTurn(page: Page, options: { delayMs?: number; beforeReply?: Promise<void> } = {}) {
   const calls: string[] = [];
   await page.route("**/api/lifeos/agent/turn", async (route) => {
     calls.push(route.request().postData() ?? "");
+    if (options.beforeReply) await options.beforeReply;
     if (options.delayMs) await new Promise((resolve) => setTimeout(resolve, options.delayMs));
     try {
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true, result: TURN_RESULT }) });
@@ -152,7 +153,12 @@ async function tabTo(page: Page, target: Locator, maxPresses = 8) {
   await expect(target).toBeFocused();
 }
 
-function settingsPanel(page: Page) {
+async function settingsPanel(page: Page) {
+  const advanced = page.locator("#advanced-settings");
+  await expect(advanced).toBeVisible();
+  const open = await advanced.evaluate((element) => (element as HTMLDetailsElement).open);
+  if (!open) await advanced.getByText("Voice & accessibility settings", { exact: true }).click();
+  await expect(advanced).toHaveJSProperty("open", true);
   return page.getByRole("region", { name: "Voice settings" });
 }
 
@@ -245,7 +251,7 @@ test.describe("interactive conversation workspace", () => {
   test("restores voice settings controls after reload, even when session metadata fails", async ({ page }) => {
     await installFakeVoice(page, { voices: FAKE_VOICES, voicesDelayMs: 150 });
     await page.goto("/conversation");
-    const settings = settingsPanel(page);
+    const settings = await settingsPanel(page);
     await settings.getByLabel(/^Provider/).selectOption("browser");
     await settings.getByLabel(/^Locale/).selectOption("en-GB");
     const voiceSelect = settings.getByLabel(/^Voice/);
@@ -257,26 +263,28 @@ test.describe("interactive conversation workspace", () => {
     const saved = await page.evaluate(() => window.localStorage.getItem("lifeos-conversation-voice-settings-v1"));
 
     await page.reload();
-    await expect(settings.getByLabel(/^Locale/)).toHaveValue("en-GB");
-    await expect(settings.getByLabel(/^Voice/)).toHaveValue("uk-1");
-    await expect(settings.getByLabel(/^Input language/)).toHaveValue("fr-FR");
-    await expect(settings.getByLabel(/^Response style/)).toHaveValue("coach");
-    await expect(settings.getByLabel(/^Provider/)).toHaveValue("browser");
+    const reloadedSettings = await settingsPanel(page);
+    await expect(reloadedSettings.getByLabel(/^Locale/)).toHaveValue("en-GB");
+    await expect(reloadedSettings.getByLabel(/^Voice/)).toHaveValue("uk-1");
+    await expect(reloadedSettings.getByLabel(/^Input language/)).toHaveValue("fr-FR");
+    await expect(reloadedSettings.getByLabel(/^Response style/)).toHaveValue("coach");
+    await expect(reloadedSettings.getByLabel(/^Provider/)).toHaveValue("browser");
 
     // Session metadata failure must not reset or overwrite saved settings.
     await page.route("**/api/lifeos/agent/session", (route) => route.abort());
     await page.reload();
     await expect(conversationAlert(page)).toContainText(/Unable to load agent session metadata/);
-    await expect(settings.getByLabel(/^Locale/)).toHaveValue("en-GB");
-    await expect(settings.getByLabel(/^Voice/)).toHaveValue("uk-1");
-    await expect(settings.getByLabel(/^Response style/)).toHaveValue("coach");
+    const failedSessionSettings = await settingsPanel(page);
+    await expect(failedSessionSettings.getByLabel(/^Locale/)).toHaveValue("en-GB");
+    await expect(failedSessionSettings.getByLabel(/^Voice/)).toHaveValue("uk-1");
+    await expect(failedSessionSettings.getByLabel(/^Response style/)).toHaveValue("coach");
     expect(await page.evaluate(() => window.localStorage.getItem("lifeos-conversation-voice-settings-v1"))).toBe(saved);
   });
 
   test("previews with the chosen browser voice and warns when a locale has no installed voice", async ({ page }) => {
     await installFakeVoice(page, { voices: FAKE_VOICES, voicesDelayMs: 100 });
     await page.goto("/conversation");
-    const settings = settingsPanel(page);
+    const settings = await settingsPanel(page);
     await settings.getByLabel(/^Locale/).selectOption("en-GB");
     await settings.getByLabel(/^Voice/).selectOption("uk-1");
     await settings.getByRole("button", { name: /preview voice/i }).click();
@@ -299,7 +307,9 @@ test.describe("interactive conversation workspace", () => {
   for (const control of ["Interrupt assistant", "Stop conversation"] as const) {
     test(`${control} cancels an in-flight turn so no speech starts afterward`, async ({ page }) => {
       await installFakeVoice(page, { voices: FAKE_VOICES });
-      const calls = await mockTurn(page, { delayMs: 1500 });
+      let releaseReply!: () => void;
+      const beforeReply = new Promise<void>((resolve) => { releaseReply = resolve; });
+      const calls = await mockTurn(page, { beforeReply });
       await page.goto("/conversation");
       await page.getByRole("button", { name: /start conversation/i }).click();
       await expect(page.getByText(/state:\s*listening/i)).toBeVisible();
@@ -309,7 +319,9 @@ test.describe("interactive conversation workspace", () => {
       expect(calls).toHaveLength(1);
       await page.getByRole("button", { name: control, exact: true }).click();
       await expect(page.getByText(control === "Interrupt assistant" ? /state:\s*listening/i : /state:\s*stopped/i)).toBeVisible();
-      // Let the delayed (mocked) reply arrive; it must never be spoken or applied.
+      // Release the reply only after cancellation, even on a slow CI runner.
+      // It must never be spoken or applied.
+      releaseReply();
       await page.waitForTimeout(2200);
       expect((await voiceState(page)).spoken).toEqual([]);
       await expect(page.getByText(/Answer from LifeOS context/i)).toHaveCount(0);

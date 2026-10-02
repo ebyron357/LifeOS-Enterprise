@@ -22,6 +22,9 @@ jobs:
         with:
           show-progress: false
 
+      - name: Clear inherited visual evidence
+        run: rm -rf artifacts/os-rebuild test-results playwright-report
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -53,3 +56,48 @@ jobs:
       - name: Run browser journeys
         timeout-minutes: 20
         run: npm run test:e2e
+
+      - name: Preserve complete browser suite results
+        if: always()
+        run: |
+          if [ -f test-results/e2e-results.json ]; then
+            mkdir -p artifacts/os-rebuild
+            cp test-results/e2e-results.json artifacts/os-rebuild/full-e2e-results.json
+          fi
+
+      - name: Verify mobile voice preview stability without retries
+        timeout-minutes: 10
+        run: npx playwright test tests/e2e/conversation.spec.ts --project=webkit-mobile --grep "previews with the chosen browser voice" --repeat-each=10 --retries=0
+
+      - name: Upload visual acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifeos-visual-proof
+          path: |
+            artifacts/os-rebuild/*.png
+            test-results/**/*.png
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload browser validation results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifeos-browser-results
+          path: |
+            artifacts/os-rebuild/full-e2e-results.json
+            test-results/e2e-results.json
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload browser failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifeos-browser-failure-diagnostics
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: warn
+          retention-days: 7

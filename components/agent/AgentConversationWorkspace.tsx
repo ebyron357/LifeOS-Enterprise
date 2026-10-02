@@ -155,6 +155,8 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   const speechGateRef = useRef(createRequestGate());
   /** One turn at a time + duplicate transcript suppression. */
   const turnGuardRef = useRef(createTurnGuard());
+  /** Explicit owner-cancellation epoch. WebKit may resolve an aborted fetch, so stale work also checks this epoch. */
+  const ownerCancelEpochRef = useRef(0);
 
   // Persisted settings hydrate from localStorage on mount, independent of the session fetch.
   // Nothing is written until the owner changes a setting, so defaults never overwrite saved values.
@@ -390,6 +392,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
 
   const runTurn = useCallback(async (text: string, channel: "text" | "voice", turnId: number) => {
     const guard = turnGuardRef.current;
+    const ownerCancelEpoch = ownerCancelEpochRef.current;
     const turnGate = turnGateRef.current;
     const generation = turnGate.advance();
     speechGateRef.current.cancel();
@@ -417,7 +420,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
       });
       const payload = await response.json();
       // Interrupt / Stop cancelled this turn: never apply or speak a stale reply.
-      if (!turnGate.isCurrent(generation)) return;
+      if (!turnGate.isCurrent(generation) || ownerCancelEpoch !== ownerCancelEpochRef.current) return;
       guard.finish(turnId, Date.now());
       if (!response.ok || !payload.ok) throw new Error(payload.error || "Agent turn failed.");
       const next = payload.result as AgentTurnResult;
@@ -530,6 +533,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   /** Cancels the in-flight turn, any pending server speech, and current playback. */
   function cancelPendingWork(): boolean {
     const hadPendingTurn = turnGuardRef.current.inFlight;
+    ownerCancelEpochRef.current += 1;
     turnGateRef.current.cancel();
     speechGateRef.current.cancel();
     turnGuardRef.current.cancel();
@@ -634,6 +638,11 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
   }
 
   const currentProject = vault.priorities[0] ?? vault.projects[0] ?? null;
+  const channelState = (category: ToolDefinition["category"]) => {
+    const match = tools.find((tool) => tool.category === category);
+    if (!match) return sessionLoadFailed ? "unavailable" : "loading";
+    return match.availability;
+  };
 
   async function decide(approval: ApprovalRequest, decision: "approved" | "rejected") {
     const response = await fetch("/api/lifeos/agent/approval", {
@@ -678,27 +687,48 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
 
   return (
     <div className={styles.workspace}>
-      <section className={styles.panel} aria-label="Conversation">
+      <header className={styles.commsHero}>
+        <div>
+          <span className={styles.eyebrow}>COMMUNICATIONS COMMAND</span>
+          <h2>ARIA Communications Hub</h2>
+          <p>Talk, type, share your screen, review approvals, and keep the mission moving from one place.</p>
+        </div>
+        <div className={styles.commsStatus}>
+          <span data-tone={voice.microphoneOpen ? "ok" : "warn"}>{voiceLabel}</span>
+          <span data-tone={screen.state === "sharing" ? "ok" : "neutral"}>{screen.state === "sharing" ? "Screen shared" : "Screen off"}</span>
+          <span data-tone={paused ? "warn" : "ok"}>{paused ? "Agent paused" : "Agent ready"}</span>
+        </div>
+      </header>
+
+      <nav className={styles.channelBar} aria-label="Communication modes">
+        <a href="#conversation-heading">ARIA Chat</a>
+        <a href="/integrations">Email <small>{channelState("email")}</small></a>
+        <a href="/integrations">Slack <small>{channelState("slack")}</small></a>
+        <a href="/integrations">ClickUp <small>{channelState("clickup")}</small></a>
+        <a href="/today">Calendar <small>{channelState("calendar")}</small></a>
+        <a href="#agent-activity">Approvals</a>
+        <a href="#screen-share">Screen</a>
+        <a href="#context-panel">Context</a>
+        <a href="#advanced-settings">Settings</a>
+      </nav>
+
+      <section className={`${styles.panel} ${styles.conversationPanel}`} aria-label="Conversation">
         <h2 id="conversation-heading" tabIndex={-1}>Conversation</h2>
         <div className={styles.statusRow} aria-live="polite">
           <span className={styles.badge} data-tone={voice.microphoneOpen ? "ok" : "warn"}>{voiceLabel}</span>
           <span className={styles.badge} data-voice-state={voice.state}>State: {voice.state}</span>
           <span className={styles.badge}>{voice.connection}</span>
-          <span className={styles.badge}>Duration {formatDuration(voice.durationMs)}</span>
-          <span className={styles.badge}>Audio recording off</span>
         </div>
         <p className={styles.runtime} role="status" aria-live="polite" data-testid="speech-runtime">
           {describeSpeechRuntime(speechRuntime)}
         </p>
         {!micEverStarted ? (
-          <p className={styles.note} data-testid="voice-privacy-note">
-            Privacy: when you start the microphone, speech recognition audio is processed by your browser or operating
-            system&apos;s speech service. When OpenAI voice is used, the reply text is sent to OpenAI to create audio.
-            Nothing is recorded or stored by LifeOS.
+          <p className={styles.privacyNote} data-testid="voice-privacy-note">
+            Privacy: microphone audio is processed by your browser or operating system&apos;s speech service. When OpenAI voice is selected, reply text is sent to OpenAI to create audio. LifeOS does not keep an audio recording.
           </p>
         ) : null}
         {capabilityNotes.map((note) => (
-          <p key={note} className={styles.note} data-testid="voice-capability-note">{note}</p>
+          <p key={note} className={styles.capabilityNote} data-testid="voice-capability-note">{note}</p>
         ))}
         <div className={`${styles.toolbar} ${styles.voiceControls}`} role="toolbar" aria-label="Voice controls">
           <button type="button" onClick={() => void beginListening(true)}>Start conversation</button>
@@ -738,11 +768,19 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
           >
             Push to talk
           </button>
-          <button type="button" onClick={() => setTranscript([])}>Clear transcript</button>
-          <button type="button" onClick={() => setVoice((current) => setTranscriptPrivacy(current, current.transcriptPrivacy === "hidden" ? "ephemeral" : "hidden"))}>
-            Transcript {voice.transcriptPrivacy === "hidden" ? "hidden" : "visible"}
-          </button>
         </div>
+        <details className={styles.sessionDetails}>
+          <summary>Session details & privacy</summary>
+          <div className={styles.sessionDetailBody}>
+            <p>Duration {formatDuration(voice.durationMs)} · Audio recording off</p>
+            <div className={styles.toolbar}>
+              <button type="button" onClick={() => setTranscript([])}>Clear transcript</button>
+              <button type="button" onClick={() => setVoice((current) => setTranscriptPrivacy(current, current.transcriptPrivacy === "hidden" ? "ephemeral" : "hidden"))}>
+                Transcript {voice.transcriptPrivacy === "hidden" ? "hidden" : "visible"}
+              </button>
+            </div>
+          </div>
+        </details>
         {turnNotice ? <p className={styles.note} role="status" data-testid="turn-notice">{turnNotice}</p> : null}
         <div className={styles.transcript} aria-label="Transcript">
           {!visibleTranscript.length ? <p>Transcript is empty or hidden. Nothing is stored as a permanent recording.</p> : null}
@@ -774,7 +812,9 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         ) : null}
       </section>
 
-      <section className={styles.panel} aria-label="Voice settings">
+      <details className={styles.advanced} id="advanced-settings">
+        <summary>Voice & accessibility settings</summary>
+        <section className={styles.panel} aria-label="Voice settings">
         <h2>Voice settings</h2>
         <div className={styles.toolbar}>
           <label>
@@ -891,10 +931,11 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
         {unavailableProviders.map((provider) => (
           <p key={provider.id}>{provider.id} unavailable: {provider.reason}</p>
         ))}
-      </section>
+        </section>
+      </details>
 
       <div className={styles.grid}>
-        <section className={styles.panel} aria-label="Screen share">
+        <section className={styles.panel} aria-label="Screen share" id="screen-share">
           <h2>Screen</h2>
           <p className={styles.status}>{screenLabel}</p>
           <div className={styles.toolbar} role="toolbar" aria-label="Screen share controls">
@@ -907,7 +948,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
           <p>LifeOS never starts capture by itself and does not store full recordings.</p>
         </section>
 
-        <section className={styles.panel} aria-label="Agent activity">
+        <section className={styles.panel} aria-label="Agent activity" id="agent-activity">
           <h2>Agent</h2>
           <div className={styles.statusRow} aria-live="polite">
             <span className={styles.badge} data-tone={paused ? "warn" : result?.waitingForOwner ? "warn" : "ok"}>{paused ? "paused" : result?.state ?? "idle"}</span>
@@ -950,7 +991,7 @@ export function AgentConversationWorkspace({ vault }: AgentConversationWorkspace
           </ul>
         </section>
 
-        <section className={styles.panel} aria-label="Context">
+        <section className={styles.panel} aria-label="Context" id="context-panel">
           <h2>Context</h2>
           <p>Workspace: Conversation</p>
           <p>Current project: {currentProject ? `${currentProject.name} (${currentProject.status})` : "None selected"}</p>
