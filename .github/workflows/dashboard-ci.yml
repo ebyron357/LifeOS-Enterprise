@@ -23,7 +23,7 @@ jobs:
           show-progress: false
 
       - name: Clear inherited visual evidence
-        run: rm -rf artifacts/os-rebuild test-results
+        run: rm -rf artifacts/os-rebuild test-results playwright-report
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -65,5 +65,16 @@ jobs:
           path: |
             artifacts/os-rebuild/*.png
             test-results/**/*.png
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload browser failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifeos-browser-failure-diagnostics
+          path: |
+            test-results/
+            playwright-report/
           if-no-files-found: warn
           retention-days: 7
