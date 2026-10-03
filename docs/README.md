@@ -18,6 +18,7 @@ This directory is the documentation entry point for LifeOS Enterprise and is str
 ## Release Closeouts
 
 - [PR #85 — Legendary LifeOS Personal Command Center](releases/PR-85-PRODUCTION-CLOSEOUT.md)
+- [PR #88 — Life-Area Colors and Private Website](releases/PR-88-PRODUCTION-CLOSEOUT.md)
 
 ## Documentation Operating Rule
 

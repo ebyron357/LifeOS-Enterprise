@@ -815,3 +815,20 @@ The owner asked for LifeOS to stop being public.
 1. Make `ebyron357/LifeOS-Enterprise` private.
 2. Add a read-capable `LIFEOS_GITHUB_TOKEN` in Vercel, then redeploy, so the GitHub card reconnects.
 3. Watch GitHub Actions minutes. Private repositories use the monthly allowance, and the Vault Health and MAPS Integrity workflows run on Windows, which counts double.
+
+## PR #88 production closeout — 2026-10-03
+
+- **Merge:** PR #88 squash-merged as `c640758fd213cf2e1f22de8021e892341acf46c0`, on the owner's decision.
+- **Production:** `dpl_8Rrgj41hjMDzo2aWaqkh7dhRWQcg` READY at `c640758`, behind Vercel Authentication on All Deployments. The authenticated check of `/` returned 200 and served the new color and state markup. Vercel reported no runtime errors in 7 days. Full evidence: `docs/releases/PR-88-PRODUCTION-CLOSEOUT.md`.
+- **Post-merge checks:** Vault Health PASS. MAPS Integrity PASS. Dashboard CI FAIL at `npm audit` from the upstream `braces` advisory GHSA-vfj7-8cjw-p6xm, which has no patched release and is also red on `main` without this change.
+
+### Final pass/fail state
+
+**AGENT VALIDATION PASSED (VAULT, MAPS, LOCAL APP SUITE); DASHBOARD CI BLOCKED UPSTREAM; OWNER ACCEPTANCE STILL REQUIRED.** The Daily Command Center and the web Command Center are operational.
+
+### Remaining owner actions
+
+1. Make the repository private. It was still public on 2026-10-03 at about 02:25 UTC.
+2. Add the Part K step 0 read-only `LIFEOS_GITHUB_TOKEN`, then redeploy.
+3. Refresh the lockfile once `braces` ships a patched release.
+4. Complete the owner acceptance workbook.
