@@ -2,7 +2,7 @@
 
 All notable changes to LifeOS Enterprise are documented in this file.
 
-## [Unreleased] — 2026-10-03 Private website and private-repository readiness
+## [Unreleased] — 2026-10-03 Private website and private-repository readiness (PR #88, merged as `c640758`)
 
 ### Security
 
@@ -14,7 +14,7 @@ All notable changes to LifeOS Enterprise are documented in this file.
 
 - The owner manual (A1–A3, G1–G3), canonical status, and deployment guide describe the Vercel login and the owner step to make the repository private.
 
-## [Unreleased] — 2026-10-03 Complementary color layer and status reconciliation
+## [Unreleased] — 2026-10-03 Complementary color layer and status reconciliation (PR #88, merged as `c640758`)
 
 ### Changed
 
