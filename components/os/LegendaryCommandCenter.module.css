@@ -49,3 +49,82 @@
 .continuityDetails :global(.os-card){margin-top:8px}
 @media(max-width:900px){.continuityCompact{grid-template-columns:1fr}.continuityDetails{grid-column:auto}}
 @media(max-width:620px){.continuitySignals{grid-template-columns:1fr}.continuityLead{flex-direction:column}}
+/* Complementary color layer.
+   Warm sunrise accents (coral, gold, rose, amber) balance the electric-blue base, with violet and teal bridging the two.
+   Each life area keeps one color everywhere through data-accent (mapping in lib/os/accents.ts).
+   Accents tint borders, icons, and edges; text stays light for contrast. */
+.shell{--sky:#72d7ff;--teal:#2ee6c8;--mint:#36e39a;--lime:#b6e86a;--gold:#ffd166;--coral:#ff7a59;--rose:#ff7db3;--orchid:#c77dff;--periwinkle:#8f9bff;--slate:#8ca0b7;--accent:var(--blue);--sunrise:linear-gradient(90deg,#2388ff,#8f5bff 28%,#ff7db3 55%,#ff7a59 76%,#ffd166)}
+.shell [data-accent="sky"]{--accent:var(--sky)}.shell [data-accent="blue"]{--accent:var(--blue)}.shell [data-accent="cyan"]{--accent:var(--cyan)}.shell [data-accent="teal"]{--accent:var(--teal)}.shell [data-accent="mint"]{--accent:var(--mint)}.shell [data-accent="lime"]{--accent:var(--lime)}.shell [data-accent="gold"]{--accent:var(--gold)}.shell [data-accent="amber"]{--accent:var(--amber)}.shell [data-accent="coral"]{--accent:var(--coral)}.shell [data-accent="rose"]{--accent:var(--rose)}.shell [data-accent="orchid"]{--accent:var(--orchid)}.shell [data-accent="violet"]{--accent:var(--violet)}.shell [data-accent="periwinkle"]{--accent:var(--periwinkle)}.shell [data-accent="slate"]{--accent:var(--slate)}
+
+.brandMark{background:linear-gradient(135deg,#315fff,#8f5bff 58%,#ff7db3);box-shadow:0 0 28px rgba(143,91,255,.3)}
+.brand small{color:#ffb28f}
+.navIcon{color:color-mix(in srgb,var(--accent) 85%,#fff)}
+.nav a:hover,.nav a:focus-visible{border-color:color-mix(in srgb,var(--accent) 38%,transparent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.nav a[data-active="true"]{background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 30%,transparent),color-mix(in srgb,var(--accent) 6%,transparent));border-color:color-mix(in srgb,var(--accent) 50%,transparent);box-shadow:inset 3px 0 var(--accent)}
+.sidebarFoot{position:relative;border-top-color:transparent}.sidebarFoot:before{content:"";position:absolute;inset:-1px 0 auto;height:1px;background:var(--sunrise);opacity:.7}
+.topActions [data-accent]{border-color:color-mix(in srgb,var(--accent) 42%,transparent);background:color-mix(in srgb,var(--accent) 12%,#0c131d);color:#fff}
+.topActions [data-accent]:hover,.topActions [data-accent]:focus-visible{background:color-mix(in srgb,var(--accent) 22%,#0c131d)}
+
+.hero{border-color:rgba(143,91,255,.38);background:linear-gradient(90deg,rgba(5,13,24,.96),rgba(8,22,38,.6) 52%,rgba(5,10,18,.9)),radial-gradient(circle at 74% 28%,rgba(255,122,89,.34),transparent 14rem),radial-gradient(circle at 90% 85%,rgba(255,125,179,.24),transparent 12rem),radial-gradient(circle at 56% 30%,rgba(35,136,255,.3),transparent 20rem),radial-gradient(circle at 36% 120%,rgba(143,91,255,.3),transparent 18rem),linear-gradient(135deg,#0d1a2b,#161628 48%,#0b111b)}
+.hero:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--sunrise);opacity:.85}
+.heroMark{border-color:transparent;background:linear-gradient(#0b1424,#0b1424) padding-box,conic-gradient(from 200deg,#2388ff,#8f5bff,#ff7db3,#ff7a59,#ffd166,#2388ff) border-box;color:var(--gold);box-shadow:0 0 26px rgba(255,125,179,.3)}
+.hero em{color:#d9b8ff}
+.heroMeta div:nth-child(1){border-left-color:rgba(255,209,102,.65)}.heroMeta div:nth-child(2){border-left-color:rgba(255,125,179,.65)}
+.heroMeta span{color:#c9a46b}
+
+.launchTile{border-color:color-mix(in srgb,var(--accent) 26%,transparent);background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 13%,#101826),#0a1018 80%);box-shadow:inset 0 2px color-mix(in srgb,var(--accent) 85%,transparent)}
+.launchIcon{color:var(--accent);text-shadow:0 0 14px color-mix(in srgb,var(--accent) 45%,transparent)}
+.launchTile small{color:#8fa1b6}
+.launchTile:hover,.launchTile:focus-visible{border-color:color-mix(in srgb,var(--accent) 62%,transparent);box-shadow:inset 0 2px var(--accent),0 8px 24px rgba(0,0,0,.3),0 0 18px color-mix(in srgb,var(--accent) 24%,transparent)}
+
+.ownerWorldTitle span{color:var(--gold)}
+.ownerLaneRow a{gap:6px}
+.ownerLaneRow a:before{content:"";flex:0 0 auto;width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px color-mix(in srgb,var(--accent) 60%,transparent)}
+.ownerLaneRow a:hover,.ownerLaneRow a:focus-visible{border-color:color-mix(in srgb,var(--accent) 50%,transparent);background:color-mix(in srgb,var(--accent) 12%,#0b131f)}
+
+.panel[data-accent],.voicePanel[data-accent]{border-top:2px solid color-mix(in srgb,var(--accent) 72%,transparent)}
+.panel[data-accent] .panelHead{background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 11%,transparent),transparent 72%)}
+.panel[data-accent] .panelHead a{color:color-mix(in srgb,var(--accent) 72%,#fff)}
+.panelKicker{display:block;margin-bottom:2px;color:color-mix(in srgb,var(--accent) 78%,#fff);font:800 .56rem ui-monospace,monospace;letter-spacing:.12em}
+.focusDot[data-tone="info"]{background:var(--sky)}
+
+.avatar{background:linear-gradient(135deg,#2388ff,#8f5bff 62%,#ff7db3)}
+.bubbleRight{align-self:flex-end;max-width:78%;margin-top:10px;padding:9px 11px;border-radius:11px;background:linear-gradient(135deg,#5a3fd6,#b0457f);color:#fff;font-size:.67rem;line-height:1.45}
+.commandChips span{border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:999px;padding:4px 8px;color:color-mix(in srgb,var(--accent) 65%,#fff);background:color-mix(in srgb,var(--accent) 8%,transparent);font-size:.56rem}
+
+.voicePanel{background:radial-gradient(circle at 78% 35%,rgba(199,125,255,.24),transparent 12rem),radial-gradient(circle at 15% 100%,rgba(255,125,179,.16),transparent 10rem),linear-gradient(180deg,#0f1426,#0a101d)}
+.voicePanel a{border-color:color-mix(in srgb,var(--accent) 55%,transparent);color:#f1dcff}
+.voiceHead span{color:var(--mint)}
+.wave i{background:linear-gradient(#ff7db3,#8f5bff 50%,#37d9ff);box-shadow:0 0 8px rgba(199,125,255,.4)}
+
+.metric[data-accent]{border-color:color-mix(in srgb,var(--accent) 52%,transparent);background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 13%,#0b121c),#0b121c)}
+.metric[data-accent] strong{color:color-mix(in srgb,var(--accent) 80%,#fff)}
+
+.upcoming a[data-accent]{padding-left:9px;box-shadow:inset 2px 0 color-mix(in srgb,var(--accent) 75%,transparent)}
+.healthGrid b{background:transparent;border:1.5px solid var(--slate)}
+.healthGrid b[data-state="on"]{background:var(--mint);border-color:var(--mint)}
+
+.resumeStrip a[data-accent],.agentGrid a[data-accent]{border-color:color-mix(in srgb,var(--accent) 28%,transparent);box-shadow:inset 0 2px color-mix(in srgb,var(--accent) 78%,transparent);background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 10%,#0b121c),#0a111a 85%)}
+.resumeStrip a[data-accent] span{color:color-mix(in srgb,var(--accent) 72%,#fff)}
+.systemRow strong{color:#cfe3f7}.systemRow small{color:var(--slate)}.systemRow small[data-state="on"]{color:var(--mint)}
+
+.quickRow a[data-accent]{border-color:color-mix(in srgb,var(--accent) 30%,transparent);background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 11%,#0b121c),#0b121c)}
+.quickRow a[data-accent] strong{color:var(--accent)}
+.quickRow a[data-accent]:hover,.quickRow a[data-accent]:focus-visible{border-color:color-mix(in srgb,var(--accent) 60%,transparent)}
+
+.continuityCompact[data-accent]{border-top:2px solid color-mix(in srgb,var(--accent) 72%,transparent)}
+.continuityLead>a{color:color-mix(in srgb,var(--accent) 72%,#fff)}
+.continuitySignals div[data-accent]{box-shadow:inset 2px 0 color-mix(in srgb,var(--accent) 75%,transparent)}
+
+.dock a[aria-current="page"]{color:#fff;box-shadow:inset 0 2px var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+
+/* Shared os-card pages inside the shell get a calm cycling top edge. */
+.content :global(.os-card):after{content:"";position:absolute;inset:0 0 auto;height:2px;background:var(--card-accent,var(--sky));opacity:.75;pointer-events:none}
+.content :global(.os-card:nth-child(5n+2)){--card-accent:var(--gold)}
+.content :global(.os-card:nth-child(5n+3)){--card-accent:var(--violet)}
+.content :global(.os-card:nth-child(5n+4)){--card-accent:var(--rose)}
+.content :global(.os-card:nth-child(5n+5)){--card-accent:var(--mint)}
+.content :global(.os-card:nth-child(5n+1)){--card-accent:var(--coral)}
+
+/* "I'm overloaded" mode softens every accent. */
+:global(html[data-lifeos-overloaded="true"]) .shell{--sky:#8fb4c8;--teal:#86b9b0;--mint:#8fbfa5;--lime:#aebf94;--gold:#cdb98b;--amber:#c9a882;--coral:#c99a8a;--rose:#c79bb1;--orchid:#a993c2;--violet:#9289c2;--periwinkle:#9aa1c9;--blue:#7f9fcf;--cyan:#8db8c7}
