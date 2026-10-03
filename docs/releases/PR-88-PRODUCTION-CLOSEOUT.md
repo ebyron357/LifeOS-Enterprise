@@ -56,7 +56,7 @@ The authenticated check of `/` found:
 1. Make the GitHub repository private: Settings → General → Danger Zone → Change visibility → Make private. It was still public on October 3, 2026 at about 02:25 UTC.
 2. After that, add a read-only `LIFEOS_GITHUB_TOKEN` (owner manual Part K step 0) and redeploy, so the GitHub card reconnects.
 3. Once `braces` publishes a patched release, refresh the lockfile so Dashboard CI's audit step passes again.
-4. Owner acceptance workbook: 0 of 88 rows are signed. It still needs real-device microphone and screen-share checks.
+4. Owner acceptance workbook: 0 of 87 rows are signed. It still needs real-device microphone and screen-share checks.
 
 ## Definition-of-Done Result
 

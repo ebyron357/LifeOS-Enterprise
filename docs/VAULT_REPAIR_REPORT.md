@@ -783,7 +783,7 @@ Base: `main` at `74a3a7bff64a1842427ab8be96954b0387e01644` (PR #86, after PR #85
 
 ### Remaining credential-only or local-UI-only actions
 
-Unchanged from the 2026-09-30 closeout: governed write credentials, optional paid voice, the owner acceptance workbook (0 of 88 rows signed on 2026-10-03), real-device microphone and screen-share checks, the Issue #56 candidate, and local Windows/Obsidian checks.
+Unchanged from the 2026-09-30 closeout: governed write credentials, optional paid voice, the owner acceptance workbook (0 of 87 rows signed on 2026-10-03), real-device microphone and screen-share checks, the Issue #56 candidate, and local Windows/Obsidian checks.
 
 ## Privacy lockdown — 2026-10-03 (`claude/youthful-carson-12g3r0`)
 
@@ -824,7 +824,7 @@ The owner asked for LifeOS to stop being public.
 
 ### Final pass/fail state
 
-**AGENT VALIDATION PASSED (VAULT, MAPS, LOCAL APP SUITE); DASHBOARD CI BLOCKED UPSTREAM; OWNER ACCEPTANCE STILL REQUIRED.** The Daily Command Center and the web Command Center are operational.
+**AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED.** The vault audit, MAPS validation, and the local app suite pass. Dashboard CI is blocked by the upstream `braces` advisory. The Daily Command Center and the web Command Center are operational.
 
 ### Remaining owner actions
 

@@ -337,7 +337,7 @@ These are agent validation records, not owner acceptance.
 Each item is written step-by-step in `80 SOPs/LifeOS Owner's Operating Manual.md` (Part K for credentials, Part J and `docs/OWNER_ACCEPTANCE_WORKBOOK.md` for acceptance).
 
 0. Privacy (2026-10-03): the website was made private by the agent on the owner's instruction (Vercel Authentication, All Deployments). The owner still needs to make the GitHub repository private (manual Part G2). After that, add a read-capable `LIFEOS_GITHUB_TOKEN` in Vercel so the GitHub card keeps working. GitHub Actions on a private repository use the account's monthly minutes, and the two Windows workflows count double, so watch usage on the account's billing page.
-1. Done: the build work is merged and deployed. On 2026-10-03, production `dpl_FuWthSLvRDDc8oSXkurWxXssJMK4` was observed READY at `74a3a7b` (PR #86, after PR #85). Re-check production identity (step 2) before starting acceptance, because later merges change it.
+1. Done: the build work is merged and deployed. On 2026-10-03, production `dpl_8Rrgj41hjMDzo2aWaqkh7dhRWQcg` was observed READY at `c640758` (PR #88). Re-check production identity (step 2) before starting acceptance, because later merges change it.
 2. At the start of the acceptance session, query Vercel and record the exact READY production deployment ID + SHA in the workbook.
 3. Complete the workbook's live checks on desktop and phone: navigation journeys, widgets and game, and voice with a real microphone and speakers (voice choice, preview, interrupt, mute, recovery, persistence). Also check screen share request, deny, and stop.
 4. Decide whether to enable governed writes, and only then configure the credentials together:
