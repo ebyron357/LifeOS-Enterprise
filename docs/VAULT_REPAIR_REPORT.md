@@ -784,3 +784,34 @@ Base: `main` at `74a3a7bff64a1842427ab8be96954b0387e01644` (PR #86, after PR #85
 ### Remaining credential-only or local-UI-only actions
 
 Unchanged from the 2026-09-30 closeout: governed write credentials, optional paid voice, the owner acceptance workbook (0 of 88 rows signed on 2026-10-03), real-device microphone and screen-share checks, the Issue #56 candidate, and local Windows/Obsidian checks.
+
+## Privacy lockdown — 2026-10-03 (`claude/youthful-carson-12g3r0`)
+
+The owner asked for LifeOS to stop being public.
+
+### Repairs completed
+
+- **Website:** the Vercel project `lifeos-enterprise` used Vercel Authentication with Standard Protection (`all_except_custom_domains`). That protects preview and deployment URLs but leaves the production domain `lifeos-enterprise.vercel.app` public. The agent changed it to All Deployments (`ssoProtection.deploymentType: "all"`) on the owner's instruction. Vercel documents this as available on all plans with no paid add-on.
+- **GitHub health:** `lib/github/health.ts` sends `LIFEOS_GITHUB_TOKEN` when it is set, so the card keeps working after the repository goes private. Covered by `tests/github-health-auth.test.ts`.
+- **Docs:** owner manual A1–A3 and G1–G3, canonical status (access row, GitHub health row, owner step 0), and the deployment guide.
+- **Exposure check:** a scan of the vault's Markdown for health and identity terms found no diagnoses or medical details. The only match was a `tbi-friendly` tag on the owner manual.
+
+### Validation evidence
+
+- Vercel `get_project` after the change: `ssoProtection: { enabled: true, deploymentType: "all" }`, with all three domains still attached.
+- Anonymous requests made through an external fetcher, with caching off and links-only output: `https://lifeos-enterprise.vercel.app/` and `/api/lifeos/continuity` both landed on "Protected Deployment – Vercel" (`vercel.com/login`). No LifeOS content was returned.
+- lint and typecheck: PASS
+- `npm test`: 74 files, 521 tests, PASS
+- build: PASS
+- `pwsh -File scripts/audit-vault.ps1`: PASS
+- `pwsh -File scripts/validate-maps.ps1`: PASS
+
+### Final pass/fail state
+
+**Website: PRIVATE (verified). Repository: still PUBLIC.** None of the agent's tools can change repository visibility. The owner must make it private in GitHub Settings → General → Danger Zone → Change visibility.
+
+### Remaining owner actions
+
+1. Make `ebyron357/LifeOS-Enterprise` private.
+2. Add a read-capable `LIFEOS_GITHUB_TOKEN` in Vercel, then redeploy, so the GitHub card reconnects.
+3. Watch GitHub Actions minutes. Private repositories use the monthly allowance, and the Vault Health and MAPS Integrity workflows run on Windows, which counts double.

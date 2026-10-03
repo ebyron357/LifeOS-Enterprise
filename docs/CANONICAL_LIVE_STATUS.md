@@ -3,7 +3,7 @@
 **Status date:** 2026-10-03  
 **Canonical repository:** `ebyron357/LifeOS-Enterprise`  
 **Canonical branch:** `main`  
-**Production URL:** `https://lifeos-enterprise.vercel.app/`  
+**Production URL:** `https://lifeos-enterprise.vercel.app/` (private since 2026-10-03: Vercel Authentication on all deployments; a Vercel login on team `tradeiq` is required)  
 **Released version:** `1.0.0`  
 **Last application-code baseline on main:** `353ada3c02690f855157f22622d3366c39e8d181` — PR #85 legendary LifeOS personal command center (cockpit shell, home, and communications hub)  
 **Prior recorded baselines:** `0d3ed7018fed006e853c134c17ae930ebecda23f` — PR #82 final LifeOS command center (redesigned shell and home); `d66467e2701e5f11fa12b0b2f60e5257756c988c` — PR #78 My Life mega navigation; `abf6c8264bed2578382d8eb60adc572762b6ee17` — PR #75 LifeOS closeout (voice #58, widgets/game #42, resource provenance, owner manual v2.0); `fc0729de8475c6c2f6b6343a99d9fac392a5442e` — Life Map and Dashboards hub (owner commit); `62a9df908608bf2c584f17be82d7f3754a582065` — PR #74 MAPS operating layer; `21b921ce8c7acf98132748f3466800468e0664a1` — PR #73 Continuity checkpoint path fix; `03657b621c2956c095c2e168f11ff159c3449651` — PR #72 Continuity checkpoint writes; `6bf7e2aff9920ba868de7381e0e68ae75d9866c7` — PR #71 Resource review; `df4b182bae4884a482bd2efd652a07783f9b6111` — PR #70 Prompt Intelligence; `1ae3fddb65b75c08127b7fef995d5ff37926f80a` — PR #69 Continuity; `45d5d018599e7b7d308523a3f38bf9ccf62e2c94` — PR #68 GitHub evidence; `7982c92a7080f60f9fb70e7c66c5220b8178bc35` — PR #64 performance hardening.  
@@ -127,8 +127,9 @@ The production Command Center currently distinguishes available/connected capabi
 
 | Capability | Current production state | Activation / owner requirement |
 |---|---|---|
+| Website and API access | PRIVATE | Since 2026-10-03, Vercel Authentication covers All Deployments, including `lifeos-enterprise.vercel.app` and every `/api/lifeos/*` route. Logged-out requests get Vercel's login page. Agents verify production through the Vercel tools or a logged-in browser, not anonymous HTTP. |
 | LifeOS vault | AVAILABLE | Canonical Markdown vault is read server-side. |
-| GitHub health | CONNECTED | Public repository-health read is succeeding. |
+| GitHub health | CONNECTED while the repository is public | The card reads the GitHub API. Once the repository is private, reads need `LIFEOS_GITHUB_TOKEN` (read access to contents, pull requests, and Actions is enough); without it the card shows "GitHub not verified". The token is sent on these reads only after the branch that adds it is merged. |
 | Quick Capture | AVAILABLE, browser-local | Captures are stored in the current browser until intentionally promoted through the governed write path. |
 | Canonical writes / external tool approvals | FAIL-CLOSED unless configured | `LIFEOS_WRITE_ENABLED=true`, `LIFEOS_WRITE_SECRET`, durable approval storage, and tool-specific credentials are required. |
 | Durable approvals | UNAVAILABLE until Redis is configured | `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`. No silent production memory fallback. |
@@ -331,6 +332,7 @@ These are agent validation records, not owner acceptance.
 
 Each item is written step-by-step in `80 SOPs/LifeOS Owner's Operating Manual.md` (Part K for credentials, Part J and `docs/OWNER_ACCEPTANCE_WORKBOOK.md` for acceptance).
 
+0. Privacy (2026-10-03): the website was made private by the agent on the owner's instruction (Vercel Authentication, All Deployments). The owner still needs to make the GitHub repository private (manual Part G2). After that, add a read-capable `LIFEOS_GITHUB_TOKEN` in Vercel so the GitHub card keeps working. GitHub Actions on a private repository use the account's monthly minutes, and the two Windows workflows count double, so watch usage on the account's billing page.
 1. Done: the build work is merged and deployed. On 2026-10-03, production `dpl_FuWthSLvRDDc8oSXkurWxXssJMK4` was observed READY at `74a3a7b` (PR #86, after PR #85). Re-check production identity (step 2) before starting acceptance, because later merges change it.
 2. At the start of the acceptance session, query Vercel and record the exact READY production deployment ID + SHA in the workbook.
 3. Complete the workbook's live checks on desktop and phone: navigation journeys, widgets and game, and voice with a real microphone and speakers (voice choice, preview, interrupt, mute, recovery, persistence). Also check screen share request, deny, and stop.

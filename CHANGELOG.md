@@ -2,6 +2,17 @@
 
 All notable changes to LifeOS Enterprise are documented in this file.
 
+## [Unreleased] — 2026-10-03 Private website and private-repository readiness
+
+### Security
+
+- The production website and every `/api/lifeos/*` route now require a Vercel login. Vercel Authentication was moved from Standard Protection, which left `lifeos-enterprise.vercel.app` open, to All Deployments (a project setting, not code).
+- The GitHub health read sends `LIFEOS_GITHUB_TOKEN` when it is configured, so the GitHub card keeps working once the repository is private.
+
+### Documentation
+
+- The owner manual (A1–A3, G1–G3), canonical status, and deployment guide describe the Vercel login and the owner step to make the repository private.
+
 ## [Unreleased] — 2026-10-03 Complementary color layer and status reconciliation
 
 ### Changed
