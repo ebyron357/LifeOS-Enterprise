@@ -2,6 +2,22 @@
 
 All notable changes to LifeOS Enterprise are documented in this file.
 
+## [Unreleased] — 2026-10-03 Complementary color layer and status reconciliation
+
+### Changed
+
+- The command-center shell and home use warm complementary accents (coral, gold, rose, amber) alongside the electric-blue base, with one color per life area across the sidebar, launch tiles, operating lanes, quick actions, and mobile dock. Projects and agents keep a stable per-name color. "I'm overloaded" mode softens the palette.
+
+### Fixed
+
+- **What needs you now** bars follow each project's recorded state instead of its list position.
+- **Connected Systems** no longer prints "unavailable" in green. System Health shows unconfigured services as hollow rings instead of red alarms.
+- The home page's kicker, ARIA reply bubble, and command chips are styled again.
+
+### Documentation
+
+- Canonical status, the owner acceptance workbook (B1), and the repair report record PR #85 (`353ada3`) as the application-code baseline and PR #86 (`74a3a7b`) in production. Stale PR #84 is closed.
+
 ## [Unreleased] — 2026-09-30 Redesigned command center (PR #82, merged as `0d3ed70`)
 
 ### Changed
