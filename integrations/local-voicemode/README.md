@@ -51,6 +51,19 @@ Useful installer options:
 | `-NoClaudeSettings` | Do not edit `settings.json`. The installer prints the rule for you to add by hand. |
 | `-WhatIf` | Show what would change without changing anything. |
 
+## Daily use
+
+The installer adds a **LifeOS Voice** folder to the Start menu (not the Desktop). The same launchers are in `launchers\`.
+
+| Launcher | What it does |
+|---|---|
+| Start Voice | Starts both speech services and waits until they are ready |
+| Stop Voice | Stops both services and frees ports 5093 and 8766 |
+| Restart Voice | Stop, then start |
+| Voice Status | Readiness, listening address (must be 127.0.0.1), memory, and privacy mode |
+
+All four call `Manage-Voice.ps1 start|stop|restart|status`. The services also start automatically at Windows logon. In Claude Code, `/talk` starts a conversation and "stop talk" ends it.
+
 ## What each phase does
 
 ### Phase 1: inspection (`Test-VoicePrereqs.ps1`, read-only)
@@ -171,6 +184,7 @@ Then delete `%USERPROFILE%\.claude\skills\talk` and remove the `talk-win.sh` rul
 | `Test-VoicePrereqs.ps1` | Phase 1 read-only inspection |
 | `Install-VoiceMode.ps1` | Install and repair |
 | `Test-VoiceLoop.ps1` | Verification and evidence (`-Interactive` for hardware) |
+| `Manage-Voice.ps1`, `launchers\*.cmd` | Start, stop, restart, and status for the two speech services |
 | `agent/Invoke-Talk.ps1` | Shared Windows voice client used by every agent |
 | `agent/talk-win.sh` | Git Bash bridge used by Claude Code's Bash tool |
 | `agent/SKILL.md` | Windows `talk` skill |

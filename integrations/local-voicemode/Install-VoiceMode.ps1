@@ -182,6 +182,29 @@ function Install-AgentSkills {
     return $selected
 }
 
+function Add-StartMenuLaunchers {
+    # Start Menu (not Desktop) shortcuts to the double-click launchers in .\launchers.
+    $programs = [Environment]::GetFolderPath('Programs')
+    if (-not $programs) { return }
+    $folder = Join-Path $programs 'LifeOS Voice'
+    if (-not $PSCmdlet.ShouldProcess($folder, 'Create Start Menu shortcuts: Start, Stop, Restart Voice and Voice Status')) { return }
+    try {
+        New-Item -ItemType Directory -Force -Path $folder | Out-Null
+        $shell = New-Object -ComObject WScript.Shell
+        foreach ($launcher in Get-ChildItem (Join-Path $Here 'launchers') -Filter '*.cmd') {
+            $shortcut = $shell.CreateShortcut((Join-Path $folder ($launcher.BaseName + '.lnk')))
+            $shortcut.TargetPath = $launcher.FullName
+            $shortcut.WorkingDirectory = $launcher.DirectoryName
+            $shortcut.Save()
+        }
+        Write-Done "Start Menu shortcuts in $folder"
+        Add-Step 'start-menu-launchers' 'created' $folder
+    } catch {
+        Write-Caution "Could not create Start Menu shortcuts ($($_.Exception.Message)). The launchers still work from $(Join-Path $Here 'launchers')."
+        Add-Step 'start-menu-launchers' 'skipped' $_.Exception.Message
+    }
+}
+
 function Add-ClaudePermissionRule {
     $settingsPath = Join-Path $UserHome '.claude\settings.json'
     if ($NoClaudeSettings) {
@@ -348,6 +371,7 @@ try {
     # Phase 5/6: shared client, agent skills, Claude Code permission rule.
     $selected = Install-AgentSkills
     if ($selected -contains 'claudecode') { Add-ClaudePermissionRule }
+    Add-StartMenuLaunchers
 
     if (-not $SkipVerify -and -not $WhatIfPreference) {
         Write-Step 'Running non-interactive verification (Test-VoiceLoop.ps1)'
@@ -361,6 +385,7 @@ try {
     Write-Host 'Next steps:' -ForegroundColor Cyan
     Write-Host '  1. Hear and speak test (uses your speakers and microphone):'
     Write-Host "     powershell -NoProfile -ExecutionPolicy Bypass -File `"$(Join-Path $Here 'Test-VoiceLoop.ps1')`" -Interactive"
+    Write-Host '  Daily use: Start menu > LifeOS Voice > Start Voice / Stop Voice / Restart Voice / Voice Status'
     Write-Host '  2. Open a NEW terminal, start Claude Code with: claude'
     Write-Host '     then type /talk (or say "voice mode"). Say "stop talk" to end.'
 } catch {
