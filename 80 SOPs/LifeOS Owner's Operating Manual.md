@@ -536,7 +536,7 @@ Success looks like: every tile opens a page, and nothing on these pages changes 
 
 **Privacy:** notes with `private: true`, `publish: false`, or `web_visibility: private`, and folders named `private`, are never shown on the website. Code folders and secrets files are never shown. Full rules: `lib/vault/exclusions.ts` and `docs/WEB_VAULT_PORTAL.md`.
 **The whole website is private (since 3 October 2026):** Vercel → project **lifeos-enterprise** → **Settings → Deployment Protection** → **Vercel Authentication** is on for **All Deployments**. It is free on every plan. Every page and every `/api/lifeos/...` address needs a Vercel login. Do not switch it back to **Standard Protection**, because that leaves `lifeos-enterprise.vercel.app` open to anyone.
-**Keep the GitHub repository private too:** GitHub → repository → **Settings → General → Danger Zone → Change visibility → Make private**. The repository holds every note, so a public repository exposes them even while the website is locked.
+**Keep the GitHub repository private too:** GitHub → repository → **Settings → General → Danger Zone → Change visibility → Make private**. The repository holds every note, so a public repository exposes them even while the website is locked. After that, the GitHub card says "GitHub not verified" until you do Part K step 0.
 
 ## G3. Login and password recovery
 
@@ -675,8 +675,14 @@ The full, signable checklist is `docs/OWNER_ACCEPTANCE_WORKBOOK.md`. Use it. The
 
 Only you can do these. LifeOS is safe and usable without them; they switch on optional capabilities.
 
+**Step 0 — Keep the GitHub card working after the repository is private (read-only, no writes)**
+1. 🌐 Create a GitHub fine-grained token: `https://github.com/settings/personal-access-tokens/new` → **Repository access: Only select repositories → LifeOS-Enterprise** → **Permissions: Contents: Read-only; Pull requests: Read-only; Actions: Read-only** → **Generate token**. Copy it.
+2. 🌐 Vercel → **Settings → Environment Variables** → **Add** (Production): `LIFEOS_GITHUB_TOKEN` = the token. This alone does **not** switch on writes; writes also need step 1.
+3. Redeploy (G5).
+4. **Success:** **Integrations** shows GitHub as connected, with your open pull request count.
+
 **Step 1 — Turn on governed writes (checkpoints, resource intake, review decisions, change plans)**
-1. 🌐 Create a GitHub fine-grained token: `https://github.com/settings/personal-access-tokens/new` → **Repository access: Only select repositories → LifeOS-Enterprise** → **Permissions: Contents: Read and write; Pull requests: Read and write** → **Generate token**. Copy it.
+1. 🌐 Create a GitHub fine-grained token: `https://github.com/settings/personal-access-tokens/new` → **Repository access: Only select repositories → LifeOS-Enterprise** → **Permissions: Contents: Read and write; Pull requests: Read and write; Actions: Read-only** → **Generate token**. Copy it. (If you already made a step 0 token, edit that token's permissions instead of making a second one. Actions: Read-only keeps the GitHub card working.)
 2. 🌐 Vercel → **Settings → Environment Variables** → **Add** (Production):
    - `LIFEOS_GITHUB_TOKEN` = the token
    - `LIFEOS_WRITE_SECRET` = a new long random secret (G3 step 1). Save it in your password manager.

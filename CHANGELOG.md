@@ -8,6 +8,7 @@ All notable changes to LifeOS Enterprise are documented in this file.
 
 - The production website and every `/api/lifeos/*` route now require a Vercel login. Vercel Authentication was moved from Standard Protection, which left `lifeos-enterprise.vercel.app` open, to All Deployments (a project setting, not code).
 - The GitHub health read sends `LIFEOS_GITHUB_TOKEN` when it is configured, so the GitHub card keeps working once the repository is private.
+- The Integrations status for GitHub no longer claims the repository is public. The owner manual adds Part K step 0 (a read-only token with Actions read access) and adds Actions read access to the step 1 write token.
 
 ### Documentation
 

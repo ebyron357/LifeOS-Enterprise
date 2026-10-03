@@ -56,9 +56,9 @@ export function listIntegrationStatuses(input: {
       state: input.github.connected ? "connected" : "unavailable",
       lastChecked: input.github.updatedAt || input.nowIso,
       reason: input.github.connected
-        ? `Public repository health read succeeded. Open PRs: ${input.github.openPullRequests}. Last workflow: ${input.github.lastWorkflow}.`
-        : "GitHub public health read failed or is unavailable.",
-      ownerAction: input.github.connected ? null : "Confirm the repository is public or supply LIFEOS_GITHUB_TOKEN for private reads.",
+        ? `Repository health read succeeded. Open PRs: ${input.github.openPullRequests}. Last workflow: ${input.github.lastWorkflow}.`
+        : "GitHub repository health read failed or is unavailable.",
+      ownerAction: input.github.connected ? null : "For a private repository, set LIFEOS_GITHUB_TOKEN with read access to contents, pull requests, and Actions.",
     },
     fromTool("clickup.create_task", "ClickUp", "Add CLICKUP_API_TOKEN and CLICKUP_LIST_ID to enable approved task creation."),
     fromTool("slack.send_message", "Slack", "Add SLACK_BOT_TOKEN and SLACK_DEFAULT_CHANNEL to enable approved posting."),
