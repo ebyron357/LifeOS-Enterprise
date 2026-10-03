@@ -4,6 +4,8 @@
 **Release:** LifeOS Enterprise v1.0 voice (PR #60), post-#60 paid-TTS and write-auth hardening, and the issue #58 conversation-voice production polish  
 **Scope:** this document describes the implemented architecture on `main`; live deployment state is tracked in `docs/CANONICAL_LIVE_STATUS.md`
 
+This document covers voice inside the LifeOS web app. Hands-free voice for Claude Code and other local agents on the owner's Windows computer is a separate system; see [`integrations/local-voicemode/README.md`](../integrations/local-voicemode/README.md).
+
 Persistent conversational voice now also lives in `/conversation`. That layer reuses this transport and state machine. See `docs/INTERACTIVE_AGENT_RUNTIME.md`. The Command Center `VoiceConsole` remains the V1 command console.
 
 ## Architecture

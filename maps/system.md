@@ -11,6 +11,7 @@
 
 ## Skills
 - [Integrations](../integrations): integration definitions.
+- [Local voice layer](../integrations/local-voicemode/README.md): hands-free two-way voice for Claude Code and other local agents on Windows.
 - [Scripts](../scripts): maintenance and validation scripts.
 - [Tests](../tests): unit tests and Playwright browser journeys (`tests/e2e`).
 

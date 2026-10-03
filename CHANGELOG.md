@@ -2,6 +2,17 @@
 
 All notable changes to LifeOS Enterprise are documented in this file.
 
+## [Unreleased] — 2026-10-03 Local voice layer for Claude Code on Windows
+
+### Added
+
+- `integrations/local-voicemode/`: hands-free two-way voice for Claude Code and other local agents on the owner's Windows computer, built on Local VoiceMode LLM at a reviewed commit. It uses Silero VAD, local Parakeet STT, and local Supertonic TTS, all on the CPU and bound to localhost. It includes a read-only inspection script, an installer that only adds missing prerequisites, a verification script with an interactive hardware check, a shared Windows voice client, a Git Bash bridge, and a Windows `talk` skill.
+- The client fixes upstream Windows gaps that block voice-only use: the early ready beep, status text mixed into transcripts, the 30-second silence and turn limits, no stop phrases, noise ending sessions, and a silent xAI cloud fallback.
+
+### Documentation
+
+- `maps/system.md` routes to the voice layer, and `docs/VOICE_ARCHITECTURE.md` clarifies that it covers web-app voice only.
+
 ## [Unreleased] — 2026-10-03 Private website and private-repository readiness (PR #88, merged as `c640758`)
 
 ### Security

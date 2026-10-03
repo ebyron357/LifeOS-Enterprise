@@ -1,0 +1,2 @@
+# Bash refuses scripts with CRLF line endings; keep the voice bridge LF on every checkout.
+integrations/local-voicemode/**/*.sh text eol=lf

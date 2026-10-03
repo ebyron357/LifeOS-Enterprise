@@ -3,6 +3,29 @@
 Date: 2026-07-14
 Repository: `ebyron357/LifeOS-Enterprise`
 
+## 2026-10-03 Local voice layer for Claude Code (Windows)
+
+Branch: `claude/gifted-pascal-6ovkmp` (from `main` at `69b43ec`)
+
+### Repairs completed
+
+- Added `integrations/local-voicemode/` (canonical README, inspection, installer, verification, shared Windows voice client, Git Bash bridge, Windows `talk` skill, hardware-free tests) and routed it from `maps/system.md`.
+- Pinned upstream Local VoiceMode LLM to reviewed commit `c3f6ca43580999f546bb5c3de9f70c59d607ac89`. The upstream Windows gaps found and handled are listed in the integration README.
+
+### Validation evidence
+
+| Check | Result |
+|---|---|
+| `pwsh -NoProfile -File ./scripts/audit-vault.ps1` | PASS |
+| `pwsh -NoProfile -File ./scripts/validate-maps.ps1` | PASS |
+| `pwsh -NoProfile -File integrations/local-voicemode/tests/Test-VoiceClient.ps1` | PASS: 37/37, with a fake recorder, STT server, and upstream script; no audio hardware |
+| PowerShell parse of every new `.ps1`; ASCII-only check; `bash -n` on the bridge | PASS |
+| `Test-VoicePrereqs.ps1`, `Test-VoiceLoop.ps1` smoke run on Linux | Run to completion; Windows-only checks report not found, as expected |
+
+### Final state
+
+**AGENT VALIDATION PASSED. WINDOWS INSTALL AND HARDWARE VERIFICATION PENDING.** The cloud agent that built this has no access to the owner's computer, microphone, or speakers. Local-only actions remain: run the three commands in `integrations/local-voicemode/README.md` on the Windows computer, then record the `verify-*.json` verdict here.
+
 ## 2026-09-25 Checkpoint path concurrency fix
 
 Branch: `claude/quirky-sagan-1m56r5` (restarted from `main` after PR #72 merged)  
