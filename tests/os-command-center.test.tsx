@@ -109,6 +109,47 @@ describe("command center and rebuilt surfaces", () => {
     expect(screen.queryByText(/\{\{/)).not.toBeInTheDocument();
   });
 
+  it("colors attention rows by recorded state, not by list position", () => {
+    const project = (name: string, fields: Partial<(typeof vault.projects)[number]> = {}) => ({
+      ...vault.projects[0],
+      name,
+      path: `Projects/${name}.md`,
+      ...fields,
+    });
+    const active = project("Active Build");
+    const waitingByField = project("Inspector Reply", { waitingOn: "Inspector reply" });
+    const blockedByStatus = project("Blocked Ops", { status: "blocked", blocker: "" });
+    const blockedByField = project("Missing Key", { blocker: "Missing API key" });
+    const waitingByStatus = project("Vendor Quote", { status: "waiting" });
+    const tonesFor = (priorities: (typeof vault.projects)[number][]) => {
+      const { container, unmount } = render(
+        <CommandCenterHome
+          greeting="Good afternoon"
+          dateLabel="Sunday, September 6, 2026"
+          vault={{ ...vault, priorities, projects: [active, blockedByStatus, blockedByField, waitingByStatus, waitingByField] }}
+          integrations={[]}
+          hermes={hermes}
+          github={github}
+          resume={resume}
+        />,
+      );
+      const tones = Object.fromEntries(
+        Array.from(container.querySelectorAll("a > span[data-tone]")).map((dot) => [dot.parentElement?.querySelector("strong")?.textContent, dot.getAttribute("data-tone")]),
+      );
+      unmount();
+      return tones;
+    };
+    const expected = {
+      "Active Build": "info",
+      "Inspector Reply": "warn",
+      "Blocked Ops": "danger",
+      "Missing Key": "danger",
+      "Vendor Quote": "warn",
+    };
+    expect(tonesFor([active, waitingByField])).toEqual(expected);
+    expect(tonesFor([waitingByField, active])).toEqual(expected);
+  });
+
   it("surfaces a linked prompt on the existing resume card", () => {
     const withPrompt = {
       ...resume,

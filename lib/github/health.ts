@@ -10,11 +10,18 @@ export type GitHubHealthData = {
 };
 
 const repository = "ebyron357/LifeOS-Enterprise";
-const headers = { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" };
+
+/** The repository is private, so reads need the server-side token; without one the card reports "not verified". */
+function githubHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" };
+  const token = process.env.LIFEOS_GITHUB_TOKEN;
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
 
 async function github<T>(path: string): Promise<T> {
   const response = await fetch(`https://api.github.com/repos/${repository}${path}`, {
-    headers,
+    headers: githubHeaders(),
     next: { revalidate: 300 },
   });
   if (!response.ok) throw new Error(`GitHub API returned ${response.status}`);

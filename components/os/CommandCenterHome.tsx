@@ -5,6 +5,7 @@ import type { IntegrationStatus } from "@/lib/os/integrations";
 import type { HermesContract } from "@/lib/os/hermes";
 import type { ProjectBrief, VaultDashboardData } from "@/lib/lifeos/types";
 import { noteHref } from "@/lib/vault/slug";
+import { accentFor, accentForName, type Accent } from "@/lib/os/accents";
 import { ContinuityResume } from "./ContinuityResume";
 import styles from "./LegendaryCommandCenter.module.css";
 
@@ -20,6 +21,13 @@ type CommandCenterHomeProps = {
 
 function projectLine(project: ProjectBrief): string {
   return project.nextAction || project.blocker || project.waitingOn || "Open this project to choose the next move.";
+}
+
+/** Urgency color follows the recorded state, so only genuinely blocked work is shown as an alert. */
+function focusTone(project: ProjectBrief): "danger" | "warn" | "info" {
+  if (project.status === "blocked" || project.blocker) return "danger";
+  if (project.status === "waiting" || project.waitingOn) return "warn";
+  return "info";
 }
 
 const ownerLanes = [
@@ -46,9 +54,9 @@ const ownerLanes = [
   { label: "Communications", href: "/conversation" },
 ];
 
-const launchers = [
+const launchers: { label: string; sub: string; href: string; icon: string; accent?: Accent }[] = [
   { label: "Communications", sub: "All channels", href: "/conversation", icon: "●" },
-  { label: "Calendar", sub: "Your time", href: "/today", icon: "▣" },
+  { label: "Calendar", sub: "Your time", href: "/today", icon: "▣", accent: "gold" },
   { label: "Tasks", sub: "Get it done", href: "/today", icon: "✓" },
   { label: "Projects", sub: "All systems", href: "/projects", icon: "▦" },
   { label: "Shopify / Brands", sub: "E-commerce", href: "/businesses", icon: "◆" },
@@ -96,7 +104,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
 
       <nav className={styles.launchStrip} aria-label="LifeOS operating lanes">
         {launchers.map((item) => (
-          <Link key={item.label} className={styles.launchTile} href={item.href}>
+          <Link key={item.label} className={styles.launchTile} href={item.href} data-accent={item.accent ?? accentFor(item.href)}>
             <span className={styles.launchIcon}>{item.icon}</span>
             <strong>{item.label}</strong>
             <small>{item.sub}</small>
@@ -110,20 +118,20 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
           <strong>Everything I run, build, learn, sell, and manage</strong>
         </div>
         <div className={styles.ownerLaneRow}>
-          {ownerLanes.map((item) => <Link key={item.label} href={item.href}>{item.label}</Link>)}
+          {ownerLanes.map((item) => <Link key={item.label} href={item.href} data-accent={accentFor(item.href)}>{item.label}</Link>)}
         </div>
       </section>
 
       <section className={styles.cockpit}>
-        <article className={styles.panel}>
+        <article className={styles.panel} data-accent="coral">
           <div className={styles.panelHead}>
             <div><span className={styles.panelKicker}>WHAT NEEDS YOU NOW</span><h2>Attention</h2></div>
             <Link href="/today">View all</Link>
           </div>
           <div className={styles.focusList}>
-            {focus.length ? focus.map((item, index) => (
+            {focus.length ? focus.map((item) => (
               <Link key={item.path} className={styles.focusItem} href={noteHref(item.path)}>
-                <span className={styles.focusDot} data-tone={index < 2 ? "danger" : index < 4 ? "warn" : "info"} />
+                <span className={styles.focusDot} data-tone={focusTone(item)} />
                 <span><strong>{item.name}</strong><small>{projectLine(item)}</small></span>
                 <time>{item.status}</time>
               </Link>
@@ -135,7 +143,7 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
           </div>
         </article>
 
-        <article className={styles.panel}>
+        <article className={styles.panel} data-accent="rose">
           <div className={styles.panelHead}>
             <div><h2>▣ Communications Hub</h2><p>All your conversations. One place. No chaos.</p></div>
             <Link href="/conversation">View all</Link>
@@ -174,40 +182,40 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
               <div className={styles.bubble}><strong>Command snapshot</strong><br />{vault.activeProjects} active projects · {blocked.length} blocked · {waiting.length} waiting · {vault.reviewsDue} reviews due.</div>
               <div className={styles.bubbleRight}>Open ARIA to ask about priorities, blockers, approvals, or the next verified move.</div>
               <Link href="/conversation" className={styles.composer}>Type a message or open voice command →</Link>
-              <div className={styles.commandChips}><span>/tasks</span><span>/projects</span><span>/summarize</span><span>/create</span><span>/research</span></div>
+              <div className={styles.commandChips}><span data-accent="mint">/tasks</span><span data-accent="blue">/projects</span><span data-accent="sky">/summarize</span><span data-accent="coral">/create</span><span data-accent="violet">/research</span></div>
             </div>
           </div>
         </article>
 
         <aside className={styles.rightRail}>
-          <article className={styles.voicePanel}>
+          <article className={styles.voicePanel} data-accent="orchid">
             <div className={styles.voiceHead}><h2>◉ ARIA Voice Command</h2><span>{hermes.state === "unavailable" ? "LifeOS available" : hermes.state}</span></div>
             <div className={styles.wave} aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /><i /><i /></div>
             <p>“Tell me what’s important today…”</p>
             <Link href="/conversation">Tap to speak or open voice</Link>
           </article>
 
-          <article className={styles.panel}>
+          <article className={styles.panel} data-accent="mint">
             <div className={styles.panelHead}><div><h2>Today</h2><p>Overview</p></div><Link href="/today">Open</Link></div>
             <div className={styles.metricGrid}>
-              <div className={styles.metric}><strong>{vault.activeProjects}</strong><span>Active</span></div>
-              <div className={styles.metric}><strong>{waiting.length}</strong><span>Waiting</span></div>
-              <div className={styles.metric}><strong>{blocked.length}</strong><span>Blocked</span></div>
-              <div className={styles.metric}><strong>{vault.reviewsDue}</strong><span>Reviews</span></div>
+              <div className={styles.metric} data-accent="mint"><strong>{vault.activeProjects}</strong><span>Active</span></div>
+              <div className={styles.metric} data-accent="gold"><strong>{waiting.length}</strong><span>Waiting</span></div>
+              <div className={styles.metric} data-accent="coral"><strong>{blocked.length}</strong><span>Blocked</span></div>
+              <div className={styles.metric} data-accent="violet"><strong>{vault.reviewsDue}</strong><span>Reviews</span></div>
             </div>
           </article>
 
-          <article className={styles.panel}>
+          <article className={styles.panel} data-accent="gold">
             <div className={styles.panelHead}><h2>Upcoming</h2><Link href="/today">View Today</Link></div>
             <div className={styles.upcoming}>
               {vault.priorities.slice(0, 3).map((item) => (
-                <Link key={item.path} href={noteHref(item.path)}><span>{item.name}</span><small>{projectLine(item)}</small></Link>
+                <Link key={item.path} href={noteHref(item.path)} data-accent={accentForName(item.name)}><span>{item.name}</span><small>{projectLine(item)}</small></Link>
               ))}
               {!vault.priorities.length ? <div className={styles.emptyState}>No scheduled priority items.</div> : null}
             </div>
           </article>
 
-          <article className={styles.panel}>
+          <article className={styles.panel} data-accent="teal">
             <div className={styles.panelHead}><h2>System Health</h2><Link href="/integrations">{onlineCount} available</Link></div>
             <div className={styles.healthGrid}>
               <span><b data-state={github.connected ? "on" : "off"} />GitHub</span>
@@ -219,12 +227,12 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
       </section>
 
       <section className={styles.lowerDeck}>
-        <article className={styles.panel}>
+        <article className={styles.panel} data-accent="blue">
           <div className={styles.panelHead}><div><h2>Resume Where You Left Off</h2><p>Verified continuity</p></div><Link href="/projects">View all</Link></div>
           <div className={styles.startHereLine}><h3>Start here</h3><strong>{resumeLabel}</strong><span>{resume.next.detail}</span></div>
           <div className={styles.resumeStrip}>
             {resumeProjects.map((project, index) => (
-              <Link key={project.path} href={noteHref(project.path)}>
+              <Link key={project.path} href={noteHref(project.path)} data-accent={accentForName(project.name)}>
                 <strong>{project.name}</strong>
                 <small>{projectLine(project)}</small>
                 <span>{index === 0 ? "Resume →" : "Open project →"}</span>
@@ -232,25 +240,25 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
             ))}
           </div>
         </article>
-        <article className={styles.panel}>
+        <article className={styles.panel} data-accent="cyan">
           <div className={styles.panelHead}><h2>Connected Systems</h2><Link href="/integrations">Manage</Link></div>
           <div className={styles.systemRow}>
             {visibleIntegrations.map((item) => (
-              <Link key={item.id} href="/integrations"><strong>{item.service.slice(0, 2).toUpperCase()}</strong><small>{item.state}</small></Link>
+              <Link key={item.id} href="/integrations"><strong>{item.service.slice(0, 2).toUpperCase()}</strong><small data-state={item.state === "available" || item.state === "connected" ? "on" : "off"}>{item.state}</small></Link>
             ))}
           </div>
         </article>
       </section>
 
       <section className={styles.agentDeck}>
-        <article className={styles.panel}>
+        <article className={styles.panel} data-accent="violet">
           <div className={styles.panelHead}>
             <div><h2>AI Agents</h2><p>Recorded workforce state</p></div>
             <Link href="/agents">Manage</Link>
           </div>
           <div className={styles.agentGrid}>
             {vault.agents.slice(0, 6).map((agent) => (
-              <Link key={agent.name} href="/agents">
+              <Link key={agent.name} href="/agents" data-accent={accentForName(agent.name)}>
                 <strong>{agent.name}</strong>
                 <span>{agent.status || "status unavailable"}</span>
                 <small>{agent.purpose || "No purpose recorded."}</small>
@@ -264,18 +272,18 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
       <section className={styles.quickPanel}>
         <div className={styles.quickTitle}>Quick Actions</div>
         <div className={styles.quickRow}>
-          <Link href="/projects"><strong>▦</strong><span>New Project</span></Link>
-          <Link href="/inbox"><strong>✓</strong><span>New Task</span></Link>
-          <Link href="/files"><strong>⇧</strong><span>Upload File</span></Link>
-          <Link href="/conversation"><strong>◉</strong><span>Record / Talk</span></Link>
-          <Link href="/resources"><strong>▶</strong><span>Create Content</span></Link>
-          <Link href="/agents"><strong>✦</strong><span>Launch Agent</span></Link>
-          <Link href="/automations"><strong>⌘</strong><span>Run Workflow</span></Link>
-          <Link href="/more"><strong>•••</strong><span>More</span></Link>
+          <Link href="/projects" data-accent={accentFor("/projects")}><strong>▦</strong><span>New Project</span></Link>
+          <Link href="/inbox" data-accent="mint"><strong>✓</strong><span>New Task</span></Link>
+          <Link href="/files" data-accent={accentFor("/files")}><strong>⇧</strong><span>Upload File</span></Link>
+          <Link href="/conversation" data-accent={accentFor("/conversation")}><strong>◉</strong><span>Record / Talk</span></Link>
+          <Link href="/resources" data-accent={accentFor("/resources")}><strong>▶</strong><span>Create Content</span></Link>
+          <Link href="/agents" data-accent={accentFor("/agents")}><strong>✦</strong><span>Launch Agent</span></Link>
+          <Link href="/automations" data-accent={accentFor("/automations")}><strong>⌘</strong><span>Run Workflow</span></Link>
+          <Link href="/more" data-accent={accentFor("/more")}><strong>•••</strong><span>More</span></Link>
         </div>
       </section>
 
-      <section className={styles.continuityCompact} aria-label="Verified continuity">
+      <section className={styles.continuityCompact} aria-label="Verified continuity" data-accent="sky">
         <div className={styles.continuityLead}>
           <div>
             <span className={styles.panelKicker}>CONTINUITY</span>
@@ -286,11 +294,11 @@ export function CommandCenterHome({ greeting, dateLabel, vault, integrations, he
           <Link href={resume.next.href}>Continue →</Link>
         </div>
         <div className={styles.continuitySignals}>
-          <div>
+          <div data-accent="gold">
             <h3>Owner attention</h3>
             <p>{resume.needsOwner[0]?.title || "Nothing currently requires your judgment."}</p>
           </div>
-          <div>
+          <div data-accent="violet">
             <h3>Agent continuation</h3>
             <p>{resume.agentCanContinue[0]?.title || "No agent-doable continuation is recorded."}</p>
           </div>

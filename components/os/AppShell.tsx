@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { Command } from "cmdk";
+import { accentFor } from "@/lib/os/accents";
 import { ADVANCED_NAV, MOBILE_NAV, PRIMARY_NAV, isNavActive } from "@/lib/os/nav";
 import { QuickCaptureDock } from "./QuickCaptureDock";
 import { LifeMegaMenu } from "./LifeMegaMenu";
@@ -76,7 +77,7 @@ export function AppShell({ children, greeting }: AppShellProps) {
 
         <nav className={styles.nav} aria-label="Primary">
           {commandNav.map((item) => (
-            <Link key={item.label} href={item.href} data-active={isNavActive(pathname, item.href) ? "true" : "false"} aria-current={isNavActive(pathname, item.href) ? "page" : undefined}>
+            <Link key={item.label} href={item.href} data-accent={accentFor(item.href)} data-active={isNavActive(pathname, item.href) ? "true" : "false"} aria-current={isNavActive(pathname, item.href) ? "page" : undefined}>
               <span className={styles.navIcon} aria-hidden="true">{item.icon}</span>
               <span>{item.label}</span>
             </Link>
@@ -98,8 +99,8 @@ export function AppShell({ children, greeting }: AppShellProps) {
           </button>
           <div className={styles.topActions}>
             <LifeMegaMenu />
-            <Link href="/conversation">Ask LifeOS</Link>
-            <button type="button" onClick={() => setCaptureOpen(true)}>Capture</button>
+            <Link href="/conversation" data-accent={accentFor("/conversation")}>Ask LifeOS</Link>
+            <button type="button" data-accent={accentFor("/inbox")} onClick={() => setCaptureOpen(true)}>Capture</button>
           </div>
         </header>
 
@@ -108,7 +109,7 @@ export function AppShell({ children, greeting }: AppShellProps) {
 
       <nav className={styles.dock} aria-label="Mobile">
         {MOBILE_NAV.map((item) => (
-          <Link key={item.href} href={item.href} aria-current={isNavActive(pathname, item.href) ? "page" : undefined}>
+          <Link key={item.href} href={item.href} data-accent={accentFor(item.href)} aria-current={isNavActive(pathname, item.href) ? "page" : undefined}>
             {item.label}
           </Link>
         ))}

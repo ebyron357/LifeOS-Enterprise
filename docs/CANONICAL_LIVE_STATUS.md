@@ -1,19 +1,19 @@
 # LifeOS Enterprise — Canonical Live Status
 
-**Status date:** 2026-09-30  
+**Status date:** 2026-10-03  
 **Canonical repository:** `ebyron357/LifeOS-Enterprise`  
 **Canonical branch:** `main`  
-**Production URL:** `https://lifeos-enterprise.vercel.app/`  
+**Production URL:** `https://lifeos-enterprise.vercel.app/` (private since 2026-10-03: Vercel Authentication on all deployments; a Vercel login on team `tradeiq` is required)  
 **Released version:** `1.0.0`  
-**Last application-code baseline on main:** `0d3ed7018fed006e853c134c17ae930ebecda23f` — PR #82 final LifeOS command center (redesigned shell and home)  
-**Prior recorded baselines:** `d66467e2701e5f11fa12b0b2f60e5257756c988c` — PR #78 My Life mega navigation; `abf6c8264bed2578382d8eb60adc572762b6ee17` — PR #75 LifeOS closeout (voice #58, widgets/game #42, resource provenance, owner manual v2.0); `fc0729de8475c6c2f6b6343a99d9fac392a5442e` — Life Map and Dashboards hub (owner commit); `62a9df908608bf2c584f17be82d7f3754a582065` — PR #74 MAPS operating layer; `21b921ce8c7acf98132748f3466800468e0664a1` — PR #73 Continuity checkpoint path fix; `03657b621c2956c095c2e168f11ff159c3449651` — PR #72 Continuity checkpoint writes; `6bf7e2aff9920ba868de7381e0e68ae75d9866c7` — PR #71 Resource review; `df4b182bae4884a482bd2efd652a07783f9b6111` — PR #70 Prompt Intelligence; `1ae3fddb65b75c08127b7fef995d5ff37926f80a` — PR #69 Continuity; `45d5d018599e7b7d308523a3f38bf9ccf62e2c94` — PR #68 GitHub evidence; `7982c92a7080f60f9fb70e7c66c5220b8178bc35` — PR #64 performance hardening.  
+**Last application-code baseline on main:** `353ada3c02690f855157f22622d3366c39e8d181` — PR #85 legendary LifeOS personal command center (cockpit shell, home, and communications hub)  
+**Prior recorded baselines:** `0d3ed7018fed006e853c134c17ae930ebecda23f` — PR #82 final LifeOS command center (redesigned shell and home); `d66467e2701e5f11fa12b0b2f60e5257756c988c` — PR #78 My Life mega navigation; `abf6c8264bed2578382d8eb60adc572762b6ee17` — PR #75 LifeOS closeout (voice #58, widgets/game #42, resource provenance, owner manual v2.0); `fc0729de8475c6c2f6b6343a99d9fac392a5442e` — Life Map and Dashboards hub (owner commit); `62a9df908608bf2c584f17be82d7f3754a582065` — PR #74 MAPS operating layer; `21b921ce8c7acf98132748f3466800468e0664a1` — PR #73 Continuity checkpoint path fix; `03657b621c2956c095c2e168f11ff159c3449651` — PR #72 Continuity checkpoint writes; `6bf7e2aff9920ba868de7381e0e68ae75d9866c7` — PR #71 Resource review; `df4b182bae4884a482bd2efd652a07783f9b6111` — PR #70 Prompt Intelligence; `1ae3fddb65b75c08127b7fef995d5ff37926f80a` — PR #69 Continuity; `45d5d018599e7b7d308523a3f38bf9ccf62e2c94` — PR #68 GitHub evidence; `7982c92a7080f60f9fb70e7c66c5220b8178bc35` — PR #64 performance hardening.  
 **Live identity source:** GitHub `main` for repository head; Vercel production deployment for deployed SHA/ID. Query both at report or acceptance time.  
 **Owner acceptance:** not complete  
 **Owner/operator manual:** `80 SOPs/LifeOS Owner's Operating Manual.md` (v2.3, step-by-step)
 
 ## Governing status
 
-**LifeOS Enterprise V1.0 is built on `main`. After PR #64, PRs #66 and #68 merged Resource Intelligence intake and GitHub evidence, PR #69 merged Continuity / resume packages, PR #70 merged Prompt Intelligence, PR #71 merged the Resource Intelligence owner review/disposition surface, and PR #72 merged governed Continuity checkpoint writes. All six are merged and were observed in a READY Vercel production deployment on 2026-09-25. PR #73 (per-save unique checkpoint paths) merged afterwards and was observed READY in production on 2026-09-30. On 2026-09-30, PR #74 (MAPS), the owner's Life Map / Dashboards commit, and the PR #75 closeout also merged; production deployment `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` was observed READY at the PR #75 merge `abf6c82`. The PR #79 status docs (`95e71d1`), PR #78 My Life mega navigation (`d66467e`), PR #81 docs (`a179a9c`), and PR #82, the redesigned command-center shell and home (`0d3ed70`), merged afterwards the same day. Repository head and production deployment identity are live operational facts and must be read from GitHub and Vercel when a status report or acceptance run begins.**
+**LifeOS Enterprise V1.0 is built on `main`. After PR #64, PRs #66 and #68 merged Resource Intelligence intake and GitHub evidence, PR #69 merged Continuity / resume packages, PR #70 merged Prompt Intelligence, PR #71 merged the Resource Intelligence owner review/disposition surface, and PR #72 merged governed Continuity checkpoint writes. All six are merged and were observed in a READY Vercel production deployment on 2026-09-25. PR #73 (per-save unique checkpoint paths) merged afterwards and was observed READY in production on 2026-09-30. On 2026-09-30, PR #74 (MAPS), the owner's Life Map / Dashboards commit, and the PR #75 closeout also merged; production deployment `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` was observed READY at the PR #75 merge `abf6c82`. The PR #79 status docs (`95e71d1`), PR #78 My Life mega navigation (`d66467e`), PR #81 docs (`a179a9c`), and PR #82, the redesigned command-center shell and home (`0d3ed70`), merged afterwards the same day. On 2026-10-02, PR #85, the legendary personal command center (`353ada3`), and its closeout record PR #86 (`74a3a7b`) merged; production deployment `dpl_FuWthSLvRDDc8oSXkurWxXssJMK4` was observed READY at `74a3a7b` on 2026-10-03. Repository head and production deployment identity are live operational facts and must be read from GitHub and Vercel when a status report or acceptance run begins.**
 
 The prior status edition is superseded because the post-#60 security corrective, the unified-command-center rebuild, and the Resource Intelligence, Continuity, and Prompt Intelligence slices have since merged and deployed:
 
@@ -119,6 +119,7 @@ The following capabilities are present on the current production deployment:
 - Prompt Intelligence canonical library at `/prompts` (PR #70); it reuses `40 Resources/Prompts/` and does not create a second command center or a second intake path
 - Resource Intelligence owner review at `/resources/review` (PR #71): state lanes, due-review flags, suggestion-only duplicate candidates, and a fail-closed draft-PR decision write
 - Continuity checkpoint saving from the resume card (PR #72): fail-closed, create-only, draft-PR-only
+- Personal command-center cockpit (PR #85): numbered sidebar, operating-lane launch strip, "My operating world" lanes, the ARIA communications hub with truthful email, Slack, ClickUp, and calendar channel states, the voice command panel, the AI agent deck, and a compact continuity summary with full evidence on demand
 
 ## Current integration and activation state
 
@@ -126,8 +127,9 @@ The production Command Center currently distinguishes available/connected capabi
 
 | Capability | Current production state | Activation / owner requirement |
 |---|---|---|
+| Website and API access | PRIVATE | Since 2026-10-03, Vercel Authentication covers All Deployments, including `lifeos-enterprise.vercel.app` and every `/api/lifeos/*` route. Logged-out requests get Vercel's login page. Agents verify production through the Vercel tools or a logged-in browser, not anonymous HTTP. |
 | LifeOS vault | AVAILABLE | Canonical Markdown vault is read server-side. |
-| GitHub health | CONNECTED | Public repository-health read is succeeding. |
+| GitHub health | CONNECTED while the repository is public | The card reads the GitHub API. Once the repository is private, reads need `LIFEOS_GITHUB_TOKEN` (read access to contents, pull requests, and Actions is enough); without it the card shows "GitHub not verified". The token is sent on these reads only after the branch that adds it is merged. |
 | Quick Capture | AVAILABLE, browser-local | Captures are stored in the current browser until intentionally promoted through the governed write path. |
 | Canonical writes / external tool approvals | FAIL-CLOSED unless configured | `LIFEOS_WRITE_ENABLED=true`, `LIFEOS_WRITE_SECRET`, durable approval storage, and tool-specific credentials are required. |
 | Durable approvals | UNAVAILABLE until Redis is configured | `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`. No silent production memory fallback. |
@@ -155,6 +157,16 @@ The production Command Center currently distinguishes available/connected capabi
 - Prompt Intelligence is read-only on the web: prompts are authored as vault Markdown and changed through the existing draft-PR path. It adds no new write API, and recommendation is deterministic and conservative, not model-generated.
 
 ## Verified release evidence
+
+### Verified release evidence — 2026-10-03 status check
+
+Observed on 2026-10-03 (about 00:20 UTC) with `main` at `74a3a7bff64a1842427ab8be96954b0387e01644` (PR #86):
+- GitHub Actions on `74a3a7b`: Dashboard CI, Vault Health, and MAPS Integrity all succeeded. PR #85's merge `353ada3` was also green on all three.
+- Vercel production deployment `dpl_FuWthSLvRDDc8oSXkurWxXssJMK4` was READY at `74a3a7b` (= `main`). The PR #85 deployment `dpl_14aNu3G7A5qmApFTnmTyCC9Pjf9w` was READY at `353ada3`. Vercel reported no runtime errors for the previous 7 days.
+- Agent validation on `74a3a7b`: `npm ci`, lint, typecheck, and build PASS; `npm test` 72 files / 516 tests PASS; `npm audit --audit-level=high` 0 vulnerabilities; `pwsh -File scripts/audit-vault.ps1` PASS (164 notes); `pwsh -File scripts/validate-maps.ps1` PASS.
+- The agent container's network policy blocks direct requests to `lifeos-enterprise.vercel.app`, so live HTTP was not re-probed in this check. `docs/releases/PR-85-PRODUCTION-CLOSEOUT.md` records a 200 response from the PR #85 deployment.
+
+The PR #85 release record is `docs/releases/PR-85-PRODUCTION-CLOSEOUT.md`. This is agent evidence, not owner acceptance.
 
 ### Verified release evidence — 2026-09-30 closeout
 
@@ -207,9 +219,9 @@ This is agent evidence, not owner acceptance.
 
 ### Last application-code baseline
 
-PR #82 merged the redesigned command-center shell and home at `0d3ed7018fed006e853c134c17ae930ebecda23f` and was observed READY in production at deployment `dpl_7XfMJ6z5wfFKXJbaZmv1bpEziAnp` on 2026-09-30.
+PR #85 merged the legendary LifeOS personal command center at `353ada3c02690f855157f22622d3366c39e8d181` on 2026-10-02 and was observed READY in production at deployment `dpl_14aNu3G7A5qmApFTnmTyCC9Pjf9w`. The documentation-only PR #86 followed at `74a3a7b`, deployed as `dpl_FuWthSLvRDDc8oSXkurWxXssJMK4`.
 
-Before it, PR #78 merged the My Life mega navigation at `d66467e2701e5f11fa12b0b2f60e5257756c988c`, observed READY at `dpl_8TmFFkc8y3bvBzrfZNDR2YCZbnaj`. Before that, PR #75 merged the LifeOS closeout at `abf6c8264bed2578382d8eb60adc572762b6ee17` and was observed READY in production at deployment `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` on 2026-09-30. Before that, PR #73 merged the per-save unique Continuity checkpoint path at `21b921ce8c7acf98132748f3466800468e0664a1` and was observed READY in production at deployment `dpl_CxF6WThSCMDdrftveicnzcN3FCC6` on 2026-09-30.
+Before it, PR #82 merged the redesigned command-center shell and home at `0d3ed7018fed006e853c134c17ae930ebecda23f` and was observed READY in production at deployment `dpl_7XfMJ6z5wfFKXJbaZmv1bpEziAnp` on 2026-09-30. Before that, PR #78 merged the My Life mega navigation at `d66467e2701e5f11fa12b0b2f60e5257756c988c`, observed READY at `dpl_8TmFFkc8y3bvBzrfZNDR2YCZbnaj`. Before that, PR #75 merged the LifeOS closeout at `abf6c8264bed2578382d8eb60adc572762b6ee17` and was observed READY in production at deployment `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` on 2026-09-30. Before that, PR #73 merged the per-save unique Continuity checkpoint path at `21b921ce8c7acf98132748f3466800468e0664a1` and was observed READY in production at deployment `dpl_CxF6WThSCMDdrftveicnzcN3FCC6` on 2026-09-30.
 
 ### Prior application-code baselines
 
@@ -312,12 +324,16 @@ These are agent validation records, not owner acceptance.
 - PR #82: merged the redesigned command-center shell and home at `0d3ed7018fed006e853c134c17ae930ebecda23f` (final head `5119be9` green on every check; supersedes #76 and #80, both closed without merge); READY in production at `dpl_7XfMJ6z5wfFKXJbaZmv1bpEziAnp`.
 - PR #81: merged the My Life manual and status docs at `a179a9c714580c590e4661d8efda60735e4f7b5d`.
 - PR #78: merged the "My Life" mega navigation at `d66467e2701e5f11fa12b0b2f60e5257756c988c` (head `830ca40` green on every check, with the Escape focus, disclosure semantics, and e2e coverage fixes). Production deployment identity for this SHA is recorded under the verified release evidence.
+- PR #84: closed without merge on 2026-10-03. Its workbook alignment to the PR #82 baseline was superseded by PR #85.
+- PR #85: merged the legendary personal command center at `353ada3c02690f855157f22622d3366c39e8d181` on 2026-10-02 (post-merge Dashboard CI, Vault Health, and MAPS Integrity green); READY in production at `dpl_14aNu3G7A5qmApFTnmTyCC9Pjf9w`.
+- PR #86: merged the PR #85 production closeout record and the documentation index at `74a3a7bff64a1842427ab8be96954b0387e01644`; READY in production at `dpl_FuWthSLvRDDc8oSXkurWxXssJMK4`.
 
 ## Remaining owner work
 
 Each item is written step-by-step in `80 SOPs/LifeOS Owner's Operating Manual.md` (Part K for credentials, Part J and `docs/OWNER_ACCEPTANCE_WORKBOOK.md` for acceptance).
 
-1. Done by the agent on the owner's instruction: PR #74 (MAPS) merged as `62a9df9` and the closeout PR #75 merged as `abf6c82` on 2026-09-30, and production `dpl_8FhMhJpUPMd5YgS8bJw6MTk8e5Q9` was observed READY at `abf6c82`. Re-check production identity (step 2) before starting acceptance, because later merges change it.
+0. Privacy (2026-10-03): the website was made private by the agent on the owner's instruction (Vercel Authentication, All Deployments). The owner still needs to make the GitHub repository private (manual Part G2). After that, add a read-capable `LIFEOS_GITHUB_TOKEN` in Vercel so the GitHub card keeps working. GitHub Actions on a private repository use the account's monthly minutes, and the two Windows workflows count double, so watch usage on the account's billing page.
+1. Done: the build work is merged and deployed. On 2026-10-03, production `dpl_FuWthSLvRDDc8oSXkurWxXssJMK4` was observed READY at `74a3a7b` (PR #86, after PR #85). Re-check production identity (step 2) before starting acceptance, because later merges change it.
 2. At the start of the acceptance session, query Vercel and record the exact READY production deployment ID + SHA in the workbook.
 3. Complete the workbook's live checks on desktop and phone: navigation journeys, widgets and game, and voice with a real microphone and speakers (voice choice, preview, interrupt, mute, recovery, persistence). Also check screen share request, deny, and stop.
 4. Decide whether to enable governed writes, and only then configure the credentials together:

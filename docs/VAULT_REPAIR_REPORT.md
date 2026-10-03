@@ -747,3 +747,71 @@ This is supplemental only. It does **not** replace the complete parallel suite r
    - local Windows/Obsidian visual checks
 
    Step-by-step instructions are in `80 SOPs/LifeOS Owner's Operating Manual.md` and `docs/OWNER_ACCEPTANCE_WORKBOOK.md`.
+
+## Status reconciliation and color layer — 2026-10-03 (`claude/youthful-carson-12g3r0`)
+
+Base: `main` at `74a3a7bff64a1842427ab8be96954b0387e01644` (PR #86, after PR #85 `353ada3`).
+
+### Repairs completed
+
+- **Status drift:** `docs/CANONICAL_LIVE_STATUS.md` still named PR #82 (`0d3ed70`) as the application-code baseline after PR #85 and PR #86 merged and deployed. It now records PR #85 as the baseline, both production deployments, the 2026-10-03 evidence, the PR #85 capabilities, and the PR #84 disposition. Workbook row B1 lists #85 and #86.
+- **Stale PR:** PR #84 aligned the workbook to the PR #82 baseline. PR #85 superseded it, so it is closed without merge.
+- **Color layer:** the shell and home gain warm complementary accents (coral, gold, rose, amber), with violet and teal bridging them to the electric-blue base. Each life area keeps one color everywhere: sidebar, launch tiles, operating lanes, quick actions, and the mobile dock. The mapping lives in `lib/os/accents.ts`, and the color values in `components/os/LegendaryCommandCenter.module.css`. Projects and agents get a stable per-name color, so the same project keeps its color in Upcoming and Resume. The softer palette applies in "I'm overloaded" mode.
+- **Truthfulness fixes on the home page:**
+  - The **What needs you now** bars were colored by list position, so the first two items always showed red. They now follow the recorded state: blocked is red, waiting is amber, and everything else is sky.
+  - **Connected Systems** printed "unavailable" in green. State text is now mint only when available.
+  - System Health shows unconfigured services as hollow rings instead of a wall of red dots, so the state is no longer carried by color alone.
+- **Missing styles:** `.panelKicker`, `.bubbleRight`, and the command chips were referenced by the home page but had no styles, so they rendered as large unstyled text. They are now styled.
+
+### Validation evidence
+
+- `main` at `74a3a7b` before changes:
+  - GitHub Actions: Dashboard CI, Vault Health, and MAPS Integrity all green.
+  - Vercel: `dpl_FuWthSLvRDDc8oSXkurWxXssJMK4` READY at `74a3a7b`, with no runtime errors in 7 days.
+- This branch:
+  - lint and typecheck: PASS
+  - `npm test`: PASS, including the new `tests/os-accents.test.ts`
+  - build: PASS
+  - `npm audit --audit-level=high`: 0 vulnerabilities
+- `pwsh -File scripts/audit-vault.ps1`: PASS (164 notes).
+- `pwsh -File scripts/validate-maps.ps1`: PASS.
+- Playwright against the production build (Chromium 1440 / 1024 / 390): 178 passed, 5 skipped (expected viewport splits). Before and after screenshots of `/` and `/today` at 1440 and 390 were reviewed; the colors are legible on the dark base and the phone layout is unchanged.
+
+### Final pass/fail state
+
+**AGENT VALIDATION PASSED — OWNER ACCEPTANCE STILL REQUIRED.** The color layer reaches production only after this branch is merged and Vercel reports the new deployment READY.
+
+### Remaining credential-only or local-UI-only actions
+
+Unchanged from the 2026-09-30 closeout: governed write credentials, optional paid voice, the owner acceptance workbook (0 of 88 rows signed on 2026-10-03), real-device microphone and screen-share checks, the Issue #56 candidate, and local Windows/Obsidian checks.
+
+## Privacy lockdown — 2026-10-03 (`claude/youthful-carson-12g3r0`)
+
+The owner asked for LifeOS to stop being public.
+
+### Repairs completed
+
+- **Website:** the Vercel project `lifeos-enterprise` used Vercel Authentication with Standard Protection (`all_except_custom_domains`). That protects preview and deployment URLs but leaves the production domain `lifeos-enterprise.vercel.app` public. The agent changed it to All Deployments (`ssoProtection.deploymentType: "all"`) on the owner's instruction. Vercel documents this as available on all plans with no paid add-on.
+- **GitHub health:** `lib/github/health.ts` sends `LIFEOS_GITHUB_TOKEN` when it is set, so the card keeps working after the repository goes private. Covered by `tests/github-health-auth.test.ts`.
+- **Docs:** owner manual A1–A3 and G1–G3, canonical status (access row, GitHub health row, owner step 0), and the deployment guide.
+- **Exposure check:** a scan of the vault's Markdown for health and identity terms found no diagnoses or medical details. The only match was a `tbi-friendly` tag on the owner manual.
+
+### Validation evidence
+
+- Vercel `get_project` after the change: `ssoProtection: { enabled: true, deploymentType: "all" }`, with all three domains still attached.
+- Anonymous requests made through an external fetcher, with caching off and links-only output: `https://lifeos-enterprise.vercel.app/` and `/api/lifeos/continuity` both landed on "Protected Deployment – Vercel" (`vercel.com/login`). No LifeOS content was returned.
+- lint and typecheck: PASS
+- `npm test`: 74 files, 521 tests, PASS
+- build: PASS
+- `pwsh -File scripts/audit-vault.ps1`: PASS
+- `pwsh -File scripts/validate-maps.ps1`: PASS
+
+### Final pass/fail state
+
+**Website: PRIVATE (verified). Repository: still PUBLIC.** None of the agent's tools can change repository visibility. The owner must make it private in GitHub Settings → General → Danger Zone → Change visibility.
+
+### Remaining owner actions
+
+1. Make `ebyron357/LifeOS-Enterprise` private.
+2. Add a read-capable `LIFEOS_GITHUB_TOKEN` in Vercel, then redeploy, so the GitHub card reconnects.
+3. Watch GitHub Actions minutes. Private repositories use the monthly allowance, and the Vault Health and MAPS Integrity workflows run on Windows, which counts double.

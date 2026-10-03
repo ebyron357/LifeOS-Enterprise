@@ -21,6 +21,7 @@
 - The last recorded application-code baseline lives in `docs/CANONICAL_LIVE_STATUS.md` (not duplicated here, because it changes on every application merge).
 - Step-by-step owner/operator instructions (access, commands, redeploy, rollback, logs, credentials): `80 SOPs/LifeOS Owner's Operating Manual.md`.
 - GitHub `main` is authoritative for the live repository head.
+- Production is private: Vercel Authentication protects All Deployments, so pages and `/api/lifeos/*` need a Vercel login on team `tradeiq`. Verify deployments through the Vercel dashboard or tools, not anonymous HTTP. Access state is recorded in `docs/CANONICAL_LIVE_STATUS.md`.
 - Vercel production for `lifeos-enterprise` is authoritative for the live deployment ID and deployed Git SHA.
 - Documentation-only merges may trigger production deployments without changing application runtime code; always report the application-code baseline and live deployment identity separately.
 - `docs/CANONICAL_LIVE_STATUS.md` is authoritative for capability/governance state, not a hard-coded live deployment SHA.
