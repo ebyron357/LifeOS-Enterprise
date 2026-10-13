@@ -1,13 +1,17 @@
 # Technology and Repository Registry
 
-**Status:** Canonical operational registry  
-**Owner:** EAB Byron  
-**Last reviewed:** 2026-07-19  
-**Governing standard:** [[Approved Design Tool Stack|Approved Technology, Platform, Repository, and Goal Stack]]
+**Status:** Subordinate operational inventory and queue\
+**Owner:** EAB Byron\
+**Queue records last reviewed:** 2026-07-19\
+**Hierarchy revision:** 2026-10-13\
+**Governing architecture and intake authority:** [[docs/MASTER_PLATFORM_OPERATING_BLUEPRINT|Master Platform Operating Blueprint]]\
+**Domain stack guidance:** [[Approved Design Tool Stack|Approved Technology and Design Tool Stack]]
 
 ## Purpose
 
-This registry converts approved technology guidance into an operational queue. Every active platform, repository, or tool must be tied to a goal, project, owner, next action, and measurable result.
+This registry is the subordinate living inventory and execution queue for approved technology guidance. Every active platform, repository, or tool must be tied to a goal, project, owner, next action, disposition, and evidence of a measurable result. Platform architecture and intake rules belong to the Master Platform Operating Blueprint; domain-specific approved choices belong to the Approved Technology and Design Tool Stack. This registry records those decisions and operational evidence, rather than establishing another top-level policy.
+
+This hierarchy follows the [owner decision in issue #56](https://github.com/ebyron357/LifeOS-Enterprise/issues/56#issuecomment-5478721582). The preserved queue below retains its 2026-07-19 review baseline; its proposed next actions are not fresh proof of an implementation gap or a completed deployment. Reconcile them with current project evidence before assigning work. This hierarchy-only revision does not approve unreviewed candidate provisions or change any tool approval decision.
 
 ## Status Definitions
 
@@ -72,4 +76,11 @@ During each weekly review:
 3. Move inactive tools out of the active queue.
 4. Do not promote a pilot without test results.
 5. Do not retain tools whose function is already covered more effectively.
-6. Update the governing document before changing approval status.
+6. Record approval-status changes under the applicable governing authority, then reconcile the domain stack and this inventory so they reflect the same approved decision. Routine queue evidence updates do not create new policy authority.
+
+## Consolidation and Supersession History
+
+Approved revisions replace this registry as one complete consolidated document; preserve still-applicable queue records, approval decisions, safety controls and evidence. Do not introduce competing policy fragments.
+
+- 2026-07-19: prior operational registry and queue baseline, retained in Git history.
+- 2026-10-13: complete hierarchy consolidation under owner issue #56 comment 5478721582, replacing the version at commit `69b43ec90adcba597ee8ea5137e10927c72ccc0e`. Replaced the top-level canonical claim and stack-only authority pointer with explicit subordination to the Master Platform Operating Blueprint. Existing queue entries, owners, priorities, statuses and safeguards remain; current readiness must be supported by current project evidence.
