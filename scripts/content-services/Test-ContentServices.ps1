@@ -58,65 +58,65 @@ try {
   }
   Test-Case 'clear with explicit note remains researching and not contacted' {
     $caseParams = $lead.Clone(); $caseParams.AccountName = 'Synthetic reviewed'; $caseParams.SuppressionStatus = 'clear'; $caseParams.SuppressionReviewNote = 'Synthetic operator reviewed all suppression categories.'
-    $result = & $leadScript @args
+    $result = & $leadScript @caseParams
     $text = [IO.File]::ReadAllText($result.Path)
     Assert-True ($text -match 'suppression_status: "clear"' -and $text -match 'qualification_status: "researching"' -and $text -match 'reply_status: "not-contacted"' -and $text -match 'not consent') 'Clear escalated to contact permission.'
   }
   Test-Case 'opt-out remains suppressed without outreach action' {
     $caseParams = $lead.Clone(); $caseParams.AccountName = 'Synthetic opted out'; $caseParams.SuppressionStatus = 'opted-out'
-    $result = & $leadScript @args
+    $result = & $leadScript @caseParams
     $text = [IO.File]::ReadAllText($result.Path)
     Assert-True ($text -match 'suppression_status: "opted-out"' -and $text -match 'do not contact or export') 'Suppression not preserved.'
   }
   Test-Case 'missing required campaign and prospect fields fail without prompting' {
     $caseParams = $campaign.Clone(); $caseParams.Remove('Owner')
-    Assert-Fails { & $campaignScript @args } 'Owner is required' | Out-Null
+    Assert-Fails { & $campaignScript @caseParams } 'Owner is required' | Out-Null
     $caseParams = $lead.Clone(); $caseParams.ObservedGap = ' '
-    Assert-Fails { & $leadScript @args } 'ObservedGap is required' | Out-Null
+    Assert-Fails { & $leadScript @caseParams } 'ObservedGap is required' | Out-Null
   }
   Test-Case 'invalid date and earlier review date fail' {
     $caseParams = $lead.Clone(); $caseParams.Date = '2026-02-30'
-    Assert-Fails { & $leadScript @args } 'valid ISO date' | Out-Null
+    Assert-Fails { & $leadScript @caseParams } 'valid ISO date' | Out-Null
     $caseParams = $lead.Clone(); $caseParams.ReviewDate = '2026-10-12'
-    Assert-Fails { & $leadScript @args } 'on or after' | Out-Null
+    Assert-Fails { & $leadScript @caseParams } 'on or after' | Out-Null
   }
   Test-Case 'invalid, credential and non-web URLs fail before writing' {
     foreach ($url in @('not a URL', 'file:///etc/passwd', 'https://user:password@example.test', 'https://example.test/?token=synthetic')) {
       $caseParams = $lead.Clone(); $caseParams.Website = $url
-      Assert-Fails { & $leadScript @args } 'URL|credential' | Out-Null
+      Assert-Fails { & $leadScript @caseParams } 'URL|credential' | Out-Null
     }
   }
   Test-Case 'control characters cannot inject properties or headings' {
     $caseParams = $campaign.Clone(); $caseParams.Title = "Synthetic`npublish: true"
-    Assert-Fails { & $campaignScript @args } 'single line' | Out-Null
+    Assert-Fails { & $campaignScript @caseParams } 'single line' | Out-Null
   }
   Test-Case 'credential-like input is rejected without reflecting the value' {
     $secret = 'api_key=synthetic-never-a-real-secret'
     $caseParams = $lead.Clone(); $caseParams.ObservedGap = $secret
-    $failure = Assert-Fails { & $leadScript @args } 'credential-like material'
+    $failure = Assert-Fails { & $leadScript @caseParams } 'credential-like material'
     Assert-True (-not $failure.Contains($secret)) 'Validation reflected a credential.'
     Assert-True (-not ((Get-ChildItem -LiteralPath $temp -Recurse -File | ForEach-Object { [IO.File]::ReadAllText($_.FullName) }) -join '').Contains($secret)) 'Credential was persisted.'
   }
   Test-Case 'reserved filenames and traversal characters remain contained' {
     foreach ($title in @('CON', '../Synthetic traversal')) {
       $caseParams = $campaign.Clone(); $caseParams.Title = $title
-      $result = & $campaignScript @args
+      $result = & $campaignScript @caseParams
       Assert-True ((Split-Path -Parent $result.Path) -eq $campaign.OutputDirectory) 'Record escaped its destination.'
       Assert-True ((Split-Path -Leaf $result.Path) -ne 'CON.md') 'Reserved filename accepted.'
     }
   }
   Test-Case 'default output is private and ignored; tracked destination rejected' {
     $caseParams = $lead.Clone(); $caseParams.Remove('OutputDirectory'); $caseParams.AccountName = 'Synthetic dry-run only'
-    $result = & $leadScript @args -DryRun
+    $result = & $leadScript @caseParams -DryRun
     Assert-True ($result.Path -match 'private[/\\]content-services[/\\]prospects') 'Default is not private.'
     $repo = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
     $caseParams.OutputDirectory = Join-Path $repo '40 Resources'
-    Assert-Fails { & $leadScript @args -DryRun } 'private/content-services' | Out-Null
+    Assert-Fails { & $leadScript @caseParams -DryRun } 'private/content-services' | Out-Null
   }
   Test-Case 'filename collisions after sanitization fail safely' {
-    $caseParams = $campaign.Clone(); $caseParams.Title = 'Synthetic collision/one'; & $campaignScript @args | Out-Null
+    $caseParams = $campaign.Clone(); $caseParams.Title = 'Synthetic collision/one'; & $campaignScript @caseParams | Out-Null
     $caseParams.Title = 'Synthetic collision:one'
-    Assert-Fails { & $campaignScript @args } 'overwrite is disabled' | Out-Null
+    Assert-Fails { & $campaignScript @caseParams } 'overwrite is disabled' | Out-Null
   }
   Test-Case 'creation scripts and helper contain no network or process execution calls' {
     $files = @($campaignScript, $leadScript, (Join-Path $PSScriptRoot 'ContentServiceRecords.psm1'))
