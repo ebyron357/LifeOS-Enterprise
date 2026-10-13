@@ -1,13 +1,16 @@
-# Approved Technology, Platform, Repository, and Goal Stack
+# Approved Technology and Design Tool Stack
 
-**Status:** Canonical  
-**Owner:** EAB Byron  
-**Last reviewed:** 2026-07-19  
+**Status:** Approved subordinate tool stack\
+**Owner:** EAB Byron\
+**Tool records last reviewed:** 2026-07-19\
+**Hierarchy revision:** 2026-10-13\
 **Review cadence:** Quarterly or when a repeated limitation, new goal, security concern, or major platform change appears
 
 ## Purpose
 
-This document is the canonical source of truth for approved tools, platforms, repositories, and controlled pilots used across LifeOS projects and goals. It replaces scattered recommendations and prevents duplicate subscriptions, disconnected experiments, unverified imports, and tools that do not advance a measurable outcome.
+This document records approved domain-specific tool choices, platform uses, reference repositories, and controlled pilots that support LifeOS projects and goals. It preserves the approved stack guidance below to prevent duplicate subscriptions, disconnected experiments, unverified imports, and tools that do not advance a measurable outcome. It is subordinate to the [[docs/MASTER_PLATFORM_OPERATING_BLUEPRINT|Master Platform Operating Blueprint]], which governs platform architecture and intake rules.
+
+The [[Technology and Repository Registry]] is the subordinate living inventory and execution queue for evidence, owner, next action, and disposition. This stack supplies domain guidance; it does not compete with that inventory or the platform blueprint. The hierarchy is authorized by [owner decision in issue #56](https://github.com/ebyron357/LifeOS-Enterprise/issues/56#issuecomment-5478721582). This correction does not approve unreviewed candidate provisions, change tool approval decisions, or establish current deployment/readiness evidence. Tool records retain their stated review date.
 
 Every approved item must answer four questions:
 
@@ -394,4 +397,9 @@ Every future entry must include:
 
 # Review and Change Control
 
-Any future change must replace this document with a complete updated version. The replacement must preserve all still-approved guidance, merge approved changes, remove duplicates, update statuses and dates, reorganize sections when needed, and keep this file as the single canonical technology, platform, repository, and goal inventory.
+Any approved change must replace this document with one complete consolidated version, preserve all still-approved domain guidance, merge the approved changes, remove contradictions, and retain a clear supersession history. The Master Platform Operating Blueprint remains the governing platform architecture and intake authority; the Technology and Repository Registry remains the subordinate living inventory and queue. A domain-stack revision must not create a competing portfolio authority or imply fresh implementation evidence.
+
+## Supersession History
+
+- 2026-07-19: prior stack version and tool-review baseline, retained in Git history.
+- 2026-10-13: complete hierarchy consolidation under owner issue #56 comment 5478721582, replacing the version at commit `69b43ec90adcba597ee8ea5137e10927c72ccc0e`. Removed this document's claim to be the portfolio-wide canonical inventory. Existing tool records, goals, safeguards and approval statuses are preserved; their operational freshness was not re-certified by this hierarchy-only revision.
