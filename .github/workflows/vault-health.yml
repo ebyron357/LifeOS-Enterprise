@@ -90,3 +90,11 @@ jobs:
       - name: Run final clean audit
         shell: pwsh
         run: ./scripts/audit-vault.ps1
+
+      - name: Test offline Content-to-Lead records (PowerShell 7)
+        shell: pwsh
+        run: ./scripts/content-services/Test-ContentServices.ps1
+
+      - name: Test offline Content-to-Lead records (Windows PowerShell 5.1)
+        shell: powershell
+        run: ./scripts/content-services/Test-ContentServices.ps1
