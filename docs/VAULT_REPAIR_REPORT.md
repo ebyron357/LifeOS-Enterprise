@@ -832,3 +832,11 @@ The owner asked for LifeOS to stop being public.
 2. Add the Part K step 0 read-only `LIFEOS_GITHUB_TOKEN`, then redeploy.
 3. Refresh the lockfile once `braces` ships a patched release.
 4. Complete the owner acceptance workbook.
+
+## Offline Content-to-Lead record scripts — 2026-10-13
+
+Issue #14's previously approved local-record slice is implemented on a separate feature branch. The two scripts reuse canonical templates, preserve quoted input, validate dates and URLs, create private records without overwrite, and support no-write previews. Prospect suppression defaults to restricted; explicit clear requires a supplied review note and never implies consent or outreach permission. Generated records are ignored by Git and remain outside web projections.
+
+Deterministic synthetic cases are wired into the existing Vault Health Windows job for PowerShell 7 and 5.1. This Linux editing environment has neither `pwsh` nor `powershell`; remote results must be recorded in the PR before claiming runtime validation. `git diff --check` is the available local formatting check. No commercial pilot, provider integration, campaign, customer data, dashboard implementation or production setting changed.
+
+This is partial delivery of issue #14, not overall Content-to-Lead completion. Remaining scope includes the governed metadata/audit extension, an approved controlled pilot and separate Obsidian acceptance. No network, outreach or public-release authorization is inferred.

@@ -39,3 +39,6 @@ docs/portfolio-sync-last-run.json
 # durable evidence as GitHub Actions artifacts; the per-routine directories
 # stay tracked through .gitkeep.
 Automations/runs/*/run-*.json
+
+# Offline Content-to-Lead records may contain private client/prospect data.
+/private/content-services/
