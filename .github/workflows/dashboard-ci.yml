@@ -35,6 +35,8 @@ jobs:
         run: npm ci
 
       - name: Audit production and development dependencies
+        id: dependency-audit
+        continue-on-error: true
         run: npm audit --audit-level=high
 
       - name: Lint
@@ -101,3 +103,7 @@ jobs:
             playwright-report/
           if-no-files-found: warn
           retention-days: 7
+
+      - name: Enforce dependency audit gate
+        if: ${{ always() && steps.dependency-audit.outcome == 'failure' }}
+        run: exit 1
