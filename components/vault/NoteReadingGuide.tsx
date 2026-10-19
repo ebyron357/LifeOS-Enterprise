@@ -15,7 +15,15 @@ export function NoteReadingGuide({ children, contentKey }: { children: ReactNode
 
   function positionMenu() {
     const menu = menuRef.current;
-    if (menu?.open) menu.dataset.menuPosition = menu.getBoundingClientRect().top > window.innerHeight / 2 ? "above" : "below";
+    if (!menu?.open) return;
+    const rect = menu.getBoundingClientRect();
+    const gap = 6;
+    const edge = 8;
+    const above = Math.max(0, rect.top - gap - edge);
+    const below = Math.max(0, window.innerHeight - rect.bottom - gap - edge);
+    const useAbove = above > below;
+    menu.dataset.menuPosition = useAbove ? "above" : "below";
+    menu.style.setProperty("--note-menu-max-height", `${Math.min(360, useAbove ? above : below)}px`);
   }
 
   useEffect(() => {
@@ -24,7 +32,7 @@ export function NoteReadingGuide({ children, contentKey }: { children: ReactNode
 
     // Read rendered headings so code fences and inline Markdown cannot create fake chapters.
     const headings = Array.from(content.querySelectorAll<HTMLElement>("h2, h3"));
-    const used = new Set<string>();
+    const used = new Set<string>(["note-reader-start"]);
     const outline = headings.map((heading) => {
       const label = heading.textContent?.trim() || "Section";
       const base = `note-${headingToAnchor(label) || "section"}`;
@@ -43,7 +51,10 @@ export function NoteReadingGuide({ children, contentKey }: { children: ReactNode
       if (!content) return;
       const rect = content.getBoundingClientRect();
       positionMenu();
-      const readingLine = Math.min(180, window.innerHeight * 0.25);
+      // Match the heading anchor offset so the selected chapter follows native
+      // fragment navigation even on short viewports.
+      const anchorOffset = headings[0] ? Number.parseFloat(window.getComputedStyle(headings[0]).scrollMarginTop) : 0;
+      const readingLine = Math.min(window.innerHeight - 1, Number.isFinite(anchorOffset) ? anchorOffset : 172);
       const travel = Math.max(1, rect.height - window.innerHeight + readingLine);
       const progress = Math.min(1, Math.max(0, (readingLine - rect.top) / travel));
       progressRef.current?.style.setProperty("--reading-progress", String(progress));

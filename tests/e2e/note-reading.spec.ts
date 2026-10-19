@@ -42,3 +42,16 @@ test("reader honors OS, LifeOS, and overload reduced-motion settings", async ({ 
   await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight / 2, behavior: "instant" }));
   await expect(page.locator(".note-reading-progress")).toBeVisible();
 });
+
+test("reading guide menu fits a short viewport and remains scrollable", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 280 });
+  await page.goto(noteUrl);
+  await page.getByText("On this page", { exact: false }).first().click();
+  const menu = page.getByRole("navigation", { name: "On this page", exact: true });
+  await expect(menu).toBeInViewport({ ratio: 1 });
+  const bounds = await menu.boundingBox();
+  expect(bounds).not.toBeNull();
+  expect(bounds!.y).toBeGreaterThanOrEqual(8);
+  expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(272);
+  expect(await menu.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
+});

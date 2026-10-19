@@ -47,4 +47,50 @@ describe("note reading guide", () => {
     expect(screen.queryByText("On this page")).toBeNull();
     expect(screen.getByText("Keep this visible.")).toBeVisible();
   });
+
+  it("does not duplicate the Back to top anchor when a chapter is named Reader start", async () => {
+    const { container } = render(
+      <NoteReadingGuide contentKey="start"><h2>Reader start</h2><h2>Next chapter</h2></NoteReadingGuide>,
+    );
+    await waitFor(() => expect(container.querySelectorAll(".note-reading-menu a")).toHaveLength(2));
+    expect(container.querySelectorAll("#note-reader-start")).toHaveLength(1);
+    expect(container.querySelector("h2")?.id).toBe("note-reader-start-2");
+    expect(container.querySelector(".note-reading-menu a")?.getAttribute("href")).toBe("#note-reader-start-2");
+  });
+
+  it("tracks the native anchor offset on a short viewport", async () => {
+    vi.stubGlobal("innerHeight", 240);
+    try {
+      const { container } = render(
+        <NoteReadingGuide contentKey="short-viewport"><h2>First</h2><h2>Second</h2></NoteReadingGuide>,
+      );
+      await waitFor(() => expect(container.querySelectorAll(".note-reading-menu a")).toHaveLength(2));
+      const headings = container.querySelectorAll("h2");
+      headings[0].style.scrollMarginTop = "172px";
+      vi.spyOn(headings[0], "getBoundingClientRect").mockReturnValue({ top: -200 } as DOMRect);
+      vi.spyOn(headings[1], "getBoundingClientRect").mockReturnValue({ top: 150 } as DOMRect);
+      act(() => window.dispatchEvent(new Event("scroll")));
+      await waitFor(() => expect(container.querySelector('[aria-current="location"]')).toHaveTextContent("Second"));
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("limits the open menu to the available viewport space", async () => {
+    vi.stubGlobal("innerHeight", 280);
+    try {
+      const { container } = render(
+        <NoteReadingGuide contentKey="menu-space"><h2>First</h2><h2>Second</h2></NoteReadingGuide>,
+      );
+      await waitFor(() => expect(container.querySelector("details")).not.toBeNull());
+      const menu = container.querySelector("details")!;
+      vi.spyOn(menu, "getBoundingClientRect").mockReturnValue({ top: 80, bottom: 130 } as DOMRect);
+      menu.open = true;
+      fireEvent(menu, new Event("toggle"));
+      expect(menu.dataset.menuPosition).toBe("below");
+      expect(menu.style.getPropertyValue("--note-menu-max-height")).toBe("136px");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });

@@ -553,7 +553,7 @@ body::before { display:none; }
 .note-reading-menu { flex: 1; min-width: 0; }
 .note-reading-menu summary { cursor: pointer; min-height: 24px; color: #e6eef8; }
 .note-reading-menu summary span { display: block; margin-top: 4px; color: #b4c4d8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.note-reading-menu nav { position: absolute; top: calc(100% + 6px); left: 0; right: 0; max-height: min(50vh, 360px); overflow-y: auto; overscroll-behavior: contain; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: #0f1927; box-shadow: 0 12px 24px #0005; }
+.note-reading-menu nav { position: absolute; top: calc(100% + 6px); left: 0; right: 0; box-sizing: border-box; max-height: var(--note-menu-max-height, min(50vh, 360px)); overflow-y: auto; overscroll-behavior: contain; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: #0f1927; box-shadow: 0 12px 24px #0005; }
 .note-reading-menu[data-menu-position="above"] nav { top: auto; bottom: calc(100% + 6px); }
 .note-reading-menu ol { list-style: none; margin: 0; padding: 0; }
 .note-reading-menu a { display: block; min-height: 44px; padding: 10px 12px; border-radius: 6px; overflow-wrap: anywhere; color: #b4c4d8; }

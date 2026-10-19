@@ -832,3 +832,9 @@ The owner asked for LifeOS to stop being public.
 2. Add the Part K step 0 read-only `LIFEOS_GITHUB_TOKEN`, then redeploy.
 3. Refresh the lockfile once `braces` ships a patched release.
 4. Complete the owner acceptance workbook.
+
+## PR #90 reading-guide repair — 2026-10-19
+
+- **Repair:** The open chapter menu now chooses the side with more viewport space and caps its scrollable height to that space. The `Reader start` chapter no longer duplicates the Back to top anchor. Active-chapter tracking uses the heading's native fragment offset, including on short viewports. The full production-and-development `npm audit --audit-level=high` CI gate is restored.
+- **Local validation:** lint, typecheck, production build, and 75 Vitest files / 527 tests passed before the final menu regression test was added; the focused guide suite then passed 6 of 6 tests. `git diff --check` passed. Browser validation remains unverified locally because the Playwright Chromium download was unavailable in this environment; the PR's exact-head CI must run it.
+- **Remaining blocker:** the restored full audit fails on the existing high-severity `braces` advisory GHSA-vfj7-8cjw-p6xm through `eslint-config-next` → `fast-glob` → `micromatch`. The current `braces` version is 3.0.3; `npm audit fix --force` proposes a breaking `eslint-config-next` downgrade. No audit bypass or breaking dependency change was applied. Do not merge until this gate is resolved under the governing release process.
