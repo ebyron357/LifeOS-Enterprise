@@ -55,3 +55,24 @@ test("reading guide menu fits a short viewport and remains scrollable", async ({
   expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(272);
   expect(await menu.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
 });
+
+
+test("short-viewport chapter tracking follows native anchors and scrolling", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 280 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(noteUrl);
+  const chapters = page.locator(".note-reading-menu a");
+  await expect.poll(() => chapters.count()).toBeGreaterThan(2);
+  const second = chapters.nth(1);
+  const secondFragment = await second.getAttribute("href");
+  await page.locator(".note-reading-menu summary").click();
+  await second.click();
+  await expect(page).toHaveURL(new RegExp(`${secondFragment}$`));
+  await expect(page.locator(secondFragment!)).toBeFocused();
+  await expect(second).toHaveAttribute("aria-current", "location");
+
+  await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
+  await expect(chapters.last()).toHaveAttribute("aria-current", "location");
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await expect(chapters.first()).toHaveAttribute("aria-current", "location");
+});
