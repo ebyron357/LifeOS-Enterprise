@@ -3,6 +3,19 @@
 Date: 2026-07-14
 Repository: `ebyron357/LifeOS-Enterprise`
 
+## PR #90 short-viewport geometry repair — 2026-10-24
+
+- Corrected popup space measurement to use its actual sticky-guide containing block, rather than the inset `details` element. This preserves the full-width popup, 8px viewport bounds, internal scrolling, and above/below placement.
+- Regression coverage now distinguishes guide/details geometry, tests both placement directions and resize, and checks native anchor focus/URL/current chapter plus document-end/back-to-start tracking. Existing strict 390x280 browser bounds are unchanged.
+- Preserved current main's PR #93 PowerShell parser repair and Next.js root configuration. Reconciled overlapping dependency candidates #94 and #95: both passed GitHub browser/mobile gates; retained the earlier PR #94 exact package/lock (Next.js and eslint-config-next 16.4.3) to avoid diverging versions. Neither dependency PR was merged or closed. No audit exceptions or gate weakening.
+- Targeted guide unit tests (7/7), lint and typecheck pass locally. Full exact-head CI, including the new browser regression, is required before acceptance. No merge or production deployment is authorized by this repair record.
+
+## PR #90 reading-guide repair — 2026-10-19
+
+- **Repair:** The open chapter menu now chooses the side with more viewport space and caps its scrollable height to that space. The `Reader start` chapter no longer duplicates the Back to top anchor. Active-chapter tracking uses the heading's native fragment offset, including on short viewports. The full production-and-development `npm audit --audit-level=high` CI gate is restored. CI records an audit failure, continues with the remaining checks for independent evidence, and fails the job at the final enforcement step if the audit failed.
+- **Local validation:** lint, typecheck, production build, and 75 Vitest files / 527 tests passed before the final menu regression test was added; the focused guide suite then passed 6 of 6 tests. `git diff --check` passed. Browser validation remains unverified locally because the Playwright Chromium download was unavailable in this environment; the PR's exact-head CI must run it.
+- **Remaining blocker:** the restored full audit fails on the existing high-severity `braces` advisory GHSA-vfj7-8cjw-p6xm through `eslint-config-next` → `fast-glob` → `micromatch`. The current `braces` version is 3.0.3; `npm audit fix --force` proposes a breaking `eslint-config-next` downgrade. No audit bypass or breaking dependency change was applied. Do not merge until this gate is resolved under the governing release process.
+
 ## 2026-09-25 Checkpoint path concurrency fix
 
 Branch: `claude/quirky-sagan-1m56r5` (restarted from `main` after PR #72 merged)  

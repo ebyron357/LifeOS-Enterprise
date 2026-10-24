@@ -4,6 +4,7 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
+import { NoteReadingGuide } from "@/components/vault/NoteReadingGuide";
 import { parseWikiTarget } from "@/lib/vault/parse-note";
 import { noteHref } from "@/lib/vault/slug";
 import type { VaultLink, VaultNote } from "@/lib/vault/types";
@@ -93,6 +94,7 @@ export function NoteMarkdown({ note }: NoteMarkdownProps) {
   const processed = preprocessForRender(note.body, resolvedTargets);
 
   return (
+    <NoteReadingGuide key={note.path} contentKey={processed}>
     <div className="note-markdown">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
@@ -114,6 +116,7 @@ export function NoteMarkdown({ note }: NoteMarkdownProps) {
         {processed}
       </ReactMarkdown>
     </div>
+    </NoteReadingGuide>
   );
 }
 
