@@ -838,3 +838,49 @@ The owner asked for LifeOS to stop being public.
 - **Repair:** The open chapter menu now chooses the side with more viewport space and caps its scrollable height to that space. The `Reader start` chapter no longer duplicates the Back to top anchor. Active-chapter tracking uses the heading's native fragment offset, including on short viewports. The full production-and-development `npm audit --audit-level=high` CI gate is restored. CI records an audit failure, continues with the remaining checks for independent evidence, and fails the job at the final enforcement step if the audit failed.
 - **Local validation:** lint, typecheck, production build, and 75 Vitest files / 527 tests passed before the final menu regression test was added; the focused guide suite then passed 6 of 6 tests. `git diff --check` passed. Browser validation remains unverified locally because the Playwright Chromium download was unavailable in this environment; the PR's exact-head CI must run it.
 - **Remaining blocker:** the restored full audit fails on the existing high-severity `braces` advisory GHSA-vfj7-8cjw-p6xm through `eslint-config-next` → `fast-glob` → `micromatch`. The current `braces` version is 3.0.3; `npm audit fix --force` proposes a breaking `eslint-config-next` downgrade. No audit bypass or breaking dependency change was applied. Do not merge until this gate is resolved under the governing release process.
+
+# Audit script PowerShell 5.1 parse fix — 2026-10-24
+
+## Issue found and fixed
+
+`scripts/audit-vault.ps1` failed to parse under Windows PowerShell 5.1 (`powershell.exe`, the interpreter named in this document's own Local Repair Command and in AGENTS.md's validation loop). The file is UTF-8 without a byte-order mark, and it contained a Unicode em dash (`—`) inside a string literal on the JSON-parsing error branch. Windows PowerShell 5.1 does not assume UTF-8 for BOM-less script files; it misread the em dash as two mojibake bytes, which broke the string literal and cascaded into a full parser failure (`Missing ')' in method call`, `Missing closing '}'`, unterminated string, etc.) — the script could not run at all on the exact interpreter AGENTS.md specifies, even though it ran fine under PowerShell Core (`pwsh`) in GitHub Actions, which is why CI had not caught it.
+
+Fix: replaced the em dash with a plain ASCII hyphen. No behavior change — this was the only non-ASCII character in any `scripts/*.ps1` file (verified by scanning all PowerShell scripts for non-ASCII bytes).
+
+Also added `next.config.ts` with `turbopack.root` set to the repository directory, to silence an unrelated Next.js workspace-root inference warning caused by a stray `package-lock.json` one directory above this repository.
+
+## Validation evidence for this change
+
+- `npm run lint` (ESLint, `--max-warnings=0`): PASS, zero warnings.
+- `npm run typecheck` (`tsc --noEmit`): PASS.
+- `npm test` (Vitest): 521/522 tests pass. One pre-existing failure (`tests/resource-template.test.ts`) is unrelated to this change — it fails identically on `main` without this fix, caused by this Windows checkout normalizing `99 Templates/Resource.md` to CRLF while the test asserts an LF-only substring. Not touched by this PR.
+- `npm run build` (Next.js production build): PASS.
+- `powershell -ExecutionPolicy Bypass -File ".\scripts\audit-vault.ps1"` (the canonical validation command from AGENTS.md), after the fix:
+
+```
+Obsidian Life OS Vault Audit
+============================
+Canonical folders checked: 36
+Required system files checked: 48
+Bases checked: 10
+Templates checked: 18
+Canonical project notes checked: 3
+Legacy project notes checked: 4
+Business notes checked: 3
+Markdown links and embeds checked: 173 notes
+
+PASS: canonical vault structure, templates, Bases, metadata, links, and embeds are valid.
+```
+
+- Confirmed no `.obsidian` files are tracked by Git and that `.obsidian/`, `node_modules/`, and `.next/` remain in `.gitignore`.
+
+## Final Status
+
+Repository repair: **PASS.** Both the Obsidian vault (PowerShell audit) and the Next.js operational dashboard (lint, typecheck, build, and the test suite apart from the one pre-existing CRLF-related failure noted above) are green on this machine.
+
+## PR #90 short-viewport geometry repair — 2026-10-24
+
+- Corrected popup space measurement to use its actual sticky-guide containing block, rather than the inset `details` element. This preserves the full-width popup, 8px viewport bounds, internal scrolling, and above/below placement.
+- Regression coverage now distinguishes guide/details geometry, tests both placement directions and resize, and checks native anchor focus/URL/current chapter plus document-end/back-to-start tracking. Existing strict 390x280 browser bounds are unchanged.
+- Preserved current main's PR #93 PowerShell parser repair and Next.js root configuration. Reconciled overlapping dependency candidates #94 and #95: both passed GitHub browser/mobile gates; retained the earlier PR #94 exact package/lock (Next.js and eslint-config-next 16.4.3) to avoid diverging versions. Neither dependency PR was merged or closed. No audit exceptions or gate weakening.
+- Targeted guide unit tests (7/7), lint and typecheck pass locally. Full exact-head CI, including the new browser regression, is required before acceptance. No merge or production deployment is authorized by this repair record.
