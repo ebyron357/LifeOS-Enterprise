@@ -832,3 +832,42 @@ The owner asked for LifeOS to stop being public.
 2. Add the Part K step 0 read-only `LIFEOS_GITHUB_TOKEN`, then redeploy.
 3. Refresh the lockfile once `braces` ships a patched release.
 4. Complete the owner acceptance workbook.
+
+# Audit script PowerShell 5.1 parse fix — 2026-10-24
+
+## Issue found and fixed
+
+`scripts/audit-vault.ps1` failed to parse under Windows PowerShell 5.1 (`powershell.exe`, the interpreter named in this document's own Local Repair Command and in AGENTS.md's validation loop). The file is UTF-8 without a byte-order mark, and it contained a Unicode em dash (`—`) inside a string literal on the JSON-parsing error branch. Windows PowerShell 5.1 does not assume UTF-8 for BOM-less script files; it misread the em dash as two mojibake bytes, which broke the string literal and cascaded into a full parser failure (`Missing ')' in method call`, `Missing closing '}'`, unterminated string, etc.) — the script could not run at all on the exact interpreter AGENTS.md specifies, even though it ran fine under PowerShell Core (`pwsh`) in GitHub Actions, which is why CI had not caught it.
+
+Fix: replaced the em dash with a plain ASCII hyphen. No behavior change — this was the only non-ASCII character in any `scripts/*.ps1` file (verified by scanning all PowerShell scripts for non-ASCII bytes).
+
+Also added `next.config.ts` with `turbopack.root` set to the repository directory, to silence an unrelated Next.js workspace-root inference warning caused by a stray `package-lock.json` one directory above this repository.
+
+## Validation evidence for this change
+
+- `npm run lint` (ESLint, `--max-warnings=0`): PASS, zero warnings.
+- `npm run typecheck` (`tsc --noEmit`): PASS.
+- `npm test` (Vitest): 521/522 tests pass. One pre-existing failure (`tests/resource-template.test.ts`) is unrelated to this change — it fails identically on `main` without this fix, caused by this Windows checkout normalizing `99 Templates/Resource.md` to CRLF while the test asserts an LF-only substring. Not touched by this PR.
+- `npm run build` (Next.js production build): PASS.
+- `powershell -ExecutionPolicy Bypass -File ".\scripts\audit-vault.ps1"` (the canonical validation command from AGENTS.md), after the fix:
+
+```
+Obsidian Life OS Vault Audit
+============================
+Canonical folders checked: 36
+Required system files checked: 48
+Bases checked: 10
+Templates checked: 18
+Canonical project notes checked: 3
+Legacy project notes checked: 4
+Business notes checked: 3
+Markdown links and embeds checked: 173 notes
+
+PASS: canonical vault structure, templates, Bases, metadata, links, and embeds are valid.
+```
+
+- Confirmed no `.obsidian` files are tracked by Git and that `.obsidian/`, `node_modules/`, and `.next/` remain in `.gitignore`.
+
+## Final Status
+
+Repository repair: **PASS.** Both the Obsidian vault (PowerShell audit) and the Next.js operational dashboard (lint, typecheck, build, and the test suite apart from the one pre-existing CRLF-related failure noted above) are green on this machine.
