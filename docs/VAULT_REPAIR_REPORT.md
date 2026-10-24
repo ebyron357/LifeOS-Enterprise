@@ -3,6 +3,47 @@
 Date: 2026-07-14
 Repository: `ebyron357/LifeOS-Enterprise`
 
+
+## 2026-10-24 Dependency release-gate repair (local candidate)
+
+Base: `69b43ec90adcba597ee8ea5137e10927c72ccc0e` (`main`).
+Branch: `fix/dependency-release-gate-20261024`.
+Scope: dependency security repair only; no application, CI-policy, credential, integration, merge or deployment change.
+
+### Changes and source verification
+
+- `next` 16.3.8 → 16.4.1, the first patched 16.x release for [GHSA-2464-fhr4-w9xw](https://github.com/advisories/GHSA-2464-fhr4-w9xw), [GHSA-p3m5-59mp-jv5r](https://github.com/advisories/GHSA-p3m5-59mp-jv5r) and [GHSA-673q-mjm6-r5xr](https://github.com/advisories/GHSA-673q-mjm6-r5xr).
+- `vitest` and its matched packages 4.1.11 → 4.1.12 for [GHSA-qxg6-89mg-rqv8](https://github.com/advisories/GHSA-qxg6-89mg-rqv8) and [GHSA-xp26-3454-mjgp](https://github.com/advisories/GHSA-xp26-3454-mjgp).
+- Compatible locked transitive updates include `sharp` 0.35.5, `source-map-js` 1.2.2, `vite` 8.3.5 and `zod` 4.6.7. The first two match the existing fixes in PR #90; this candidate does not duplicate or merge its reading-guide implementation.
+- Official advisory patch floors: sharp 0.35.5, source-map-js 1.2.2, Vite 8.3.3 and Zod 4.6.6. Registry versions and installed resolution were checked.
+- No dependency added/removed, no override, no forced major downgrade, and no audit gate weakened. npm regenerated optional-platform metadata in the lockfile.
+
+### Verified local checks
+
+Environment: Linux, Node 24.22.1, npm 11.9.0; portable official PowerShell 7.6.8 for vault validation.
+
+| Check | Result |
+|---|---|
+| Baseline main lock audit | 16 vulnerable-package records: 1 critical, 14 high, 1 moderate |
+| Final `npm ci` | PASS, 616 packages installed |
+| Full `npm audit --audit-level=high` | PASS, 0 vulnerabilities |
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS, 74 files / 522 tests |
+| `npm run build` | PASS |
+| `pwsh -NoProfile -File scripts/audit-vault.ps1` | PASS, 173 Markdown notes checked |
+| `pwsh -NoProfile -File scripts/validate-maps.ps1` | PASS |
+| Independent dependency-diff review | APPROVE, no blocking finding; browser validation outstanding |
+| Browser application assertions | NOT VERIFIED: browser process cannot launch in this executor |
+
+### Browser limitation and release boundary
+
+The standard Chromium CDN endpoint returned non-ZIP content. The exact pinned Chrome for Testing 151.0.7922.34 archive was then retrieved from Google's official storage, ZIP-tested and version-verified. A temporary, uncommitted test configuration used that executable and bound the existing production build to loopback. Chromium still terminated before application assertions because the executor disallowed its local IPC socket. A supported elevated-execution attempt failed at executor initialization. This is environment evidence, not a finding that all browser journeys fail in the app; no browser pass is claimed.
+
+WebKit 26.5 downloaded from the official Playwright Microsoft mirror, but the host lacks GTK/Graphene/Harfbuzz-ICU/Manette/Hyphen/GLES libraries. No system-security change or test weakening was performed.
+
+**DEPENDENCY REPAIR VERIFIED BY NON-BROWSER GATES — BROWSER ACCEPTANCE BLOCKED.** Run the unchanged full browser suite and repeated mobile-voice gate on the exact candidate in a capable approved executor before release. Remote publication, CI, merge, production deployment and owner acceptance are not established by this local result.
+
 ## 2026-09-25 Checkpoint path concurrency fix
 
 Branch: `claude/quirky-sagan-1m56r5` (restarted from `main` after PR #72 merged)  
