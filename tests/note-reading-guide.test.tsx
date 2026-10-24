@@ -76,7 +76,10 @@ describe("note reading guide", () => {
     }
   });
 
-  it("limits the open menu to the available viewport space", async () => {
+  it.each([
+    { position: "below", top: 70, bottom: 140, height: "126px" },
+    { position: "above", top: 180, bottom: 250, height: "166px" },
+  ])("limits the $position menu using the guide's containing block", async ({ position, top, bottom, height }) => {
     vi.stubGlobal("innerHeight", 280);
     try {
       const { container } = render(
@@ -84,11 +87,21 @@ describe("note reading guide", () => {
       );
       await waitFor(() => expect(container.querySelector("details")).not.toBeNull());
       const menu = container.querySelector("details")!;
-      vi.spyOn(menu, "getBoundingClientRect").mockReturnValue({ top: 80, bottom: 130 } as DOMRect);
+      const guide = container.querySelector(".note-reading-guide")!;
+      vi.spyOn(guide, "getBoundingClientRect").mockReturnValue({ top, bottom } as DOMRect);
+      vi.spyOn(menu, "getBoundingClientRect").mockReturnValue({ top: top + 11, bottom: bottom - 11 } as DOMRect);
       menu.open = true;
       fireEvent(menu, new Event("toggle"));
-      expect(menu.dataset.menuPosition).toBe("below");
-      expect(menu.style.getPropertyValue("--note-menu-max-height")).toBe("136px");
+      expect(menu.dataset.menuPosition).toBe(position);
+      expect(menu.style.getPropertyValue("--note-menu-max-height")).toBe(height);
+
+      // Resize while open must recompute both placement and available height.
+      vi.stubGlobal("innerHeight", 600);
+      act(() => window.dispatchEvent(new Event("resize")));
+      await waitFor(() => {
+        expect(menu.dataset.menuPosition).toBe("below");
+        expect(menu.style.getPropertyValue("--note-menu-max-height")).toBe(`${Math.min(360, 600 - bottom - 14)}px`);
+      });
     } finally {
       vi.unstubAllGlobals();
     }
