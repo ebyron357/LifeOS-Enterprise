@@ -9,14 +9,17 @@ type Chapter = { id: string; label: string };
 export function NoteReadingGuide({ children, contentKey }: { children: ReactNode; contentKey: string }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLSpanElement>(null);
+  const guideRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDetailsElement>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [activeId, setActiveId] = useState("");
 
   function positionMenu() {
     const menu = menuRef.current;
-    if (!menu?.open) return;
-    const rect = menu.getBoundingClientRect();
+    const guide = guideRef.current;
+    if (!menu?.open || !guide) return;
+    // The absolute popup is positioned against the sticky guide, not details.
+    const rect = guide.getBoundingClientRect();
     const gap = 6;
     const edge = 8;
     const above = Math.max(0, rect.top - gap - edge);
@@ -101,7 +104,7 @@ export function NoteReadingGuide({ children, contentKey }: { children: ReactNode
   return (
     <div className="note-reading-surface" id="note-reader-start" tabIndex={-1}>
       {chapters.length > 1 ? (
-        <div className="note-reading-guide">
+        <div ref={guideRef} className="note-reading-guide">
           <details ref={menuRef} className="note-reading-menu" onToggle={positionMenu}>
             <summary>On this page<span aria-hidden="true">{activeChapter?.label}</span></summary>
             <nav aria-label="On this page">
