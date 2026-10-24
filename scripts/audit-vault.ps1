@@ -165,7 +165,7 @@ foreach ($jsonFile in $jsonFiles) {
   try {
     Get-Content $path -Raw | ConvertFrom-Json | Out-Null
   } catch {
-    $errors.Add("Invalid JSON: $jsonFile — $($_.Exception.Message)")
+    $errors.Add("Invalid JSON: $jsonFile - $($_.Exception.Message)")
   }
 }
 
